@@ -121,7 +121,7 @@ const Sidebar = (props) => {
             <img
               alt={logo.imgAlt}
               className="navbar-brand-img"
-              src={logo.imgSrc}
+              src={require("../../assets/img/brand/miracleLogo.png")}
             />
           </NavbarBrand>
         ) : null}
