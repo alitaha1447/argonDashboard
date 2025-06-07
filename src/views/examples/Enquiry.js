@@ -10,7 +10,6 @@ import {
     Label,
     Input,
     Button,
-    FormText,
 } from "reactstrap";
 import Header from "components/Headers/Header";
 import React, { useState } from "react";
