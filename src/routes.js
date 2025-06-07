@@ -21,6 +21,7 @@ import Maps from "views/examples/Maps.js";
 import Register from "views/examples/Register.js";
 import Login from "views/examples/Login.js";
 import Tables from "views/examples/Tables.js";
+import Enquiry from "views/examples/Enquiry";
 import Icons from "views/examples/Icons.js";
 
 var routes = [
@@ -59,6 +60,13 @@ var routes = [
     component: <Tables />,
     layout: "/admin",
   },
+   {
+    path: "/enquiry",
+    name: "Enquiry Form",
+    icon: "ni ni-ungroup text-red",
+    component: <Enquiry />,
+    layout: "/admin",
+  },
   {
     path: "/login",
     name: "Login",
@@ -73,5 +81,6 @@ var routes = [
     component: <Register />,
     layout: "/auth",
   },
+ 
 ];
 export default routes;
