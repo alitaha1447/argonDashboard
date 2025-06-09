@@ -22,6 +22,7 @@ import Register from "views/examples/Register.js";
 import Login from "views/examples/Login.js";
 import Tables from "views/examples/Tables.js";
 import Enquiry from "views/examples/Enquiry";
+import List from "views/examples/List";
 import Icons from "views/examples/Icons.js";
 
 var routes = [
@@ -60,11 +61,18 @@ var routes = [
     component: <Tables />,
     layout: "/admin",
   },
-   {
+  {
     path: "/enquiry",
     name: "Enquiry Form",
     icon: "ni ni-ungroup text-red",
     component: <Enquiry />,
+    layout: "/admin",
+  },
+  {
+    path: "/list",
+    name: "List",
+    icon: "ni ni-bullet-list-67 text-red",
+    component: <List />,
     layout: "/admin",
   },
   {
@@ -81,6 +89,6 @@ var routes = [
     component: <Register />,
     layout: "/auth",
   },
- 
+
 ];
 export default routes;
