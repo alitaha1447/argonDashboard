@@ -47,9 +47,7 @@ const Index = (props) => {
     setChartExample1Data("data" + index);
   };
 
-  const location = useLocation();
-  console.log(location.pathname);
-  const showStats = location.pathname === "/admin/index"; // ✅ Only for Index.js
+
   return (
     <>
       <Header />
