@@ -31,7 +31,7 @@ import {
 } from "variables/charts.js";
 
 import Header from "components/Headers/Header.js";
-import { useLocation } from "react-router-dom";
+// import { useLocation } from "react-router-dom";
 
 const Index = (props) => {
   const [activeNav, setActiveNav] = useState(1);
