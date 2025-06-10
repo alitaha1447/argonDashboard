@@ -127,7 +127,7 @@ const Sidebar = (props) => {
         </button>
         {/* Brand */}
         {logo ? (
-          <NavbarBrand className="pt-0" {...navbarBrandProps}>
+          <NavbarBrand className="pt-0 pb-0" {...navbarBrandProps} style={{ textAlign: 'left' }}>
             <img
               alt={logo.imgAlt}
               className="navbar-brand-img"
@@ -241,11 +241,25 @@ const Sidebar = (props) => {
           <Nav navbar>{createLinks(routes)}</Nav>
           {/* Divider */}
           <hr className="my-3" />
+          {/* <Nav className="mb-md-3" navbar>
+            <NavItem className="active-pro active">
+              <NavLink>
+                <i className="ni ni-spaceship" />
+                Support
+              </NavLink>
+            </NavItem>
+          </Nav> */}
           {/* Heading */}
-          <h6 className="navbar-heading text-muted">Documentation</h6>
+          {/* <h6 className="navbar-heading text-muted">Documentation</h6> */}
           {/* Navigation */}
           <Nav className="mb-md-3" navbar>
             <NavItem>
+              <NavLink>
+                <i className="ni ni-spaceship" />
+                Support
+              </NavLink>
+            </NavItem>
+            {/* <NavItem>
               <NavLink href="https://demos.creative-tim.com/argon-dashboard-react/#/documentation/overview?ref=adr-admin-sidebar">
                 <i className="ni ni-spaceship" />
                 Getting started
@@ -262,7 +276,7 @@ const Sidebar = (props) => {
                 <i className="ni ni-ui-04" />
                 Components
               </NavLink>
-            </NavItem>
+            </NavItem> */}
           </Nav>
           {/* <Nav className="mb-md-3" navbar>
             <NavItem className="active-pro active">
