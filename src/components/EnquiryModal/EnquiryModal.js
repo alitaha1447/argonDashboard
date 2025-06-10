@@ -18,12 +18,12 @@ const EnquiryModal = ({ modal, toggle, handleSubmit }) => {
     return (
         <div>
             <Modal isOpen={modal} toggle={toggle} size="lg" centered>
-                <Card className="shadow border-0 mb-0">
-                    <ModalHeader toggle={toggle} className="bg-white border-bottom">
+                <Card className="shadow border-0 mb-0" style={{ maxHeight: '90vh' }}>
+                    <ModalHeader toggle={toggle} className="bg-white border-bottom" style={{ position: "sticky", top: 0, zIndex: 10 }}>
                         <h2 className="mb-0">Enquiry Form</h2>
                     </ModalHeader>
 
-                    <ModalBody>
+                    <ModalBody style={{ overflowY: "auto", }}>
                         <Form>
                             <Row>
                                 <Col md={6}>
@@ -136,7 +136,8 @@ const EnquiryModal = ({ modal, toggle, handleSubmit }) => {
                         </Form>
                     </ModalBody>
 
-                    <ModalFooter>
+                    <ModalFooter className="bg-white border-top"
+                        style={{ position: "sticky", bottom: 0, zIndex: 10 }}>
                         <Button color="primary" onClick={handleSubmit}>
                             Submit
                         </Button>

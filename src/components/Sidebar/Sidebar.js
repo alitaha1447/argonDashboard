@@ -1,21 +1,3 @@
-/*!
-
-=========================================================
-* Argon Dashboard React - v1.2.4
-=========================================================
-
-* Product Page: https://www.creative-tim.com/product/argon-dashboard-react
-* Copyright 2024 Creative Tim (https://www.creative-tim.com)
-* Licensed under MIT (https://github.com/creativetimofficial/argon-dashboard-react/blob/master/LICENSE.md)
-
-* Coded by Creative Tim
-
-=========================================================
-
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-*/
-/*eslint-disable*/
 import { useState } from "react";
 import { NavLink as NavLinkRRD, Link } from "react-router-dom";
 // nodejs library to set properties for components
@@ -24,16 +6,16 @@ import { PropTypes } from "prop-types";
 // reactstrap components
 import {
   Button,
-  Card,
-  CardHeader,
-  CardBody,
-  CardTitle,
+  // Card,
+  // CardHeader,
+  // CardBody,
+  // CardTitle,
   Collapse,
   DropdownMenu,
   DropdownItem,
   UncontrolledDropdown,
   DropdownToggle,
-  FormGroup,
+  // FormGroup,
   Form,
   Input,
   InputGroupAddon,
@@ -45,8 +27,8 @@ import {
   NavItem,
   NavLink,
   Nav,
-  Progress,
-  Table,
+  // Progress,
+  // Table,
   Container,
   Row,
   Col,
@@ -69,22 +51,49 @@ const Sidebar = (props) => {
     setCollapseOpen(false);
   };
   // creates the links that appear in the left menu / Sidebar
+  // const createLinks = (routes) => {
+  //   console.log(routes)
+  //   return routes.map((prop, key) => {
+  //     return (
+  //       <NavItem key={key}>
+  //         <NavLink
+  //           to={prop.layout + prop.path}
+  //           tag={NavLinkRRD}
+  //           onClick={closeCollapse}
+  //         >
+  //           <i className={prop.icon} />
+  //           {prop.name}
+  //         </NavLink>
+  //       </NavItem>
+  //     );
+  //   });
+  // };
   const createLinks = (routes) => {
-    return routes.map((prop, key) => {
+    return routes.map((route, index) => {
+      if (route.isLabel) {
+        return (
+          <li key={index} className="nav-heading text-uppercase font-weight-bold text-muted mt-3 mb-2 px-3 small">
+            {route.name}
+          </li>
+        );
+      }
+
       return (
-        <NavItem key={key}>
+        <NavItem key={index} className="pl-4">
           <NavLink
-            to={prop.layout + prop.path}
+            to={route.layout + route.path}
             tag={NavLinkRRD}
             onClick={closeCollapse}
           >
-            <i className={prop.icon} />
-            {prop.name}
+            <i className={route.icon} />
+            <span className="ml-2">{route.name}</span>
           </NavLink>
         </NavItem>
       );
     });
   };
+
+
 
   const { bgColor, routes, logo } = props;
   let navbarBrandProps;
@@ -254,14 +263,14 @@ const Sidebar = (props) => {
               </NavLink>
             </NavItem>
           </Nav>
-          <Nav className="mb-md-3" navbar>
+          {/* <Nav className="mb-md-3" navbar>
             <NavItem className="active-pro active">
               <NavLink href="https://www.creative-tim.com/product/argon-dashboard-pro-react?ref=adr-admin-sidebar">
                 <i className="ni ni-spaceship" />
                 Upgrade to PRO
               </NavLink>
             </NavItem>
-          </Nav>
+          </Nav> */}
         </Collapse>
       </Container>
     </Navbar>

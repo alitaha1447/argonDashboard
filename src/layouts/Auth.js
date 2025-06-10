@@ -41,14 +41,16 @@ const Auth = (props) => {
     <>
       <div className="bg-gradient-info min-vh-100">
         <AuthNavbar />
-        <Container className="mt-2 pb-5">
-          <Row className="justify-content-center">
-            <Routes>
-              {getRoutes(routes)}
-              <Route path="*" element={<Navigate to="/auth/login" replace />} />
-            </Routes>
-          </Row>
-        </Container>
+        <div className="bg-gradient-info  d-flex align-items-center">
+          <Container>
+            <Row className="justify-content-center">
+              <Routes>
+                {getRoutes(routes)}
+                <Route path="*" element={<Navigate to="/auth/login" replace />} />
+              </Routes>
+            </Row>
+          </Container>
+        </div>
         {/* <div className="header bg-gradient-info py-7 py-lg-8">
           <Container>
             <div className="header-body text-center mb-7">

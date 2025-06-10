@@ -20,8 +20,26 @@ const Login = () => {
       <Col lg="5" md="7">
         <Card className="bg-secondary shadow border-0">
           <CardHeader className="bg-transparent pb-1">
-            <div className="text-center">
-              <h1>Login</h1>
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                position: 'relative',
+                height: '3rem',
+              }}
+            >
+              {/* Left-aligned logo */}
+              <div style={{ position: 'absolute', left: 0 }}>
+                <img
+                  alt="Logo"
+                  src={require("../../assets/img/brand/m.png")}
+                  style={{ height: '3rem' }}
+                />
+              </div>
+
+              {/* Centered text */}
+              <h1 style={{ margin: 0 }}>Login</h1>
             </div>
           </CardHeader>
           <CardBody className="px-lg-5 py-lg-5">
@@ -57,6 +75,9 @@ const Login = () => {
               <div className="text-center">
                 <Button className="my-0" color="primary" type="button">
                   Sign in
+                </Button>
+                <Button className="my-0" color="primary" type="button">
+                  Sign up
                 </Button>
               </div>
             </Form>

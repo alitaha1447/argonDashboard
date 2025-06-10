@@ -24,11 +24,35 @@ const List = () => {
         console.log("Enquiry form submitted");
     };
 
+    const data = [
+        {
+            firstName: "Taha",
+            lastName: "Ali",
+            email: "ali.taha1447@gmail.com",
+            contact: "+91-9981341447",
+            gender: "Male",
+        },
+        {
+            firstName: "John",
+            lastName: "Doe",
+            email: "john.doe@example.com",
+            contact: "+91-9123456789",
+            gender: "Male",
+        },
+        {
+            firstName: "Jane",
+            lastName: "Smith",
+            email: "jane.smith@example.com",
+            contact: "+91-9876543210",
+            gender: "Female",
+        },
+    ];
+
 
     return (
         <>
             <Header />
-            <Container className="mt--7" fluid>
+            <Container className="mt--9" fluid>
                 {/* Table */}
                 <Row>
                     <div className="col">
@@ -48,47 +72,47 @@ const List = () => {
                                     </Button>
                                 </div>
                             </CardHeader>
-                            <Table className="align-items-center table-flush" responsive>
-                                <thead className="thead-light">
-                                    <tr>
-                                        <th scope="col">First Name</th>
-                                        <th scope="col">Last Name</th>
-                                        <th scope="col">Email</th>
-                                        <th scope="col">Contact Number</th>
-                                        <th scope="col">Gender</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>Taha</td>
-                                        <td>Ali</td>
-                                        <td>ali.taha1447@gmail.com</td>
-                                        <td> +91-9981341447 </td>
-                                        <td>Male</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Taha</td>
-                                        <td>Ali</td>
-                                        <td>ali.taha1447@gmail.com</td>
-                                        <td> +91-9981341447 </td>
-                                        <td>Male</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Taha</td>
-                                        <td>Ali</td>
-                                        <td>ali.taha1447@gmail.com</td>
-                                        <td> +91-9981341447 </td>
-                                        <td>Male</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Taha</td>
-                                        <td>Ali</td>
-                                        <td>ali.taha1447@gmail.com</td>
-                                        <td> +91-9981341447 </td>
-                                        <td>Male</td>
-                                    </tr>
-                                </tbody>
-                            </Table>
+                            {/* ✅ Table View for Desktop (Large screens only) */}
+                            <div className="d-none d-lg-block">
+                                <Table className="align-items-center table-flush" responsive>
+                                    <thead className="thead-light">
+                                        <tr>
+                                            <th scope="col">First Name</th>
+                                            <th scope="col">Last Name</th>
+                                            <th scope="col">Email</th>
+                                            <th scope="col">Contact Number</th>
+                                            <th scope="col">Gender</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {
+                                            data.map((item, index) => (
+                                                <tr key={index}>
+                                                    <td>{item.firstName}</td>
+                                                    <td>{item.lastName}</td>
+                                                    <td>{item.email}</td>
+                                                    <td>{item.contact}</td>
+                                                    <td>{item.gender}</td>
+                                                </tr>
+                                            ))
+                                        }
+                                    </tbody>
+                                </Table>
+                            </div>
+                            {/* ✅ Card View for Mobile & Tablet */}
+                            <div className="d-block d-lg-none p-3">
+                                {data.map((item, index) => (
+                                    <Card key={index} className="mb-3 shadow-sm">
+                                        <div className="p-3">
+                                            <p className="fs-6 fw-semibold mb-1"><strong>First Name:</strong> {item.firstName}</p>
+                                            <p className="fs-6 fw-semibold mb-1"><strong>Last Name:</strong> {item.lastName}</p>
+                                            <p className="fs-6 fw-semibold mb-1"><strong>Email:</strong> {item.email}</p>
+                                            <p className="fs-6 fw-semibold mb-1"><strong>Contact:</strong> {item.contact}</p>
+                                            <p className="fs-6 fw-semibold mb-1"><strong>Gender:</strong> {item.gender}</p>
+                                        </div>
+                                    </Card>
+                                ))}
+                            </div>
                             <CardFooter className="py-4">
                                 <nav aria-label="...">
                                     <Pagination

@@ -33,7 +33,7 @@ const Enquiry = () => {
     return (
         <>
             <Header />
-            <Container className="mt--7" fluid>
+            <Container className="mt--9" fluid>
                 <Row className="justify-content-center">
                     <Col lg={12}>
                         <Card className="shadow">
