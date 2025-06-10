@@ -16,20 +16,20 @@ import UserCreation from "views/master/UserCreation";
 import Attendance from "views/transaction/Attendance";
 import Certificate from "views/transaction/Certificate";
 import CourseStructure from "views/transaction/CourseStructure";
-import HR_Payment from "views/transaction/HR_Payment";
+import HRPayment from "views/transaction/HRPayment";
 import Payable from "views/transaction/Payable";
-import Appointment_letter from "views/employee/Appointment_letter";
-import Experience_Certificate from "views/employee/Experience_Certificate";
+import Appointmentletter from "views/employee/Appointmentletter";
+import ExperienceCertificate from "views/employee/ExperienceCertificate";
 import Achievement from "views/employee/Achievement";
 import Relieving from "views/employee/Relieving";
-import Anuall_Increment from "views/employee/Anuall_Increment";
-import Intern_Fulltime from "views/employee/Intern_Fulltime";
+import AnuallIncrement from "views/employee/AnuallIncrement";
+import InternFulltime from "views/employee/InternFulltime";
 import Item from "views/inventory/Item";
 import Group from "views/inventory/Group";
 import Purchase from "views/inventory/Purchase";
 import Sale from "views/inventory/Sale";
 import Billing from "views/inventory/Billing";
-import E_Filling from "views/main_menu/E_Filling";
+import EFilling from "views/main_menu/EFilling";
 import Support from "views/main_menu/Support";
 
 
@@ -190,7 +190,7 @@ var routes = [
     path: "/hrPayment",
     name: "HR_Payment",
     icon: "ni ni-ungroup text-red",
-    component: <HR_Payment />,
+    component: <HRPayment />,
     layout: "/admin",
   },
   {
@@ -212,7 +212,7 @@ var routes = [
     path: "/appointmentLetter",
     name: "Appointment letter",
     icon: "ni ni-ungroup text-red",
-    component: <Appointment_letter />,
+    component: <Appointmentletter />,
     layout: "/admin",
   },
   {
@@ -226,7 +226,7 @@ var routes = [
     path: "/experienceCertificate",
     name: "Experience Certificate",
     icon: "ni ni-ungroup text-red",
-    component: <Experience_Certificate />,
+    component: <ExperienceCertificate />,
     layout: "/admin",
   },
   {
@@ -240,14 +240,14 @@ var routes = [
     path: "/anuallIncrement",
     name: "Anuall Increment",
     icon: "ni ni-ungroup text-red",
-    component: <Anuall_Increment />,
+    component: <AnuallIncrement />,
     layout: "/admin",
   },
   {
     path: "/internFulltime",
     name: "Intern Fulltime",
     icon: "ni ni-ungroup text-red",
-    component: <Intern_Fulltime />,
+    component: <InternFulltime />,
     layout: "/admin",
   },
   {
@@ -299,7 +299,7 @@ var routes = [
     path: "/eFilling",
     name: "E Filling",
     icon: "ni ni-ungroup text-red",
-    component: <E_Filling />,
+    component: <EFilling />,
     layout: "/admin",
   },
   {
