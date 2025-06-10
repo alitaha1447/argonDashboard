@@ -34,7 +34,7 @@ import {
   Col,
 } from "reactstrap";
 
-var ps;
+// var ps;
 
 const Sidebar = (props) => {
   const [collapseOpen, setCollapseOpen] = useState();
@@ -95,7 +95,8 @@ const Sidebar = (props) => {
 
 
 
-  const { bgColor, routes, logo } = props;
+  // const { bgColor, routes, logo } = props;
+  const { routes, logo } = props;
   let navbarBrandProps;
   if (logo && logo.innerLink) {
     navbarBrandProps = {
