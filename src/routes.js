@@ -10,6 +10,7 @@ import List from "views/examples/List";
 // import Test from "views/examples/Test";
 import ContentMaster from "views/master/ContentMaster";
 import CourseMaster from "views/master/CourseMaster";
+import ContentType from "views/master/ContentType";
 import EnquiryType from "views/master/EnquiryType";
 import FeesMaster from "views/master/FeesMaster";
 import UserCreation from "views/master/UserCreation";
@@ -126,41 +127,195 @@ var routes = [
     isLabel: true,
   },
   {
-    path: "/contentMaster",
-    name: "ContentMaster",
-    icon: "ni ni-ungroup text-red",
-    component: <ContentMaster />,
+    name: "User",
+    icon: "ni ni-folder-17 text-orange",
     layout: "/admin",
-  },
+    children: [{
 
-  {
-    path: "/courseMaster",
-    name: "CourseMaster",
-    icon: "ni ni-ungroup text-red",
-    component: <CourseMaster />,
-    layout: "/admin",
+      path: "/userCreation",
+      name: "User Creation",
+      icon: "ni ni-single-copy-04 text-red",
+      component: <UserCreation />,
+      layout: "/admin",
+
+    },]
   },
   {
-    path: "/enquiryType",
-    name: "EnquiryType",
-    icon: "ni ni-ungroup text-red",
-    component: <EnquiryType />,
+    name: "Course",
+    icon: "ni ni-folder-17 text-orange",
     layout: "/admin",
+    children: [{
+
+      path: "/courseStructure",
+      name: "Course Structure",
+      icon: "ni ni-single-copy-04 text-red",
+      component: <CourseStructure />,
+      layout: "/admin",
+
+    },
+    {
+      path: "/courseMaster",
+      name: "CourseMaster",
+      icon: "ni ni-ungroup text-red",
+      component: <CourseMaster />,
+      layout: "/admin",
+    }]
   },
   {
-    path: "/feesMaster",
-    name: "FeesMaster",
-    icon: "ni ni-ungroup text-red",
-    component: <FeesMaster />,
+    name: "Inventory",
+    icon: "ni ni-folder-17 text-orange",
     layout: "/admin",
+    children: [{
+
+      path: "/item",
+      name: "Item",
+      icon: "ni ni-single-copy-04 text-red",
+      component: <Item />,
+      layout: "/admin",
+
+    }, {
+
+      path: "/group",
+      name: "Group",
+      icon: "ni ni-single-copy-04 text-red",
+      component: <Group />,
+      layout: "/admin",
+
+    }]
   },
   {
-    path: "/userCreation",
-    name: "UserCreation",
-    icon: "ni ni-ungroup text-red",
-    component: <UserCreation />,
+    name: "Content",
+    icon: "ni ni-folder-17 text-orange",
     layout: "/admin",
+    children: [{
+
+      path: "/contentMaster",
+      name: "Content Master",
+      icon: "ni ni-single-copy-04 text-red",
+      component: <ContentMaster />,
+      layout: "/admin",
+
+    }, {
+
+      path: "/contentType",
+      name: "Content Type",
+      icon: "ni ni-single-copy-04 text-red",
+      component: <ContentType />,
+      layout: "/admin",
+
+    }]
   },
+  {
+    name: "Enquiry",
+    icon: "ni ni-folder-17 text-orange",
+    layout: "/admin",
+    children: [{
+      path: "/enquiryType",
+      name: "Enquiry Type",
+      icon: "ni ni-single-copy-04 text-red",
+      component: <EnquiryType />,
+      layout: "/admin",
+    },
+    {
+      path: "/group",
+      name: "Group",
+      icon: "ni ni-single-copy-04 text-red",
+      component: <Group />,
+      layout: "/admin",
+
+    }]
+  },
+  {
+    name: "HR",
+    icon: "ni ni-folder-17 text-orange",
+    layout: "/admin",
+    // children: [{
+    //   path: "/enquiryType",
+    //   name: "Enquiry Type",
+    //   icon: "ni ni-single-copy-04 text-red",
+    //   component: <EnquiryType />,
+    //   layout: "/admin",
+    // },
+    // {
+    //   path: "/group",
+    //   name: "Group",
+    //   icon: "ni ni-single-copy-04 text-red",
+    //   component: <Group />,
+    //   layout: "/admin",
+
+    // }]
+  },
+  {
+    name: "Fees",
+    icon: "ni ni-folder-17 text-orange",
+    layout: "/admin",
+    children: [{
+      path: "/feesMaster",
+      name: "Fees Master",
+      icon: "ni ni-single-copy-04 text-red",
+      component: <FeesMaster />,
+      layout: "/admin",
+    },
+    ]
+  },
+  // {
+  //   path: "/contentMaster",
+  //   name: "ContentMaster",
+  //   icon: "ni ni-ungroup text-red",
+  //   component: <ContentMaster />,
+  //   layout: "/admin",
+  // },
+
+  // {
+  //   path: "/courseMaster",
+  //   name: "CourseMaster",
+  //   icon: "ni ni-ungroup text-red",
+  //   component: <CourseMaster />,
+  //   layout: "/admin",
+  // },
+  // {
+  //   path: "/enquiryType",
+  //   name: "EnquiryType",
+  //   icon: "ni ni-ungroup text-red",
+  //   component: <EnquiryType />,
+  //   layout: "/admin",
+  // },
+  // {
+  //   path: "/feesMaster",
+  //   name: "FeesMaster",
+  //   icon: "ni ni-ungroup text-red",
+  //   component: <FeesMaster />,
+  //   layout: "/admin",
+  // },
+  // {
+  //   path: "/userCreation",
+  //   name: "UserCreation",
+  //   icon: "ni ni-ungroup text-red",
+  //   component: <UserCreation />,
+  //   layout: "/admin",
+  // },
+  // {
+  //   name: "Forms",
+  //   icon: "ni ni-folder-17 text-orange",
+  //   layout: "/admin",
+  //   children: [
+  //     {
+  //       path: "/enquiry",
+  //       name: "Enquiry Form",
+  //       icon: "ni ni-single-copy-04 text-red",
+  //       component: <Enquiry />,
+  //       layout: "/admin",
+  //     },
+  //     {
+  //       path: "/list",
+  //       name: "List",
+  //       icon: "ni ni-bullet-list-67 text-blue",
+  //       component: <List />,
+  //       layout: "/admin",
+  //     }
+  //   ]
+  // },
+
   {
     name: "Transaction", // 👈 just a label, no path
     isLabel: true,

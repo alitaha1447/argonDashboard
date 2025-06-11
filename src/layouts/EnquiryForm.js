@@ -8,7 +8,7 @@ import {
   Form,
   Button,
 } from "reactstrap";
-import Header from "components/Headers/Header";
+// import Header from "components/Headers/Header";
 import InputField from "components/FormFields/InputField";
 import RadioGroup from "components/FormFields/RadioGroup";
 import SelectField from "components/FormFields/SelectField";
@@ -28,20 +28,8 @@ const genderOptions = ["Male", "Female", "Prefer not to say"];
 const refOptions = ["Social Media", "Friends / Relatives", "Website", "Other"];
 
 const Enquiry = () => {
-  // const [isConfirmed, setIsConfirmed] = useState(false);
-
-  // const handleCheckboxChange = () => {
-  //   setIsConfirmed(!isConfirmed);
-  // };
   const handleSubmit = (e) => {
     e.preventDefault();
-
-    // if (!isConfirmed) {
-    //   console.log("Please confirm the details before submitting.");
-    //   return;
-    // }
-
-    // console.log("Form submitted successfully.");
   };
   const courseOptions = [
     "MERN",
@@ -64,8 +52,7 @@ const Enquiry = () => {
   ];
   return (
     <>
-      <Header />
-      <Container className="mt--9" fluid>
+      <Container className="container mt-5 mb-5" fluid>
         <Row className="justify-content-center">
           <Col lg={12}>
             <Card className="shadow">

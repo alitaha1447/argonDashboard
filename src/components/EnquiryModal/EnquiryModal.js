@@ -1,154 +1,144 @@
 import React from "react";
 import {
-    Modal,
-    ModalHeader,
-    ModalBody,
-    ModalFooter,
-    Form,
-    FormGroup,
-    Label,
-    Input,
-    Button,
-    Row,
-    Col,
-    Card,
+  Modal,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  Form,
+  Button,
+  Row,
+  Col,
+  Card,
 } from "reactstrap";
+import CheckboxGroup from "components/FormFields/CheckboxGroup";
+import FileUploadField from "components/FormFields/FileUploadField";
+import InputField from "components/FormFields/InputField";
+import RadioGroup from "components/FormFields/RadioGroup";
+import SelectField from "components/FormFields/SelectField";
+import TextAreaField from "components/FormFields/TextAreaField";
+
+const qualificationOptions = [
+  "10th",
+  "12th",
+  "Diploma",
+  "Graduate",
+  "Post Graduate",
+];
+const genderOptions = ["Male", "Female", "Prefer not to say"];
+const refOptions = ["Social Media", "Friends / Relatives", "Website", "Other"];
+const courseOptions = [
+  "MERN",
+  "MEAN",
+  "Full Stack Web Development",
+  "C/C++/Data Structures",
+  "Java Full Stack",
+  "Python",
+  "PHP",
+  "Artificial Intelligence",
+  "Machine Learning",
+  "Big Data",
+  "Data Science",
+  "Data Analytics",
+  "IT Security & Ethical Hacking",
+  "Cloud Computing",
+  "Devops",
+  "AWS/Azure",
+  "Other",
+];
 
 const EnquiryModal = ({ modal, toggle, handleSubmit }) => {
-    return (
-        <div>
-            <Modal isOpen={modal} toggle={toggle} size="lg" centered>
-                <Card className="shadow border-0 mb-0" style={{ maxHeight: '90vh' }}>
-                    <ModalHeader toggle={toggle} className="bg-white border-bottom" style={{ position: "sticky", top: 0, zIndex: 10 }}>
-                        <h2 className="mb-0">Enquiry Form</h2>
-                    </ModalHeader>
+  return (
+    <div>
+      <Modal isOpen={modal} toggle={toggle} size="lg" centered>
+        <Card className="shadow border-0 mb-0" style={{ maxHeight: "90vh" }}>
+          <ModalHeader
+            toggle={toggle}
+            className="bg-white border-bottom"
+            style={{ position: "sticky", top: 0, zIndex: 10 }}
+          >
+            <h2 className="mb-0">Enquiry Form</h2>
+          </ModalHeader>
 
-                    <ModalBody style={{ overflowY: "auto", }}>
-                        <Form>
-                            <Row>
-                                <Col md={6}>
-                                    <FormGroup>
-                                        <Label for="firstName">First Name</Label>
-                                        <Input
-                                            id="firstName"
-                                            name="firstName"
-                                            placeholder="Enter first name"
-                                            type="text"
-                                        />
-                                    </FormGroup>
-                                </Col>
-                                <Col md={6}>
-                                    <FormGroup>
-                                        <Label for="lastName">Last Name</Label>
-                                        <Input
-                                            id="lastName"
-                                            name="lastName"
-                                            placeholder="Enter last name"
-                                            type="text"
-                                        />
-                                    </FormGroup>
-                                </Col>
-                            </Row>
+          <ModalBody style={{ overflowY: "auto" }}>
+            <Form onSubmit={handleSubmit}>
+              <Row>
+                <Col md={6}>
+                  <InputField label="Full Name" id="fullName" type="text" />
+                </Col>
+                <Col md={6}>
+                  <InputField label="Email" id="email" type="email" />
+                </Col>
+              </Row>
+              <Row>
+                <Col md={6}>
+                  <InputField label="Contact Number" id="contact" type="tel" />
+                </Col>
+                <Col md={6}>
+                  <InputField label="Address" id="contact" type="text" />
+                </Col>
+              </Row>
+              <RadioGroup
+                label="Gender"
+                name="gender"
+                options={genderOptions}
+              />
+              <Row>
+                <Col md={5}>
+                  <SelectField
+                    label="Highest Qualification"
+                    id="qualification"
+                    options={qualificationOptions}
+                  />
+                </Col>
+                <Col md={7}>
+                  <CheckboxGroup
+                    label="Preferred Courses"
+                    name="courses"
+                    options={courseOptions}
+                  />
+                </Col>
+              </Row>
+              <RadioGroup
+                label="How did you hear about us?"
+                name="refSource"
+                options={refOptions}
+              />
+              <Row>
+                <Col md={6}>
+                  <InputField
+                    label="WhatsApp Number for Updates"
+                    id="whatsapp"
+                    type="tel"
+                  />
+                </Col>
+                <Col md={6}>
+                  <TextAreaField label="Any Additional Query" id="about" />
+                </Col>
+              </Row>
+              <FileUploadField label="Upload Resume" id="resume" />
+              <div className="text-end">
+                <Button type="submit" color="primary">
+                  Submit
+                </Button>
+              </div>
+            </Form>
+          </ModalBody>
 
-                            <Row>
-                                <Col md={6}>
-                                    <FormGroup>
-                                        <Label for="email">Email</Label>
-                                        <Input
-                                            id="email"
-                                            name="email"
-                                            placeholder="Enter email"
-                                            type="email"
-                                        />
-                                    </FormGroup>
-                                </Col>
-                                <Col md={6}>
-                                    <FormGroup>
-                                        <Label for="contact">Contact Number</Label>
-                                        <Input
-                                            id="contact"
-                                            name="contact"
-                                            placeholder="Enter contact number"
-                                            type="tel"
-                                        />
-                                    </FormGroup>
-                                </Col>
-                            </Row>
-
-                            <FormGroup tag="fieldset">
-                                <Label>Gender</Label>
-                                <Row>
-                                    <Col md={3}>
-                                        <FormGroup check>
-                                            <Input name="gender" type="radio" id="male" />
-                                            <Label check for="male">
-                                                Male
-                                            </Label>
-                                        </FormGroup>
-                                    </Col>
-                                    <Col md={3}>
-                                        <FormGroup check>
-                                            <Input name="gender" type="radio" id="female" />
-                                            <Label check for="female">
-                                                Female
-                                            </Label>
-                                        </FormGroup>
-                                    </Col>
-                                    <Col md={3}>
-                                        <FormGroup check>
-                                            <Input name="gender" type="radio" id="other" />
-                                            <Label check for="other">
-                                                Other
-                                            </Label>
-                                        </FormGroup>
-                                    </Col>
-                                </Row>
-                            </FormGroup>
-
-                            <FormGroup>
-                                <Label for="selectChoice">Select Your Choice</Label>
-                                <Input type="select" name="choice" id="selectChoice">
-                                    <option value="">-- Select --</option>
-                                    <option>General Enquiry</option>
-                                    <option>Support</option>
-                                    <option>Feedback</option>
-                                    <option>Others</option>
-                                </Input>
-                            </FormGroup>
-
-                            <FormGroup>
-                                <Label for="about">About</Label>
-                                <Input
-                                    type="textarea"
-                                    name="about"
-                                    id="about"
-                                    placeholder="Write something about your enquiry..."
-                                    rows="4"
-                                />
-                            </FormGroup>
-
-                            <FormGroup check className="mb-0">
-                                <Input type="checkbox" id="confirmCheck" />
-                                <Label check for="confirmCheck">
-                                    I confirm the above details are correct
-                                </Label>
-                            </FormGroup>
-                        </Form>
-                    </ModalBody>
-
-                    <ModalFooter className="bg-white border-top"
-                        style={{ position: "sticky", bottom: 0, zIndex: 10 }}>
-                        <Button color="primary" onClick={handleSubmit}>
-                            Submit
-                        </Button>
-                        <Button color="secondary" onClick={toggle}>
-                            Cancel
-                        </Button>
-                    </ModalFooter>
-                </Card>
-            </Modal>
-        </div>
-    );
+          <ModalFooter
+            className="bg-white border-top"
+            style={{ position: "sticky", bottom: 0, zIndex: 10 }}
+          >
+            <Button color="primary" onClick={handleSubmit}>
+              Submit
+            </Button>
+            <Button color="secondary" onClick={toggle}>
+              Cancel
+            </Button>
+          </ModalFooter>
+        </Card>
+      </Modal>
+    </div>
+  );
 };
 
 export default EnquiryModal;

@@ -38,6 +38,9 @@ import {
 
 const Sidebar = (props) => {
   const [collapseOpen, setCollapseOpen] = useState();
+  const [openDropdowns, setOpenDropdowns] = useState({});
+  console.log(openDropdowns, 'oopsJSKXJ')
+
   // verifies if routeName is the one active (in browser input)
   // const activeRoute = (routeName) => {
   //   return props.location.pathname.indexOf(routeName) > -1 ? "active" : "";
@@ -50,6 +53,8 @@ const Sidebar = (props) => {
   const closeCollapse = () => {
     setCollapseOpen(false);
   };
+
+
   // creates the links that appear in the left menu / Sidebar
   // const createLinks = (routes) => {
   //   console.log(routes)
@@ -69,21 +74,75 @@ const Sidebar = (props) => {
   //   });
   // };
   const createLinks = (routes) => {
+
+    const toggleDropdown = (name) => {
+      console.log(name)
+      setOpenDropdowns((prev) => ({
+        ...prev,
+        [name]: !prev[name],
+      }));
+    };
+
     return routes.map((route, index) => {
+      // Label (like "Master")
       if (route.isLabel) {
         return (
-          <li key={index} className="nav-heading text-uppercase font-weight-bold text-muted mt-3 mb-2 px-3 small">
+          <li
+            key={index}
+            className="nav-heading text-uppercase font-weight-bold text-muted mt-3 mb-2 px-3 small"
+          >
             {route.name}
           </li>
         );
       }
 
+      // Dropdown (has children)
+      if (route.children && route.children.length > 0) {
+        return (
+          <div key={index}>
+            <NavItem className="pl-2">
+              <div
+                className="nav-link d-flex align-items-center cursor-pointer"
+                onClick={() => toggleDropdown(route.name)}
+                style={{ cursor: "pointer" }}
+              >
+                <i className={route.icon} />
+                <span className="ml-0">{route.name}</span>
+                <i
+                  className={`ml-auto fas fa-chevron-${openDropdowns[route.name] ? "up" : "down"
+                    }`}
+                />
+              </div>
+              <Collapse isOpen={openDropdowns[route.name]}>
+                <Nav className="nav-sm flex-column ml-0">
+                  {route.children.map((child, idx) => (
+                    <NavItem key={idx}>
+                      <NavLink
+                        to={child.layout + child.path}
+                        tag={NavLinkRRD}
+                        onClick={closeCollapse}
+                      // activeClassName="active"
+                      >
+                        <i className={child.icon} />
+                        <span className="ml-0">{child.name}</span>
+                      </NavLink>
+                    </NavItem>
+                  ))}
+                </Nav>
+              </Collapse>
+            </NavItem>
+          </div>
+        );
+      }
+
+      // Normal nav item
       return (
-        <NavItem key={index} className="pl-4">
+        <NavItem key={index} className="pl-2">
           <NavLink
             to={route.layout + route.path}
             tag={NavLinkRRD}
             onClick={closeCollapse}
+          // activeClassName="active"
           >
             <i className={route.icon} />
             <span className="ml-2">{route.name}</span>
@@ -92,6 +151,7 @@ const Sidebar = (props) => {
       );
     });
   };
+
 
 
 

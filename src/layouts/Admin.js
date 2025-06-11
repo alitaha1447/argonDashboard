@@ -19,26 +19,56 @@ const Admin = (props) => {
     mainContent.current.scrollTop = 0;
   }, [location]);
 
+  // const getRoutes = (routes) => {
+  //   return routes.map((prop, key) => {
+  //     // if (prop.children) {
+  //     //   return prop.children.map((child, i) => (
+  //     //     <Route
+  //     //       path={child.path}
+  //     //       element={child.component}
+  //     //       key={`${key}-${i}`}
+  //     //     />
+  //     //   ));
+  //     // }
+  //     if (prop.layout === "/admin") {
+  //       return (
+  //         <Route path={prop.path} element={prop.component} key={key} exact />
+  //       );
+  //     } else {
+  //       return null;
+  //     }
+  //   });
+  // };
+
   const getRoutes = (routes) => {
-    return routes.map((prop, key) => {
-      // if (prop.children) {
-      //   return prop.children.map((child, i) => (
-      //     <Route
-      //       path={child.path}
-      //       element={child.component}
-      //       key={`${key}-${i}`}
-      //     />
-      //   ));
-      // }
-      if (prop.layout === "/admin") {
-        return (
-          <Route path={prop.path} element={prop.component} key={key} exact />
-        );
-      } else {
-        return null;
+    console.log(routes)
+    return routes.flatMap((route, key) => {
+      // Render child routes if present
+      if (route.children && route.children.length) {
+        return route.children.map((child, idx) => (
+          <Route
+            path={child.path}
+            element={child.component}
+            key={`${key}-${idx}`}
+          />
+        ));
       }
+
+      // Render normal route
+      if (route.layout === "/admin") {
+        return (
+          <Route
+            path={route.path}
+            element={route.component}
+            key={key}
+          />
+        );
+      }
+
+      return [];
     });
   };
+
 
   const getBrandText = (path) => {
     for (let i = 0; i < routes.length; i++) {
@@ -63,15 +93,17 @@ const Admin = (props) => {
           imgAlt: "...",
         }}
       />
-      <div className="main-content" ref={mainContent}>
+      <div className="main-content d-flex flex-column min-vh-100" ref={mainContent}>
         <AdminNavbar
           {...props}
           brandText={getBrandText(props?.location?.pathname)}
         />
-        <Routes>
-          {getRoutes(routes)}
-          <Route path="*" element={<Navigate to="/admin/index" replace />} />
-        </Routes>
+        <div className="flex-grow-1">
+          <Routes>
+            {getRoutes(routes)}
+            <Route path="*" element={<Navigate to="/admin/index" replace />} />
+          </Routes>
+        </div>
         <Container fluid>
           <AdminFooter />
         </Container>

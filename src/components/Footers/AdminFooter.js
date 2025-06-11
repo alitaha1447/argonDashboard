@@ -30,7 +30,7 @@ const Footer = () => {
               </NavLink>
             </NavItem>
 
-            <NavItem>
+            {/* <NavItem>
               <NavLink
                 href="https://www.creative-tim.com/presentation?ref=adr-admin-footer"
                 rel="noopener noreferrer"
@@ -58,7 +58,7 @@ const Footer = () => {
               >
                 MIT License
               </NavLink>
-            </NavItem>
+            </NavItem> */}
           </Nav>
         </Col>
       </Row>
