@@ -124,8 +124,8 @@ const Enquiry = () => {
           <Col lg={12}>
             <Card className="shadow">
               <CardHeader className="bg-white">
-                <div className="d-flex justify-content-between align-items-center w-100 pb-2">
-                  <h1 className="mb-0">Enquiry Form</h1>
+                <div className="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center w-100 pb-2 gap-2">
+                  <h1 className="mb-2 mb-md-0">Enquiry Form</h1>
                   <div style={{ width: "200px" }}>
                     <Select
                       options={enquiry}

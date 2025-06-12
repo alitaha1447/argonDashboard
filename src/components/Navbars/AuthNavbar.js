@@ -16,14 +16,13 @@ const AdminNavbar = () => {
   return (
     <>
       <Navbar className="navbar-top navbar-horizontal navbar-dark" expand="md">
-        <Container className="px-4">
+        <Container className="px-0">
           <NavbarBrand to="/" tag={Link}>
-            <div style={{ height: '3rem' }}>
-
+            <div style={{ height: "3rem" }}>
               <img
                 alt="..."
                 src={require("../../assets/img/brand/miracleLogo.png")}
-                style={{ height: '100%' }}
+                style={{ height: "100%" }}
               />
             </div>
           </NavbarBrand>
