@@ -1,11 +1,12 @@
 import React from "react";
-import { FormGroup, Label, Input, Col } from "reactstrap";
+import { FormGroup, Label, Input } from "reactstrap";
 
 const RadioGroup = ({ label, name, options }) => {
   return (
     <FormGroup tag="fieldset">
       <Label>{label}</Label>
-      <Col md={4}>
+      {/* <Col md={4}> */}
+      <div style={{ display: "flex", gap: "20px", alignItems: "center" }}>
         {options.map((opt, idx) => {
           const value = opt.toLowerCase().replace(/\s+/g, "");
           return (
@@ -17,7 +18,8 @@ const RadioGroup = ({ label, name, options }) => {
             </FormGroup>
           );
         })}
-      </Col>
+      </div>
+      {/* </Col> */}
     </FormGroup>
   );
 };
