@@ -18,7 +18,7 @@ import RadioGroup from "components/FormFields/RadioGroup";
 import TextAreaField from "components/FormFields/TextAreaField";
 import FileUploadField from "components/FormFields/FileUploadField";
 import React, { useState } from "react";
-import Select from "react-select";
+import Select, { components } from "react-select";
 
 const products = [
   { value: "erp", label: "ERP" },
@@ -74,6 +74,21 @@ const Enquiry = () => {
   const [selectedEnquiry, setSelectedEnquiry] = useState(enquiry[0]);
   const [selectedProduct, setSelectedProduct] = useState();
   const [selectedBranch, setSelectedBranch] = useState([]);
+
+  // Custom Option component with checkbox
+  const CheckboxOption = (props) => {
+    return (
+      <components.Option {...props}>
+        <input
+          type="checkbox"
+          checked={props.isSelected}
+          onChange={() => null}
+          style={{ marginRight: 10 }}
+        />
+        <label>{props.label}</label>
+      </components.Option>
+    );
+  };
 
   // const [isConfirmed, setIsConfirmed] = useState(false);
 
@@ -154,25 +169,43 @@ const Enquiry = () => {
                     options={genderOptions}
                   />
                   <Row>
-                    <Col md={6}>
-                      <FormGroup>
-                        <Label for="Courses">Highest Qualification</Label>
-                        <Select
-                          options={qualificationOptions}
-                          value={selectedQualification}
-                          onChange={handleChangeQualification}
-                        />
-                      </FormGroup>
-                    </Col>
+                    {selectedEnquiry.value === "course" && (
+                      <Col md={6}>
+                        <FormGroup>
+                          <Label for="Courses">Highest Qualification</Label>
+                          <Select
+                            options={qualificationOptions}
+                            value={selectedQualification}
+                            onChange={handleChangeQualification}
+                          />
+                        </FormGroup>
+                      </Col>
+                    )}
+
                     <Col md={6}>
                       {selectedEnquiry.value === "course" ? (
                         <FormGroup>
                           <Label for="Courses">Preferred Courses</Label>
                           <Select
-                            options={options}
+                            inputId="Courses"
                             isMulti
+                            closeMenuOnSelect={false}
+                            hideSelectedOptions={false}
+                            components={{ Option: CheckboxOption }}
+                            options={options}
                             value={selectedOptions}
                             onChange={handleChange}
+                            styles={{
+                              option: (provided, state) => ({
+                                ...provided,
+                                backgroundColor: state.isSelected
+                                  ? "#f8f9fa"
+                                  : state.isFocused
+                                  ? "#f1f1f1"
+                                  : "white",
+                                color: "black",
+                              }),
+                            }}
                           />
                         </FormGroup>
                       ) : (
@@ -186,16 +219,18 @@ const Enquiry = () => {
                         </FormGroup>
                       )}
                     </Col>
-                    <Col md={6}>
-                      <FormGroup>
-                        <Label for="Courses">Branch</Label>
-                        <Select
-                          options={branch}
-                          value={selectedBranch}
-                          onChange={handleChangeBranch}
-                        />
-                      </FormGroup>
-                    </Col>
+                    {selectedEnquiry.value === "course" && (
+                      <Col md={6}>
+                        <FormGroup>
+                          <Label for="Courses">Branch</Label>
+                          <Select
+                            options={branch}
+                            value={selectedBranch}
+                            onChange={handleChangeBranch}
+                          />
+                        </FormGroup>
+                      </Col>
+                    )}
                   </Row>
                   <RadioGroup
                     label="How did you hear about us?"
