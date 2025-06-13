@@ -21,8 +21,8 @@ import React, { useState } from "react";
 import Select, { components } from "react-select";
 import AuthNavbar from "components/Navbars/AuthNavbar.js";
 
-const apiKey = process.env.REACT_APP_API_KEY;
-console.log(`API Key: ${apiKey}`);
+const apipath = process.env.REACT_APP_API_PATH;
+console.log(`API Key: ${apipath}`);
 
 const products = [
   { value: "erp", label: "ERP" },

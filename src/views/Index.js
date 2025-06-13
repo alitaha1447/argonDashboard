@@ -1,5 +1,4 @@
-
-import { useState, } from "react";
+import { useState } from "react";
 // node.js library that concatenates classes (strings)
 import classnames from "classnames";
 // javascipt plugin for creating charts
@@ -47,10 +46,14 @@ const Index = (props) => {
     setChartExample1Data("data" + index);
   };
 
-
   return (
     <>
-      <Header />
+      <Header
+        cardTitle1={"Traffic"}
+        cardTitle2={"New Users"}
+        cardTitle3={"Sales"}
+        cardTitle4={"Performances"}
+      />
       {/* Page content */}
       <Container className="mt--7" fluid>
         <Row>

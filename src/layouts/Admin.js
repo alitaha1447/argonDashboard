@@ -41,7 +41,7 @@ const Admin = (props) => {
   // };
 
   const getRoutes = (routes) => {
-    console.log(routes)
+    // console.log(routes);
     return routes.flatMap((route, key) => {
       // Render child routes if present
       if (route.children && route.children.length) {
@@ -56,19 +56,12 @@ const Admin = (props) => {
 
       // Render normal route
       if (route.layout === "/admin") {
-        return (
-          <Route
-            path={route.path}
-            element={route.component}
-            key={key}
-          />
-        );
+        return <Route path={route.path} element={route.component} key={key} />;
       }
 
       return [];
     });
   };
-
 
   const getBrandText = (path) => {
     for (let i = 0; i < routes.length; i++) {
@@ -93,7 +86,10 @@ const Admin = (props) => {
           imgAlt: "...",
         }}
       />
-      <div className="main-content d-flex flex-column min-vh-100" ref={mainContent}>
+      <div
+        className="main-content d-flex flex-column min-vh-100"
+        ref={mainContent}
+      >
         <AdminNavbar
           {...props}
           brandText={getBrandText(props?.location?.pathname)}

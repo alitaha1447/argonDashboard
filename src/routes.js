@@ -37,6 +37,7 @@ import GramPanchayat from "views/master/GramPanchayat";
 import Block from "views/master/Block";
 import District from "views/master/District";
 import State from "views/master/State";
+import EnquiryDashboard from "views/dashboard/EnquiryDashboard";
 
 var routes = [
   {
@@ -48,6 +49,13 @@ var routes = [
     name: "Dashboard",
     icon: "ni ni-tv-2 text-primary",
     component: <Index />,
+    layout: "/admin",
+  },
+  {
+    path: "/enquiryDashboard",
+    name: "Enquiry Dashboard",
+    icon: "ni ni-tv-2 text-primary",
+    component: <EnquiryDashboard />,
     layout: "/admin",
   },
   {
@@ -149,7 +157,7 @@ var routes = [
     children: [
       {
         path: "/courseStructure",
-        name: "Course Structure",
+        name: "CourseStructure",
         icon: "ni ni-single-copy-04 text-red",
         component: <CourseStructure />,
         layout: "/admin",
@@ -370,22 +378,65 @@ var routes = [
         component: <Payable />,
         layout: "/admin",
       },
-    ],
-  },
-  {
-    name: "Course",
-    icon: "ni ni-folder-17 text-orange",
-    layout: "/admin",
-    children: [
+
       {
-        path: "/courseStructure",
-        name: "CourseStructure",
+        path: "/appointmentLetter",
+        name: "Appointment letter",
         icon: "ni ni-ungroup text-red",
-        component: <CourseStructure />,
+        component: <Appointmentletter />,
+        layout: "/admin",
+      },
+      {
+        path: "/relieving",
+        name: "Relieving Letter",
+        icon: "ni ni-ungroup text-red",
+        component: <Relieving />,
+        layout: "/admin",
+      },
+      {
+        path: "/experienceCertificate",
+        name: "Experience Certificate",
+        icon: "ni ni-ungroup text-red",
+        component: <ExperienceCertificate />,
+        layout: "/admin",
+      },
+      {
+        path: "/achievement",
+        name: "Achievement",
+        icon: "ni ni-ungroup text-red",
+        component: <Achievement />,
+        layout: "/admin",
+      },
+      {
+        path: "/anuallIncrement",
+        name: "Anuall Increment",
+        icon: "ni ni-ungroup text-red",
+        component: <AnuallIncrement />,
+        layout: "/admin",
+      },
+      {
+        path: "/internFulltime",
+        name: "Intern Fulltime",
+        icon: "ni ni-ungroup text-red",
+        component: <InternFulltime />,
         layout: "/admin",
       },
     ],
   },
+  // {
+  //   name: "Course",
+  //   icon: "ni ni-folder-17 text-orange",
+  //   layout: "/admin",
+  //   children: [
+  //     {
+  //       path: "/courseStructure",
+  //       name: "CourseStructure",
+  //       icon: "ni ni-ungroup text-red",
+  //       component: <CourseStructure />,
+  //       layout: "/admin",
+  //     },
+  //   ],
+  // },
   {
     name: "Certifcate",
     icon: "ni ni-folder-17 text-orange",
@@ -419,78 +470,44 @@ var routes = [
         component: <Purchase />,
         layout: "/admin",
       },
+      {
+        path: "/billing",
+        name: "Billing",
+        icon: "ni ni-ungroup text-red",
+        component: <Billing />,
+        layout: "/admin",
+      },
     ],
   },
 
-  {
-    path: "/courseStructure",
-    name: "CourseStructure",
-    icon: "ni ni-ungroup text-red",
-    component: <CourseStructure />,
-    layout: "/admin",
-  },
+  // {
+  //   path: "/courseStructure",
+  //   name: "CourseStructure",
+  //   icon: "ni ni-ungroup text-red",
+  //   component: <CourseStructure />,
+  //   layout: "/admin",
+  // },
 
-  {
-    name: "Project Monitoring", // 👈 just a label, no path
-    isLabel: true,
-  },
-  {
-    name: "Employee", // 👈 just a label, no path
-    isLabel: true,
-  },
-  {
-    path: "/appointmentLetter",
-    name: "Appointment letter",
-    icon: "ni ni-ungroup text-red",
-    component: <Appointmentletter />,
-    layout: "/admin",
-  },
-  {
-    path: "/relieving",
-    name: "Relieving Letter",
-    icon: "ni ni-ungroup text-red",
-    component: <Relieving />,
-    layout: "/admin",
-  },
-  {
-    path: "/experienceCertificate",
-    name: "Experience Certificate",
-    icon: "ni ni-ungroup text-red",
-    component: <ExperienceCertificate />,
-    layout: "/admin",
-  },
-  {
-    path: "/achievement",
-    name: "Achievement",
-    icon: "ni ni-ungroup text-red",
-    component: <Achievement />,
-    layout: "/admin",
-  },
-  {
-    path: "/anuallIncrement",
-    name: "Anuall Increment",
-    icon: "ni ni-ungroup text-red",
-    component: <AnuallIncrement />,
-    layout: "/admin",
-  },
-  {
-    path: "/internFulltime",
-    name: "Intern Fulltime",
-    icon: "ni ni-ungroup text-red",
-    component: <InternFulltime />,
-    layout: "/admin",
-  },
-  {
-    name: "Inventory", // 👈 just a label, no path
-    isLabel: true,
-  },
-  {
-    path: "/billing",
-    name: "Billing",
-    icon: "ni ni-ungroup text-red",
-    component: <Billing />,
-    layout: "/admin",
-  },
+  // {
+  //   name: "Project Monitoring",
+  //   isLabel: true,
+  // },
+  // {
+  //   name: "Employee",
+  //   isLabel: true,
+  // },
+
+  // {
+  //   name: "Inventory", // 👈 just a label, no path
+  //   isLabel: true,
+  // },
+  // {
+  //   path: "/billing",
+  //   name: "Billing",
+  //   icon: "ni ni-ungroup text-red",
+  //   component: <Billing />,
+  //   layout: "/admin",
+  // },
   {
     name: "Main Menu", // 👈 just a label, no path
     isLabel: true,
