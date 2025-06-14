@@ -135,8 +135,8 @@ const EnquiryModal = ({ modal, toggle, handleSubmit }) => {
             className="bg-white border-bottom"
             style={{ position: "sticky", top: 0, zIndex: 10 }}
           >
-            <div className="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center w-100 pb-2 gap-2">
-              <h1 className="mb-2 mb-md-0">Enquiry Form</h1>
+            <div className="d-flex flex-column g-5">
+              <h1 className="">Enquiry Form</h1>
               <div style={{ width: "200px" }}>
                 <Select
                   options={enquiry}
