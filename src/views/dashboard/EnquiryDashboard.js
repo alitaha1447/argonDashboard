@@ -188,7 +188,7 @@ const EnquiryDashboard = (props) => {
                 {/* Chart */}
                 <div className="chart">
                   <Bar
-                    data={chartExample1[chartExample1Data]}
+                    data={chartExample3.data}
                     options={chartExample1.options}
                     getDatasetAtEvent={(e) => console.log(e)}
                   />
