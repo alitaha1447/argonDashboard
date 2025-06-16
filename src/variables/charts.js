@@ -1,20 +1,3 @@
-/*!
-
-=========================================================
-* Argon Dashboard React - v1.2.4
-=========================================================
-
-* Product Page: https://www.creative-tim.com/product/argon-dashboard-react
-* Copyright 2024 Creative Tim (https://www.creative-tim.com)
-* Licensed under MIT (https://github.com/creativetimofficial/argon-dashboard-react/blob/master/LICENSE.md)
-
-* Coded by Creative Tim
-
-=========================================================
-
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-*/
 const Chart = require("chart.js");
 //
 // Chart extension for making the bars rounded
@@ -308,48 +291,48 @@ function parseOptions(parent, options) {
 
 // Example 1 of Chart inside src/views/Index.js (Sales value - Card)
 let chartExample1 = {
-  options: {
-    scales: {
-      yAxes: [
-        {
-          gridLines: {
-            color: colors.gray[900],
-            zeroLineColor: colors.gray[900],
-          },
-          ticks: {
-            callback: function (value) {
-              if (!(value % 10)) {
-                return "$" + value + "k";
-              }
-            },
-          },
-        },
-      ],
-    },
-    tooltips: {
-      callbacks: {
-        label: function (item, data) {
-          var label = data.datasets[item.datasetIndex].label || "";
-          var yLabel = item.yLabel;
-          var content = "";
+  // options: {
+  //   scales: {
+  //     yAxes: [
+  //       {
+  //         gridLines: {
+  //           color: colors.gray[900],
+  //           zeroLineColor: colors.gray[900],
+  //         },
+  //         ticks: {
+  //           callback: function (value) {
+  //             if (!(value % 10)) {
+  //               return "$" + value + "k";
+  //             }
+  //           },
+  //         },
+  //       },
+  //     ],
+  //   },
+  //   tooltips: {
+  //     callbacks: {
+  //       label: function (item, data) {
+  //         var label = data.datasets[item.datasetIndex].label || "";
+  //         var yLabel = item.yLabel;
+  //         var content = "";
 
-          if (data.datasets.length > 1) {
-            content += label;
-          }
+  //         if (data.datasets.length > 1) {
+  //           content += label;
+  //         }
 
-          content += "$" + yLabel + "k";
-          return content;
-        },
-      },
-    },
-  },
+  //         content += "$" + yLabel + "k";
+  //         return content;
+  //       },
+  //     },
+  //   },
+  // },
   data1: (canvas) => {
     return {
       labels: ["May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
       datasets: [
         {
           label: "Performance",
-          data: [0, 20, 10, 30, 15, 40, 20, 60, 60],
+          data: [10, 20, 10, 30, 15, 40, 20, 60, 60],
         },
       ],
     };
@@ -359,7 +342,7 @@ let chartExample1 = {
       labels: ["May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
       datasets: [
         {
-          label: "Performance",
+          label: "TAHA",
           data: [0, 20, 5, 25, 10, 30, 15, 40, 40],
         },
       ],
@@ -411,9 +394,59 @@ let chartExample2 = {
   },
 };
 
+let chartExample3 = {
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    legend: {
+      display: true,
+      position: "bottom",
+      // labels: {
+      //   fontColor: "#000",
+      //   boxWidth: 12,
+      // },
+    },
+    tooltips: {
+      enabled: true,
+      // callbacks: {
+      //   label: function (tooltipItem, data) {
+      //     const label = data.labels[tooltipItem.index] || "";
+      //     const value = data.datasets[0].data[tooltipItem.index] || 0;
+      //     return `${label}: ${value}`;
+      //   },
+      // },
+    },
+  },
+  data: {
+    labels: ["Facebook", "Google", "Instagram", "Twitter", "LinkedIn"],
+    datasets: [
+      {
+        data: [1480, 4807, 3678, 2645, 1000],
+        backgroundColor: [
+          "#f5365c", // Facebook - red
+          "#2dce89", // Google - green
+          "#11cdef", // Instagram - blue
+          "#fb6340", // Twitter - orange
+          "#5e72e4", // LinkedIn - purple
+        ],
+        hoverBackgroundColor: [
+          "#d92e4a",
+          "#24b97d",
+          "#0ebad6",
+          "#ec5920",
+          "#4b5fd9",
+        ],
+        borderColor: "#fff",
+        borderWidth: 0,
+      },
+    ],
+  },
+};
+
 module.exports = {
   chartOptions, // used inside src/views/Index.js
   parseOptions, // used inside src/views/Index.js
   chartExample1, // used inside src/views/Index.js
   chartExample2, // used inside src/views/Index.js
+  chartExample3, // used inside src/views/Index.js
 };

@@ -1,23 +1,71 @@
-import React, { useState } from "react";
-import Header from "components/Headers/Header";
+import { useState } from "react";
+
+import Chart from "chart.js";
+import { Bar, Pie } from "react-chartjs-2";
+// reactstrap components
 import {
-  Row,
-  Card,
-  // CardBody,
-  // Nav,
-  // NavItem,
-  // NavLink,
-  Container,
-  CardHeader,
   Button,
+  Card,
+  CardHeader,
+  CardBody,
   Table,
-  // Progress,
-  // Col,
-  // Input,
+  Container,
+  Row,
+  Col,
+  Input,
 } from "reactstrap";
+
+import Header from "components/Headers/Header.js";
+import Select from "react-select";
+
+// core components
+import {
+  chartOptions,
+  parseOptions,
+  chartExample1,
+  chartExample3,
+} from "variables/charts.js";
+
 import { BsThreeDotsVertical } from "react-icons/bs";
 import EnquiryModal from "components/EnquiryModal/EnquiryModal";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
+const data = [
+  {
+    name: "Taha",
+    contactNumber: "+91-9981341447",
+    highestQualification: "12th",
+    course: "DSA",
+    branch: "Male",
+    enquiryDate: "27/06/2025",
+    status: "Enquired Recieved",
+    testStatus: "Failed",
+    qualified: "Not",
+  },
+  {
+    name: "John",
+    contactNumber: "+91-9123456789",
+    highestQualification: "Graduate",
+    course: "Python",
+    branch: "Male",
+    enquiryDate: "27/03/1996",
+    status: "Rejected",
+    testStatus: "Failed",
+    qualified: "Not",
+  },
+  {
+    name: "Jane",
+    contactNumber: "+91-9876543210",
+    highestQualification: "10th",
+    course: "Java",
+    branch: "Female",
+    enquiryDate: "27/03/1996",
+    status: "Enquired Recieved",
+    testStatus: "Failed",
+    qualified: "Not",
+  },
+];
 const status = [
   { value: "all", label: "All" },
   { value: "enquiredRecieved", label: "Enquired Recieved" },
@@ -27,154 +75,83 @@ const status = [
   { value: "rejected", label: "Rejected" },
 ];
 
-const EnquiryDashboard = () => {
-  // const [nameFilter, setNameFilter] = useState("");
-  // const [numberFilter, setNumberFilter] = useState("");
-  const [filteredData, setFilteredData] = useState([]);
-  const [isFilterActive, setIsFilterActive] = useState(false);
-  // const [chartExample1Data, setChartExample1Data] = useState("data1");
-  const [selectedDate, setSelectedDate] = useState(null);
-
-  const [searchText, setSearchText] = useState("");
-  const [selectedEnquiry, setSelectedEnquiry] = useState(status[0]);
-
+const EnquiryDashboard = (props) => {
+  //   const [activeNav, setActiveNav] = useState(1);
   const [modalOpen, setModalOpen] = useState(false);
   const [openDropdownIndex, setOpenDropdownIndex] = useState(null);
+  const [selectedEnquiry, setSelectedEnquiry] = useState(status[0]);
+  const [dateRange, setDateRange] = useState([null, null]);
+  const [startDate, endDate] = dateRange;
+  const [searchText, setSearchText] = useState("");
+  const [filteredData, setFilteredData] = useState([]);
+  const [isFilterActive, setIsFilterActive] = useState(false);
+  const [chartExample1Data, setChartExample1Data] = useState("data1");
+
+  if (window.Chart) {
+    parseOptions(Chart, chartOptions());
+  }
 
   const toggleModal = () => setModalOpen(!modalOpen);
 
-  const handleFormSubmit = (e) => {
-    e.preventDefault();
-    console.log("Enquiry form submitted");
-  };
-
-  const data = [
-    {
-      name: "Taha",
-      contactNumber: "+91-9981341447",
-      highestQualification: "12th",
-      course: "DSA",
-      branch: "Male",
-      enquiryDate: "27/06/2025",
-      status: "Enquired Recieved",
-      testStatus: "Failed",
-      qualified: "Not",
-    },
-    {
-      name: "John",
-      contactNumber: "+91-9123456789",
-      highestQualification: "Graduate",
-      course: "Python",
-      branch: "Male",
-      enquiryDate: "27/03/1996",
-      status: "Rejected",
-      testStatus: "Failed",
-      qualified: "Not",
-    },
-    {
-      name: "Jane",
-      contactNumber: "+91-9876543210",
-      highestQualification: "10th",
-      course: "Java",
-      branch: "Female",
-      enquiryDate: "27/03/1996",
-      status: "Enquired Recieved",
-      testStatus: "Failed",
-      qualified: "Not",
-    },
-  ];
-
-  // const handleChangeByName = (e) => {
-  //   const value = e.target.value;
-  //   setNameFilter(value);
-
-  //   // If both inputs are empty, show full data immediately
-  //   if (value.trim() === "") {
-  //     setIsFilterActive(false);
-  //     setFilteredData([]);
-  //   }
-  // };
-
-  // const handleChangeByContact = (e) => {
-  //   e.preventDefault();
-  //   // const { name, value } = e.target;
-  //   const { value } = e.target;
-  //   setNumberFilter(value);
-
-  //   // If both inputs are empty, show full data immediately
-  //   if (value.trim() === "") {
-  //     setIsFilterActive(false);
-  //     setFilteredData([]);
-  //   }
+  // const handleEnquiry = (selected) => {
+  //   setSelectedEnquiry(selected);
   // };
 
   const handleUnifiedSearchChange = (e) => {
-    const value = e.target.value;
+    const { value } = e.target;
     setSearchText(value);
-
     if (value.trim() === "") {
       setIsFilterActive(false);
       setFilteredData([]);
     }
   };
 
-  const handleDateChange = (date) => {
-    setSelectedDate(date);
-    if (date === null) {
-      setIsFilterActive(false);
-      setFilteredData([]);
-    }
-  };
+  // const handleDateChange = (date) => {
+  //   setDateRange(date);
+  //   if (dateRange === null) {
+  //     setIsFilterActive(false);
+  //     setFilteredData([]);
+  //   }
+  // };
 
-  const formatDate = (dateString) => {
-    const [day, month, year] = dateString.split("/");
+  const parseDDMMYYYY = (dateStr) => {
+    const [day, month, year] = dateStr.split("/");
     return new Date(`${year}-${month}-${day}`);
   };
 
-  const handleEnquiry = (selected) => {
-    setSelectedEnquiry(selected);
-  };
+  // const filterData = data.filter((item) => {
+  //   const itemDate = parseDDMMYYYY(item.enquiryDate);
+
+  //   const isAfterStart = !startDate || itemDate >= startDate;
+  //   const isBeforeEnd = !endDate || itemDate <= endDate;
+
+  //   const inRange = isAfterStart && isBeforeEnd;
+
+  //   return inRange;
+  // });
 
   const handleSearchClick = (e) => {
     e.preventDefault();
-
-    // const filtered = data.filter((item) => {
-    //   const matchesName = item.name
-    //     .toLowerCase()
-    //     .includes(nameFilter.toLowerCase());
-    //   const matchesNumber = item.contactNumber.includes(numberFilter);
-    //   return matchesName && matchesNumber;
-    // });
-
     const filtered = data.filter((item) => {
       // Text search
       const lowerSearch = searchText.toLowerCase();
       const matchesText =
         item.name.toLowerCase().includes(lowerSearch) ||
         item.contactNumber.includes(lowerSearch);
-
       // Date filter
-      let matchesDate = true;
-      if (selectedDate) {
-        const enquiryDate = formatDate(item.enquiryDate);
-        const selectedDateObj = new Date(selectedDate);
-
-        matchesDate =
-          enquiryDate.getDate() === selectedDateObj.getDate() &&
-          enquiryDate.getMonth() === selectedDateObj.getMonth() &&
-          enquiryDate.getFullYear() === selectedDateObj.getFullYear();
-      }
-
+      const itemDate = parseDDMMYYYY(item.enquiryDate);
+      const isAfterStart = !startDate || itemDate >= startDate;
+      const isBeforeEnd = !endDate || itemDate <= endDate;
+      const inRange = isAfterStart && isBeforeEnd;
+      // Status filter
       let matchesStatus = true;
       if (selectedEnquiry?.value !== "all") {
         matchesStatus =
           item.status.toLowerCase().replace(/\s/g, "") ===
           selectedEnquiry.value.toLowerCase().replace(/\s/g, "");
       }
-      console.log(matchesStatus);
-      return matchesText && matchesDate && matchesStatus;
+      return matchesText && inRange && matchesStatus;
     });
-
     setFilteredData(filtered);
     setIsFilterActive(true);
   };
@@ -183,26 +160,146 @@ const EnquiryDashboard = () => {
   const displayData = isFilterActive ? filteredData : data;
 
   return (
-    <div>
+    <>
       <Header
         cardTitle1={"Total Enquiry"}
         cardTitle2={"Student"}
         cardTitle3={"Not Interested"}
         cardTitle4={"Follow Up"}
-        // handleChange={handleChangeByName}
-        // handleContactChange={handleChangeByContact}
-        handleSearchClick={handleSearchClick}
-        handleUnifiedSearchChange={handleUnifiedSearchChange}
-        selectedDate={selectedDate}
-        setSelectedDate={setSelectedDate}
-        handleDateChange={handleDateChange}
-        handleEnquiry={handleEnquiry}
-        selectedEnquiry={selectedEnquiry}
       />
+
+      {/* Page content */}
       <Container className="mt--7" fluid>
-        {/* Table */}
-        <Row>
-          <div className="col">
+        <Row className="pb-5 d-flex">
+          <Col className="mb-5 mb-xl-0" xl="8">
+            <Card className="bg-gradient-default shadow">
+              <CardHeader className="bg-transparent">
+                <Row className="align-items-center">
+                  <div className="col">
+                    <h6 className="text-uppercase text-light ls-1 mb-1">
+                      Overview
+                    </h6>
+                    <h2 className="text-white mb-0">Sales value</h2>
+                  </div>
+                  <div className="col"></div>
+                </Row>
+              </CardHeader>
+              <CardBody>
+                {/* Chart */}
+                <div className="chart">
+                  <Bar
+                    data={chartExample1[chartExample1Data]}
+                    options={chartExample1.options}
+                    getDatasetAtEvent={(e) => console.log(e)}
+                  />
+                </div>
+              </CardBody>
+            </Card>
+          </Col>
+          <Col xl="4">
+            <Card className="shadow">
+              <CardHeader className="bg-transparent">
+                <Row className="align-items-center">
+                  <div className="col">
+                    <h6 className="text-uppercase text-muted ls-1 mb-1">
+                      Performance
+                    </h6>
+                    <h2 className="mb-0">Total orders</h2>
+                  </div>
+                </Row>
+              </CardHeader>
+              <CardBody>
+                {/* Chart */}
+                <div className="chart" style={{}}>
+                  <Pie
+                    data={chartExample3.data}
+                    options={chartExample3.options}
+                  />
+                </div>
+              </CardBody>
+            </Card>
+          </Col>
+        </Row>
+        <Row className="d-flex flex-column">
+          <Col className="pb-4">
+            {/* <div className=""> */}
+            <div
+              className="d-flex flex-row justify-content-between align-items-center mt-4 p-2"
+              style={{
+                background: "#f7fafc",
+                maxWidth: "100%",
+                borderRadius: "5px",
+                border: "1px solid #d3d3d3 ",
+              }}
+            >
+              <div
+                className="d-flex flex-column flex-md-row align-items-center w-100"
+                style={{ gap: "1rem" }}
+              >
+                <div style={{ width: "200px" }}>
+                  <Select
+                    options={status}
+                    value={selectedEnquiry}
+                    onChange={(prev) => setSelectedEnquiry(prev)}
+                  />
+                </div>
+                {/* <div style={{}}>
+                    <Input
+                      placeholder="Search By Name"
+                      type="text"
+                      name="nameSearch"
+                      onChange={handleChange}
+                    />
+                  </div>
+                  <div style={{}}>
+                    <Input
+                      placeholder="Search By Phone Number"
+                      type="text"
+                      onChange={handleContactChange}
+                    />
+                  </div> */}
+                <div style={{ maxWidth: "200px" }}>
+                  <Input
+                    placeholder="Search by Name or Phone"
+                    type="text"
+                    onChange={handleUnifiedSearchChange}
+                  />
+                </div>
+                <div style={{ width: "auto" }}>
+                  <DatePicker
+                    selectsRange
+                    startDate={startDate}
+                    endDate={endDate}
+                    onChange={(date) => setDateRange(date)}
+                    monthsShown={2} // ✅ Show two calendars
+                    dateFormat="dd/MM/yyyy"
+                    className="form-control"
+                    placeholderText="Select date range"
+                    isClearable
+                    // showMonthDropdown
+                    // showYearDropdown
+                    scrollableYearDropdown
+                    yearDropdownItemNumber={50}
+                    minDate={new Date(1900, 0, 1)}
+                    maxDate={new Date(2025, 11, 31)}
+                    popperPlacement="bottom-start" // ✅ Opens dropdown below input
+                  />
+                </div>
+              </div>
+              <div
+                style={{
+                  padding: "5px",
+                  cursor: "pointer",
+                }}
+                onClick={handleSearchClick}
+              >
+                <i className="fas fa-search" />
+              </div>
+            </div>
+            {/* </div> */}
+          </Col>
+
+          <Col>
             <Card className="shadow">
               <CardHeader className="border-0">
                 <div
@@ -219,7 +316,8 @@ const EnquiryDashboard = () => {
                   </Button>
                 </div>
               </CardHeader>
-              {/* ✅ Table View for Desktop (Large screens only) */}
+
+              {/* ✅ Table View for Large Screens */}
               <div className="d-none d-lg-block">
                 <Table className="align-items-center table-flush" responsive>
                   <thead className="thead-light">
@@ -236,6 +334,7 @@ const EnquiryDashboard = () => {
                       <th scope="col">Action</th>
                     </tr>
                   </thead>
+                  {/* tbody will be dynamically rendered */}
                   <tbody>
                     {displayData.map((item, index) => (
                       <tr key={index}>
@@ -309,8 +408,10 @@ const EnquiryDashboard = () => {
                   </tbody>
                 </Table>
               </div>
-              {/* ✅ Card View for Mobile & Tablet */}
-              <div className="d-block d-lg-none p-3">
+
+              {/* ✅ Card View for Mobile & Tablets */}
+              <div className="d-block d-lg-none px-3 pb-3">
+                {/* Example of one card item */}
                 {displayData.map((item, index) => (
                   <Card key={index} className="mb-3 shadow-sm">
                     <div className="p-3 d-flex justify-content-between">
@@ -400,17 +501,19 @@ const EnquiryDashboard = () => {
                     </div>
                   </Card>
                 ))}
+
+                {/* You can map more cards dynamically here */}
               </div>
             </Card>
-          </div>
+          </Col>
         </Row>
       </Container>
       <EnquiryModal
         modal={modalOpen}
         toggle={toggleModal}
-        handleSubmit={handleFormSubmit}
+        // handleSubmit={handleFormSubmit}
       />
-    </div>
+    </>
   );
 };
 

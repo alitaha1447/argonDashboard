@@ -51,6 +51,7 @@ var routes = [
     component: <Index />,
     layout: "/admin",
   },
+
   {
     path: "/enquiryDashboard",
     name: "Enquiry Dashboard",
