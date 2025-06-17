@@ -1,7 +1,7 @@
 import React from "react";
 import { FormGroup, Label, Input } from "reactstrap";
 
-const InputField = ({ label, id, type }) => {
+const InputField = ({ label, id, type, value, onChange }) => {
   return (
     <FormGroup>
       <Label for={id}>{label}</Label>
@@ -10,6 +10,8 @@ const InputField = ({ label, id, type }) => {
         name={id}
         placeholder={`Enter ${label.toLowerCase()}`}
         type={type}
+        value={value}
+        onChange={onChange}
       />
     </FormGroup>
   );

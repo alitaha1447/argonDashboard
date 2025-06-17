@@ -1,5 +1,5 @@
 import React from "react";
-import { Row, Col, Form, Button, Label, FormGroup } from "reactstrap";
+import { Row, Col, Form, Button, Label, FormGroup, Input } from "reactstrap";
 import InputField from "components/FormFields/InputField";
 import RadioGroup from "components/FormFields/RadioGroup";
 import TextAreaField from "components/FormFields/TextAreaField";
@@ -8,23 +8,49 @@ import Select from "react-select";
 
 const EnquiryForm = ({
   handleSubmit,
+  fullName,
+  setFullName,
+  email,
+  setEmail,
+  contactNumber,
+  setContactNumber,
+  address,
+  setAddress,
+  // selectedGender,
+  // setSelectedGender,
+  gender,
+  setGender,
+  genderOptions,
+  referedBy,
+  setReferedBy,
+  refOptions,
+  whatsappNumber,
+  setWhatsappNumber,
+  additionalQuery,
+  setAdditionalQuery,
   selectedEnquiry,
+  // qualifications
+  qualificationOptions,
   selectedQualification,
   handleChangeQualification,
-  selectedOptions,
+  handleQualificationOpen,
+  // courses
+  courseOptions,
+  selectedCoursesOptions,
   handleChangeCourse,
+  handleCourseOpen,
+  // products
+  productOptions,
   selectedProduct,
   handleProduct,
+  handleProductOpen,
+  // branches
+  branchOptions,
   selectedBranch,
   handleChangeBranch,
   handleBranchInputChange,
   isLoading,
-  branchOptions,
-  genderOptions,
-  refOptions,
-  qualificationOptions,
-  options,
-  products,
+
   CheckboxOption,
 }) => {
   return (
@@ -32,23 +58,72 @@ const EnquiryForm = ({
       <Form onSubmit={handleSubmit}>
         <Row>
           <Col md={6}>
-            <InputField label="Full Name" id="fullName" type="text" />
+            <InputField
+              label="Full Name"
+              id="fullName"
+              type="text"
+              value={fullName}
+              onChange={(e) => setFullName(e.target.value)}
+            />
           </Col>
           <Col md={6}>
-            <InputField label="Email" id="email" type="email" />
+            <InputField
+              label="Email"
+              id="email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
           </Col>
         </Row>
         <Row>
           <Col md={6}>
-            <InputField label="Contact Number" id="contact" type="tel" />
+            <InputField
+              label="Contact Number"
+              id="contact"
+              type="tel"
+              value={contactNumber}
+              onChange={(e) => setContactNumber(e.target.value)}
+            />
           </Col>
           <Col md={6}>
-            <InputField label="Address" id="contact" type="text" />
+            <InputField
+              label="Address"
+              id="address"
+              type="text"
+              value={address}
+              onChange={(e) => setAddress(e.target.value)}
+            />
           </Col>
         </Row>
-        <RadioGroup label="Gender" name="gender" options={genderOptions} />
+
+        <FormGroup tag="fieldset" className="mb-3">
+          <Label className="d-block mb-2">{"Gender"}</Label>
+          <Row>
+            {genderOptions.map((option) => (
+              <Col xs="12" sm="6" md="auto" key={option.value}>
+                <FormGroup check className="d-flex align-items-center">
+                  <Input
+                    type="radio"
+                    name="gender"
+                    value={option.value}
+                    id={`gender-${option.value}`}
+                    checked={gender?.value === option.value}
+                    onChange={() => setGender(option)}
+                    className="me-2"
+                  />
+                  <Label check for={`gender-${option.value}`} className="mb-0">
+                    {option.label}
+                  </Label>
+                </FormGroup>
+              </Col>
+            ))}
+          </Row>
+        </FormGroup>
+
+        {/* <RadioGroup label="Gender" name="gender" options={genderOptions} /> */}
         <Row>
-          {selectedEnquiry.value === "course" && (
+          {selectedEnquiry.label === "Course Enquiry" && (
             <>
               <Col md={6}>
                 <FormGroup>
@@ -57,6 +132,7 @@ const EnquiryForm = ({
                     options={qualificationOptions}
                     value={selectedQualification}
                     onChange={handleChangeQualification}
+                    onMenuOpen={handleQualificationOpen}
                   />
                 </FormGroup>
               </Col>
@@ -64,7 +140,7 @@ const EnquiryForm = ({
           )}
 
           <Col md={6}>
-            {selectedEnquiry.value === "course" ? (
+            {selectedEnquiry.label === "Course Enquiry" ? (
               <FormGroup>
                 <Label for="Courses">Preferred Courses</Label>
                 <Select
@@ -73,9 +149,10 @@ const EnquiryForm = ({
                   closeMenuOnSelect={false}
                   hideSelectedOptions={false}
                   components={{ Option: CheckboxOption }}
-                  options={options}
-                  value={selectedOptions}
+                  options={courseOptions}
+                  value={selectedCoursesOptions}
                   onChange={handleChangeCourse}
+                  onMenuOpen={handleCourseOpen}
                   styles={{
                     option: (provided, state) => ({
                       ...provided,
@@ -93,14 +170,15 @@ const EnquiryForm = ({
               <FormGroup>
                 <Label for="Courses">Products</Label>
                 <Select
-                  options={products}
+                  options={productOptions}
                   value={selectedProduct}
                   onChange={handleProduct}
+                  onMenuOpen={handleProductOpen}
                 />
               </FormGroup>
             )}
           </Col>
-          {selectedEnquiry.value === "course" && (
+          {selectedEnquiry.label === "Course Enquiry" && (
             <Col md={6}>
               <FormGroup>
                 <Label for="Courses">Branch</Label>
@@ -123,24 +201,58 @@ const EnquiryForm = ({
             </Col>
           )}
         </Row>
-        <RadioGroup
+        {/* <RadioGroup
           label="How did you hear about us?"
           name="refSource"
           options={refOptions}
-        />
+        /> */}
+        <FormGroup tag="fieldset" className="mb-3">
+          <Label className="d-block mb-2">{"How did you hear about us?"}</Label>
+          <Row>
+            {refOptions.map((option) => (
+              <Col xs="12" sm="6" md="auto" key={option.value}>
+                <FormGroup check className="d-flex align-items-center">
+                  <Input
+                    type="radio"
+                    name="referedBy"
+                    value={option.value}
+                    id={`referedBy-${option.value}`}
+                    checked={referedBy?.value === option.value}
+                    onChange={() => setReferedBy(option)}
+                    className="me-2"
+                  />
+                  <Label
+                    check
+                    for={`referedBy-${option.value}`}
+                    className="mb-0"
+                  >
+                    {option.label}
+                  </Label>
+                </FormGroup>
+              </Col>
+            ))}
+          </Row>
+        </FormGroup>
         <Row>
           <Col md={6}>
             <InputField
               label="WhatsApp Number for Updates"
               id="whatsapp"
               type="tel"
+              value={whatsappNumber}
+              onChange={(e) => setWhatsappNumber(e.target.value)}
             />
           </Col>
           <Col md={6}>
-            <TextAreaField label="Any Additional Query" id="about" />
+            <TextAreaField
+              label="Any Additional Query"
+              id="about"
+              value={additionalQuery}
+              onChange={(e) => setAdditionalQuery(e.target.value)}
+            />
           </Col>
         </Row>
-        {selectedEnquiry.value === "course" && (
+        {selectedEnquiry.label === "Course Enquiry" && (
           <FileUploadField label="Upload Resume" id="resume" />
         )}
         <div className="text-end">

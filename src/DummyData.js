@@ -6,9 +6,9 @@ export const products = [
 ];
 
 export const enquiry = [
-  { value: "course", label: "Course Enquiry" },
-  { value: "product", label: "Product Enquiry" },
-  { value: "internship", label: "Internship Enquiry" },
+  { value: 1, label: "Course Enquiry" },
+  { value: 2, label: "Product Enquiry" },
+  { value: 3, label: "Internship Enquiry" },
 ];
 export const qualificationOptions = [
   { value: "10th", label: "10th" },
@@ -39,10 +39,19 @@ export const options = [
   { value: "AWS ", label: "AWS" },
   { value: "Other ", label: "Other" },
 ];
-export const genderOptions = ["Male", "Female", "Prefer not to say"];
+export const genderOptions = [
+  { value: 1, label: "Male" },
+  { value: 2, label: "Female" },
+  { value: 3, label: "Prefer not to say" },
+];
 export const refOptions = [
-  "Social Media",
-  "Friends / Relatives",
-  "Website",
-  "Other",
+  { value: 1, label: "Social Media" },
+  { value: 2, label: "Friends / Relatives" },
+  { value: 3, label: "Website" },
+  { value: 4, label: "Other" },
+];
+
+export const enquiryType = [
+  { value: "internShip", label: "Internship" },
+  { value: "fullTime", label: "Full Time" },
 ];

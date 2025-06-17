@@ -8,26 +8,32 @@ import Select, { components } from "react-select";
 import axios from "axios";
 
 // DATA
-import {
-  products,
-  enquiry,
-  qualificationOptions,
-  options,
-  genderOptions,
-  refOptions,
-} from "DummyData";
+import { enquiry, genderOptions, refOptions, enquiryType } from "DummyData";
 
-const enquiryType = [
-  { value: "internShip", label: "Internship" },
-  { value: "fullTime", label: "Full Time" },
-];
+const API_PATH = process.env.REACT_APP_API_PATH;
+const API_KEY = process.env.REACT_APP_API_KEY;
 
 const Enquiry = () => {
-  const [selectEnquiryType, setSelectEnquiryType] = useState(null);
-  const [selectedQualification, setSelectedOptionsQualification] = useState([]);
-  const [selectedOptions, setSelectedOptions] = useState([]);
+  // const [selectEnquiryType, setSelectEnquiryType] = useState(null);
+  const [fullName, setFullName] = useState("");
+  const [email, setEmail] = useState("");
+  const [contactNumber, setContactNumber] = useState("");
+  const [address, setAddress] = useState("");
+  const [gender, setGender] = useState(null);
+  const [referedBy, setReferedBy] = useState(null);
+  const [whatsappNumber, setWhatsappNumber] = useState("");
+  const [additionalQuery, setAdditionalQuery] = useState("");
+  // Qualifications
+  const [qualificationOptions, setQualificationOptions] = useState([]);
+  const [selectedQualification, setSelectedOptionsQualification] =
+    useState(null);
+  // Prefered Courses
+  const [courseOptions, setCourseOptions] = useState([]);
+  const [selectedCoursesOptions, setSelectedCoursesOptions] = useState(null);
   const [selectedEnquiry, setSelectedEnquiry] = useState(enquiry[0]);
-  const [selectedProduct, setSelectedProduct] = useState();
+  //  Products
+  const [productOptions, setProductOptions] = useState([]);
+  const [selectedProduct, setSelectedProduct] = useState(null);
 
   const [selectedBranch, setSelectedBranch] = useState(null);
   const [branchOptions, setBranchOptions] = useState([]);
@@ -52,15 +58,62 @@ const Enquiry = () => {
   // const handleCheckboxChange = () => {
   //   setIsConfirmed(!isConfirmed);
   // };
-  const handleSubmit = (e) => {
+
+  const resetForm = () => {
+    setFullName("");
+    setEmail("");
+    setContactNumber("");
+    setAddress("");
+    setGender(null);
+    setReferedBy(null);
+    setWhatsappNumber("");
+    setAdditionalQuery("");
+    setSelectedOptionsQualification(null);
+    setSelectedCoursesOptions(null);
+    setSelectedProduct(null);
+    setSelectedBranch(null);
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // if (!isConfirmed) {
-    //   console.log("Please confirm the details before submitting.");
-    //   return;
-    // }
+    const isCourseEnquiry = selectedEnquiry?.label === "Course Enquiry";
 
-    // console.log("Form submitted successfully.");
+    const enquiryFormdata = {
+      EnquiryType: selectedEnquiry?.value,
+      Name: fullName,
+      Email: email,
+      Mobileno: contactNumber,
+      Address: address,
+      Gender: gender?.value,
+      Qualification: isCourseEnquiry ? selectedQualification?.value : null,
+      Course: isCourseEnquiry
+        ? selectedCoursesOptions?.map((c) => c.value).join(",") || ""
+        : "",
+      Product: !isCourseEnquiry ? selectedProduct?.value : null,
+      Branch: isCourseEnquiry ? selectedBranch?.value : null,
+      ReferedBy: referedBy?.value,
+      WhatsappNo: whatsappNumber,
+      AdditionalQuery: additionalQuery,
+      CreatedBy: "Developer",
+    };
+
+    try {
+      const res = await axios.post(
+        `${API_PATH}/api/SaveEnquiry`,
+        enquiryFormdata,
+        {
+          params: {
+            APIKEY: "12345678@",
+          },
+        }
+      );
+      console.log("✅ Enquiry submitted successfully:", res);
+    } catch (error) {
+      console.error("❌ Failed to submit enquiry:", error);
+    }
+    console.log(enquiryFormdata);
+    resetForm();
   };
 
   const handleEnquiry = (selected) => {
@@ -76,20 +129,17 @@ const Enquiry = () => {
     const fetchData = async () => {
       setIsLoading(true);
       try {
-        const res = await axios.get(
-          "https://hotelapi.shriyanshnath.com/api/branches",
-          {
-            params: {
-              APIKEY: "12345678@",
-              searchtext: branchSearchText,
-            },
-          }
-        );
+        const res = await axios.get(`${API_PATH}/api/branches`, {
+          params: {
+            APIKEY: API_KEY,
+            searchtext: branchSearchText,
+          },
+        });
 
         const options =
           res.data?.map((branch) => ({
             label: branch?.BranchName || `Branch ${branch?.BranchId}`,
-            value: branch?.BranchId?.toString(),
+            value: branch?.BranchId,
           })) || [];
 
         setBranchOptions(options);
@@ -103,6 +153,62 @@ const Enquiry = () => {
 
     fetchData();
   }, [branchSearchText]);
+
+  const fetchCourseDetails = async () => {
+    try {
+      const res = await axios.get(`${API_PATH}/api/GetCourse`, {
+        params: {
+          APIKEY: API_KEY,
+          // searchtext: branchSearchText,
+        },
+      });
+      const formattedCourses = res.data.map((item) => ({
+        value: item.Id,
+        label: item.TopicTitle,
+      }));
+      setCourseOptions(formattedCourses);
+    } catch (error) {
+      console.log(`course_Error ---> ${error}`);
+    }
+  };
+
+  const fetchProductLists = async () => {
+    try {
+      const res = await axios.get(`${API_PATH}/api/GetProduct`, {
+        params: {
+          APIKEY: API_KEY,
+          // searchtext: branchSearchText,
+        },
+      });
+
+      const formattedProduct = res.data.map((item) => ({
+        value: item.Id,
+        label: item.Name,
+      }));
+      setProductOptions(formattedProduct);
+    } catch (error) {
+      console.log(`product_Error ---> ${error}`);
+    }
+  };
+
+  const fetchQualificationLists = async () => {
+    try {
+      const res = await axios.get(`${API_PATH}/api/GetQualification`, {
+        params: {
+          APIKEY: API_KEY,
+          // searchtext: branchSearchText,
+        },
+      });
+
+      const formattedQualification = res.data.map((item) => ({
+        label: item.QualificationName,
+        value: item.QualificationId,
+      }));
+      setQualificationOptions(formattedQualification);
+    } catch (error) {
+      console.log(`qualification_Error ---> ${error}`);
+    }
+  };
 
   return (
     <>
@@ -128,30 +234,53 @@ const Enquiry = () => {
                   handleSubmit={handleSubmit}
                   selectedEnquiry={selectedEnquiry}
                   enquiryType={enquiryType}
-                  selectEnquiryType={selectEnquiryType}
-                  handleEnquiryType={(selected) =>
-                    setSelectEnquiryType(selected)
-                  }
+                  // fullName
+                  fullName={fullName}
+                  setFullName={setFullName}
+                  // email
+                  email={email}
+                  setEmail={setEmail}
+                  contactNumber={contactNumber}
+                  setContactNumber={setContactNumber}
+                  address={address}
+                  setAddress={setAddress}
+                  genderOptions={genderOptions}
+                  gender={gender}
+                  setGender={setGender}
+                  referedBy={referedBy}
+                  setReferedBy={setReferedBy}
+                  refOptions={refOptions}
+                  whatsappNumber={whatsappNumber}
+                  setWhatsappNumber={setWhatsappNumber}
+                  additionalQuery={additionalQuery}
+                  setAdditionalQuery={setAdditionalQuery}
+                  // qualifications
+                  qualificationOptions={qualificationOptions}
                   selectedQualification={selectedQualification}
                   handleChangeQualification={(selected) =>
                     setSelectedOptionsQualification(selected)
                   }
-                  selectedOptions={selectedOptions}
-                  handleChangeCourse={(selected) =>
-                    setSelectedOptions(selected)
+                  handleQualificationOpen={async () =>
+                    await fetchQualificationLists()
                   }
+                  // courses
+                  courseOptions={courseOptions}
+                  selectedCoursesOptions={selectedCoursesOptions}
+                  handleChangeCourse={(selected) => {
+                    setSelectedCoursesOptions(selected);
+                  }}
+                  handleCourseOpen={async () => await fetchCourseDetails()}
+                  // products
+                  productOptions={productOptions}
                   selectedProduct={selectedProduct}
                   handleProduct={(selected) => setSelectedProduct(selected)}
+                  handleProductOpen={async () => await fetchProductLists()}
+                  //  branches
                   selectedBranch={selectedBranch}
                   handleChangeBranch={(selected) => setSelectedBranch(selected)}
                   handleBranchInputChange={(text) => setBranchSearchText(text)}
                   isLoading={isLoading}
                   branchOptions={branchOptions}
-                  genderOptions={genderOptions}
-                  refOptions={refOptions}
-                  qualificationOptions={qualificationOptions}
-                  options={options}
-                  products={products}
                   CheckboxOption={CheckboxOption}
                 />
               </CardBody>
