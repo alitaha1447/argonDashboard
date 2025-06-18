@@ -11,34 +11,36 @@ import {
   Row,
   Button,
 } from "reactstrap";
+import { BsThreeDotsVertical } from "react-icons/bs";
+
 import Header from "components/Headers/Header";
 import EnquiryModal from "components/EnquiryModal/EnquiryModal";
 
 const data = [
   {
-    firstName: "Taha",
-    lastName: "Ali",
-    email: "ali.taha1447@gmail.com",
-    contact: "+91-9981341447",
-    gender: "Male",
+    blockName: "ABC",
+    districtname: "Sehore",
+    stateName: "MP",
+    isActive: "True",
   },
   {
-    firstName: "John",
-    lastName: "Doe",
-    email: "john.doe@example.com",
-    contact: "+91-9123456789",
-    gender: "Male",
+    blockName: "ABC",
+
+    districtname: "Sehore",
+    stateName: "Goa",
+    isActive: "True",
   },
   {
-    firstName: "Jane",
-    lastName: "Smith",
-    email: "jane.smith@example.com",
-    contact: "+91-9876543210",
-    gender: "Female",
+    blockName: "ABC",
+
+    districtname: "Sehore",
+    stateName: "Kerala",
+    isActive: "False",
   },
 ];
 
 const Block = () => {
+  const [openDropdownIndex, setOpenDropdownIndex] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
 
   const toggleModal = () => setModalOpen(!modalOpen);
@@ -47,7 +49,6 @@ const Block = () => {
     e.preventDefault();
     console.log("Enquiry form submitted");
   };
-
   return (
     <>
       <Header />
@@ -76,21 +77,75 @@ const Block = () => {
                 <Table className="align-items-center table-flush" responsive>
                   <thead className="thead-light">
                     <tr>
-                      <th scope="col">First Name</th>
-                      <th scope="col">Last Name</th>
-                      <th scope="col">Email</th>
-                      <th scope="col">Contact Number</th>
-                      <th scope="col">Gender</th>
+                      <th scope="col">Block Name</th>
+                      <th scope="col">District Name</th>
+                      <th scope="col">State Name</th>
+                      <th scope="col">Is Active</th>
+                      <th scope="col">Action Number</th>
                     </tr>
                   </thead>
                   <tbody>
                     {data.map((item, index) => (
                       <tr key={index}>
-                        <td>{item.firstName}</td>
-                        <td>{item.lastName}</td>
-                        <td>{item.email}</td>
-                        <td>{item.contact}</td>
-                        <td>{item.gender}</td>
+                        <td>{item.blockName}</td>
+                        <td>{item.districtname}</td>
+                        <td>{item.stateName}</td>
+                        <td>{item.isActive}</td>
+
+                        <td style={{ position: "relative", textAlign: "" }}>
+                          <div
+                            style={{ cursor: "pointer" }}
+                            onClick={() =>
+                              setOpenDropdownIndex(
+                                openDropdownIndex === index ? null : index
+                              )
+                            }
+                          >
+                            <BsThreeDotsVertical size={20} />
+                          </div>
+
+                          {openDropdownIndex === index && (
+                            <div
+                              style={{
+                                position: "absolute",
+                                top: "-30px",
+                                left: "50px",
+                                backgroundColor: "#fff",
+                                border: "1px solid #ddd",
+                                borderRadius: "4px",
+                                boxShadow: "0px 2px 6px rgba(0,0,0,0.2)",
+                                zIndex: 10,
+                                minWidth: "100px",
+                              }}
+                            >
+                              <div
+                                style={{
+                                  padding: "8px 12px",
+                                  cursor: "pointer",
+                                  borderBottom: "1px solid #eee",
+                                }}
+                                onClick={() => {
+                                  console.log("Edit clicked for", item.name);
+                                  setOpenDropdownIndex(null);
+                                }}
+                              >
+                                ✏️ Edit
+                              </div>
+                              <div
+                                style={{
+                                  padding: "8px 12px",
+                                  cursor: "pointer",
+                                }}
+                                onClick={() => {
+                                  console.log("Delete clicked for", item.name);
+                                  setOpenDropdownIndex(null);
+                                }}
+                              >
+                                🗑️ Delete
+                              </div>
+                            </div>
+                          )}
+                        </td>
                       </tr>
                     ))}
                   </tbody>

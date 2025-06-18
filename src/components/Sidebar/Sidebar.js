@@ -39,7 +39,6 @@ import {
 const Sidebar = (props) => {
   const [collapseOpen, setCollapseOpen] = useState();
   const [openDropdowns, setOpenDropdowns] = useState({});
-  console.log(openDropdowns, 'oopsJSKXJ')
 
   // verifies if routeName is the one active (in browser input)
   // const activeRoute = (routeName) => {
@@ -53,7 +52,6 @@ const Sidebar = (props) => {
   const closeCollapse = () => {
     setCollapseOpen(false);
   };
-
 
   // creates the links that appear in the left menu / Sidebar
   // const createLinks = (routes) => {
@@ -74,9 +72,8 @@ const Sidebar = (props) => {
   //   });
   // };
   const createLinks = (routes) => {
-
     const toggleDropdown = (name) => {
-      console.log(name)
+      console.log(name);
       setOpenDropdowns((prev) => ({
         ...prev,
         [name]: !prev[name],
@@ -109,8 +106,9 @@ const Sidebar = (props) => {
                 <i className={route.icon} />
                 <span className="ml-0">{route.name}</span>
                 <i
-                  className={`ml-auto fas fa-chevron-${openDropdowns[route.name] ? "up" : "down"
-                    }`}
+                  className={`ml-auto fas fa-chevron-${
+                    openDropdowns[route.name] ? "up" : "down"
+                  }`}
                 />
               </div>
               <Collapse isOpen={openDropdowns[route.name]}>
@@ -121,7 +119,7 @@ const Sidebar = (props) => {
                         to={child.layout + child.path}
                         tag={NavLinkRRD}
                         onClick={closeCollapse}
-                      // activeClassName="active"
+                        // activeClassName="active"
                       >
                         <i className={child.icon} />
                         <span className="ml-0">{child.name}</span>
@@ -142,7 +140,7 @@ const Sidebar = (props) => {
             to={route.layout + route.path}
             tag={NavLinkRRD}
             onClick={closeCollapse}
-          // activeClassName="active"
+            // activeClassName="active"
           >
             <i className={route.icon} />
             <span className="ml-2">{route.name}</span>
@@ -151,9 +149,6 @@ const Sidebar = (props) => {
       );
     });
   };
-
-
-
 
   // const { bgColor, routes, logo } = props;
   const { routes, logo } = props;
@@ -187,7 +182,11 @@ const Sidebar = (props) => {
         </button>
         {/* Brand */}
         {logo ? (
-          <NavbarBrand className="pt-0 pb-0" {...navbarBrandProps} style={{ textAlign: 'left' }}>
+          <NavbarBrand
+            className="pt-0 pb-0"
+            {...navbarBrandProps}
+            style={{ textAlign: "left" }}
+          >
             <img
               alt={logo.imgAlt}
               className="navbar-brand-img"

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 import Chart from "chart.js";
 import { Bar, Pie } from "react-chartjs-2";
@@ -8,6 +8,10 @@ import {
   Card,
   CardHeader,
   CardBody,
+  CardFooter,
+  Pagination,
+  PaginationItem,
+  PaginationLink,
   Table,
   Container,
   Row,
@@ -30,6 +34,7 @@ import { BsThreeDotsVertical } from "react-icons/bs";
 import EnquiryModal from "components/EnquiryModal/EnquiryModal";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+// import axios from "axios";
 
 const data = [
   {
@@ -87,6 +92,52 @@ const EnquiryDashboard = (props) => {
   const [isFilterActive, setIsFilterActive] = useState(false);
   // const [chartExample1Data, setChartExample1Data] = useState("data1");
 
+  const fetchPaginatedData = async (page = 1) => {
+    console.log(page);
+    // try {
+    //   const res = await axios.get(
+    //     "https://hotelapi.shriyanshnath.com/api/Get_Enquiry_Dashboard_Data",
+    //     {
+    //       params: {
+    //         fromdate: formattedStartDate,
+    //         todate: formattedEndDate,
+    //         enquirytype: 1,
+    //         pageNumber: page,
+    //         pageSize: 10,
+    //         APIKEY: "12345678@",
+    //       },
+    //     }
+    //   );
+    //   setEnquiries(res.data.Data);
+    //   setPageNumber(res.data.PageNumber);
+    //   setTotalPages(res.data.TotalPages);
+    // } catch (error) {
+    //   console.error("❌ Pagination fetch failed:", error);
+    // }
+  };
+
+  useEffect(() => {
+    fetchPaginatedData(1); // load first page initially
+  }, []);
+
+  const [pageNumber, setPageNumber] = useState(1);
+  // const [totalPages, setTotalPages] = useState(1);
+  const [pageStart, setPageStart] = useState(1); // starting number of visible pages
+  const visiblePages = [pageStart, pageStart + 1, pageStart + 2];
+
+  const handlePageChange = (page) => {
+    setPageNumber(page);
+    fetchPaginatedData(page);
+  };
+
+  const handleNext = () => {
+    setPageStart((prev) => prev + 1);
+  };
+
+  const handlePrevious = () => {
+    setPageStart((prev) => (prev > 1 ? prev - 1 : 1));
+  };
+
   if (window.Chart) {
     parseOptions(Chart, chartOptions());
   }
@@ -119,6 +170,16 @@ const EnquiryDashboard = (props) => {
     return new Date(`${year}-${month}-${day}`);
   };
 
+  // const formatDate = (date) => {
+  //   return date ? new Date(date).toISOString().split("T")[0] : "N/A";
+  // };
+
+  // const formattedStartDate = formatDate(startDate);
+  // const formattedEndDate = formatDate(endDate);
+
+  // console.log(formattedStartDate);
+  // console.log(formattedEndDate);
+
   // const filterData = data.filter((item) => {
   //   const itemDate = parseDDMMYYYY(item.enquiryDate);
 
@@ -129,6 +190,30 @@ const EnquiryDashboard = (props) => {
 
   //   return inRange;
   // });
+
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     try {
+  //       const res = await axios.get(
+  //         "https://hotelapi.shriyanshnath.com/api/Get_Enquiry_Dashboard_Data",
+  //         {
+  //           params: {
+  //             fromdate: formattedStartDate, // 👈 dynamic value
+  //             todate: formattedEndDate, // 👈 dynamic value
+  //             enquirytype: 1,
+  //           },
+  //         }
+  //       );
+  //       console.log(res);
+  //     } catch (error) {
+  //       console.error("Error fetching data:", error);
+  //     }
+  //   };
+
+  //   if (startDate && endDate) {
+  //     fetchData(); // 👈 Only fetch if both dates are selected
+  //   }
+  // }, [formattedStartDate, formattedEndDate]); // 👈 Add as dependencies
 
   const handleSearchClick = (e) => {
     e.preventDefault();
@@ -158,6 +243,15 @@ const EnquiryDashboard = (props) => {
 
   // Use filteredData if search was clicked and there are any filters, otherwise use all data
   const displayData = isFilterActive ? filteredData : data;
+
+  // OR, if you want to auto-grow when user clicks "Next"
+  // const generatePages = () => {
+  //   const pages = [];
+  //   for (let i = 1; i <= Math.max(3, pageNumber); i++) {
+  //     pages.push(i);
+  //   }
+  //   return pages;
+  // };
 
   return (
     <>
@@ -190,7 +284,7 @@ const EnquiryDashboard = (props) => {
                   <Bar
                     data={chartExample3.data}
                     options={chartExample1.options}
-                    getDatasetAtEvent={(e) => console.log(e)}
+                    // getDatasetAtEvent={(e) => console.log(e)}
                   />
                 </div>
               </CardBody>
@@ -311,9 +405,14 @@ const EnquiryDashboard = (props) => {
                   }}
                 >
                   <h3 className="mb-0">Lists</h3>
-                  <Button color="primary" onClick={toggleModal}>
-                    Add
-                  </Button>
+                  <div>
+                    <Button color="primary" onClick={toggleModal}>
+                      Create Batch
+                    </Button>
+                    <Button color="primary" onClick={toggleModal}>
+                      Add
+                    </Button>
+                  </div>
                 </div>
               </CardHeader>
 
@@ -322,6 +421,7 @@ const EnquiryDashboard = (props) => {
                 <Table className="align-items-center table-flush" responsive>
                   <thead className="thead-light">
                     <tr>
+                      <th scope="col" className="text-center"></th>
                       <th scope="col">Name</th>
                       <th scope="col">Contact Number</th>
                       <th scope="col">Highest Qualification</th>
@@ -329,8 +429,8 @@ const EnquiryDashboard = (props) => {
                       <th scope="col">Branch</th>
                       <th scope="col">Enquiry Date</th>
                       <th scope="col">Status</th>
-                      <th scope="col">Test Status</th>
-                      <th scope="col">Qualified/Not Qualified</th>
+                      {/* <th scope="col">Test Status</th>
+                      <th scope="col">Qualified/Not Qualified</th> */}
                       <th scope="col">Action</th>
                     </tr>
                   </thead>
@@ -338,6 +438,11 @@ const EnquiryDashboard = (props) => {
                   <tbody>
                     {displayData.map((item, index) => (
                       <tr key={index}>
+                        <td>
+                          <div className="d-flex justify-content-center align-items-center">
+                            <Input type="checkbox" style={{ margin: 0 }} />
+                          </div>
+                        </td>
                         <td>{item.name}</td>
                         <td>{item.contactNumber}</td>
                         <td>{item.highestQualification}</td>
@@ -345,8 +450,8 @@ const EnquiryDashboard = (props) => {
                         <td>{item.branch}</td>
                         <td>{item.enquiryDate}</td>
                         <td>{item.status}</td>
-                        <td>{item.testStatus}</td>
-                        <td>{item.qualified}</td>
+                        {/* <td>{item.testStatus}</td>
+                        <td>{item.qualified}</td> */}
                         <td
                           style={{ position: "relative", textAlign: "center" }}
                         >
@@ -504,6 +609,49 @@ const EnquiryDashboard = (props) => {
 
                 {/* You can map more cards dynamically here */}
               </div>
+              <CardFooter className="py-4">
+                <nav aria-label="...">
+                  <Pagination className="pagination justify-content-end mb-0">
+                    <PaginationItem disabled={pageStart === 1}>
+                      <PaginationLink
+                        href="#"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          handlePrevious();
+                        }}
+                      >
+                        <i className="fas fa-angle-left" />
+                      </PaginationLink>
+                    </PaginationItem>
+
+                    {visiblePages.map((page) => (
+                      <PaginationItem key={page} active={page === pageNumber}>
+                        <PaginationLink
+                          href="#"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            handlePageChange(page);
+                          }}
+                        >
+                          {page}
+                        </PaginationLink>
+                      </PaginationItem>
+                    ))}
+
+                    <PaginationItem>
+                      <PaginationLink
+                        href="#"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          handleNext();
+                        }}
+                      >
+                        <i className="fas fa-angle-right" />
+                      </PaginationLink>
+                    </PaginationItem>
+                  </Pagination>
+                </nav>
+              </CardFooter>
             </Card>
           </Col>
         </Row>
