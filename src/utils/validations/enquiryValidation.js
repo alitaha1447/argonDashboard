@@ -1,5 +1,4 @@
-import { toast } from "react-toastify";
-export const mandatoryFields = ({
+export const getValidationErrors = ({
   fullName,
   contactNumber,
   email,
@@ -7,59 +6,37 @@ export const mandatoryFields = ({
   selectedQualification,
   selectedCoursesOptions,
 }) => {
-  console.log(isCourseEnquiry);
-
-  // Full Name Validation
+  const errors = {};
 
   const trimmedName = fullName.trim();
   if (!trimmedName) {
-    toast.warn("Name is a mandatory field!");
-    return false;
-  }
-  if (trimmedName.length > 200) {
-    toast.warn("Name cannot exceed 200 characters!");
-    return false;
-  }
-  const nameRegex = /^[a-zA-Z\s]+$/;
-  if (!nameRegex.test(trimmedName)) {
-    toast.warn("Name should not contain special characters or numbers!");
-    return false;
+    errors.fullName = "Name is a mandatory field!";
+  } else if (trimmedName.length > 200) {
+    errors.fullName = "Name cannot exceed 200 characters!";
+  } else if (!/^[a-zA-Z\s]+$/.test(trimmedName)) {
+    errors.fullName = "Name should not contain special characters or numbers!";
   }
 
-  // Contact Number Validation
   if (!contactNumber.trim()) {
-    toast.warn("Contact number is a mandatory field!");
-    return false;
+    errors.contactNumber = "Contact number is a mandatory field!";
+  } else if (!/^\d{11}$/.test(contactNumber)) {
+    errors.contactNumber = "Contact number must be exactly 10 digits!";
   }
 
-  const isAllDigits = /^\d{10}$/.test(contactNumber);
-  if (!isAllDigits || contactNumber.length !== 10) {
-    toast.warn("Contact number must be exactly 10 numeric digits!");
-    return false;
-  }
-
-  // Email Validation
   if (!email.trim()) {
-    toast.warn("Email is a mandatory field!");
-    return false;
-  }
-
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!emailRegex.test(email)) {
-    toast.warn("Please enter a valid email address!");
-    return false;
+    errors.email = "Email is a mandatory field!";
+  } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    errors.email = "Please enter a valid email address!";
   }
 
   if (isCourseEnquiry) {
     if (!selectedQualification) {
-      toast.warn("Highest Qualification is required for Course Enquiry!");
-      return false;
+      errors.selectedQualification = "Highest Qualification is required!";
     }
     if (!selectedCoursesOptions || selectedCoursesOptions.length === 0) {
-      toast.warn("Course is required for Course Enquiry!");
-      return false;
+      errors.selectedCoursesOptions = "At least one course must be selected!";
     }
   }
 
-  return true;
+  return errors;
 };

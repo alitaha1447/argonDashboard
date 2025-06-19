@@ -34,43 +34,45 @@ import { BsThreeDotsVertical } from "react-icons/bs";
 import EnquiryModal from "components/EnquiryModal/EnquiryModal";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-// import axios from "axios";
+import { fetchFinancialYearRangeByDate } from "utils/financialYearRange/FinancialYearRange";
+import axios from "axios";
+import { enquiry } from "DummyData";
 
-const data = [
-  {
-    name: "Taha",
-    contactNumber: "+91-9981341447",
-    highestQualification: "12th",
-    course: "DSA",
-    branch: "Male",
-    enquiryDate: "27/06/2025",
-    status: "Enquired Recieved",
-    testStatus: "Failed",
-    qualified: "Not",
-  },
-  {
-    name: "John",
-    contactNumber: "+91-9123456789",
-    highestQualification: "Graduate",
-    course: "Python",
-    branch: "Male",
-    enquiryDate: "27/03/1996",
-    status: "Rejected",
-    testStatus: "Failed",
-    qualified: "Not",
-  },
-  {
-    name: "Jane",
-    contactNumber: "+91-9876543210",
-    highestQualification: "10th",
-    course: "Java",
-    branch: "Female",
-    enquiryDate: "27/03/1996",
-    status: "Enquired Recieved",
-    testStatus: "Failed",
-    qualified: "Not",
-  },
-];
+// const data = [
+//   {
+//     name: "Taha",
+//     contactNumber: "+91-9981341447",
+//     highestQualification: "12th",
+//     course: "DSA",
+//     branch: "Male",
+//     enquiryDate: "27/06/2025",
+//     status: "Enquired Recieved",
+//     testStatus: "Failed",
+//     qualified: "Not",
+//   },
+//   {
+//     name: "John",
+//     contactNumber: "+91-9123456789",
+//     highestQualification: "Graduate",
+//     course: "Python",
+//     branch: "Male",
+//     enquiryDate: "27/03/1996",
+//     status: "Rejected",
+//     testStatus: "Failed",
+//     qualified: "Not",
+//   },
+//   {
+//     name: "Jane",
+//     contactNumber: "+91-9876543210",
+//     highestQualification: "10th",
+//     course: "Java",
+//     branch: "Female",
+//     enquiryDate: "27/03/1996",
+//     status: "Enquired Recieved",
+//     testStatus: "Failed",
+//     qualified: "Not",
+//   },
+// ];
 const status = [
   { value: "all", label: "All" },
   { value: "enquiredRecieved", label: "Enquired Recieved" },
@@ -85,45 +87,66 @@ const EnquiryDashboard = (props) => {
   const [modalOpen, setModalOpen] = useState(false);
   const [openDropdownIndex, setOpenDropdownIndex] = useState(null);
   const [selectedEnquiry, setSelectedEnquiry] = useState(status[0]);
+  const [selectedEnquiryType, setSelectedEnquiryType] = useState(enquiry[0]);
   const [dateRange, setDateRange] = useState([null, null]);
   const [startDate, endDate] = dateRange;
   const [searchText, setSearchText] = useState("");
-  const [filteredData, setFilteredData] = useState([]);
-  const [isFilterActive, setIsFilterActive] = useState(false);
-  // const [chartExample1Data, setChartExample1Data] = useState("data1");
+  // const [filteredData, setFilteredData] = useState([]);
+  // const [isFilterActive, setIsFilterActive] = useState(false);
 
-  const fetchPaginatedData = async (page = 1) => {
-    console.log(page);
-    // try {
-    //   const res = await axios.get(
-    //     "https://hotelapi.shriyanshnath.com/api/Get_Enquiry_Dashboard_Data",
-    //     {
-    //       params: {
-    //         fromdate: formattedStartDate,
-    //         todate: formattedEndDate,
-    //         enquirytype: 1,
-    //         pageNumber: page,
-    //         pageSize: 10,
-    //         APIKEY: "12345678@",
-    //       },
-    //     }
-    //   );
-    //   setEnquiries(res.data.Data);
-    //   setPageNumber(res.data.PageNumber);
-    //   setTotalPages(res.data.TotalPages);
-    // } catch (error) {
-    //   console.error("❌ Pagination fetch failed:", error);
-    // }
+  const [pageNumber, setPageNumber] = useState(1);
+  const [pageStart, setPageStart] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const pageSize = 5;
+
+  const [listData, setListData] = useState([]);
+
+  const fetchPaginatedData = async (page = 1, filters = {}) => {
+    try {
+      const { startDate1, endDate1 } = fetchFinancialYearRangeByDate();
+      console.log("startDate1", startDate1);
+      console.log("fromDate", filters.fromDate);
+      const params = {
+        fromdate: filters.fromDate || startDate1,
+        todate: filters.toDate || endDate1,
+        enquirytype: filters.status || 1,
+        searchtext: filters.searchText || "",
+        pageno: page,
+        pagesize: pageSize,
+      };
+
+      console.log("API Params:", params); // For debugging
+
+      const res = await axios.get(
+        "https://hotelapi.shriyanshnath.com/api/Get_Enquiry_Dashboard_Data",
+        { params }
+      );
+
+      if (!res.data) {
+        throw new Error("No data received from API");
+      }
+
+      const result = res.data;
+      setListData(result?.Data || []);
+      setPageNumber(result?.PageNumber || page);
+      setTotalPages(result?.TotalPages || 1);
+
+      if (page > pageStart + 2) {
+        setPageStart(page - 2);
+      } else if (page < pageStart) {
+        setPageStart(page);
+      }
+    } catch (error) {
+      console.error("Error fetching paginated data:", error);
+      // You might want to show a user-friendly error message here
+    }
   };
 
   useEffect(() => {
-    fetchPaginatedData(1); // load first page initially
+    setPageStart(1);
+    setPageNumber(1);
+    fetchPaginatedData(1);
   }, []);
-
-  const [pageNumber, setPageNumber] = useState(1);
-  // const [totalPages, setTotalPages] = useState(1);
-  const [pageStart, setPageStart] = useState(1); // starting number of visible pages
-  const visiblePages = [pageStart, pageStart + 1, pageStart + 2];
 
   const handlePageChange = (page) => {
     setPageNumber(page);
@@ -131,12 +154,21 @@ const EnquiryDashboard = (props) => {
   };
 
   const handleNext = () => {
-    setPageStart((prev) => prev + 1);
+    if (pageStart < totalPages) {
+      setPageStart((prev) => prev + 1);
+    }
   };
 
   const handlePrevious = () => {
-    setPageStart((prev) => (prev > 1 ? prev - 1 : 1));
+    if (pageStart > 1) {
+      setPageStart((prev) => prev - 1);
+    }
   };
+
+  const visiblePages = Array.from(
+    { length: Math.min(3, totalPages - pageStart + 1) },
+    (_, i) => pageStart + i
+  );
 
   if (window.Chart) {
     parseOptions(Chart, chartOptions());
@@ -152,8 +184,8 @@ const EnquiryDashboard = (props) => {
     const { value } = e.target;
     setSearchText(value);
     if (value.trim() === "") {
-      setIsFilterActive(false);
-      setFilteredData([]);
+      // setIsFilterActive(false);
+      // setFilteredData([]);
     }
   };
 
@@ -165,10 +197,10 @@ const EnquiryDashboard = (props) => {
   //   }
   // };
 
-  const parseDDMMYYYY = (dateStr) => {
-    const [day, month, year] = dateStr.split("/");
-    return new Date(`${year}-${month}-${day}`);
-  };
+  // const parseDDMMYYYY = (dateStr) => {
+  //   const [day, month, year] = dateStr.split("/");
+  //   return new Date(`${year}-${month}-${day}`);
+  // };
 
   // const formatDate = (date) => {
   //   return date ? new Date(date).toISOString().split("T")[0] : "N/A";
@@ -191,68 +223,53 @@ const EnquiryDashboard = (props) => {
   //   return inRange;
   // });
 
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     try {
-  //       const res = await axios.get(
-  //         "https://hotelapi.shriyanshnath.com/api/Get_Enquiry_Dashboard_Data",
-  //         {
-  //           params: {
-  //             fromdate: formattedStartDate, // 👈 dynamic value
-  //             todate: formattedEndDate, // 👈 dynamic value
-  //             enquirytype: 1,
-  //           },
-  //         }
-  //       );
-  //       console.log(res);
-  //     } catch (error) {
-  //       console.error("Error fetching data:", error);
+  // const handleSearchClick = (e) => {
+  //   e.preventDefault();
+  //   const filtered = data.filter((item) => {
+  //     // Text search
+  //     const lowerSearch = searchText.toLowerCase();
+  //     const matchesText =
+  //       item.name.toLowerCase().includes(lowerSearch) ||
+  //       item.contactNumber.includes(lowerSearch);
+  //     // Date filter
+  //     const itemDate = parseDDMMYYYY(item.enquiryDate);
+  //     const isAfterStart = !startDate || itemDate >= startDate;
+  //     const isBeforeEnd = !endDate || itemDate <= endDate;
+  //     const inRange = isAfterStart && isBeforeEnd;
+  //     // Status filter
+  //     let matchesStatus = true;
+  //     if (selectedEnquiry?.value !== "all") {
+  //       matchesStatus =
+  //         item.status.toLowerCase().replace(/\s/g, "") ===
+  //         selectedEnquiry.value.toLowerCase().replace(/\s/g, "");
   //     }
-  //   };
 
-  //   if (startDate && endDate) {
-  //     fetchData(); // 👈 Only fetch if both dates are selected
-  //   }
-  // }, [formattedStartDate, formattedEndDate]); // 👈 Add as dependencies
-
-  const handleSearchClick = (e) => {
-    e.preventDefault();
-    const filtered = data.filter((item) => {
-      // Text search
-      const lowerSearch = searchText.toLowerCase();
-      const matchesText =
-        item.name.toLowerCase().includes(lowerSearch) ||
-        item.contactNumber.includes(lowerSearch);
-      // Date filter
-      const itemDate = parseDDMMYYYY(item.enquiryDate);
-      const isAfterStart = !startDate || itemDate >= startDate;
-      const isBeforeEnd = !endDate || itemDate <= endDate;
-      const inRange = isAfterStart && isBeforeEnd;
-      // Status filter
-      let matchesStatus = true;
-      if (selectedEnquiry?.value !== "all") {
-        matchesStatus =
-          item.status.toLowerCase().replace(/\s/g, "") ===
-          selectedEnquiry.value.toLowerCase().replace(/\s/g, "");
-      }
-      return matchesText && inRange && matchesStatus;
-    });
-    setFilteredData(filtered);
-    setIsFilterActive(true);
-  };
-
-  // Use filteredData if search was clicked and there are any filters, otherwise use all data
-  const displayData = isFilterActive ? filteredData : data;
-
-  // OR, if you want to auto-grow when user clicks "Next"
-  // const generatePages = () => {
-  //   const pages = [];
-  //   for (let i = 1; i <= Math.max(3, pageNumber); i++) {
-  //     pages.push(i);
-  //   }
-  //   return pages;
+  //     return matchesText && inRange && matchesStatus;
+  //   });
+  //   setFilteredData(filtered);
+  //   setIsFilterActive(true);
   // };
 
+  // Use filteredData if search was clicked and there are any filters, otherwise use all data
+  // const displayData = isFilterActive ? filteredData : data;
+  const handleSearchClick = (e) => {
+    e.preventDefault();
+
+    // const fromDate = startDate ? startDate.toISOString().split("T")[0] : null;
+    // const toDate = endDate ? endDate.toISOString().split("T")[0] : null;
+    // console.log(fromDate);
+    // console.log(toDate);
+    const filters = {
+      // fromDate,
+      // toDate,
+      searchText: searchText.trim(),
+      status: selectedEnquiryType.value,
+    };
+
+    // setIsFilterActive(true); // Optional if you want to show 'Clear Filters' button or UI change
+    fetchPaginatedData(1, filters); // Load filtered data from backend for page 1
+  };
+  console.log(selectedEnquiryType.label);
   return (
     <>
       <Header
@@ -379,6 +396,13 @@ const EnquiryDashboard = (props) => {
                     popperPlacement="bottom-start" // ✅ Opens dropdown below input
                   />
                 </div>
+                <div style={{ width: "200px" }}>
+                  <Select
+                    options={enquiry}
+                    value={selectedEnquiryType}
+                    onChange={(prev) => setSelectedEnquiryType(prev)}
+                  />
+                </div>
               </div>
               <div
                 style={{
@@ -422,10 +446,16 @@ const EnquiryDashboard = (props) => {
                   <thead className="thead-light">
                     <tr>
                       <th scope="col" className="text-center"></th>
+                      <th scope="col">Id</th>
                       <th scope="col">Name</th>
                       <th scope="col">Contact Number</th>
                       <th scope="col">Highest Qualification</th>
-                      <th scope="col">Course</th>
+                      {selectedEnquiryType.label === "Course Enquiry" ||
+                      selectedEnquiryType.label === "Internship Enquiry" ? (
+                        <th scope="col">Course</th>
+                      ) : (
+                        <th scope="col">Product</th>
+                      )}
                       <th scope="col">Branch</th>
                       <th scope="col">Enquiry Date</th>
                       <th scope="col">Status</th>
@@ -436,22 +466,27 @@ const EnquiryDashboard = (props) => {
                   </thead>
                   {/* tbody will be dynamically rendered */}
                   <tbody>
-                    {displayData.map((item, index) => (
+                    {listData.map((item, index) => (
                       <tr key={index}>
                         <td>
                           <div className="d-flex justify-content-center align-items-center">
                             <Input type="checkbox" style={{ margin: 0 }} />
                           </div>
                         </td>
-                        <td>{item.name}</td>
-                        <td>{item.contactNumber}</td>
-                        <td>{item.highestQualification}</td>
-                        <td>{item.course}</td>
-                        <td>{item.branch}</td>
+
+                        <td>{item.Id}</td>
+                        <td>{item.Name}</td>
+                        <td>{item.Mobileno}</td>
+                        <td>{item.QualificationCode}</td>
+                        {selectedEnquiryType.label === "Course Enquiry" ||
+                        selectedEnquiryType.label === "Internship Enquiry" ? (
+                          <td>{item.TopicTitle}</td>
+                        ) : (
+                          <td>{item.product_name}</td>
+                        )}
+                        <td>{item.BranchName}</td>
                         <td>{item.enquiryDate}</td>
-                        <td>{item.status}</td>
-                        {/* <td>{item.testStatus}</td>
-                        <td>{item.qualified}</td> */}
+                        <td>{item.status_txt}</td>
                         <td
                           style={{ position: "relative", textAlign: "center" }}
                         >
@@ -517,12 +552,12 @@ const EnquiryDashboard = (props) => {
               {/* ✅ Card View for Mobile & Tablets */}
               <div className="d-block d-lg-none px-3 pb-3">
                 {/* Example of one card item */}
-                {displayData.map((item, index) => (
+                {listData.map((item, index) => (
                   <Card key={index} className="mb-3 shadow-sm">
                     <div className="p-3 d-flex justify-content-between">
                       <div>
                         <p className="fs-6 fw-semibold mb-1">
-                          <strong>Name:</strong> {item.name}
+                          <strong>Name:</strong> {item.Name}
                         </p>
                         <p className="fs-6 fw-semibold mb-1">
                           <strong>Contact Number:</strong> {item.contactNumber}

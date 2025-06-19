@@ -6,18 +6,22 @@ import {
   Button,
   Label,
   FormGroup,
-  Input,
-  CardHeader,
+  // Input,
+  // CardHeader,
   CardBody,
 } from "reactstrap";
 import InputField from "components/FormFields/InputField";
 // import RadioGroup from "components/FormFields/RadioGroup";
 import TextAreaField from "components/FormFields/TextAreaField";
 import FileUploadField from "components/FormFields/FileUploadField";
+import RadioGroupField from "components/FormFields/RadioGroup";
+import EnquiryFormCardHeader from "components/Molecules/EnquiryFormCardHeader";
+// import EnquiryFormCardBody from "components/Molecules/EnquiryFormCardBody";
 import Select, { components } from "react-select";
 import axios from "axios";
-import { mandatoryFields } from "utils/validations/enquiryValidation";
+// import { mandatoryFields } from "utils/validations/enquiryValidation";
 import { ToastContainer, toast } from "react-toastify";
+import { getValidationErrors } from "utils/validations/enquiryValidation";
 
 // DATA
 import { genderOptions, refOptions, enquiry } from "DummyData";
@@ -50,6 +54,7 @@ const EnquiryForm = () => {
   const [productOptions, setProductOptions] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [selectedEnquiry, setSelectedEnquiry] = useState(enquiry[0]);
+  const [formErrors, setFormErrors] = useState({});
 
   const resetForm = () => {
     setFullName("");
@@ -61,7 +66,7 @@ const EnquiryForm = () => {
     setWhatsappNumber("");
     setAdditionalQuery("");
     setSelectedOptionsQualification(null);
-    setSelectedCoursesOptions(null);
+    setSelectedCoursesOptions("");
     setSelectedProduct(null);
     setSelectedBranch(null);
   };
@@ -73,8 +78,18 @@ const EnquiryForm = () => {
     const isCourseEnquiry =
       selectedEnquiry?.label === "Course Enquiry" ||
       selectedEnquiry?.label === "Internship Enquiry";
+    // const isValid = mandatoryFields({
+    //   fullName,
+    //   contactNumber,
+    //   email,
+    //   isCourseEnquiry,
+    //   selectedQualification,
+    //   selectedCoursesOptions,
+    // });
 
-    const isValid = mandatoryFields({
+    // if (!isValid) return;
+
+    const errors = getValidationErrors({
       fullName,
       contactNumber,
       email,
@@ -83,8 +98,10 @@ const EnquiryForm = () => {
       selectedCoursesOptions,
     });
 
-    if (!isValid) return;
-
+    if (Object.keys(errors).length > 0) {
+      setFormErrors(errors); // show error messages under fields
+      return;
+    }
     const enquiryFormdata = {
       EnquiryType: selectedEnquiry?.value,
       Name: fullName,
@@ -94,9 +111,8 @@ const EnquiryForm = () => {
       Gender: gender?.value,
       Qualification: !isCourseEnquiry ? null : selectedQualification?.value,
       Course:
-        (isCourseEnquiry &&
-          selectedCoursesOptions?.map((c) => c.value).join(",")) ||
-        null,
+        isCourseEnquiry &&
+        selectedCoursesOptions?.map((c) => c.value).join(","),
       Product: !isCourseEnquiry ? selectedProduct?.value : null,
       Branch: !isCourseEnquiry ? null : selectedBranch?.value,
       ReferedBy: referedBy?.value,
@@ -228,13 +244,20 @@ const EnquiryForm = () => {
       console.log(`product_Error ---> ${error}`);
     }
   };
-  const handleEnquiry = (selected) => {
-    setSelectedEnquiry(selected);
-  };
+  // const handleEnquiry = (selected) => {
+  //   setSelectedEnquiry(selected);
+  // };
 
   return (
     <>
-      <CardHeader className="bg-white">
+      <EnquiryFormCardHeader
+        enquiry={enquiry}
+        selectedEnquiry={selectedEnquiry}
+        handleEnquiry={(selected) => {
+          setSelectedEnquiry(selected);
+        }}
+      />
+      {/* <CardHeader className="bg-white">
         <div className="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center w-100 pb-2 gap-2">
           <h1 className="mb-2 mb-md-0">Enquiry Form</h1>
           <div style={{ width: "200px" }}>
@@ -245,8 +268,9 @@ const EnquiryForm = () => {
             />
           </div>
         </div>
-      </CardHeader>
+      </CardHeader> */}
       <CardBody>
+        {/* <EnquiryFormCardBody /> */}
         <Form onSubmit={handleSubmit}>
           <Row>
             <Col md={6}>
@@ -255,16 +279,25 @@ const EnquiryForm = () => {
                 id="fullName"
                 type="text"
                 value={fullName}
-                onChange={(e) => setFullName(e.target.value)}
+                onChange={(e) => {
+                  setFullName(e.target.value);
+                  setFormErrors((prev) => ({ ...prev, fullName: "" }));
+                }}
+                error={formErrors.fullName}
+                required={true}
               />
             </Col>
             <Col md={6}>
               <InputField
                 label="Email"
                 id="email"
-                type="email"
+                type="text"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                  setFormErrors((prev) => ({ ...prev, email: "" }));
+                }}
+                error={formErrors.email}
               />
             </Col>
           </Row>
@@ -275,7 +308,12 @@ const EnquiryForm = () => {
                 id="contact"
                 type="tel"
                 value={contactNumber}
-                onChange={(e) => setContactNumber(e.target.value)}
+                onChange={(e) => {
+                  setContactNumber(e.target.value);
+                  setFormErrors((prev) => ({ ...prev, contactNumber: "" }));
+                }}
+                error={formErrors.contactNumber}
+                required={true}
               />
             </Col>
             <Col md={6}>
@@ -288,7 +326,7 @@ const EnquiryForm = () => {
               />
             </Col>
           </Row>
-
+          {/* 
           <FormGroup tag="fieldset" className="mb-3">
             <Label className="d-block mb-2">{"Gender"}</Label>
             <Row>
@@ -315,23 +353,43 @@ const EnquiryForm = () => {
                 </Col>
               ))}
             </Row>
-          </FormGroup>
+          </FormGroup> */}
+          <RadioGroupField
+            label="Gender"
+            name="gender"
+            options={genderOptions}
+            selected={gender}
+            onChange={setGender}
+            required={true}
+          />
 
-          {/* <RadioGroup label="Gender" name="gender" options={genderOptions} /> */}
           <Row>
             {(selectedEnquiry?.label === "Course Enquiry" ||
               selectedEnquiry?.label === "Internship Enquiry") && (
               <Col md={6}>
                 <FormGroup>
-                  <Label for="Courses">Highest Qualification</Label>
+                  <Label for="Courses">
+                    {" "}
+                    Highest Qualification
+                    <span className="text-danger ms-1">*</span>
+                  </Label>
                   <Select
                     options={qualificationOptions}
                     value={selectedQualification}
-                    onChange={(selected) =>
-                      setSelectedOptionsQualification(selected)
-                    }
+                    onChange={(selected) => {
+                      setSelectedOptionsQualification(selected);
+                      setFormErrors((prev) => ({
+                        ...prev,
+                        selectedQualification: "",
+                      }));
+                    }}
                     onMenuOpen={async () => await fetchQualificationLists()}
                   />
+                  {formErrors.selectedQualification && (
+                    <div className="text-danger mt-1">
+                      {formErrors.selectedQualification}
+                    </div>
+                  )}
                 </FormGroup>
               </Col>
             )}
@@ -340,7 +398,10 @@ const EnquiryForm = () => {
               {selectedEnquiry?.label === "Course Enquiry" ||
               selectedEnquiry?.label === "Internship Enquiry" ? (
                 <FormGroup>
-                  <Label for="Courses">Preferred Courses</Label>
+                  <Label for="Courses">
+                    Preferred Courses{" "}
+                    <span className="text-danger ms-1">*</span>
+                  </Label>
                   <Select
                     inputId="Courses"
                     isMulti
@@ -351,6 +412,10 @@ const EnquiryForm = () => {
                     value={selectedCoursesOptions}
                     onChange={(selected) => {
                       setSelectedCoursesOptions(selected);
+                      setFormErrors((prev) => ({
+                        ...prev,
+                        selectedCoursesOptions: "",
+                      }));
                     }}
                     onMenuOpen={async () => await fetchCourseDetails()}
                     styles={{
@@ -365,6 +430,11 @@ const EnquiryForm = () => {
                       }),
                     }}
                   />
+                  {formErrors.selectedCoursesOptions && (
+                    <div className="text-danger mt-1">
+                      {formErrors.selectedCoursesOptions}
+                    </div>
+                  )}
                 </FormGroup>
               ) : (
                 <FormGroup>
@@ -407,7 +477,7 @@ const EnquiryForm = () => {
           name="refSource"
           options={refOptions}
         /> */}
-          <FormGroup tag="fieldset" className="mb-3">
+          {/* <FormGroup tag="fieldset" className="mb-3">
             <Label className="d-block mb-2">
               {"How did you hear about us?"}
             </Label>
@@ -435,7 +505,14 @@ const EnquiryForm = () => {
                 </Col>
               ))}
             </Row>
-          </FormGroup>
+          </FormGroup> */}
+          <RadioGroupField
+            label="How did you hear about us?"
+            name="referedBy"
+            options={refOptions}
+            selected={referedBy}
+            onChange={setReferedBy}
+          />
           <Row>
             <Col md={6}>
               <InputField
