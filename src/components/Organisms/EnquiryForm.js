@@ -298,6 +298,7 @@ const EnquiryForm = () => {
                   setFormErrors((prev) => ({ ...prev, email: "" }));
                 }}
                 error={formErrors.email}
+                required={true}
               />
             </Col>
           </Row>
