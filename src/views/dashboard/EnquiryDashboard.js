@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 
 import Chart from "chart.js";
 import { Bar, Pie } from "react-chartjs-2";
@@ -101,52 +101,50 @@ const EnquiryDashboard = (props) => {
 
   const [listData, setListData] = useState([]);
 
-  const fetchPaginatedData = async (page = 1, filters = {}) => {
-    try {
-      const { startDate1, endDate1 } = fetchFinancialYearRangeByDate();
-      console.log("startDate1", startDate1);
-      console.log("fromDate", filters.fromDate);
-      const params = {
-        fromdate: filters.fromDate || startDate1,
-        todate: filters.toDate || endDate1,
-        enquirytype: filters.status || 1,
-        searchtext: filters.searchText || "",
-        pageno: page,
-        pagesize: pageSize,
-      };
+  const fetchPaginatedData = useCallback(
+    async (page = 1, filters = {}) => {
+      try {
+        const { startDate1, endDate1 } = fetchFinancialYearRangeByDate();
+        const params = {
+          fromdate: filters.fromDate || startDate1,
+          todate: filters.toDate || endDate1,
+          enquirytype: filters.status || 1,
+          searchtext: filters.searchText || "",
+          pageno: page,
+          pagesize: pageSize,
+        };
 
-      console.log("API Params:", params); // For debugging
+        const res = await axios.get(
+          "https://hotelapi.shriyanshnath.com/api/Get_Enquiry_Dashboard_Data",
+          { params }
+        );
 
-      const res = await axios.get(
-        "https://hotelapi.shriyanshnath.com/api/Get_Enquiry_Dashboard_Data",
-        { params }
-      );
+        if (!res.data) {
+          throw new Error("No data received from API");
+        }
 
-      if (!res.data) {
-        throw new Error("No data received from API");
+        const result = res.data;
+        setListData(result?.Data || []);
+        setPageNumber(result?.PageNumber || page);
+        setTotalPages(result?.TotalPages || 1);
+
+        if (page > pageStart + 2) {
+          setPageStart(page - 2);
+        } else if (page < pageStart) {
+          setPageStart(page);
+        }
+      } catch (error) {
+        console.error("Error fetching paginated data:", error);
       }
-
-      const result = res.data;
-      setListData(result?.Data || []);
-      setPageNumber(result?.PageNumber || page);
-      setTotalPages(result?.TotalPages || 1);
-
-      if (page > pageStart + 2) {
-        setPageStart(page - 2);
-      } else if (page < pageStart) {
-        setPageStart(page);
-      }
-    } catch (error) {
-      console.error("Error fetching paginated data:", error);
-      // You might want to show a user-friendly error message here
-    }
-  };
+    },
+    [pageStart, pageSize]
+  );
 
   useEffect(() => {
     setPageStart(1);
     setPageNumber(1);
     fetchPaginatedData(1);
-  }, []);
+  }, [fetchPaginatedData]);
 
   const handlePageChange = (page) => {
     setPageNumber(page);
