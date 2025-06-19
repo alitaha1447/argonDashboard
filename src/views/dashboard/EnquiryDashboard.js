@@ -200,9 +200,9 @@ const EnquiryDashboard = (props) => {
   //   return new Date(`${year}-${month}-${day}`);
   // };
 
-  // const formatDate = (date) => {
-  //   return date ? new Date(date).toISOString().split("T")[0] : "N/A";
-  // };
+  const formatDate = (date) => {
+    return new Date(date).toISOString().split("T")[0];
+  };
 
   // const formattedStartDate = formatDate(startDate);
   // const formattedEndDate = formatDate(endDate);
@@ -342,7 +342,7 @@ const EnquiryDashboard = (props) => {
               }}
             >
               <div
-                className="d-flex flex-column flex-md-row align-items-center w-100"
+                className="d-flex  flex-md-row flex-sm-row flex-wrap flex-column  align-items-center w-100"
                 style={{ gap: "1rem" }}
               >
                 <div style={{ width: "200px" }}>
@@ -367,14 +367,14 @@ const EnquiryDashboard = (props) => {
                       onChange={handleContactChange}
                     />
                   </div> */}
-                <div style={{ maxWidth: "200px" }}>
+                <div style={{ width: "200px" }}>
                   <Input
                     placeholder="Search by Name or Phone"
                     type="text"
                     onChange={handleUnifiedSearchChange}
                   />
                 </div>
-                <div style={{ width: "auto" }}>
+                <div style={{ width: "200px !important" }}>
                   <DatePicker
                     selectsRange
                     startDate={startDate}
@@ -422,12 +422,18 @@ const EnquiryDashboard = (props) => {
                   style={{
                     display: "flex",
                     flexDirection: "row",
+                    flexWrap: "wrap",
                     alignItems: "center",
                     justifyContent: "space-between",
                   }}
                 >
                   <h3 className="mb-0">Lists</h3>
-                  <div>
+                  <div
+                    style={{
+                      display: "flex",
+                      flexDirection: "row",
+                    }}
+                  >
                     <Button color="primary" onClick={toggleModal}>
                       Create Batch
                     </Button>
@@ -483,7 +489,7 @@ const EnquiryDashboard = (props) => {
                           <td>{item.product_name}</td>
                         )}
                         <td>{item.BranchName}</td>
-                        <td>{item.enquiryDate}</td>
+                        <td>{formatDate(item.CreatedOn)}</td>
                         <td>{item.status_txt}</td>
                         <td
                           style={{ position: "relative", textAlign: "center" }}
@@ -558,30 +564,53 @@ const EnquiryDashboard = (props) => {
                           <strong>Name:</strong> {item.Name}
                         </p>
                         <p className="fs-6 fw-semibold mb-1">
-                          <strong>Contact Number:</strong> {item.contactNumber}
+                          <strong>Contact Number:</strong> {item.Mobileno}
                         </p>
                         <p className="fs-6 fw-semibold mb-1">
                           <strong>Qualification:</strong>{" "}
-                          {item.highestQualification}
+                          {item.QualificationCode}
+                        </p>
+
+                        <p className="fs-6 fw-semibold mb-1">
+                          <strong>
+                            {selectedEnquiryType.label === "Course Enquiry" ||
+                            selectedEnquiryType.label === "Internship Enquiry"
+                              ? "Course:"
+                              : "Product"}
+                          </strong>{" "}
+                          {selectedEnquiryType.label === "Course Enquiry" ||
+                          selectedEnquiryType.label === "Internship Enquiry"
+                            ? item.TopicTitle
+                            : item.product_name}
+                        </p>
+
+                        {/* {selectedEnquiryType.label === "Course Enquiry" ||
+                        selectedEnquiryType.label === "Internship Enquiry" ? (
+                          <p className="fs-6 fw-semibold mb-1">
+                            <strong>Course:</strong> {item.TopicTitle}
+                          </p>
+                        ) : (
+                          <p className="fs-6 fw-semibold mb-1">
+                            <strong>Course:</strong> {item.product_name}
+                          </p>
+                        )} */}
+
+                        <p className="fs-6 fw-semibold mb-1">
+                          <strong>Branch:</strong> {item.BranchName}
                         </p>
                         <p className="fs-6 fw-semibold mb-1">
-                          <strong>Course:</strong> {item.course}
+                          <strong>Enquiry Date:</strong>{" "}
+                          {formatDate(item.CreatedOn)}
                         </p>
                         <p className="fs-6 fw-semibold mb-1">
-                          <strong>Branch:</strong> {item.branch}
+                          <strong>Status:</strong> {item.status_txt}
                         </p>
-                        <p className="fs-6 fw-semibold mb-1">
-                          <strong>Enquiry Date:</strong> {item.enquiryDate}
-                        </p>
-                        <p className="fs-6 fw-semibold mb-1">
-                          <strong>Status:</strong> {item.status}
-                        </p>
-                        <p className="fs-6 fw-semibold mb-1">
+                        {/* <p className="fs-6 fw-semibold mb-1">
                           <strong>Test Status:</strong> {item.testStatus}
                         </p>
                         <p className="fs-6 fw-semibold mb-1">
                           <strong>Qualified/Not:</strong> {item.qualified}
-                        </p>
+                        </p> */}
                       </div>
                       <div>
                         <div
