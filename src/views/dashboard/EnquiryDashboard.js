@@ -155,7 +155,7 @@ const EnquiryDashboard = (props) => {
     setPageStart(1);
     setPageNumber(1);
     fetchPaginatedData(1);
-  }, [pageNumDropDown]);
+  }, [pageSize]);
 
   useEffect(() => {
     if (branchSearchText.length < 3) {
@@ -562,7 +562,7 @@ const EnquiryDashboard = (props) => {
                         {(selectedEnquiryType.label === "Course Enquiry" ||
                           selectedEnquiryType.label ===
                             "Internship Enquiry") && (
-                          <td scope="col">{item.QualificationCode}</td>
+                          <td>{item.QualificationCode}</td>
                         )}
                         {selectedEnquiryType.label === "Course Enquiry" ||
                         selectedEnquiryType.label === "Internship Enquiry" ? (
