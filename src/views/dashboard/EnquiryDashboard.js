@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 
 import Chart from "chart.js";
 import { Bar, Pie } from "react-chartjs-2";
@@ -32,11 +32,15 @@ import {
 
 import { BsThreeDotsVertical } from "react-icons/bs";
 import EnquiryModal from "components/EnquiryModal/EnquiryModal";
+import BatchModal from "components/BatchModal/BatchModal";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { fetchFinancialYearRangeByDate } from "utils/financialYearRange/FinancialYearRange";
 import axios from "axios";
 import { enquiry } from "DummyData";
+
+const API_PATH = process.env.REACT_APP_API_PATH;
+const API_KEY = process.env.REACT_APP_API_KEY;
 
 // const data = [
 //   {
@@ -82,77 +86,127 @@ const status = [
   { value: "rejected", label: "Rejected" },
 ];
 
+const pageNum = [
+  { value: 1, label: "1" },
+  { value: 2, label: " 2" },
+  { value: 3, label: "3" },
+  { value: 4, label: "4" },
+  { value: 5, label: "5" },
+];
+
 const EnquiryDashboard = (props) => {
   //   const [activeNav, setActiveNav] = useState(1);
   const [modalOpen, setModalOpen] = useState(false);
+  const [batchModalOpen, setBatchModalOpen] = useState(false);
   const [openDropdownIndex, setOpenDropdownIndex] = useState(null);
   const [selectedEnquiry, setSelectedEnquiry] = useState(status[0]);
   const [selectedEnquiryType, setSelectedEnquiryType] = useState(enquiry[0]);
   const [dateRange, setDateRange] = useState([null, null]);
   const [startDate, endDate] = dateRange;
   const [searchText, setSearchText] = useState("");
+  // Branch
+  const [selectedBranch, setSelectedBranch] = useState(null);
+  const [branchOptions, setBranchOptions] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [branchSearchText, setBranchSearchText] = useState("");
   // const [filteredData, setFilteredData] = useState([]);
   // const [isFilterActive, setIsFilterActive] = useState(false);
 
   const [pageNumber, setPageNumber] = useState(1);
   const [pageStart, setPageStart] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const pageSize = 5;
 
   const [listData, setListData] = useState([]);
 
-  const fetchPaginatedData = useCallback(
-    async (page = 1, filters = {}) => {
-      try {
-        const { startDate1, endDate1 } = fetchFinancialYearRangeByDate();
-        const params = {
-          fromdate: filters.fromDate || startDate1,
-          todate: filters.toDate || endDate1,
-          enquirytype: filters.status || 1,
-          searchtext: filters.searchText || "",
-          pageno: page,
-          pagesize: pageSize,
-        };
+  const [pageNumDropDown, setPageNumDropDown] = useState(pageNum[0]);
+  const pageSize = pageNumDropDown?.value;
 
-        const res = await axios.get(
-          "https://hotelapi.shriyanshnath.com/api/Get_Enquiry_Dashboard_Data",
-          { params }
-        );
+  const fetchPaginatedData = async (page = 1, filters = {}) => {
+    try {
+      const { startDate1, endDate1 } = fetchFinancialYearRangeByDate();
+      const params = {
+        fromdate: filters.fromDate || startDate1,
+        todate: filters.toDate || endDate1,
+        enquirytype: filters.status || 1,
+        searchtext: filters.searchText || "",
+        pageno: page,
+        pagesize: pageSize,
+      };
 
-        if (!res.data) {
-          throw new Error("No data received from API");
-        }
+      const res = await axios.get(
+        "https://hotelapi.shriyanshnath.com/api/Get_Enquiry_Dashboard_Data",
+        { params }
+      );
 
-        const result = res.data;
-        setListData(result?.Data || []);
-        setPageNumber(result?.PageNumber || page);
-        setTotalPages(result?.TotalPages || 1);
-
-        if (page > pageStart + 2) {
-          setPageStart(page - 2);
-        } else if (page < pageStart) {
-          setPageStart(page);
-        }
-      } catch (error) {
-        console.error("Error fetching paginated data:", error);
+      if (!res.data) {
+        throw new Error("No data received from API");
       }
-    },
-    [pageStart, pageSize]
-  );
+
+      const result = res.data;
+      setListData(result?.Data || []);
+      setPageNumber(result?.PageNumber || page);
+      setTotalPages(result?.TotalPages || 1);
+    } catch (error) {
+      console.error("Error fetching paginated data:", error);
+    }
+  };
 
   useEffect(() => {
     setPageStart(1);
     setPageNumber(1);
     fetchPaginatedData(1);
-  }, [fetchPaginatedData]);
+  }, [pageNumDropDown]);
+
+  useEffect(() => {
+    if (branchSearchText.length < 3) {
+      setBranchOptions([]);
+      return;
+    }
+
+    const fetchData = async () => {
+      setIsLoading(true);
+      try {
+        const res = await axios.get(`${API_PATH}/api/branches`, {
+          params: {
+            APIKEY: API_KEY,
+            searchtext: branchSearchText,
+          },
+          // headers: {
+          //   APIKEY: API_KEY,
+          // },
+        });
+
+        const options =
+          res.data?.map((branch) => ({
+            label: branch?.BranchName || `Branch ${branch?.BranchId}`,
+            value: branch?.BranchId,
+          })) || [];
+
+        setBranchOptions(options);
+      } catch (err) {
+        console.error("Branch fetch error:", err);
+        setBranchOptions([]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [branchSearchText]);
 
   const handlePageChange = (page) => {
     setPageNumber(page);
     fetchPaginatedData(page);
+
+    // if (page > pageStart + 2) {
+    //   setPageStart(page - 2);
+    // } else if (page < pageStart) {
+    //   setPageStart(page);
+    // }
   };
 
   const handleNext = () => {
-    if (pageStart < totalPages) {
+    if (pageStart + 2 < totalPages) {
       setPageStart((prev) => prev + 1);
     }
   };
@@ -163,16 +217,17 @@ const EnquiryDashboard = (props) => {
     }
   };
 
-  const visiblePages = Array.from(
-    { length: Math.min(3, totalPages - pageStart + 1) },
-    (_, i) => pageStart + i
-  );
+  const visiblePages = [];
+  for (let i = pageStart; i <= Math.min(pageStart + 2, totalPages); i++) {
+    visiblePages.push(i);
+  }
 
   if (window.Chart) {
     parseOptions(Chart, chartOptions());
   }
 
   const toggleModal = () => setModalOpen(!modalOpen);
+  const batchModal = () => setBatchModalOpen(!batchModalOpen);
 
   // const handleEnquiry = (selected) => {
   //   setSelectedEnquiry(selected);
@@ -201,7 +256,11 @@ const EnquiryDashboard = (props) => {
   // };
 
   const formatDate = (date) => {
-    return new Date(date).toISOString().split("T")[0];
+    const d = new Date(date);
+    const day = String(d.getDate()).padStart(2, "0");
+    const month = String(d.getMonth() + 1).padStart(2, "0"); // months are 0-based
+    const year = d.getFullYear();
+    return `${day}-${month}-${year}`;
   };
 
   // const formattedStartDate = formatDate(startDate);
@@ -258,16 +317,12 @@ const EnquiryDashboard = (props) => {
     // console.log(fromDate);
     // console.log(toDate);
     const filters = {
-      // fromDate,
-      // toDate,
       searchText: searchText.trim(),
       status: selectedEnquiryType.value,
     };
 
-    // setIsFilterActive(true); // Optional if you want to show 'Clear Filters' button or UI change
-    fetchPaginatedData(1, filters); // Load filtered data from backend for page 1
+    fetchPaginatedData(1, filters);
   };
-  console.log(selectedEnquiryType.label);
   return (
     <>
       <Header
@@ -345,7 +400,7 @@ const EnquiryDashboard = (props) => {
                 className="d-flex  flex-md-row flex-sm-row flex-wrap flex-column  align-items-center w-100"
                 style={{ gap: "1rem" }}
               >
-                <div style={{ width: "200px" }}>
+                <div style={{ width: "150px" }}>
                   <Select
                     options={status}
                     value={selectedEnquiry}
@@ -367,14 +422,39 @@ const EnquiryDashboard = (props) => {
                       onChange={handleContactChange}
                     />
                   </div> */}
-                <div style={{ width: "200px" }}>
+                <div style={{ width: "150px" }}>
                   <Input
                     placeholder="Search by Name or Phone"
                     type="text"
                     onChange={handleUnifiedSearchChange}
                   />
                 </div>
-                <div style={{ width: "200px !important" }}>
+
+                <div style={{ width: "150px" }}>
+                  <Select
+                    options={enquiry}
+                    value={selectedEnquiryType}
+                    onChange={(prev) => setSelectedEnquiryType(prev)}
+                  />
+                </div>
+                <div style={{ width: "150px" }}>
+                  <Select
+                    id="branch-select"
+                    options={branchOptions}
+                    value={selectedBranch}
+                    onChange={(selected) => setSelectedBranch(selected)}
+                    onInputChange={(text) => setBranchSearchText(text)}
+                    placeholder="branch"
+                    isClearable
+                    isLoading={isLoading}
+                    noOptionsMessage={({ inputValue }) =>
+                      inputValue.length < 3
+                        ? "Type at least 3 characters to search"
+                        : "No branches found"
+                    }
+                  />
+                </div>
+                <div className="">
                   <DatePicker
                     selectsRange
                     startDate={startDate}
@@ -382,7 +462,7 @@ const EnquiryDashboard = (props) => {
                     onChange={(date) => setDateRange(date)}
                     monthsShown={2} // ✅ Show two calendars
                     dateFormat="dd/MM/yyyy"
-                    className="form-control"
+                    className="react-datepicker__input-container form-control"
                     placeholderText="Select date range"
                     isClearable
                     // showMonthDropdown
@@ -392,13 +472,6 @@ const EnquiryDashboard = (props) => {
                     minDate={new Date(1900, 0, 1)}
                     maxDate={new Date(2025, 11, 31)}
                     popperPlacement="bottom-start" // ✅ Opens dropdown below input
-                  />
-                </div>
-                <div style={{ width: "200px" }}>
-                  <Select
-                    options={enquiry}
-                    value={selectedEnquiryType}
-                    onChange={(prev) => setSelectedEnquiryType(prev)}
                   />
                 </div>
               </div>
@@ -434,7 +507,7 @@ const EnquiryDashboard = (props) => {
                       flexDirection: "row",
                     }}
                   >
-                    <Button color="primary" onClick={toggleModal}>
+                    <Button color="primary" onClick={batchModal}>
                       Create Batch
                     </Button>
                     <Button color="primary" onClick={toggleModal}>
@@ -453,7 +526,11 @@ const EnquiryDashboard = (props) => {
                       <th scope="col">Id</th>
                       <th scope="col">Name</th>
                       <th scope="col">Contact Number</th>
-                      <th scope="col">Highest Qualification</th>
+                      {(selectedEnquiryType.label === "Course Enquiry" ||
+                        selectedEnquiryType.label === "Internship Enquiry") && (
+                        <th scope="col">Highest Qualification</th>
+                      )}
+
                       {selectedEnquiryType.label === "Course Enquiry" ||
                       selectedEnquiryType.label === "Internship Enquiry" ? (
                         <th scope="col">Course</th>
@@ -481,7 +558,12 @@ const EnquiryDashboard = (props) => {
                         <td>{item.Id}</td>
                         <td>{item.Name}</td>
                         <td>{item.Mobileno}</td>
-                        <td>{item.QualificationCode}</td>
+                        {/* <td>{item.QualificationCode}</td> */}
+                        {(selectedEnquiryType.label === "Course Enquiry" ||
+                          selectedEnquiryType.label ===
+                            "Internship Enquiry") && (
+                          <td scope="col">{item.QualificationCode}</td>
+                        )}
                         {selectedEnquiryType.label === "Course Enquiry" ||
                         selectedEnquiryType.label === "Internship Enquiry" ? (
                           <td>{item.TopicTitle}</td>
@@ -711,6 +793,13 @@ const EnquiryDashboard = (props) => {
                         <i className="fas fa-angle-right" />
                       </PaginationLink>
                     </PaginationItem>
+                    <div style={{ width: "80px", marginLeft: "10px" }}>
+                      <Select
+                        options={pageNum}
+                        value={pageNumDropDown}
+                        onChange={(prev) => setPageNumDropDown(prev)}
+                      />
+                    </div>
                   </Pagination>
                 </nav>
               </CardFooter>
@@ -723,6 +812,7 @@ const EnquiryDashboard = (props) => {
         toggle={toggleModal}
         // handleSubmit={handleFormSubmit}
       />
+      <BatchModal modal={batchModalOpen} toggle={batchModal} />
     </>
   );
 };

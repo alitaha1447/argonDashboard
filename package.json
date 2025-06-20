@@ -64,7 +64,8 @@
     "react-select": "^5.10.1",
     "react-toastify": "^11.0.5",
     "reactstrap": "8.10.0",
-    "sass": "1.69.5"
+    "sass": "1.69.5",
+    "uuid": "^11.1.0"
   },
   "devDependencies": {
     "cross-env": "^7.0.3",
