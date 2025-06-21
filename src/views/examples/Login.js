@@ -22,19 +22,19 @@ const Login = () => {
           <CardHeader className="bg-transparent pb-1">
             <div
               style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                position: 'relative',
-                height: '3rem',
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                position: "relative",
+                height: "3rem",
               }}
             >
               {/* Left-aligned logo */}
-              <div style={{ position: 'absolute', left: 0 }}>
+              <div style={{ position: "absolute", left: 0 }}>
                 <img
                   alt="Logo"
                   src={require("../../assets/img/brand/m.png")}
-                  style={{ height: '3rem' }}
+                  style={{ height: "3rem" }}
                 />
               </div>
 

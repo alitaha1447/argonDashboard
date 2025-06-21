@@ -1,7 +1,7 @@
 import React from "react";
 import { Route, Routes, Navigate } from "react-router-dom";
 // reactstrap components
-import { Container, Row, } from "reactstrap";
+import { Container, Row } from "reactstrap";
 
 // core components
 import AuthNavbar from "components/Navbars/AuthNavbar.js";
@@ -46,7 +46,10 @@ const Auth = (props) => {
             <Row className="justify-content-center">
               <Routes>
                 {getRoutes(routes)}
-                <Route path="*" element={<Navigate to="/auth/login" replace />} />
+                <Route
+                  path="*"
+                  element={<Navigate to="/auth/login" replace />}
+                />
               </Routes>
             </Row>
           </Container>

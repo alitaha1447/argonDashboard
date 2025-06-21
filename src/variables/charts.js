@@ -418,23 +418,23 @@ let chartExample3 = {
     },
   },
   data: {
-    labels: ["Facebook", "Google", "Instagram", "Twitter", "LinkedIn"],
+    labels: ["Course", "internship", "product"],
     datasets: [
       {
-        data: [1480, 4807, 3678, 2645, 1000],
+        data: [12, 2, 2],
         backgroundColor: [
           "#f5365c", // Facebook - red
           "#2dce89", // Google - green
           "#11cdef", // Instagram - blue
-          "#fb6340", // Twitter - orange
-          "#5e72e4", // LinkedIn - purple
+          // "#fb6340", // Twitter - orange
+          // "#5e72e4", // LinkedIn - purple
         ],
         hoverBackgroundColor: [
           "#d92e4a",
           "#24b97d",
           "#0ebad6",
-          "#ec5920",
-          "#4b5fd9",
+          // "#ec5920",
+          // "#4b5fd9",
         ],
         borderColor: "#fff",
         borderWidth: 0,

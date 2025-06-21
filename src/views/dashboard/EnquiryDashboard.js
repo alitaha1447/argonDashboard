@@ -17,9 +17,14 @@ import {
   Row,
   Col,
   Input,
+  UncontrolledDropdown,
+  DropdownToggle,
+  DropdownMenu,
+  DropdownItem,
 } from "reactstrap";
 
 import Header from "components/Headers/Header.js";
+// import List from "components/EnquiryDashboardList/List";
 import Select from "react-select";
 
 // core components
@@ -38,6 +43,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import { fetchFinancialYearRangeByDate } from "utils/financialYearRange/FinancialYearRange";
 import axios from "axios";
 import { enquiry } from "DummyData";
+import { FaPlus } from "react-icons/fa";
 
 const API_PATH = process.env.REACT_APP_API_PATH;
 const API_KEY = process.env.REACT_APP_API_KEY;
@@ -87,10 +93,10 @@ const status = [
 ];
 
 const pageNum = [
-  { value: 1, label: "1" },
-  { value: 2, label: " 2" },
-  { value: 3, label: "3" },
-  { value: 4, label: "4" },
+  { value: 10, label: "10" },
+  { value: 25, label: " 25" },
+  { value: 50, label: "50" },
+  { value: 100, label: "100" },
   { value: 5, label: "5" },
 ];
 
@@ -117,11 +123,42 @@ const EnquiryDashboard = (props) => {
   const [totalPages, setTotalPages] = useState(1);
 
   const [listData, setListData] = useState([]);
+  const [isTableLoading, setIsTableLoading] = useState(false);
 
   const [pageNumDropDown, setPageNumDropDown] = useState(pageNum[0]);
   const pageSize = pageNumDropDown?.value;
+  // PieChart
+  const [pieData, setPieData] = useState({
+    labels: [],
+    datasets: [
+      {
+        data: [],
+        backgroundColor: ["#f5365c", "#2dce89", "#11cdef"],
+        hoverBackgroundColor: ["#d92e4a", "#24b97d", "#0ebad6"],
+        borderColor: "#fff",
+        borderWidth: 0,
+      },
+    ],
+  });
+  // BarChart
+  const [barData, setBarData] = useState({
+    labels: [],
+    datasets: [
+      {
+        data: [],
+        backgroundColor: ["#f5365c", "#2dce89"],
+        hoverBackgroundColor: ["#d92e4a", "#24b97d"],
+        borderColor: "#fff",
+        borderWidth: 0,
+      },
+    ],
+  });
+
+  // const [loadingChart, setLoadingChart] = useState(true);
 
   const fetchPaginatedData = async (page = 1, filters = {}) => {
+    console.log(11);
+    setIsTableLoading(true); // show loader
     try {
       const { startDate1, endDate1 } = fetchFinancialYearRangeByDate();
       const params = {
@@ -148,6 +185,8 @@ const EnquiryDashboard = (props) => {
       setTotalPages(result?.TotalPages || 1);
     } catch (error) {
       console.error("Error fetching paginated data:", error);
+    } finally {
+      setIsTableLoading(false); // hide loader
     }
   };
 
@@ -241,6 +280,9 @@ const EnquiryDashboard = (props) => {
       // setFilteredData([]);
     }
   };
+  const handleEnquiryTypeChange = (selectedOption) => {
+    setSelectedEnquiryType(selectedOption); // only update state
+  };
 
   // const handleDateChange = (date) => {
   //   setDateRange(date);
@@ -309,26 +351,103 @@ const EnquiryDashboard = (props) => {
 
   // Use filteredData if search was clicked and there are any filters, otherwise use all data
   // const displayData = isFilterActive ? filteredData : data;
-  const handleSearchClick = (e) => {
-    e.preventDefault();
+  // const handleSearchClick = (e) => {
+  //   e.preventDefault();
 
-    // const fromDate = startDate ? startDate.toISOString().split("T")[0] : null;
-    // const toDate = endDate ? endDate.toISOString().split("T")[0] : null;
-    // console.log(fromDate);
-    // console.log(toDate);
+  //   // const fromDate = startDate ? startDate.toISOString().split("T")[0] : null;
+  //   // const toDate = endDate ? endDate.toISOString().split("T")[0] : null;
+  //   // console.log(fromDate);
+  //   // console.log(toDate);
+  //   const filters = {
+  //     searchText: searchText.trim(),
+  //     status: selectedEnquiryType.value,
+  //   };
+
+  //   fetchPaginatedData(1, filters);
+  // };
+
+  const handleSearch = () => {
     const filters = {
       searchText: searchText.trim(),
-      status: selectedEnquiryType.value,
+      status: selectedEnquiryType?.value || "",
     };
-
     fetchPaginatedData(1, filters);
   };
+
+  const handleSearchClick = (e) => {
+    e.preventDefault();
+    handleSearch(); // ✅ Reuse search logic
+  };
+
+  useEffect(() => {
+    const { startDate1, endDate1 } = fetchFinancialYearRangeByDate();
+    const fetchPieData = async () => {
+      try {
+        const res = await axios.get(`${API_PATH}/api/Get_Typewise_Enquiry`, {
+          params: {
+            APIKEY: API_KEY,
+            fromdate: startDate1,
+            todate: endDate1,
+          },
+        });
+        const labels = res.data.map((item) => item.enquiry_type_name);
+        const values = res.data.map((item) => item.enquiries);
+
+        setPieData((prev) => ({
+          ...prev,
+          labels: labels,
+          datasets: [
+            {
+              ...prev.datasets[0],
+              data: values,
+            },
+          ],
+        }));
+        // ✅ Now Fetch Bar Chart Data (replace with your actual endpoint)
+        const barChartRes = await axios.get(
+          `${API_PATH}/api/Get_Coursewise_Enquiry`,
+          {
+            params: {
+              APIKEY: API_KEY,
+              fromdate: startDate1,
+              todate: endDate1,
+            },
+          }
+        );
+        const barLabels = barChartRes.data.map((item) => item.topic_title);
+        const barValues = barChartRes.data.map((item) => item.enquires);
+        setBarData((prev) => ({
+          ...prev,
+          labels: barLabels,
+          datasets: [
+            {
+              ...prev.datasets[0],
+              data: barValues,
+            },
+          ],
+        }));
+      } catch (err) {
+        console.error("Error loading pie chart data:", err);
+      }
+    };
+
+    fetchPieData();
+  }, []);
+
+  useEffect(() => {
+    const debounceTimer = setTimeout(() => {
+      handleSearch();
+    }, 300); // Optional: debounce for better performance
+
+    return () => clearTimeout(debounceTimer);
+  }, [selectedEnquiryType]);
+
   return (
     <>
       <Header
-        cardTitle1={"Total Enquiry"}
+        cardTitle1={"Enquiry"}
         cardTitle2={"Student"}
-        cardTitle3={"Not Interested"}
+        cardTitle3={"Not Interest"}
         cardTitle4={"Follow Up"}
       />
 
@@ -340,10 +459,10 @@ const EnquiryDashboard = (props) => {
               <CardHeader className="bg-transparent">
                 <Row className="align-items-center">
                   <div className="col">
-                    <h6 className="text-uppercase text-light ls-1 mb-1">
+                    {/* <h6 className="text-uppercase text-light ls-1 mb-1">
                       Overview
-                    </h6>
-                    <h2 className="text-white mb-0">Sales value</h2>
+                    </h6> */}
+                    <h2 className="text-white mb-0">Course Enquiry</h2>
                   </div>
                   <div className="col"></div>
                 </Row>
@@ -352,7 +471,8 @@ const EnquiryDashboard = (props) => {
                 {/* Chart */}
                 <div className="chart">
                   <Bar
-                    data={chartExample3.data}
+                    // data={chartExample3.data}
+                    data={barData}
                     options={chartExample1.options}
                     // getDatasetAtEvent={(e) => console.log(e)}
                   />
@@ -365,10 +485,10 @@ const EnquiryDashboard = (props) => {
               <CardHeader className="bg-transparent">
                 <Row className="align-items-center">
                   <div className="col">
-                    <h6 className="text-uppercase text-muted ls-1 mb-1">
+                    {/* <h6 className="text-uppercase text-muted ls-1 mb-1">
                       Performance
-                    </h6>
-                    <h2 className="mb-0">Total orders</h2>
+                    </h6> */}
+                    <h2 className="mb-0">Type Enquiry</h2>
                   </div>
                 </Row>
               </CardHeader>
@@ -376,7 +496,8 @@ const EnquiryDashboard = (props) => {
                 {/* Chart */}
                 <div className="chart" style={{}}>
                   <Pie
-                    data={chartExample3.data}
+                    // data={chartExample3.data}
+                    data={pieData}
                     options={chartExample3.options}
                   />
                 </div>
@@ -434,7 +555,7 @@ const EnquiryDashboard = (props) => {
                   <Select
                     options={enquiry}
                     value={selectedEnquiryType}
-                    onChange={(prev) => setSelectedEnquiryType(prev)}
+                    onChange={handleEnquiryTypeChange}
                   />
                 </div>
                 <div style={{ width: "150px" }}>
@@ -501,7 +622,7 @@ const EnquiryDashboard = (props) => {
                   }}
                 >
                   <h3 className="mb-0">Lists</h3>
-                  <div
+                  {/* <div
                     style={{
                       display: "flex",
                       flexDirection: "row",
@@ -513,12 +634,63 @@ const EnquiryDashboard = (props) => {
                     <Button color="primary" onClick={toggleModal}>
                       Add
                     </Button>
-                  </div>
+                  </div> */}
+                  <UncontrolledDropdown direction="down">
+                    <DropdownToggle
+                      tag="span"
+                      style={{
+                        cursor: "pointer",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        width: "38px",
+                        height: "38px",
+                        backgroundColor: "#5e72e4",
+                        color: "#fff",
+                        borderRadius: "4px",
+                      }}
+                    >
+                      <FaPlus />
+                    </DropdownToggle>
+
+                    <DropdownMenu
+                      right
+                      style={{
+                        padding: "10px",
+                        border: "1px solid #ddd",
+                        borderRadius: "4px",
+                        boxShadow: "0px 2px 6px rgba(0,0,0,0.2)",
+                        minWidth: "160px",
+                      }}
+                    >
+                      <Button
+                        color="primary"
+                        block
+                        size="md"
+                        onClick={batchModal}
+                      >
+                        Create Batch
+                      </Button>
+                      <Button
+                        color="primary"
+                        block
+                        size="md"
+                        onClick={toggleModal}
+                      >
+                        Add
+                      </Button>
+                    </DropdownMenu>
+                  </UncontrolledDropdown>
                 </div>
               </CardHeader>
 
               {/* ✅ Table View for Large Screens */}
               <div className="d-none d-lg-block">
+                {/* <List
+                  listData={listData}
+                  isTableLoading={isTableLoading}
+                  selectedEnquiryType={selectedEnquiryType}
+                /> */}
                 <Table className="align-items-center table-flush" responsive>
                   <thead className="thead-light">
                     <tr>
@@ -540,40 +712,47 @@ const EnquiryDashboard = (props) => {
                       <th scope="col">Branch</th>
                       <th scope="col">Enquiry Date</th>
                       <th scope="col">Status</th>
-                      {/* <th scope="col">Test Status</th>
-                      <th scope="col">Qualified/Not Qualified</th> */}
                       <th scope="col">Action</th>
                     </tr>
                   </thead>
                   {/* tbody will be dynamically rendered */}
+                  <></>
                   <tbody>
-                    {listData.map((item, index) => (
-                      <tr key={index}>
-                        <td>
-                          <div className="d-flex justify-content-center align-items-center">
-                            <Input type="checkbox" style={{ margin: 0 }} />
-                          </div>
+                    {isTableLoading ? (
+                      <tr>
+                        <td colSpan="10" className="text-center py-4">
+                          <i className="fas fa-spinner fa-spin fa-2x text-primary" />
+                          <p className="mt-2 mb-0">Loading data...</p>
                         </td>
+                      </tr>
+                    ) : listData.length > 0 ? (
+                      listData.map((item, index) => (
+                        <tr key={index}>
+                          <td>
+                            <div className="d-flex justify-content-center align-items-center">
+                              <Input type="checkbox" style={{ margin: 0 }} />
+                            </div>
+                          </td>
 
-                        <td>{item.Id}</td>
-                        <td>{item.Name}</td>
-                        <td>{item.Mobileno}</td>
-                        {/* <td>{item.QualificationCode}</td> */}
-                        {(selectedEnquiryType.label === "Course Enquiry" ||
-                          selectedEnquiryType.label ===
-                            "Internship Enquiry") && (
-                          <td>{item.QualificationCode}</td>
-                        )}
-                        {selectedEnquiryType.label === "Course Enquiry" ||
-                        selectedEnquiryType.label === "Internship Enquiry" ? (
-                          <td>{item.TopicTitle}</td>
-                        ) : (
-                          <td>{item.product_name}</td>
-                        )}
-                        <td>{item.BranchName}</td>
-                        <td>{formatDate(item.CreatedOn)}</td>
-                        <td>{item.status_txt}</td>
-                        <td
+                          <td>{item.Id}</td>
+                          <td>{item.Name}</td>
+                          <td>{item.Mobileno}</td>
+                          {/* <td>{item.QualificationCode}</td> */}
+                          {(selectedEnquiryType.label === "Course Enquiry" ||
+                            selectedEnquiryType.label ===
+                              "Internship Enquiry") && (
+                            <td>{item.QualificationCode}</td>
+                          )}
+                          {selectedEnquiryType.label === "Course Enquiry" ||
+                          selectedEnquiryType.label === "Internship Enquiry" ? (
+                            <td>{item.TopicTitle}</td>
+                          ) : (
+                            <td>{item.product_name}</td>
+                          )}
+                          <td>{item.BranchName}</td>
+                          <td>{formatDate(item.CreatedOn)}</td>
+                          <td>{item.status_txt}</td>
+                          {/* <td
                           style={{ position: "relative", textAlign: "center" }}
                         >
                           <div
@@ -586,7 +765,7 @@ const EnquiryDashboard = (props) => {
                           >
                             <BsThreeDotsVertical size={20} />
                           </div>
-
+                  
                           {openDropdownIndex === index && (
                             <div
                               style={{
@@ -628,9 +807,59 @@ const EnquiryDashboard = (props) => {
                               </div>
                             </div>
                           )}
+                        </td> */}
+                          <td style={{ textAlign: "center" }}>
+                            <UncontrolledDropdown direction="left">
+                              <DropdownToggle
+                                tag="span"
+                                style={{ cursor: "pointer" }}
+                                data-toggle="dropdown"
+                                aria-expanded={false}
+                              >
+                                <BsThreeDotsVertical size={20} />
+                              </DropdownToggle>
+
+                              <DropdownMenu
+                                right
+                                style={{
+                                  minWidth: "120px",
+                                  border: "1px solid #ddd",
+                                  borderRadius: "4px",
+                                  boxShadow: "0px 2px 6px rgba(0,0,0,0.2)",
+                                }}
+                              >
+                                <DropdownItem
+                                  onClick={() => {
+                                    console.log("Edit clicked for", item.name);
+                                  }}
+                                >
+                                  ✏️ Edit
+                                </DropdownItem>
+                                <DropdownItem
+                                  onClick={() => {
+                                    console.log(
+                                      "Delete clicked for",
+                                      item.name
+                                    );
+                                  }}
+                                >
+                                  🗑️ Delete
+                                </DropdownItem>
+                              </DropdownMenu>
+                            </UncontrolledDropdown>
+                          </td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td
+                          colSpan="10"
+                          className="text-center py-4 text-muted"
+                        >
+                          No data found.
                         </td>
                       </tr>
-                    ))}
+                    )}
                   </tbody>
                 </Table>
               </div>
