@@ -117,6 +117,8 @@ const EnquiryDashboard = (props) => {
   const [branchSearchText, setBranchSearchText] = useState("");
   // const [filteredData, setFilteredData] = useState([]);
   // const [isFilterActive, setIsFilterActive] = useState(false);
+  const [showGraph, setShowGraph] = useState(false);
+  const [showFilters, setShowFilters] = useState(false);
 
   const [pageNumber, setPageNumber] = useState(1);
   const [pageStart, setPageStart] = useState(1);
@@ -452,9 +454,20 @@ const EnquiryDashboard = (props) => {
       />
 
       {/* Page content */}
+
+      <div className={`d-flex justify-content-end px-2 `}>
+        <Button
+          color="primary"
+          size="sm"
+          style={{ zIndex: 1 }}
+          onClick={() => setShowGraph((prev) => !prev)}
+        >
+          {showGraph ? "Hide Chart" : "Show Chart"}
+        </Button>
+      </div>
       <Container className="mt--7" fluid>
-        <Row className="pb-5 d-flex">
-          <Col className="mb-5 mb-xl-0" xl="8">
+        <Row className={`pb-5 ${showGraph ? "d-flex" : "d-none"}`}>
+          <Col className="mb-5 mb-xl-0 " xl="8">
             <Card className="bg-gradient-default shadow">
               <CardHeader className="bg-transparent">
                 <Row className="align-items-center">
@@ -505,11 +518,34 @@ const EnquiryDashboard = (props) => {
             </Card>
           </Col>
         </Row>
+
         <Row className="d-flex flex-column">
-          <Col className="pb-4">
+          <div
+            className={`d-flex justify-content-end d-md-none px-2 ${
+              showFilters ? "mb-0" : "mb-2"
+            }`}
+          >
+            <Button
+              color="primary"
+              size="sm"
+              onClick={() => setShowFilters(!showFilters)}
+            >
+              {showFilters ? "Hide Filters" : "Show Filters"}
+            </Button>
+          </div>
+          <Col
+            className={`${
+              showFilters ? "d-block d-md-flex" : "d-none d-md-flex"
+            } pb-4`}
+
+            //  className={`${showFilters ? "d-block" : "d-none"} pb-4`}
+          >
             {/* <div className=""> */}
+
             <div
-              className="d-flex flex-row justify-content-between align-items-center mt-4 p-2"
+              className={`${
+                showFilters ? "d-block d-md-flex" : "d-none d-md-flex"
+              } flex-column flex-md-row justify-content-between align-items-start align-items-md-center mt-4 p-2`}
               style={{
                 background: "#f7fafc",
                 maxWidth: "100%",
