@@ -295,11 +295,12 @@ const EnquiryDashboard = (props) => {
 
   const handleUnifiedSearchChange = (e) => {
     const { value } = e.target;
+    // console.log(value);
     setSearchText(value);
-    if (value.trim() === "") {
-      // setIsFilterActive(false);
-      // setFilteredData([]);
-    }
+    // if (value.trim() === "") {
+    // setIsFilterActive(false);
+    // setFilteredData([]);
+    // }
   };
   const handleEnquiryTypeChange = (selectedOption) => {
     setSelectedEnquiryType(selectedOption); // only update state
@@ -335,6 +336,7 @@ const EnquiryDashboard = (props) => {
   };
 
   const handleSearchClick = (e) => {
+    // console.log("first");
     e.preventDefault();
     handleSearch(); // ✅ Reuse search logic
   };
@@ -543,7 +545,8 @@ const EnquiryDashboard = (props) => {
                   minWidth: "38px",
                   // marginLeft: "10px",
                 }}
-                onClick={handleUnifiedSearchChange}
+                // onClick={handleUnifiedSearchChange}
+                onClick={handleSearchClick}
               >
                 <i className="fas fa-search" />
               </div>
