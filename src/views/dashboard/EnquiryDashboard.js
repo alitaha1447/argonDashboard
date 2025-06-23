@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 
 import Chart from "chart.js";
 import { Bar, Pie } from "react-chartjs-2";
@@ -38,9 +38,14 @@ import {
 import { BsThreeDotsVertical } from "react-icons/bs";
 import EnquiryModal from "components/EnquiryModal/EnquiryModal";
 import BatchModal from "components/BatchModal/BatchModal";
+import PieChart from "components/Charts/PieChart";
+import BarChart from "components/Charts/BarChart";
+import Action from "components/ActionDropDown/Action";
+import CustomPagination from "components/CustomPagination/CustomPagination";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { fetchFinancialYearRangeByDate } from "utils/financialYearRange/FinancialYearRange";
+import useBranchList from "customHookApi/EnquiryDashboardApi/useBranchList";
 import axios from "axios";
 import { enquiry } from "DummyData";
 import { FaPlus } from "react-icons/fa";
@@ -101,6 +106,7 @@ const pageNum = [
 ];
 
 const EnquiryDashboard = (props) => {
+  // console.log("EnquiryDashboard");
   //   const [activeNav, setActiveNav] = useState(1);
   const [modalOpen, setModalOpen] = useState(false);
   const [batchModalOpen, setBatchModalOpen] = useState(false);
@@ -112,13 +118,13 @@ const EnquiryDashboard = (props) => {
   const [searchText, setSearchText] = useState("");
   // Branch
   const [selectedBranch, setSelectedBranch] = useState(null);
-  const [branchOptions, setBranchOptions] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [branchSearchText, setBranchSearchText] = useState("");
+  // const [branchOptions, setBranchOptions] = useState([]);
+  // const [isLoading, setIsLoading] = useState(false);
+  // const [branchSearchText, setBranchSearchText] = useState("");
   // const [filteredData, setFilteredData] = useState([]);
   // const [isFilterActive, setIsFilterActive] = useState(false);
   const [showGraph, setShowGraph] = useState(false);
-  const [showFilters, setShowFilters] = useState(false);
+  // const [showFilters, setShowFilters] = useState(false);
 
   const [pageNumber, setPageNumber] = useState(1);
   const [pageStart, setPageStart] = useState(1);
@@ -129,6 +135,16 @@ const EnquiryDashboard = (props) => {
 
   const [pageNumDropDown, setPageNumDropDown] = useState(pageNum[0]);
   const pageSize = pageNumDropDown?.value;
+
+  // customHookAPI
+  const {
+    branchOptions,
+    setBranchOptions,
+    isLoading,
+    fetchBranch,
+    setBranchSearchText,
+    branchSearchText,
+  } = useBranchList();
   // PieChart
   const [pieData, setPieData] = useState({
     labels: [],
@@ -159,7 +175,7 @@ const EnquiryDashboard = (props) => {
   // const [loadingChart, setLoadingChart] = useState(true);
 
   const fetchPaginatedData = async (page = 1, filters = {}) => {
-    console.log(11);
+    // console.log(11);
     setIsTableLoading(true); // show loader
     try {
       const { startDate1, endDate1 } = fetchFinancialYearRangeByDate();
@@ -198,41 +214,41 @@ const EnquiryDashboard = (props) => {
     fetchPaginatedData(1);
   }, [pageSize]);
 
+  // const fetchData = async () => {
+  //   setIsLoading(true);
+  //   try {
+  //     const res = await axios.get(`${API_PATH}/api/branches`, {
+  //       params: {
+  //         APIKEY: API_KEY,
+  //         searchtext: branchSearchText,
+  //       },
+  //       // headers: {
+  //       //   APIKEY: API_KEY,
+  //       // },
+  //     });
+
+  //     const options =
+  //       res.data?.map((branch) => ({
+  //         label: branch?.BranchName || `Branch ${branch?.BranchId}`,
+  //         value: branch?.BranchId,
+  //       })) || [];
+
+  //     setBranchOptions(options);
+  //   } catch (err) {
+  //     console.error("Branch fetch error:", err);
+  //     setBranchOptions([]);
+  //   } finally {
+  //     setIsLoading(false);
+  //   }
+  // };
+
   useEffect(() => {
     if (branchSearchText.length < 3) {
       setBranchOptions([]);
       return;
     }
 
-    const fetchData = async () => {
-      setIsLoading(true);
-      try {
-        const res = await axios.get(`${API_PATH}/api/branches`, {
-          params: {
-            APIKEY: API_KEY,
-            searchtext: branchSearchText,
-          },
-          // headers: {
-          //   APIKEY: API_KEY,
-          // },
-        });
-
-        const options =
-          res.data?.map((branch) => ({
-            label: branch?.BranchName || `Branch ${branch?.BranchId}`,
-            value: branch?.BranchId,
-          })) || [];
-
-        setBranchOptions(options);
-      } catch (err) {
-        console.error("Branch fetch error:", err);
-        setBranchOptions([]);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchData();
+    fetchBranch();
   }, [branchSearchText]);
 
   const handlePageChange = (page) => {
@@ -267,9 +283,12 @@ const EnquiryDashboard = (props) => {
     parseOptions(Chart, chartOptions());
   }
 
-  const toggleModal = () => setModalOpen(!modalOpen);
-  const batchModal = () => setBatchModalOpen(!batchModalOpen);
-
+  const toggleModal = useCallback(() => {
+    setModalOpen((prev) => !prev);
+  }, []);
+  const batchModal = useCallback(() => {
+    setBatchModalOpen((prev) => !prev);
+  }, []);
   // const handleEnquiry = (selected) => {
   //   setSelectedEnquiry(selected);
   // };
@@ -306,67 +325,6 @@ const EnquiryDashboard = (props) => {
     const year = d.getFullYear();
     return `${day}-${month}-${year}`;
   };
-
-  // const formattedStartDate = formatDate(startDate);
-  // const formattedEndDate = formatDate(endDate);
-
-  // console.log(formattedStartDate);
-  // console.log(formattedEndDate);
-
-  // const filterData = data.filter((item) => {
-  //   const itemDate = parseDDMMYYYY(item.enquiryDate);
-
-  //   const isAfterStart = !startDate || itemDate >= startDate;
-  //   const isBeforeEnd = !endDate || itemDate <= endDate;
-
-  //   const inRange = isAfterStart && isBeforeEnd;
-
-  //   return inRange;
-  // });
-
-  // const handleSearchClick = (e) => {
-  //   e.preventDefault();
-  //   const filtered = data.filter((item) => {
-  //     // Text search
-  //     const lowerSearch = searchText.toLowerCase();
-  //     const matchesText =
-  //       item.name.toLowerCase().includes(lowerSearch) ||
-  //       item.contactNumber.includes(lowerSearch);
-  //     // Date filter
-  //     const itemDate = parseDDMMYYYY(item.enquiryDate);
-  //     const isAfterStart = !startDate || itemDate >= startDate;
-  //     const isBeforeEnd = !endDate || itemDate <= endDate;
-  //     const inRange = isAfterStart && isBeforeEnd;
-  //     // Status filter
-  //     let matchesStatus = true;
-  //     if (selectedEnquiry?.value !== "all") {
-  //       matchesStatus =
-  //         item.status.toLowerCase().replace(/\s/g, "") ===
-  //         selectedEnquiry.value.toLowerCase().replace(/\s/g, "");
-  //     }
-
-  //     return matchesText && inRange && matchesStatus;
-  //   });
-  //   setFilteredData(filtered);
-  //   setIsFilterActive(true);
-  // };
-
-  // Use filteredData if search was clicked and there are any filters, otherwise use all data
-  // const displayData = isFilterActive ? filteredData : data;
-  // const handleSearchClick = (e) => {
-  //   e.preventDefault();
-
-  //   // const fromDate = startDate ? startDate.toISOString().split("T")[0] : null;
-  //   // const toDate = endDate ? endDate.toISOString().split("T")[0] : null;
-  //   // console.log(fromDate);
-  //   // console.log(toDate);
-  //   const filters = {
-  //     searchText: searchText.trim(),
-  //     status: selectedEnquiryType.value,
-  //   };
-
-  //   fetchPaginatedData(1, filters);
-  // };
 
   const handleSearch = () => {
     const filters = {
@@ -444,6 +402,10 @@ const EnquiryDashboard = (props) => {
     return () => clearTimeout(debounceTimer);
   }, [selectedEnquiryType]);
 
+  const handleCheckId = (id) => {
+    // console.log(`ID --> ${id}`);
+  };
+
   return (
     <>
       <Header
@@ -455,72 +417,24 @@ const EnquiryDashboard = (props) => {
 
       {/* Page content */}
 
-      <div className={`d-flex justify-content-end px-2 `}>
-        <Button
-          color="primary"
-          size="sm"
-          style={{ zIndex: 1 }}
-          onClick={() => setShowGraph((prev) => !prev)}
-        >
-          {showGraph ? "Hide Chart" : "Show Chart"}
-        </Button>
-      </div>
-      <Container className="mt--7" fluid>
+      <Container className="mt--8" fluid>
+        <div className={`d-flex justify-content-end px-2 mb-2 mt-2`}>
+          <Button
+            color="primary"
+            size="sm"
+            style={{ zIndex: 1, backgroundColor: "#191d4d" }}
+            onClick={() => setShowGraph((prev) => !prev)}
+          >
+            {showGraph ? "Hide Chart" : "Show Chart"}
+          </Button>
+        </div>
         <Row className={`pb-5 ${showGraph ? "d-flex" : "d-none"}`}>
-          <Col className="mb-5 mb-xl-0 " xl="8">
-            <Card className="bg-gradient-default shadow">
-              <CardHeader className="bg-transparent">
-                <Row className="align-items-center">
-                  <div className="col">
-                    {/* <h6 className="text-uppercase text-light ls-1 mb-1">
-                      Overview
-                    </h6> */}
-                    <h2 className="text-white mb-0">Course Enquiry</h2>
-                  </div>
-                  <div className="col"></div>
-                </Row>
-              </CardHeader>
-              <CardBody>
-                {/* Chart */}
-                <div className="chart">
-                  <Bar
-                    // data={chartExample3.data}
-                    data={barData}
-                    options={chartExample1.options}
-                    // getDatasetAtEvent={(e) => console.log(e)}
-                  />
-                </div>
-              </CardBody>
-            </Card>
-          </Col>
-          <Col xl="4">
-            <Card className="shadow">
-              <CardHeader className="bg-transparent">
-                <Row className="align-items-center">
-                  <div className="col">
-                    {/* <h6 className="text-uppercase text-muted ls-1 mb-1">
-                      Performance
-                    </h6> */}
-                    <h2 className="mb-0">Type Enquiry</h2>
-                  </div>
-                </Row>
-              </CardHeader>
-              <CardBody>
-                {/* Chart */}
-                <div className="chart" style={{}}>
-                  <Pie
-                    // data={chartExample3.data}
-                    data={pieData}
-                    options={chartExample3.options}
-                  />
-                </div>
-              </CardBody>
-            </Card>
-          </Col>
+          <BarChart data={barData} options={chartExample1.options} />
+          <PieChart data={pieData} options={chartExample3.options} />
         </Row>
 
         <Row className="d-flex flex-column">
-          <div
+          {/* <div
             className={`d-flex justify-content-end d-md-none px-2 ${
               showFilters ? "mb-0" : "mb-2"
             }`}
@@ -532,69 +446,49 @@ const EnquiryDashboard = (props) => {
             >
               {showFilters ? "Hide Filters" : "Show Filters"}
             </Button>
-          </div>
+          </div> */}
           <Col
-            className={`${
-              showFilters ? "d-block d-md-flex" : "d-none d-md-flex"
-            } pb-4`}
-
-            //  className={`${showFilters ? "d-block" : "d-none"} pb-4`}
+            className={` pb-4`}
+            // className={`${
+            //   showFilters ? "d-block d-md-flex" : "d-none d-md-flex"
+            // } pb-4`}
           >
-            {/* <div className=""> */}
-
             <div
-              className={`${
-                showFilters ? "d-block d-md-flex" : "d-none d-md-flex"
-              } flex-column flex-md-row justify-content-between align-items-start align-items-md-center mt-4 p-2`}
+              className="d-flex flex-column flex-lg-row align-items-center justify-content-between p-2 w-100"
               style={{
                 background: "#f7fafc",
-                maxWidth: "100%",
                 borderRadius: "5px",
-                border: "1px solid #d3d3d3 ",
+                border: "1px solid #d3d3d3",
+                gap: "1rem",
               }}
             >
+              {/* Filter Inputs */}
               <div
-                className="d-flex  flex-md-row flex-sm-row flex-wrap flex-column  align-items-center w-100"
+                className="d-flex flex-wrap justify-content-center align-items-center"
                 style={{ gap: "1rem" }}
               >
-                <div style={{ width: "150px" }}>
+                <div style={{ width: "170px" }}>
                   <Select
                     options={status}
                     value={selectedEnquiry}
                     onChange={(prev) => setSelectedEnquiry(prev)}
                   />
                 </div>
-                {/* <div style={{}}>
-                    <Input
-                      placeholder="Search By Name"
-                      type="text"
-                      name="nameSearch"
-                      onChange={handleChange}
-                    />
-                  </div>
-                  <div style={{}}>
-                    <Input
-                      placeholder="Search By Phone Number"
-                      type="text"
-                      onChange={handleContactChange}
-                    />
-                  </div> */}
-                <div style={{ width: "150px" }}>
+                <div style={{ width: "170px" }}>
                   <Input
                     placeholder="Search by Name or Phone"
                     type="text"
                     onChange={handleUnifiedSearchChange}
                   />
                 </div>
-
-                <div style={{ width: "150px" }}>
+                <div style={{ width: "170px" }}>
                   <Select
                     options={enquiry}
                     value={selectedEnquiryType}
                     onChange={handleEnquiryTypeChange}
                   />
                 </div>
-                <div style={{ width: "150px" }}>
+                <div style={{ width: "170px" }}>
                   <Select
                     id="branch-select"
                     options={branchOptions}
@@ -611,7 +505,7 @@ const EnquiryDashboard = (props) => {
                     }
                   />
                 </div>
-                <div className="">
+                <div className="" style={{ width: "170px" }}>
                   <DatePicker
                     selectsRange
                     startDate={startDate}
@@ -632,19 +526,29 @@ const EnquiryDashboard = (props) => {
                   />
                 </div>
               </div>
+
+              {/* Search Icon */}
               <div
                 style={{
-                  padding: "5px",
+                  padding: "6px 12px",
                   cursor: "pointer",
+                  border: "1px solid #ccc",
+                  borderRadius: "4px",
+                  backgroundColor: "#5e72e4",
+                  color: "#fff",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  height: "38px",
+                  minWidth: "38px",
+                  // marginLeft: "10px",
                 }}
-                onClick={handleSearchClick}
+                onClick={handleUnifiedSearchChange}
               >
                 <i className="fas fa-search" />
               </div>
             </div>
-            {/* </div> */}
           </Col>
-
           <Col>
             <Card className="shadow">
               <CardHeader className="border-0">
@@ -658,19 +562,6 @@ const EnquiryDashboard = (props) => {
                   }}
                 >
                   <h3 className="mb-0">Lists</h3>
-                  {/* <div
-                    style={{
-                      display: "flex",
-                      flexDirection: "row",
-                    }}
-                  >
-                    <Button color="primary" onClick={batchModal}>
-                      Create Batch
-                    </Button>
-                    <Button color="primary" onClick={toggleModal}>
-                      Add
-                    </Button>
-                  </div> */}
                   <UncontrolledDropdown direction="down">
                     <DropdownToggle
                       tag="span"
@@ -706,6 +597,14 @@ const EnquiryDashboard = (props) => {
                         onClick={batchModal}
                       >
                         Create Batch
+                      </Button>
+                      <Button
+                        color="primary"
+                        block
+                        size="md"
+                        // onClick={batchModal}
+                      >
+                        Assign Batch
                       </Button>
                       <Button
                         color="primary"
@@ -766,14 +665,17 @@ const EnquiryDashboard = (props) => {
                         <tr key={index}>
                           <td>
                             <div className="d-flex justify-content-center align-items-center">
-                              <Input type="checkbox" style={{ margin: 0 }} />
+                              <Input
+                                type="checkbox"
+                                style={{ margin: 0 }}
+                                onClick={() => handleCheckId(item.Id)}
+                              />
                             </div>
                           </td>
 
                           <td>{item.Id}</td>
                           <td>{item.Name}</td>
                           <td>{item.Mobileno}</td>
-                          {/* <td>{item.QualificationCode}</td> */}
                           {(selectedEnquiryType.label === "Course Enquiry" ||
                             selectedEnquiryType.label ===
                               "Internship Enquiry") && (
@@ -788,101 +690,8 @@ const EnquiryDashboard = (props) => {
                           <td>{item.BranchName}</td>
                           <td>{formatDate(item.CreatedOn)}</td>
                           <td>{item.status_txt}</td>
-                          {/* <td
-                          style={{ position: "relative", textAlign: "center" }}
-                        >
-                          <div
-                            style={{ cursor: "pointer" }}
-                            onClick={() =>
-                              setOpenDropdownIndex(
-                                openDropdownIndex === index ? null : index
-                              )
-                            }
-                          >
-                            <BsThreeDotsVertical size={20} />
-                          </div>
-                  
-                          {openDropdownIndex === index && (
-                            <div
-                              style={{
-                                position: "absolute",
-                                top: "-30px",
-                                right: "60px",
-                                backgroundColor: "#fff",
-                                border: "1px solid #ddd",
-                                borderRadius: "4px",
-                                boxShadow: "0px 2px 6px rgba(0,0,0,0.2)",
-                                zIndex: 10,
-                                minWidth: "100px",
-                              }}
-                            >
-                              <div
-                                style={{
-                                  padding: "8px 12px",
-                                  cursor: "pointer",
-                                  borderBottom: "1px solid #eee",
-                                }}
-                                onClick={() => {
-                                  console.log("Edit clicked for", item.name);
-                                  setOpenDropdownIndex(null);
-                                }}
-                              >
-                                ✏️ Edit
-                              </div>
-                              <div
-                                style={{
-                                  padding: "8px 12px",
-                                  cursor: "pointer",
-                                }}
-                                onClick={() => {
-                                  console.log("Delete clicked for", item.name);
-                                  setOpenDropdownIndex(null);
-                                }}
-                              >
-                                🗑️ Delete
-                              </div>
-                            </div>
-                          )}
-                        </td> */}
                           <td style={{ textAlign: "center" }}>
-                            <UncontrolledDropdown direction="left">
-                              <DropdownToggle
-                                tag="span"
-                                style={{ cursor: "pointer" }}
-                                data-toggle="dropdown"
-                                aria-expanded={false}
-                              >
-                                <BsThreeDotsVertical size={20} />
-                              </DropdownToggle>
-
-                              <DropdownMenu
-                                right
-                                style={{
-                                  minWidth: "120px",
-                                  border: "1px solid #ddd",
-                                  borderRadius: "4px",
-                                  boxShadow: "0px 2px 6px rgba(0,0,0,0.2)",
-                                }}
-                              >
-                                <DropdownItem
-                                  onClick={() => {
-                                    console.log("Edit clicked for", item.name);
-                                  }}
-                                >
-                                  ✏️ Edit
-                                </DropdownItem>
-                                <DropdownItem
-                                  onClick={() => {
-                                    console.log(
-                                      "Delete clicked for",
-                                      item.name
-                                    );
-                                  }}
-                                >
-                                  🗑️ Delete
-                                </DropdownItem>
-                              </DropdownMenu>
-                            </UncontrolledDropdown>
+                            <Action />
                           </td>
                         </tr>
                       ))
@@ -931,17 +740,6 @@ const EnquiryDashboard = (props) => {
                             : item.product_name}
                         </p>
 
-                        {/* {selectedEnquiryType.label === "Course Enquiry" ||
-                        selectedEnquiryType.label === "Internship Enquiry" ? (
-                          <p className="fs-6 fw-semibold mb-1">
-                            <strong>Course:</strong> {item.TopicTitle}
-                          </p>
-                        ) : (
-                          <p className="fs-6 fw-semibold mb-1">
-                            <strong>Course:</strong> {item.product_name}
-                          </p>
-                        )} */}
-
                         <p className="fs-6 fw-semibold mb-1">
                           <strong>Branch:</strong> {item.BranchName}
                         </p>
@@ -952,66 +750,8 @@ const EnquiryDashboard = (props) => {
                         <p className="fs-6 fw-semibold mb-1">
                           <strong>Status:</strong> {item.status_txt}
                         </p>
-                        {/* <p className="fs-6 fw-semibold mb-1">
-                          <strong>Test Status:</strong> {item.testStatus}
-                        </p>
-                        <p className="fs-6 fw-semibold mb-1">
-                          <strong>Qualified/Not:</strong> {item.qualified}
-                        </p> */}
                       </div>
-                      <div>
-                        <div
-                          style={{ cursor: "pointer" }}
-                          onClick={() =>
-                            setOpenDropdownIndex(
-                              openDropdownIndex === index ? null : index
-                            )
-                          }
-                        >
-                          <BsThreeDotsVertical size={20} />
-                        </div>
-                        {openDropdownIndex === index && (
-                          <div
-                            style={{
-                              position: "absolute",
-                              top: "30px",
-                              right: "10px",
-                              backgroundColor: "#fff",
-                              border: "1px solid #ddd",
-                              borderRadius: "4px",
-                              boxShadow: "0px 2px 6px rgba(0,0,0,0.2)",
-                              zIndex: 10,
-                              minWidth: "100px",
-                            }}
-                          >
-                            <div
-                              style={{
-                                padding: "8px 12px",
-                                cursor: "pointer",
-                                borderBottom: "1px solid #eee",
-                              }}
-                              onClick={() => {
-                                console.log("Edit clicked for", item.name);
-                                setOpenDropdownIndex(null);
-                              }}
-                            >
-                              ✏️ Edit
-                            </div>
-                            <div
-                              style={{
-                                padding: "8px 12px",
-                                cursor: "pointer",
-                              }}
-                              onClick={() => {
-                                console.log("Delete clicked for", item.name);
-                                setOpenDropdownIndex(null);
-                              }}
-                            >
-                              🗑️ Delete
-                            </div>
-                          </div>
-                        )}
-                      </div>
+                      <Action />
                     </div>
                   </Card>
                 ))}
@@ -1019,64 +759,26 @@ const EnquiryDashboard = (props) => {
                 {/* You can map more cards dynamically here */}
               </div>
               <CardFooter className="py-4">
-                <nav aria-label="...">
-                  <Pagination className="pagination justify-content-end mb-0">
-                    <PaginationItem disabled={pageStart === 1}>
-                      <PaginationLink
-                        href="#"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          handlePrevious();
-                        }}
-                      >
-                        <i className="fas fa-angle-left" />
-                      </PaginationLink>
-                    </PaginationItem>
+                {/* <nav aria-label="..."> */}
+                <CustomPagination
+                  pageStart={pageStart}
+                  setPageStart={setPageStart}
+                  totalPages={totalPages}
+                  setPageNumber={setPageNumber}
+                  fetchPaginatedData={fetchPaginatedData}
+                  pageNumber={pageNumber}
+                  pageNumDropDown={pageNumDropDown}
+                  setPageNumDropDown={setPageNumDropDown}
+                  pageNum={pageNum}
+                />
 
-                    {visiblePages.map((page) => (
-                      <PaginationItem key={page} active={page === pageNumber}>
-                        <PaginationLink
-                          href="#"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            handlePageChange(page);
-                          }}
-                        >
-                          {page}
-                        </PaginationLink>
-                      </PaginationItem>
-                    ))}
-
-                    <PaginationItem>
-                      <PaginationLink
-                        href="#"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          handleNext();
-                        }}
-                      >
-                        <i className="fas fa-angle-right" />
-                      </PaginationLink>
-                    </PaginationItem>
-                    <div style={{ width: "80px", marginLeft: "10px" }}>
-                      <Select
-                        options={pageNum}
-                        value={pageNumDropDown}
-                        onChange={(prev) => setPageNumDropDown(prev)}
-                      />
-                    </div>
-                  </Pagination>
-                </nav>
+                {/* </nav> */}
               </CardFooter>
             </Card>
           </Col>
         </Row>
       </Container>
-      <EnquiryModal
-        modal={modalOpen}
-        toggle={toggleModal}
-        // handleSubmit={handleFormSubmit}
-      />
+      <EnquiryModal modal={modalOpen} toggle={toggleModal} />
       <BatchModal modal={batchModalOpen} toggle={batchModal} />
     </>
   );

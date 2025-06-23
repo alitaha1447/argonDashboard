@@ -24,7 +24,6 @@ const EnquiryModal = ({
   const handleEnquiry = (selected) => {
     setSelectedEnquiry(selected);
   };
-
   return (
     <div>
       <Modal isOpen={modal} toggle={toggle} size="lg" centered>
@@ -67,4 +66,4 @@ const EnquiryModal = ({
   );
 };
 
-export default EnquiryModal;
+export default React.memo(EnquiryModal);

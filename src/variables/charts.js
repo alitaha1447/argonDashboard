@@ -290,63 +290,111 @@ function parseOptions(parent, options) {
 }
 
 // Example 1 of Chart inside src/views/Index.js (Sales value - Card)
+// let chartExample1 = {
+//   options: {
+//     scales: {
+//       yAxes: [
+//         {
+//           gridLines: {
+//             color: colors.gray[900],
+//             zeroLineColor: colors.gray[900],
+//           },
+//           ticks: {
+//             callback: function (value) {
+//               if (!(value % 10)) {
+//                 return "$" + value + "k";
+//               }
+//             },
+//           },
+//         },
+//       ],
+//     },
+//     tooltips: {
+//       callbacks: {
+//         label: function (item, data) {
+//           var label = data.datasets[item.datasetIndex].label || "";
+//           var yLabel = item.yLabel;
+//           var content = "";
+
+//           if (data.datasets.length > 1) {
+//             content += label;
+//           }
+
+//           content += "$" + yLabel + "k";
+//           return content;
+//         },
+//       },
+//     },
+//   },
+//   data1: (canvas) => {
+//     return {
+//       labels: ["May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+//       datasets: [
+//         {
+//           label: "Performance",
+//           data: [10, 20, 10, 30, 15, 40, 20, 60, 60],
+//         },
+//       ],
+//     };
+//   },
+//   data2: (canvas) => {
+//     return {
+//       labels: ["May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+//       datasets: [
+//         {
+//           label: "TAHA",
+//           data: [0, 20, 5, 25, 10, 30, 15, 40, 40],
+//         },
+//       ],
+//     };
+//   },
+// };
+
 let chartExample1 = {
-  // options: {
-  //   scales: {
-  //     yAxes: [
-  //       {
-  //         gridLines: {
-  //           color: colors.gray[900],
-  //           zeroLineColor: colors.gray[900],
-  //         },
-  //         ticks: {
-  //           callback: function (value) {
-  //             if (!(value % 10)) {
-  //               return "$" + value + "k";
-  //             }
-  //           },
-  //         },
-  //       },
-  //     ],
-  //   },
-  //   tooltips: {
-  //     callbacks: {
-  //       label: function (item, data) {
-  //         var label = data.datasets[item.datasetIndex].label || "";
-  //         var yLabel = item.yLabel;
-  //         var content = "";
-
-  //         if (data.datasets.length > 1) {
-  //           content += label;
-  //         }
-
-  //         content += "$" + yLabel + "k";
-  //         return content;
-  //       },
-  //     },
-  //   },
-  // },
-  data1: (canvas) => {
-    return {
-      labels: ["May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
-      datasets: [
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    scales: {
+      yAxes: [
         {
-          label: "Performance",
-          data: [10, 20, 10, 30, 15, 40, 20, 60, 60],
+          ticks: {
+            beginAtZero: true,
+            callback: function (value) {
+              return value;
+            },
+            fontColor: "#525f7f", // Label color
+          },
+          // gridLines: {
+          //   drawBorder: true, // Show left axis line
+          //   display: true, // Show horizontal grid lines
+          //   color: "#e9ecef", // Grid line color
+          //   zeroLineColor: "#e9ecef",
+          //   lineWidth: 1,
+          //   zeroLineWidth: 1,
+          // },
         },
       ],
-    };
-  },
-  data2: (canvas) => {
-    return {
-      labels: ["May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
-      datasets: [
-        {
-          label: "TAHA",
-          data: [0, 20, 5, 25, 10, 30, 15, 40, 40],
-        },
-      ],
-    };
+      // xAxes: [
+      //   {
+      //     ticks: {
+      //       fontColor: "#525f7f",
+      //     },
+      //     gridLines: {
+      //       drawBorder: false,
+      //       display: true, // Show vertical grid lines
+      //       color: "#f0f0f0",
+      //     },
+      //   },
+      // ],
+    },
+    legend: {
+      display: false,
+    },
+    tooltips: {
+      enabled: true,
+      mode: "index",
+      intersect: false,
+    },
   },
 };
 

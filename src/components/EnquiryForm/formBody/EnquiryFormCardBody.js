@@ -8,7 +8,9 @@ import RadioGroupField from "components/FormFields/RadioGroup";
 import { refOptions, genderOptions } from "DummyData";
 import { getValidationErrors } from "utils/validations/enquiryValidation";
 import axios from "axios";
-import { toast } from "react-toastify";
+import useQualificationList from "customHookApi/EnquiryDashboardApi/useQualificationList";
+import usePreferredCourse from "customHookApi/EnquiryDashboardApi/usePreferredCourse";
+import useBranchList from "customHookApi/EnquiryDashboardApi/useBranchList";
 
 const API_PATH = process.env.REACT_APP_API_PATH;
 const API_KEY = process.env.REACT_APP_API_KEY;
@@ -38,93 +40,41 @@ const EnquiryFormCardBody = ({ selectedEnquiry }) => {
   const [whatsappNumber, setWhatsappNumber] = useState("");
   const [additionalQuery, setAdditionalQuery] = useState("");
   // Qualifications
-  const [qualificationOptions, setQualificationOptions] = useState([]);
   const [selectedQualification, setSelectedOptionsQualification] =
     useState(null);
   // Prefered Courses
-  const [courseOptions, setCourseOptions] = useState([]);
+
   const [selectedCoursesOptions, setSelectedCoursesOptions] = useState(null);
   // Branch
   const [selectedBranch, setSelectedBranch] = useState(null);
-  const [branchOptions, setBranchOptions] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [branchSearchText, setBranchSearchText] = useState("");
+
   //  Products
   const [productOptions, setProductOptions] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [selectedFile, setSelectedFile] = useState(null);
   const [formErrors, setFormErrors] = useState({});
   // Qualifications
-  const fetchQualificationLists = async () => {
-    try {
-      const res = await axios.get(`${API_PATH}/api/GetQualification`, {
-        params: {
-          APIKEY: API_KEY,
-          // searchtext: branchSearchText,
-        },
-      });
-
-      const formattedQualification = res.data.map((item) => ({
-        label: item.QualificationName,
-        value: item.QualificationId,
-      }));
-      setQualificationOptions(formattedQualification);
-    } catch (error) {
-      console.log(`qualification_Error ---> ${error}`);
-    }
-  };
-  // Prefered Courses
-  const fetchCourseDetails = async () => {
-    try {
-      const res = await axios.get(`${API_PATH}/api/GetCourse`, {
-        params: {
-          APIKEY: API_KEY,
-          // searchtext: branchSearchText,
-        },
-      });
-      const formattedCourses = res.data.map((item) => ({
-        value: item.Id,
-        label: item.TopicTitle,
-      }));
-      setCourseOptions(formattedCourses);
-    } catch (error) {
-      console.log(`course_Error ---> ${error}`);
-    }
-  };
+  const { qualificationOptions, fetchQualificationLists } =
+    useQualificationList();
+  const { courseOptions, fetchCourseDetails } = usePreferredCourse();
 
   // branches
+  const {
+    branchOptions,
+    setBranchOptions,
+    isLoading,
+    fetchBranch,
+    setBranchSearchText,
+    branchSearchText,
+  } = useBranchList();
+
   useEffect(() => {
     if (branchSearchText.length < 3) {
       setBranchOptions([]);
       return;
     }
 
-    const fetchData = async () => {
-      setIsLoading(true);
-      try {
-        const res = await axios.get(`${API_PATH}/api/branches`, {
-          params: {
-            APIKEY: API_KEY,
-            searchtext: branchSearchText,
-          },
-        });
-
-        const options =
-          res.data?.map((branch) => ({
-            label: branch?.BranchName || `Branch ${branch?.BranchId}`,
-            value: branch?.BranchId,
-          })) || [];
-
-        setBranchOptions(options);
-      } catch (err) {
-        console.error("Branch fetch error:", err);
-        setBranchOptions([]);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchData();
+    fetchBranch();
   }, [branchSearchText]);
   // ProductLists
   const fetchProductLists = async () => {
@@ -233,23 +183,23 @@ const EnquiryFormCardBody = ({ selectedEnquiry }) => {
       ResumePath: selectedFile,
       CreatedBy: "Developer",
     };
-
-    try {
-      const res = await axios.post(
-        `${API_PATH}/api/SaveEnquiry`,
-        enquiryFormdata,
-        {
-          params: {
-            APIKEY: "12345678@",
-          },
-        }
-      );
-      toast.success("Enquiry submitted successfully!");
-      console.log("DATA --> ", enquiryFormdata);
-      console.log("✅ Enquiry submitted successfully:", res.data);
-    } catch (error) {
-      console.error("❌ Failed to submit enquiry:", error);
-    }
+    console.log(enquiryFormdata);
+    // try {
+    //   const res = await axios.post(
+    //     `${API_PATH}/api/SaveEnquiry`,
+    //     enquiryFormdata,
+    //     {
+    //       params: {
+    //         APIKEY: "12345678@",
+    //       },
+    //     }
+    //   );
+    //   toast.success("Enquiry submitted successfully!");
+    //   console.log("DATA --> ", enquiryFormdata);
+    //   console.log("✅ Enquiry submitted successfully:", res.data);
+    // } catch (error) {
+    //   console.error("❌ Failed to submit enquiry:", error);
+    // }
     resetForm();
   };
   return (
@@ -460,4 +410,4 @@ const EnquiryFormCardBody = ({ selectedEnquiry }) => {
   );
 };
 
-export default EnquiryFormCardBody;
+export default React.memo(EnquiryFormCardBody);

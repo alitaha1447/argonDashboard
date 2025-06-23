@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Modal,
   ModalHeader,
@@ -12,6 +12,7 @@ import {
   Row,
   Col,
   Label,
+  Input,
 } from "reactstrap";
 
 import Select from "react-select";
@@ -21,6 +22,8 @@ import "react-datepicker/dist/react-datepicker.css";
 import axios from "axios";
 
 import InputField from "components/FormFields/InputField";
+import useQualificationList from "customHookApi/EnquiryDashboardApi/useQualificationList";
+import useBranchList from "customHookApi/EnquiryDashboardApi/useBranchList";
 // import SelectField from "components/FormFields/SelectField";
 // import EnquiryForm from "components/Organisms/EnquiryForm";
 // DATA
@@ -43,39 +46,73 @@ const facultyOptions = [
   { value: "abc", label: "ABC" },
   { value: "xyz", label: "XYZ" },
 ];
+const paymentOptions = [
+  { value: "individual", label: "Individual" },
+  { value: "paidOrganization", label: "Paid Organization" },
+];
+
+const modeOptions = [
+  { value: "offline", label: "Offline" },
+  { value: "online", label: "Online" },
+  { value: "hybrid", label: "Hybrid" },
+];
 
 const BatchModal = ({ modal, toggle, handleSubmit }) => {
+  // console.log("BatchModal");
   const [fullName, setFullName] = useState("");
 
   // Qualifications
-  const [qualificationOptions, setQualificationOptions] = useState([]);
+  // const [qualificationOptions, setQualificationOptions] = useState([]);
   const [selectedQualification, setSelectedOptionsQualification] =
     useState(null);
   const [startDate, setStartDate] = useState(new Date());
   const [typeMode, setTypeMode] = useState(typeModeClass[0]);
   const [selectFaculty, setSelectFaculty] = useState(facultyOptions[0]);
+  const [selectPayment, setSelectPayment] = useState(paymentOptions[0]);
+  const [selectMode, setSelectMode] = useState(modeOptions[0]);
+  const [selectedBranch, setSelectedBranch] = useState(null);
 
+  // customHook
+  const { qualificationOptions, fetchQualificationLists, error } =
+    useQualificationList();
+  const {
+    branchOptions,
+    setBranchOptions,
+    isLoading,
+    fetchBranch,
+    setBranchSearchText,
+    branchSearchText,
+  } = useBranchList();
   // Qualifications
-  const fetchQualificationLists = async () => {
-    try {
-      const res = await axios.get(`${API_PATH}/api/GetQualification`, {
-        params: {
-          APIKEY: API_KEY,
-          // searchtext: branchSearchText,
-        },
-      });
+  // const fetchQualificationLists = async () => {
+  //   try {
+  //     const res = await axios.get(`${API_PATH}/api/GetQualification`, {
+  //       params: {
+  //         APIKEY: API_KEY,
+  //         // searchtext: branchSearchText,
+  //       },
+  //     });
 
-      const formattedQualification = res.data.map((item) => ({
-        label: item.QualificationName,
-        value: item.QualificationId,
-      }));
-      setQualificationOptions(formattedQualification);
-    } catch (error) {
-      console.log(`qualification_Error ---> ${error}`);
-    }
-  };
+  //     const formattedQualification = res.data.map((item) => ({
+  //       label: item.QualificationName,
+  //       value: item.QualificationId,
+  //     }));
+  //     setQualificationOptions(formattedQualification);
+  //   } catch (error) {
+  //     console.log(`qualification_Error ---> ${error}`);
+  //   }
+  // };
 
   // Custom Option component with checkbox
+  useEffect(() => {
+    if (branchSearchText.length < 3) {
+      setBranchOptions([]);
+      return;
+    }
+
+    // fetchData();
+    fetchBranch();
+  }, [branchSearchText]);
 
   return (
     <div>
@@ -109,27 +146,41 @@ const BatchModal = ({ modal, toggle, handleSubmit }) => {
                   </Col>
                   <Col md={6}>
                     <FormGroup>
-                      <Label for="Courses"> Highest Qualification</Label>
+                      <Label for="Courses"> Minimum Qualification</Label>
                       <Select
                         options={qualificationOptions}
                         value={selectedQualification}
                         onChange={(selected) => {
                           setSelectedOptionsQualification(selected);
                         }}
-                        onMenuOpen={async () => await fetchQualificationLists()}
+                        // onMenuOpen={async () => await fetchQualificationLists()}
+                        onMenuOpen={fetchQualificationLists}
                       />
                     </FormGroup>
                   </Col>
                 </Row>
                 <Row>
                   <Col md={6}>
-                    <InputField
-                      label="Duration"
-                      id="duration"
-                      type="text"
-                      // value={duration}
-                      // onChange={(e) => setDuration(e.target.value)}
-                    />
+                    <FormGroup>
+                      <Label for="duration" className="form-label">
+                        Duration
+                      </Label>
+                      <Row>
+                        <Col sm={3}>
+                          <Input type="number" />
+                        </Col>
+                        <Col sm={9}>
+                          <Select
+                            id="mode"
+                            options={modeOptions}
+                            value={selectMode}
+                            onChange={(selected) => setSelectMode(selected)}
+                            placeholder="Select Mode"
+                            isClearable
+                          />
+                        </Col>
+                      </Row>
+                    </FormGroup>
                   </Col>
                   <Col md={6}>
                     <FormGroup>
@@ -152,7 +203,7 @@ const BatchModal = ({ modal, toggle, handleSubmit }) => {
                 <Row>
                   <Col md={6}>
                     <InputField
-                      label="Capacity"
+                      label="Batch Capacity"
                       id="capacity"
                       type="text"
                       //   value={fullName}
@@ -162,29 +213,16 @@ const BatchModal = ({ modal, toggle, handleSubmit }) => {
                     />
                   </Col>
                   <Col md={6}>
-                    <InputField
-                      label="Status"
-                      id="status"
-                      type="text"
-                      //   value={fullName}
-                      //   onChange={(e) => {
-                      //     setFullName(e.target.value);
-                      //   }}
-                    />
-                  </Col>
-                </Row>
-                <Row>
-                  <Col md={6}>
                     <FormGroup>
-                      <Label for="typeMode" className="form-label">
-                        Type
+                      <Label for="mode" className="form-label">
+                        Mode
                       </Label>
                       <Select
-                        id="typeMode"
-                        options={typeModeClass}
-                        value={typeMode}
-                        onChange={(selected) => setTypeMode(selected)}
-                        placeholder="Select type (Online/Offline)"
+                        id="mode"
+                        options={modeOptions}
+                        value={selectMode}
+                        onChange={(selected) => setSelectMode(selected)}
+                        placeholder="Select Mode"
                         isClearable
                       />
                     </FormGroup>
@@ -208,15 +246,15 @@ const BatchModal = ({ modal, toggle, handleSubmit }) => {
                   </Col>
                   <Col md={6}>
                     <FormGroup>
-                      <Label for="applicableBranch " className="form-label">
-                        Applicable branch
+                      <Label for="payment" className="form-label">
+                        Payment
                       </Label>
                       <Select
-                        id="applicableBranch"
-                        // options={facultyOptions}
-                        // value={selectFaculty}
-                        // onChange={(selected) => setSelectFaculty(selected)}
-                        placeholder="Select Applicable branch"
+                        id="payment"
+                        options={paymentOptions}
+                        value={selectPayment}
+                        onChange={(selected) => setSelectPayment(selected)}
+                        placeholder="Select Payment"
                         isClearable
                       />
                     </FormGroup>
@@ -224,30 +262,46 @@ const BatchModal = ({ modal, toggle, handleSubmit }) => {
                 </Row>
                 <Row>
                   <Col md={6}>
-                    <InputField
-                      label="Full Name"
-                      id="fullName"
-                      type="text"
-                      value={fullName}
-                      onChange={(e) => {
-                        setFullName(e.target.value);
-                      }}
-                    />
+                    <FormGroup>
+                      <Label for="batchLabel " className="form-label">
+                        Batch Label
+                      </Label>
+                      <Select
+                        id="batchLabel"
+                        // options={facultyOptions}
+                        // value={selectFaculty}
+                        // onChange={(selected) => setSelectFaculty(selected)}
+                        placeholder="Select Batch label"
+                        isClearable
+                      />
+                    </FormGroup>
                   </Col>
                   <Col md={6}>
-                    <InputField
-                      label="Min Qualification"
-                      id="fullName"
-                      type="text"
-                      value={fullName}
-                      onChange={(e) => {
-                        setFullName(e.target.value);
-                      }}
-                    />
+                    <FormGroup>
+                      <Label for="branch" className="form-label">
+                        Branch Applicable
+                      </Label>
+                      <Select
+                        options={branchOptions}
+                        value={selectedBranch}
+                        onChange={setSelectedBranch}
+                        onInputChange={setBranchSearchText}
+                        placeholder="Type at least 3 letters..."
+                        isClearable
+                        isLoading={isLoading}
+                      />
+                    </FormGroup>
                   </Col>
                 </Row>
-
-                <Row></Row>
+                <Row>
+                  <Col md={6}>
+                    <FormGroup>
+                      <Label for="branch" className="form-label">
+                        Fee Structure
+                      </Label>
+                    </FormGroup>
+                  </Col>
+                </Row>
               </Form>
             </CardBody>
           </ModalBody>
@@ -269,4 +323,4 @@ const BatchModal = ({ modal, toggle, handleSubmit }) => {
   );
 };
 
-export default BatchModal;
+export default React.memo(BatchModal);
