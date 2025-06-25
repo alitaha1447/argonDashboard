@@ -40,7 +40,7 @@ const List = ({ selectedEnquiryType, isTableLoading, listData }) => {
   //     const year = d.getFullYear();
   //     return `${day}-${month}-${year}`;
   //   };
-  console.log(listData);
+  // console.log(listData);
   const formatDate = (date) => {
     const d = new Date(date);
     const day = String(d.getDate()).padStart(2, "0");

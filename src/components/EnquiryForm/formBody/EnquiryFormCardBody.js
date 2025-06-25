@@ -122,8 +122,8 @@ const EnquiryFormCardBody = ({ selectedEnquiry }) => {
           },
         }
       );
-      console.log("fileUpload --> ", response);
-      console.log("Upload success:", response.data);
+      // console.log("fileUpload --> ", response);
+      // console.log("Upload success:", response.data);
     } catch (error) {
       console.error("Upload error:", error);
     }

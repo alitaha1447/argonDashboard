@@ -1,17 +1,12 @@
 import { useState, useEffect, useCallback } from "react";
 
 import Chart from "chart.js";
-import { Bar, Pie } from "react-chartjs-2";
 // reactstrap components
 import {
   Button,
   Card,
   CardHeader,
-  CardBody,
   CardFooter,
-  Pagination,
-  PaginationItem,
-  PaginationLink,
   Table,
   Container,
   Row,
@@ -24,7 +19,6 @@ import {
 } from "reactstrap";
 
 import Header from "components/Headers/Header.js";
-// import List from "components/EnquiryDashboardList/List";
 import Select from "react-select";
 
 // core components
@@ -35,7 +29,6 @@ import {
   chartExample3,
 } from "variables/charts.js";
 
-import { BsThreeDotsVertical } from "react-icons/bs";
 import EnquiryModal from "components/EnquiryModal/EnquiryModal";
 import BatchModal from "components/BatchModal/BatchModal";
 import PieChart from "components/Charts/PieChart";
@@ -53,41 +46,6 @@ import { FaPlus } from "react-icons/fa";
 const API_PATH = process.env.REACT_APP_API_PATH;
 const API_KEY = process.env.REACT_APP_API_KEY;
 
-// const data = [
-//   {
-//     name: "Taha",
-//     contactNumber: "+91-9981341447",
-//     highestQualification: "12th",
-//     course: "DSA",
-//     branch: "Male",
-//     enquiryDate: "27/06/2025",
-//     status: "Enquired Recieved",
-//     testStatus: "Failed",
-//     qualified: "Not",
-//   },
-//   {
-//     name: "John",
-//     contactNumber: "+91-9123456789",
-//     highestQualification: "Graduate",
-//     course: "Python",
-//     branch: "Male",
-//     enquiryDate: "27/03/1996",
-//     status: "Rejected",
-//     testStatus: "Failed",
-//     qualified: "Not",
-//   },
-//   {
-//     name: "Jane",
-//     contactNumber: "+91-9876543210",
-//     highestQualification: "10th",
-//     course: "Java",
-//     branch: "Female",
-//     enquiryDate: "27/03/1996",
-//     status: "Enquired Recieved",
-//     testStatus: "Failed",
-//     qualified: "Not",
-//   },
-// ];
 const status = [
   { value: "all", label: "All" },
   { value: "enquiredRecieved", label: "Enquired Recieved" },
@@ -106,7 +64,6 @@ const pageNum = [
 ];
 
 const EnquiryDashboard = (props) => {
-  // console.log("EnquiryDashboard");
   //   const [activeNav, setActiveNav] = useState(1);
   const [modalOpen, setModalOpen] = useState(false);
   const [batchModalOpen, setBatchModalOpen] = useState(false);
@@ -118,13 +75,8 @@ const EnquiryDashboard = (props) => {
   const [searchText, setSearchText] = useState("");
   // Branch
   const [selectedBranch, setSelectedBranch] = useState(null);
-  // const [branchOptions, setBranchOptions] = useState([]);
-  // const [isLoading, setIsLoading] = useState(false);
-  // const [branchSearchText, setBranchSearchText] = useState("");
-  // const [filteredData, setFilteredData] = useState([]);
-  // const [isFilterActive, setIsFilterActive] = useState(false);
+
   const [showGraph, setShowGraph] = useState(false);
-  // const [showFilters, setShowFilters] = useState(false);
 
   const [pageNumber, setPageNumber] = useState(1);
   const [pageStart, setPageStart] = useState(1);
@@ -135,6 +87,8 @@ const EnquiryDashboard = (props) => {
 
   const [pageNumDropDown, setPageNumDropDown] = useState(pageNum[0]);
   const pageSize = pageNumDropDown?.value;
+
+  const [studentID, setStudentID] = useState([]);
 
   // customHookAPI
   const {
@@ -172,10 +126,7 @@ const EnquiryDashboard = (props) => {
     ],
   });
 
-  // const [loadingChart, setLoadingChart] = useState(true);
-
   const fetchPaginatedData = async (page = 1, filters = {}) => {
-    // console.log(11);
     setIsTableLoading(true); // show loader
     try {
       const { startDate1, endDate1 } = fetchFinancialYearRangeByDate();
@@ -251,34 +202,6 @@ const EnquiryDashboard = (props) => {
     fetchBranch();
   }, [branchSearchText]);
 
-  const handlePageChange = (page) => {
-    setPageNumber(page);
-    fetchPaginatedData(page);
-
-    // if (page > pageStart + 2) {
-    //   setPageStart(page - 2);
-    // } else if (page < pageStart) {
-    //   setPageStart(page);
-    // }
-  };
-
-  const handleNext = () => {
-    if (pageStart + 2 < totalPages) {
-      setPageStart((prev) => prev + 1);
-    }
-  };
-
-  const handlePrevious = () => {
-    if (pageStart > 1) {
-      setPageStart((prev) => prev - 1);
-    }
-  };
-
-  const visiblePages = [];
-  for (let i = pageStart; i <= Math.min(pageStart + 2, totalPages); i++) {
-    visiblePages.push(i);
-  }
-
   if (window.Chart) {
     parseOptions(Chart, chartOptions());
   }
@@ -295,7 +218,6 @@ const EnquiryDashboard = (props) => {
 
   const handleUnifiedSearchChange = (e) => {
     const { value } = e.target;
-    // console.log(value);
     setSearchText(value);
     // if (value.trim() === "") {
     // setIsFilterActive(false);
@@ -336,7 +258,6 @@ const EnquiryDashboard = (props) => {
   };
 
   const handleSearchClick = (e) => {
-    // console.log("first");
     e.preventDefault();
     handleSearch(); // ✅ Reuse search logic
   };
@@ -405,7 +326,19 @@ const EnquiryDashboard = (props) => {
   }, [selectedEnquiryType]);
 
   const handleCheckId = (id) => {
-    // console.log(`ID --> ${id}`);
+    // console.log(id);
+    setStudentID((prev) => {
+      // Check if ID already exists
+      const exists = prev.some((item) => item.id === id);
+
+      if (exists) {
+        // Remove ID if already present (uncheck)
+        return prev.filter((item) => item.id !== id);
+      } else {
+        // Add new ID object if not present (check)
+        return [...prev, { studentid: id }];
+      }
+    });
   };
 
   return (
@@ -717,43 +650,52 @@ const EnquiryDashboard = (props) => {
                 {/* Example of one card item */}
                 {listData.map((item, index) => (
                   <Card key={index} className="mb-3 shadow-sm">
-                    <div className="p-3 d-flex justify-content-between">
-                      <div>
-                        <p className="fs-6 fw-semibold mb-1">
-                          <strong>Name:</strong> {item.Name}
-                        </p>
-                        <p className="fs-6 fw-semibold mb-1">
-                          <strong>Contact Number:</strong> {item.Mobileno}
-                        </p>
-                        <p className="fs-6 fw-semibold mb-1">
-                          <strong>Qualification:</strong>{" "}
-                          {item.QualificationCode}
-                        </p>
+                    <div className="d-flex p-4 justify-content-between">
+                      <div className="d-flex">
+                        <div className="mx-2">
+                          <Input
+                            type="checkbox"
+                            onClick={() => handleCheckId(item.Id)}
+                          />
+                        </div>
+                        <div>
+                          <p className="fs-6 fw-semibold mb-1">
+                            <strong>Name:</strong> {item.Name}
+                          </p>
+                          <p className="fs-6 fw-semibold mb-1">
+                            <strong>Contact Number:</strong> {item.Mobileno}
+                          </p>
+                          <p className="fs-6 fw-semibold mb-1">
+                            <strong>Qualification:</strong>{" "}
+                            {item.QualificationCode}
+                          </p>
 
-                        <p className="fs-6 fw-semibold mb-1">
-                          <strong>
+                          <p className="fs-6 fw-semibold mb-1">
+                            <strong>
+                              {selectedEnquiryType.label === "Course Enquiry" ||
+                              selectedEnquiryType.label === "Internship Enquiry"
+                                ? "Course:"
+                                : "Product"}
+                            </strong>{" "}
                             {selectedEnquiryType.label === "Course Enquiry" ||
                             selectedEnquiryType.label === "Internship Enquiry"
-                              ? "Course:"
-                              : "Product"}
-                          </strong>{" "}
-                          {selectedEnquiryType.label === "Course Enquiry" ||
-                          selectedEnquiryType.label === "Internship Enquiry"
-                            ? item.TopicTitle
-                            : item.product_name}
-                        </p>
+                              ? item.TopicTitle
+                              : item.product_name}
+                          </p>
 
-                        <p className="fs-6 fw-semibold mb-1">
-                          <strong>Branch:</strong> {item.BranchName}
-                        </p>
-                        <p className="fs-6 fw-semibold mb-1">
-                          <strong>Enquiry Date:</strong>{" "}
-                          {formatDate(item.CreatedOn)}
-                        </p>
-                        <p className="fs-6 fw-semibold mb-1">
-                          <strong>Status:</strong> {item.status_txt}
-                        </p>
+                          <p className="fs-6 fw-semibold mb-1">
+                            <strong>Branch:</strong> {item.BranchName}
+                          </p>
+                          <p className="fs-6 fw-semibold mb-1">
+                            <strong>Enquiry Date:</strong>{" "}
+                            {formatDate(item.CreatedOn)}
+                          </p>
+                          <p className="fs-6 fw-semibold mb-1">
+                            <strong>Status:</strong> {item.status_txt}
+                          </p>
+                        </div>
                       </div>
+
                       <Action />
                     </div>
                   </Card>
@@ -782,7 +724,11 @@ const EnquiryDashboard = (props) => {
         </Row>
       </Container>
       <EnquiryModal modal={modalOpen} toggle={toggleModal} />
-      <BatchModal modal={batchModalOpen} toggle={batchModal} />
+      <BatchModal
+        modal={batchModalOpen}
+        toggle={batchModal}
+        studentID={studentID}
+      />
     </>
   );
 };

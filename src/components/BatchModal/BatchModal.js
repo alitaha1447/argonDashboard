@@ -22,6 +22,7 @@ import Select, { components } from "react-select";
 
 import InputField from "components/FormFields/InputField";
 import TextAreaField from "components/FormFields/TextAreaField";
+import InstallModal from "components/CustomModals/installmentModal/InstallModal";
 
 import useQualificationList from "customHookApi/EnquiryDashboardApi/useQualificationList";
 import useBranchList from "customHookApi/EnquiryDashboardApi/useBranchList";
@@ -77,7 +78,25 @@ const CheckboxOption = (props) => (
   </components.Option>
 );
 
-const BatchModal = ({ modal, toggle }) => {
+// const CheckboxOption = (props) => {
+//   return (
+//     <components.Option {...props}>
+//       <input
+//         type="checkbox"
+//         checked={props.isSelected}
+//         onChange={() => {
+//           props.selectOption(props.data); // ✅ this triggers selection
+//         }}
+//         style={{ marginRight: 10 }}
+//       />
+//       <label>{props.label}</label>
+//     </components.Option>
+//   );
+// };
+
+const BatchModal = ({ modal, toggle, studentID }) => {
+  const [menuIsOpen, setMenuIsOpen] = useState(false);
+
   const [batchName, setBatchName] = useState("");
   const [description, setDescription] = useState("");
 
@@ -110,15 +129,15 @@ const BatchModal = ({ modal, toggle }) => {
 
   // Fees Structure
   const [showFeeFields, setShowFeeFields] = useState(false);
-  // const [feeStructures, setFeeStructures] = useState([]);
+  const [feeStructures, setFeeStructures] = useState([
+    { selectedFees: null, feesAmount: "" },
+  ]);
 
   const [courseFeesOptions, setCourseFeesOptions] = useState([]);
-  const [selectedFees, setSelectedFees] = useState(null);
-  const [feesAmount, setFeesAmount] = useState(null);
 
-  // const [feeRows, setFeeRows] = useState([
-  //   { selectedFees: null, feesAmount: null },
-  // ]);
+  // Installment Modal
+  const [installmentModalOpen, setinstallmentModalOpen] = useState(false);
+  const [installmentsDetails, setInstallmentsDetails] = useState([]);
 
   // customHook
   const { qualificationOptions, fetchQualificationLists, error } =
@@ -148,7 +167,7 @@ const BatchModal = ({ modal, toggle }) => {
         "https://hotelapi.shriyanshnath.com/api/Get_Faculties",
         {
           params: {
-            APIKEY: "12345678@",
+            APIKEY: API_KEY,
           },
           // headers: {
           //   APIKEY: "12345678@",
@@ -172,7 +191,7 @@ const BatchModal = ({ modal, toggle }) => {
         "https://hotelapi.shriyanshnath.com/api/Get_Batch_Level",
         {
           params: {
-            APIKEY: "12345678@",
+            APIKEY: API_KEY,
           },
           // headers: {
           //   APIKEY: "12345678@", // Passing API key in headers as well
@@ -195,7 +214,7 @@ const BatchModal = ({ modal, toggle }) => {
       "https://hotelapi.shriyanshnath.com/api/Get_Ledger_Heads",
       {
         params: {
-          APIKEY: "12345678@",
+          APIKEY: API_KEY,
         },
       }
     );
@@ -204,65 +223,39 @@ const BatchModal = ({ modal, toggle }) => {
       label: item.HeadName,
     }));
     setCourseFeesOptions(formattedBatch);
-    // console.log(res?.data);
   };
-  // console.log(selectedFees?.value, "---", selectedFees?.label);
-  // console.log(feesAmount);
-  // const handleFeesStructure = () => {
-  //   console.log("first");
-  // };
 
-  // const handleAddFee = () => {
-  //   setFeeStructures((prev) => [...prev, {}]);
-  // };
+  const handleAddFee = () => {
+    setFeeStructures((prev) => [
+      ...prev,
+      { selectedFees: null, feesAmount: "" },
+    ]);
+  };
 
-  // const handleRemoveFee = (indexToRemove) => {
-  //   setFeeStructures((prev) =>
-  //     prev.filter((_, index) => index !== indexToRemove)
-  //   );
-  // };
+  const handleRemoveFee = (indexToRemove) => {
+    setFeeStructures((prev) => prev.filter((_, i) => i !== indexToRemove));
+  };
 
-  // const handleFeeChange = (index, key, value) => {
-  //   const updated = [...feeStructures];
-  //   updated[index][key] = value;
-  //   setFeeStructures(updated);
-  // };
-  // console.log("StartDate --> ", startDate);
+  const handleFeeChange = (index, key, value) => {
+    const updated = [...feeStructures];
+    updated[index][key] = value;
+    setFeeStructures(updated);
+  };
 
-  // const durationType = selectedDurations?.value;
-  // const duration = parseInt(durationCount);
+  const cleanedFees = feeStructures.map((fee) => ({
+    amount: fee.feesAmount,
+    headid: fee.selectedFees?.value,
+  }));
 
-  // const endDate = new Date(startDate);
-
-  // console.log(durationType, "----------", duration);
-
-  // switch (durationType) {
-  //   // case 0: // Hours
-  //   //   endDate.setHours(endDate.getHours() + duration1);
-  //   //   break;
-  //   case 1: // Days
-  //     endDate.setDate(endDate.getDate() + duration);
-  //     break;
-  //   case 2: // Weeks
-  //     endDate.setDate(endDate.getDate() + duration * 7);
-  //     break;
-  //   case 3: // Months
-  //     endDate.setMonth(endDate.getMonth() + duration);
-  //     break;
-  //   case 4: // Years
-  //     endDate.setFullYear(endDate.getFullYear() + duration);
-  //     break;
-  //   default:
-  //     throw new Error("Invalid duration type");
-  // }
-  // // Output result with full datetime
-  // console.log("End Date (raw):", endDate);
-  // console.log("End Date (formatted):", endDate.toISOString()); // "2025-06-25T10:39:08.000Z"
+  const handleInstallmentSubmit = (receivedInstallments) => {
+    setInstallmentsDetails(receivedInstallments);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     const isOrganization = selectPayment?.label === "Paid Organization";
+
     const formattedStartDate = startDate?.toISOString(); // 💡 move it here
 
     const duration = parseInt(durationCount);
@@ -305,17 +298,42 @@ const BatchModal = ({ modal, toggle }) => {
       sponsorid: isOrganization ? selectedOrganization?.value : null,
       min_qualification: selectedQualification?.value,
       CreatedBy: "Developer",
-      batch_locations: selectedBranch?.map((item) => item.value),
-      // batch_fees,
-      // batch_students,
-      // installments_details,
+      batch_locations: selectedBranch.map((item) => ({
+        branchid: item.value,
+        venue: item.label,
+      })),
+      batch_fees: cleanedFees,
+      batch_students: studentID,
+      installments_details: installmentsDetails,
     };
     console.log(batchFormData);
+
+    try {
+      const res = await axios.post(`${API_PATH}/api/Batch`, batchFormData, {
+        params: {
+          APIKEY: API_KEY,
+        },
+      });
+      console.log("✅ Batch created successfully:", res.data);
+    } catch (error) {
+      console.error("❌ Failed to create batch:", error);
+    }
+  };
+
+  const toggleInstallment = () => {
+    setinstallmentModalOpen((prev) => !prev);
   };
 
   return (
     <div>
-      <Modal isOpen={modal} toggle={toggle} size="xl" centered>
+      <Modal
+        isOpen={modal}
+        toggle={toggle}
+        size="xl"
+        centered
+        backdrop="static"
+        keyboard={false}
+      >
         <Card className="shadow border-0 mb-0" style={{ maxHeight: "90vh" }}>
           <ModalHeader
             toggle={toggle}
@@ -327,7 +345,9 @@ const BatchModal = ({ modal, toggle }) => {
             </div>
           </ModalHeader>
 
-          <ModalBody style={{ overflowY: "auto" }}>
+          <ModalBody
+            style={{ overflowY: "auto", maxHeight: "calc(100vh - 210px)" }}
+          >
             <CardBody>
               {/* <EnquiryFormCardBody /> */}
               <Form>
@@ -353,6 +373,12 @@ const BatchModal = ({ modal, toggle }) => {
                           setSelectedOptionsQualification(selected);
                         }}
                         onMenuOpen={fetchQualificationLists}
+                        menuPortalTarget={document.body}
+                        menuPosition="fixed"
+                        styles={{
+                          menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+                        }}
+                        menuShouldScrollIntoView={false}
                       />
                     </FormGroup>
                   </Col>
@@ -385,6 +411,12 @@ const BatchModal = ({ modal, toggle }) => {
                           setSelectedCoursesOptions(selected);
                         }}
                         onMenuOpen={fetchCourseDetails}
+                        menuPortalTarget={document.body}
+                        menuPosition="fixed"
+                        styles={{
+                          menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+                        }}
+                        menuShouldScrollIntoView={false}
                       />
                     </FormGroup>
                   </Col>
@@ -418,6 +450,15 @@ const BatchModal = ({ modal, toggle }) => {
                                 setSelectedDurations(selected)
                               }
                               isClearable
+                              menuPortalTarget={document.body}
+                              menuPosition="fixed"
+                              styles={{
+                                menuPortal: (base) => ({
+                                  ...base,
+                                  zIndex: 9999,
+                                }),
+                              }}
+                              menuShouldScrollIntoView={false}
                             />
                           </div>
                         </Col>
@@ -471,6 +512,12 @@ const BatchModal = ({ modal, toggle }) => {
                         onChange={(selected) => setSelectMode(selected)}
                         placeholder="Select Mode"
                         isClearable
+                        menuPortalTarget={document.body}
+                        menuPosition="fixed"
+                        styles={{
+                          menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+                        }}
+                        menuShouldScrollIntoView={false}
                       />
                     </FormGroup>
                   </Col>
@@ -488,6 +535,12 @@ const BatchModal = ({ modal, toggle }) => {
                           setSelectedFaculty(selected);
                         }}
                         onMenuOpen={handleFaculty}
+                        menuPortalTarget={document.body}
+                        menuPosition="fixed"
+                        styles={{
+                          menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+                        }}
+                        menuShouldScrollIntoView={false}
                       />
                     </FormGroup>
                   </Col>
@@ -523,6 +576,12 @@ const BatchModal = ({ modal, toggle }) => {
                             onChange={(selected) => setSelectPayment(selected)}
                             placeholder="Select Payment"
                             // isClearable
+                            menuPortalTarget={document.body}
+                            menuPosition="fixed"
+                            styles={{
+                              menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+                            }}
+                            menuShouldScrollIntoView={false}
                           />
                         </Col>
                         {selectPayment?.label === "Paid Organization" && (
@@ -535,6 +594,15 @@ const BatchModal = ({ modal, toggle }) => {
                                 setSelectedOrganization(selected)
                               }
                               placeholder="Select Organization"
+                              menuPortalTarget={document.body}
+                              menuPosition="fixed"
+                              styles={{
+                                menuPortal: (base) => ({
+                                  ...base,
+                                  zIndex: 9999,
+                                }),
+                              }}
+                              menuShouldScrollIntoView={false}
                             />
                           </Col>
                         )}
@@ -550,21 +618,58 @@ const BatchModal = ({ modal, toggle }) => {
                       </Label>
                       <Select
                         isMulti
+                        closeMenuOnSelect={false}
+                        hideSelectedOptions={false}
+                        components={{ Option: CheckboxOption }}
                         options={branchOptions}
                         value={selectedBranch}
-                        onChange={setSelectedBranch}
-                        onInputChange={(e) => setBranchSearchText(e)} // ✅ correct usage                        placeholder="Type at least 3 letters..."
+                        onChange={(selected) => setSelectedBranch(selected)}
+                        onInputChange={(e) => setBranchSearchText(e)}
                         isClearable
                         isLoading={isLoading}
+                        menuPortalTarget={document.body}
+                        menuPosition="fixed"
+                        styles={{
+                          menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+                        }}
+                        menuShouldScrollIntoView={false}
                       />
                     </FormGroup>
                   </Col>
-                  <Col md={6}>
+                </Row>
+                <Row>
+                  <Col md={8}>
                     <FormGroup>
                       <div className="d-flex justify-content-between align-items-center">
-                        <Label for="branch" className="form-label mb-0">
+                        <Label
+                          for="branch"
+                          className="form-label mb-0 d-inline-flex align-items-center"
+                          style={{
+                            fontWeight: "bold",
+                            position: "relative",
+                            paddingRight: "50px",
+                          }}
+                        >
                           Fee Structure
+                          <Button
+                            onClick={toggleInstallment}
+                            style={{
+                              // border: "1px solid #5e72e4",
+                              // borderRadius: "4px",
+                              padding: "0 6px",
+                              fontSize: "12px",
+                              marginLeft: "8px",
+                              backgroundColor: "#5e72e4",
+                              color: "#ffffff",
+                              position: "absolute",
+                              right: -40,
+                              bottom: 10,
+                            }}
+                          >
+                            installment
+                          </Button>
                         </Label>
+
                         <div
                           onClick={() => {
                             setShowFeeFields(!showFeeFields);
@@ -585,81 +690,99 @@ const BatchModal = ({ modal, toggle }) => {
                           <FaPlus size={12} />
                         </div>
                       </div>
-                      {showFeeFields && (
-                        <Row className="mt-2">
-                          <Col xs={5}>
-                            <Select
-                              // id={`durationUnit-${index}`}
-                              options={courseFeesOptions}
-                              value={selectedFees}
-                              onChange={(selected) => setSelectedFees(selected)}
-                              onMenuOpen={handleCourseFees}
-                              isClearable
-                            />
-                          </Col>
+                      {showFeeFields &&
+                        feeStructures.map((fee, index) => (
+                          <Row className="mt-2" key={index}>
+                            <Col xs={5}>
+                              <Select
+                                options={courseFeesOptions}
+                                value={fee.selectedFees}
+                                onChange={(selected) =>
+                                  handleFeeChange(
+                                    index,
+                                    "selectedFees",
+                                    selected
+                                  )
+                                }
+                                onMenuOpen={handleCourseFees}
+                                isClearable
+                                menuPortalTarget={document.body}
+                                menuPosition="fixed"
+                                styles={{
+                                  menuPortal: (base) => ({
+                                    ...base,
+                                    zIndex: 9999,
+                                  }),
+                                }}
+                                menuShouldScrollIntoView={false}
+                              />
+                            </Col>
 
-                          <Col xs={7}>
-                            <div
-                              className="d-flex align-items-center"
-                              style={{ height: "38px" }}
-                            >
-                              <div style={{ flex: 1 }}>
-                                <Input
-                                  type="text"
-                                  placeholder="Enter Amount"
-                                  value={feesAmount}
-                                  onChange={(e) => {
-                                    setFeesAmount(e.target.value);
-                                  }}
+                            <Col xs={7}>
+                              <div
+                                className="d-flex align-items-center"
+                                style={{ height: "38px" }}
+                              >
+                                <div style={{ flex: 1 }}>
+                                  <Input
+                                    type="text"
+                                    placeholder="Enter Amount"
+                                    value={fee.feesAmount}
+                                    onChange={(e) =>
+                                      handleFeeChange(
+                                        index,
+                                        "feesAmount",
+                                        e.target.value
+                                      )
+                                    }
+                                    style={{
+                                      height: "38px",
+                                      borderRadius: "4px",
+                                    }}
+                                  />
+                                </div>
+
+                                <div
+                                  onClick={handleAddFee}
                                   style={{
-                                    height: "38px",
-                                    borderRadius: "4px",
+                                    marginLeft: "8px",
+                                    width: "28px",
+                                    height: "28px",
+                                    backgroundColor: "#5e72e4",
+                                    color: "#fff",
+                                    borderRadius: "50%",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    cursor: "pointer",
                                   }}
-                                />
-                              </div>
+                                >
+                                  <FaPlus size={12} />
+                                </div>
 
-                              {/* ➕ */}
-                              <div
-                                // onClick={handleAddFee}
-                                style={{
-                                  marginLeft: "8px",
-                                  width: "28px",
-                                  height: "28px",
-                                  backgroundColor: "#5e72e4",
-                                  color: "#fff",
-                                  borderRadius: "50%",
-                                  display: "flex",
-                                  alignItems: "center",
-                                  justifyContent: "center",
-                                  cursor: "pointer",
-                                }}
-                              >
-                                <FaPlus size={12} />
+                                {feeStructures.length > 1 && (
+                                  <div
+                                    onClick={() => handleRemoveFee(index)}
+                                    style={{
+                                      marginLeft: "8px",
+                                      width: "28px",
+                                      height: "28px",
+                                      backgroundColor: "#f5365c",
+                                      color: "#fff",
+                                      borderRadius: "50%",
+                                      display: "flex",
+                                      alignItems: "center",
+                                      justifyContent: "center",
+                                      cursor: "pointer",
+                                    }}
+                                  >
+                                    <FaMinus size={12} />
+                                  </div>
+                                )}
                               </div>
-
-                              {/* ➖ */}
-
-                              <div
-                                // onClick={() => handleRemoveFee(index)}
-                                style={{
-                                  marginLeft: "8px",
-                                  width: "28px",
-                                  height: "28px",
-                                  backgroundColor: "#f5365c",
-                                  color: "#fff",
-                                  borderRadius: "50%",
-                                  display: "flex",
-                                  alignItems: "center",
-                                  justifyContent: "center",
-                                  cursor: "pointer",
-                                }}
-                              >
-                                <FaMinus size={12} />
-                              </div>
-                            </div>
-                          </Col>
-                        </Row>
-                      )}
+                            </Col>
+                          </Row>
+                        ))}
                     </FormGroup>
                   </Col>
                 </Row>
@@ -680,6 +803,11 @@ const BatchModal = ({ modal, toggle }) => {
           </ModalFooter>
         </Card>
       </Modal>
+      <InstallModal
+        modal={installmentModalOpen}
+        toggle={toggleInstallment}
+        onSubmitInstallment={handleInstallmentSubmit}
+      />
     </div>
   );
 };

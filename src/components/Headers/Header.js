@@ -26,7 +26,7 @@ const Header = ({ cardTitle1, cardTitle2, cardTitle3, cardTitle4 }) => {
             },
           }
         );
-        console.log(res.data);
+        // console.log(res.data);
         setStatsData(res?.data);
       } catch (error) {
         console.log(error);
@@ -34,7 +34,7 @@ const Header = ({ cardTitle1, cardTitle2, cardTitle3, cardTitle4 }) => {
     };
     fetch();
   }, []);
-  console.log(statsData.total_enquiry);
+  // console.log(statsData.total_enquiry);
   return (
     <>
       <div className="header bg-gradient-info pb-8 pt-5 pt-md-8">
