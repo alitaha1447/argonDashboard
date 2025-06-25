@@ -38,6 +38,7 @@ import Block from "views/master/Block";
 import District from "views/master/District";
 import State from "views/master/State";
 import EnquiryDashboard from "views/dashboard/EnquiryDashboard";
+import Test from "views/master/Test";
 
 var routes = [
   {
@@ -231,6 +232,20 @@ var routes = [
         name: "Group",
         icon: "ni ni-single-copy-04 text-red",
         component: <Group />,
+        layout: "/admin",
+      },
+    ],
+  },
+  {
+    name: "Test",
+    icon: "ni ni-folder-17 text-orange",
+    layout: "/admin",
+    children: [
+      {
+        path: "/test",
+        name: "Test",
+        icon: "ni ni-single-copy-04 text-red",
+        component: <Test />,
         layout: "/admin",
       },
     ],

@@ -1,3 +1,4 @@
+import { v4 as uuidv4 } from "uuid";
 import React, { useEffect, useState } from "react";
 import {
   Modal,
@@ -78,22 +79,6 @@ const CheckboxOption = (props) => (
   </components.Option>
 );
 
-// const CheckboxOption = (props) => {
-//   return (
-//     <components.Option {...props}>
-//       <input
-//         type="checkbox"
-//         checked={props.isSelected}
-//         onChange={() => {
-//           props.selectOption(props.data); // ✅ this triggers selection
-//         }}
-//         style={{ marginRight: 10 }}
-//       />
-//       <label>{props.label}</label>
-//     </components.Option>
-//   );
-// };
-
 const BatchModal = ({ modal, toggle, studentID }) => {
   const [menuIsOpen, setMenuIsOpen] = useState(false);
 
@@ -138,6 +123,8 @@ const BatchModal = ({ modal, toggle, studentID }) => {
   // Installment Modal
   const [installmentModalOpen, setinstallmentModalOpen] = useState(false);
   const [installmentsDetails, setInstallmentsDetails] = useState([]);
+
+  const [selectedFile, setSelectedFile] = useState(null);
 
   // customHook
   const { qualificationOptions, fetchQualificationLists, error } =
@@ -249,6 +236,52 @@ const BatchModal = ({ modal, toggle, studentID }) => {
 
   const handleInstallmentSubmit = (receivedInstallments) => {
     setInstallmentsDetails(receivedInstallments);
+  };
+
+  const handleFileChange = async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    // ✅ Allowed image types
+    const allowedTypes = ["image/png", "image/jpeg"];
+    if (!allowedTypes.includes(file.type)) {
+      alert("Only PNG and JPEG files are allowed.");
+      return;
+    }
+
+    const fileName = file.name;
+    let parts = fileName.split(".");
+    let name = parts[0];
+    setSelectedFile(fileName);
+
+    const uuid = uuidv4();
+    const newFileName = `${uuid}-${name}`;
+
+    const formData = new FormData();
+    formData.append("file", file, newFileName);
+
+    for (let pair of formData.entries()) {
+      console.log(`${pair[0]}:`, pair[1]);
+    }
+
+    // 🔁 Uncomment when ready to upload
+    try {
+      const response = await axios.post(
+        `${API_PATH}/api/FileAPI/UploadFiles`,
+        formData,
+        {
+          params: {
+            APIKEY: API_KEY,
+          },
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+      console.log("Upload success:", response.data);
+    } catch (error) {
+      console.error("Upload error:", error);
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -384,7 +417,7 @@ const BatchModal = ({ modal, toggle, studentID }) => {
                   </Col>
                 </Row>
                 <Row>
-                  <Col md={12}>
+                  <Col md={6}>
                     <TextAreaField
                       label="Description"
                       id="description"
@@ -394,6 +427,21 @@ const BatchModal = ({ modal, toggle, studentID }) => {
                         setDescription(e.target.value);
                       }}
                     />
+                  </Col>
+                  <Col md={6}>
+                    <FormGroup>
+                      <Label>Upload Resume</Label>
+                      <Input
+                        type="file"
+                        name="resume"
+                        id="resume"
+                        accept=".png,.jpeg,"
+                        onChange={handleFileChange}
+                      />
+                      <p style={{ fontSize: "0.875rem", color: "#6c757d" }}>
+                        Supported files: PNG/JPEG. Max 10 MB.
+                      </p>
+                    </FormGroup>
                   </Col>
                 </Row>
                 <Row>
@@ -425,8 +473,8 @@ const BatchModal = ({ modal, toggle, studentID }) => {
                       <Label for="duration" className="form-label">
                         Duration
                       </Label>
-                      <Row className="">
-                        <Col xs={4}>
+                      <Row className="mb-2">
+                        <Col xs={12} sm={5} className="mb-2 mb-sm-0">
                           <Input
                             type="number"
                             placeholder="Duration"
@@ -439,7 +487,7 @@ const BatchModal = ({ modal, toggle, studentID }) => {
                             }}
                           />
                         </Col>
-                        <Col xs={8}>
+                        <Col xs={12} sm={7}>
                           <div style={{ height: "38px" }}>
                             <Select
                               id="durationUnit"
@@ -568,7 +616,7 @@ const BatchModal = ({ modal, toggle, studentID }) => {
                         Payment
                       </Label>
                       <Row>
-                        <Col xs={6}>
+                        <Col md={6} sm={12} className="mb-2 mb-sm-2">
                           <Select
                             id="payment"
                             options={paymentOptions}
@@ -585,7 +633,7 @@ const BatchModal = ({ modal, toggle, studentID }) => {
                           />
                         </Col>
                         {selectPayment?.label === "Paid Organization" && (
-                          <Col xs={6}>
+                          <Col md={6} sm={12}>
                             <Select
                               id="organization"
                               options={organizationOptions}
