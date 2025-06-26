@@ -354,23 +354,15 @@ const FeesDashboard = () => {
                   }}
                 >
                   <h3 className="mb-0">Student Fee Lists</h3>
-
-                  <div
-                    onClick={togglePaymentDetail}
-                    tag="span"
-                    style={{
-                      cursor: "pointer",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      width: "38px",
-                      height: "38px",
-                      backgroundColor: "#5e72e4",
-                      color: "#fff",
-                      borderRadius: "4px",
-                    }}
-                  >
-                    <FaPlus />
+                  <div>
+                    <Button
+                      color="primary"
+                      block
+                      size="md"
+                      onClick={togglePaymentDetail}
+                    >
+                      Payment
+                    </Button>
                   </div>
                 </div>
               </CardHeader>
