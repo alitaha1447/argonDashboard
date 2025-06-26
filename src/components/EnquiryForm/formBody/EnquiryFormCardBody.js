@@ -8,6 +8,8 @@ import RadioGroupField from "components/FormFields/RadioGroup";
 import { refOptions, genderOptions } from "DummyData";
 import { getValidationErrors } from "utils/validations/enquiryValidation";
 import axios from "axios";
+import { ToastContainer, toast } from "react-toastify";
+
 import useQualificationList from "customHookApi/EnquiryDashboardApi/useQualificationList";
 import usePreferredCourse from "customHookApi/EnquiryDashboardApi/usePreferredCourse";
 import useBranchList from "customHookApi/EnquiryDashboardApi/useBranchList";
@@ -184,22 +186,22 @@ const EnquiryFormCardBody = ({ selectedEnquiry }) => {
       CreatedBy: "Developer",
     };
     console.log(enquiryFormdata);
-    // try {
-    //   const res = await axios.post(
-    //     `${API_PATH}/api/SaveEnquiry`,
-    //     enquiryFormdata,
-    //     {
-    //       params: {
-    //         APIKEY: "12345678@",
-    //       },
-    //     }
-    //   );
-    //   toast.success("Enquiry submitted successfully!");
-    //   console.log("DATA --> ", enquiryFormdata);
-    //   console.log("✅ Enquiry submitted successfully:", res.data);
-    // } catch (error) {
-    //   console.error("❌ Failed to submit enquiry:", error);
-    // }
+    try {
+      const res = await axios.post(
+        `${API_PATH}/api/SaveEnquiry`,
+        enquiryFormdata,
+        {
+          params: {
+            APIKEY: "12345678@",
+          },
+        }
+      );
+      toast.success("Enquiry submitted successfully!");
+      console.log("DATA --> ", enquiryFormdata);
+      console.log("✅ Enquiry submitted successfully:", res.data);
+    } catch (error) {
+      console.error("❌ Failed to submit enquiry:", error);
+    }
     resetForm();
   };
   return (

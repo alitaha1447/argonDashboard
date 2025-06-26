@@ -38,6 +38,7 @@ import Block from "views/master/Block";
 import District from "views/master/District";
 import State from "views/master/State";
 import EnquiryDashboard from "views/dashboard/EnquiryDashboard";
+import FeesDashboard from "views/dashboard/FeesDashboard";
 import Test from "views/master/Test";
 
 var routes = [
@@ -58,6 +59,13 @@ var routes = [
     name: "Enquiry Dashboard",
     icon: "ni ni-tv-2 text-primary",
     component: <EnquiryDashboard />,
+    layout: "/admin",
+  },
+  {
+    path: "/feesDashboard",
+    name: "Fees Dashboard",
+    icon: "ni ni-tv-2 text-primary",
+    component: <FeesDashboard />,
     layout: "/admin",
   },
   {

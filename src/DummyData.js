@@ -55,3 +55,38 @@ export const enquiryType = [
   { value: "internShip", label: "Internship" },
   { value: "fullTime", label: "Full Time" },
 ];
+
+export const studentFeeData = [
+  {
+    name: "TAHA",
+    phone: "9981341447",
+    totalFees: "55000",
+    feeReceived: "25000",
+    dueFee: "30000",
+    collectionDate: "02-02-2025",
+  },
+  {
+    name: "Ali",
+    phone: "9876543210",
+    totalFees: "55000",
+    feeReceived: "20000",
+    dueFee: "15000",
+    collectionDate: "15-03-2025",
+  },
+  {
+    name: "Zoya",
+    phone: "9123456780",
+    totalFees: "55000",
+    feeReceived: "35000",
+    dueFee: "5000",
+    collectionDate: "22-01-2025",
+  },
+  {
+    name: "Ravi",
+    phone: "9999999999",
+    totalFees: "55000",
+    feeReceived: "18000",
+    dueFee: "12000",
+    collectionDate: "10-04-2025",
+  },
+];

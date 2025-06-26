@@ -64,6 +64,7 @@ const pageNum = [
 ];
 
 const EnquiryDashboard = (props) => {
+  const [statsData, setStatsData] = useState({});
   //   const [activeNav, setActiveNav] = useState(1);
   const [modalOpen, setModalOpen] = useState(false);
   const [batchModalOpen, setBatchModalOpen] = useState(false);
@@ -264,17 +265,32 @@ const EnquiryDashboard = (props) => {
 
   useEffect(() => {
     const { startDate1, endDate1 } = fetchFinancialYearRangeByDate();
-    const fetchPieData = async () => {
+
+    const fetchAllDashboardData = async () => {
       try {
-        const res = await axios.get(`${API_PATH}/api/Get_Typewise_Enquiry`, {
+        // 1. Enquiry Analytics (for header stats)
+        const analyticsRes = await axios.get(
+          "https://hotelapi.shriyanshnath.com/api/Get_Enquiry_Analytics",
+          {
+            // headers: { APIKEY: "12345678@" },
+            params: {
+              APIKEY: "12345678@",
+              fromdate: "2025-04-01",
+              todate: "2026-03-01",
+            },
+          }
+        );
+        setStatsData(analyticsRes?.data);
+        // 2. Pie Chart Data
+        const pieRes = await axios.get(`${API_PATH}/api/Get_Typewise_Enquiry`, {
           params: {
             APIKEY: API_KEY,
             fromdate: startDate1,
             todate: endDate1,
           },
         });
-        const labels = res.data.map((item) => item.enquiry_type_name);
-        const values = res.data.map((item) => item.enquiries);
+        const labels = pieRes.data.map((item) => item.enquiry_type_name);
+        const values = pieRes.data.map((item) => item.enquiries);
 
         setPieData((prev) => ({
           ...prev,
@@ -286,7 +302,7 @@ const EnquiryDashboard = (props) => {
             },
           ],
         }));
-        // ✅ Now Fetch Bar Chart Data (replace with your actual endpoint)
+        // 3. Bar Chart Data
         const barChartRes = await axios.get(
           `${API_PATH}/api/Get_Coursewise_Enquiry`,
           {
@@ -309,12 +325,61 @@ const EnquiryDashboard = (props) => {
             },
           ],
         }));
-      } catch (err) {
-        console.error("Error loading pie chart data:", err);
+      } catch (error) {
+        console.error("Error loading dashboard data:", error);
       }
     };
+    // const fetchPieData = async () => {
+    //   try {
+    //     const res = await axios.get(`${API_PATH}/api/Get_Typewise_Enquiry`, {
+    //       params: {
+    //         APIKEY: API_KEY,
+    //         fromdate: startDate1,
+    //         todate: endDate1,
+    //       },
+    //     });
+    //     const labels = res.data.map((item) => item.enquiry_type_name);
+    //     const values = res.data.map((item) => item.enquiries);
 
-    fetchPieData();
+    //     setPieData((prev) => ({
+    //       ...prev,
+    //       labels: labels,
+    //       datasets: [
+    //         {
+    //           ...prev.datasets[0],
+    //           data: values,
+    //         },
+    //       ],
+    //     }));
+    //     // ✅ Now Fetch Bar Chart Data (replace with your actual endpoint)
+    //     const barChartRes = await axios.get(
+    //       `${API_PATH}/api/Get_Coursewise_Enquiry`,
+    //       {
+    //         params: {
+    //           APIKEY: API_KEY,
+    //           fromdate: startDate1,
+    //           todate: endDate1,
+    //         },
+    //       }
+    //     );
+    //     const barLabels = barChartRes.data.map((item) => item.topic_title);
+    //     const barValues = barChartRes.data.map((item) => item.enquires);
+    //     setBarData((prev) => ({
+    //       ...prev,
+    //       labels: barLabels,
+    //       datasets: [
+    //         {
+    //           ...prev.datasets[0],
+    //           data: barValues,
+    //         },
+    //       ],
+    //     }));
+    //   } catch (err) {
+    //     console.error("Error loading pie chart data:", err);
+    //   }
+    // };
+
+    fetchAllDashboardData();
   }, []);
 
   useEffect(() => {
@@ -340,14 +405,43 @@ const EnquiryDashboard = (props) => {
       }
     });
   };
+  console.log(statsData);
 
+  const statsCard1 = {
+    title: "Enquiry",
+    value: statsData?.total_enquiry,
+    description: "Total enquiry received",
+    icon: "fas fa-chart-bar",
+    color: "danger",
+  };
+  const statsCard2 = {
+    title: "Student",
+    value: statsData?.joined,
+    description: "Convertes to Student",
+    icon: "fas fa-chart-pie",
+    color: "warning",
+  };
+  const statsCard3 = {
+    title: "Not Interest",
+    value: statsData?.not_interested,
+    description: "Student not interested",
+    icon: "fas fa-users",
+    color: "yellow",
+  };
+  const statsCard4 = {
+    title: "Follow Up",
+    value: statsData?.follow_up,
+    description: "Need to follow up",
+    icon: "fas fa-percent",
+    color: "info",
+  };
   return (
     <>
       <Header
-        cardTitle1={"Enquiry"}
-        cardTitle2={"Student"}
-        cardTitle3={"Not Interest"}
-        cardTitle4={"Follow Up"}
+        cardTitle1={statsCard1}
+        cardTitle2={statsCard2}
+        cardTitle3={statsCard3}
+        cardTitle4={statsCard4}
       />
 
       {/* Page content */}
