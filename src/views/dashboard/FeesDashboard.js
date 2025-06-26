@@ -23,7 +23,8 @@ import {
 import BarChart from "components/Charts/BarChart";
 import Header from "components/Headers/Header";
 import PieChart from "components/Charts/PieChart";
-import FeeDetailModal from "components/CustomModals/feeDetailModal/FeeDetailModal";
+import PaymentDetail from "components/CustomModals/paymentDetailModal/PaymentDetail";
+import FeeDetail from "components/CustomModals/feeDetailModal/FeeDetail";
 
 import Select from "react-select";
 import DatePicker from "react-datepicker";
@@ -47,6 +48,7 @@ const FeesDashboard = () => {
   const [dateRange, setDateRange] = useState([null, null]);
   const [startDate, endDate] = dateRange;
   const [showGraph, setShowGraph] = useState(false);
+  const [showPaymentDetail, setShowPaymentDetail] = useState(false);
   const [showFeeDetail, setShowFeeDetail] = useState(false);
   // PieChart
   const [pieData, setPieData] = useState({
@@ -118,10 +120,12 @@ const FeesDashboard = () => {
     handleSearch(); // ✅ Reuse search logic
   };
 
+  const togglePaymentDetail = () => {
+    setShowPaymentDetail((prev) => !prev);
+  };
   const toggleFeeDetail = () => {
     setShowFeeDetail((prev) => !prev);
   };
-  console.log(showFeeDetail);
 
   useEffect(() => {
     // const { startDate1, endDate1 } = fetchFinancialYearRangeByDate();
@@ -350,6 +354,24 @@ const FeesDashboard = () => {
                   }}
                 >
                   <h3 className="mb-0">Student Fee Lists</h3>
+
+                  <div
+                    onClick={togglePaymentDetail}
+                    tag="span"
+                    style={{
+                      cursor: "pointer",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      width: "38px",
+                      height: "38px",
+                      backgroundColor: "#5e72e4",
+                      color: "#fff",
+                      borderRadius: "4px",
+                    }}
+                  >
+                    <FaPlus />
+                  </div>
                 </div>
               </CardHeader>
               {/* ✅ Table View for Large Screens */}
@@ -493,7 +515,8 @@ const FeesDashboard = () => {
             </Card>
           </Col>
         </Row>
-        <FeeDetailModal modal={showFeeDetail} toggle={toggleFeeDetail} />
+        <PaymentDetail modal={showPaymentDetail} toggle={togglePaymentDetail} />
+        <FeeDetail modal={showFeeDetail} toggle={toggleFeeDetail} />
       </Container>
     </>
   );

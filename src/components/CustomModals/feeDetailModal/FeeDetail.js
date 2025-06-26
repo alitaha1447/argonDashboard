@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect } from "react";
 import {
   Modal,
   ModalHeader,
@@ -13,7 +13,8 @@ import {
   Button,
   Table,
 } from "reactstrap";
-const FeeDetailModal = ({ modal, toggle }) => {
+
+const FeeDetail = ({ modal, toggle }) => {
   return (
     <Modal
       isOpen={modal}
@@ -39,58 +40,31 @@ const FeeDetailModal = ({ modal, toggle }) => {
         <Table className="align-items-center table-flush" responsive>
           <thead className="thead-light">
             <tr>
-              <th scope="col" className="text-center"></th>
               <th scope="col">Title</th>
               <th scope="col">Amount</th>
+              <th scope="col">Payment Status</th>
               <th scope="col">Due Date</th>
-              <th scope="col">Fee Recieved</th>
-              <th scope="col">Due Fees</th>
-              <th scope="col">Collection Date</th>
-              <th scope="col">Input</th>
             </tr>
           </thead>
           <tbody>
             <tr>
-              <td>
-                <div className="d-flex justify-content-center align-items-center">
-                  <Input
-                    type="checkbox"
-                    style={{ margin: 0 }}
-                    // onClick={() => handleCheckId(item.Id)}
-                  />
-                </div>
-              </td>
               <td>{"TAHA"}</td>
               <td>{"55000"}</td>
+              <td>{"Paid"}</td>
               <td>{"02-02-2025"}</td>
-              <td>{"25000"}</td>
-              <td>{"30000"}</td>
-              <td>{"02-02-2025"}</td>
-              <td>
-                <Input
-                  // id={id}
-                  // name={id}
-                  placeholder={`Enter Fees`}
-                  type={"text"}
-                  // value={value}
-                  // onChange={onChange}
-                />
-              </td>
             </tr>
           </tbody>
         </Table>
       </ModalBody>
-      <ModalFooter
+      {/* <ModalFooter
         className="bg-white border-top"
         style={{ position: "sticky", bottom: 0, zIndex: 10 }}
       >
         <Button color="primary">Payment</Button>
-        {/* <Button color="secondary" onClick={toggle}>
-          Cancel
-        </Button> */}
-      </ModalFooter>
+      
+      </ModalFooter> */}
     </Modal>
   );
 };
 
-export default FeeDetailModal;
+export default FeeDetail;
