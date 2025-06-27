@@ -82,6 +82,7 @@ const EnquiryDashboard = (props) => {
   const [selectedBranch, setSelectedBranch] = useState(null);
 
   const [showGraph, setShowGraph] = useState(false);
+  const [showFilters, setShowFilters] = useState(false);
 
   const [pageNumber, setPageNumber] = useState(1);
   const [pageStart, setPageStart] = useState(1);
@@ -513,11 +514,22 @@ const EnquiryDashboard = (props) => {
               {showFilters ? "Hide Filters" : "Show Filters"}
             </Button>
           </div> */}
+          <Col>
+            <div className="d-md-none mb-2 d-flex justify-content-end px-2">
+              <Button
+                color="primary"
+                size="sm"
+                onClick={() => setShowFilters((prev) => !prev)}
+                style={{ zIndex: 1, backgroundColor: "#191d4d" }}
+              >
+                {showFilters ? "🔎" : "🔍"}
+              </Button>
+            </div>
+          </Col>
           <Col
-            className={` pb-4`}
-            // className={`${
-            //   showFilters ? "d-block d-md-flex" : "d-none d-md-flex"
-            // } pb-4`}
+            className={`pb-4 ${
+              showFilters ? "d-block d-md-block" : "d-none d-md-block"
+            }`}
           >
             <div
               className="d-flex flex-column flex-lg-row align-items-center justify-content-between p-2 w-100"
