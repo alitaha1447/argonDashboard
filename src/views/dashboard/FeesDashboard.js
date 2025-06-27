@@ -129,7 +129,7 @@ const FeesDashboard = () => {
   };
 
   useEffect(() => {
-    // const { startDate1, endDate1 } = fetchFinancialYearRangeByDate();
+    const { startDate1, endDate1 } = fetchFinancialYearRangeByDate();
 
     const fetchAllDashboardData = async () => {
       try {
@@ -147,49 +147,49 @@ const FeesDashboard = () => {
         );
         setStatsData(analyticsRes?.data);
         // 2. Pie Chart Data
-        // const pieRes = await axios.get(`${API_PATH}/api/Get_Typewise_Enquiry`, {
-        //   params: {
-        //     APIKEY: API_KEY,
-        //     fromdate: startDate1,
-        //     todate: endDate1,
-        //   },
-        // });
-        // const labels = pieRes.data.map((item) => item.enquiry_type_name);
-        // const values = pieRes.data.map((item) => item.enquiries);
+        const pieRes = await axios.get(`${API_PATH}/api/Get_Typewise_Enquiry`, {
+          params: {
+            APIKEY: API_KEY,
+            fromdate: startDate1,
+            todate: endDate1,
+          },
+        });
+        const labels = pieRes.data.map((item) => item.enquiry_type_name);
+        const values = pieRes.data.map((item) => item.enquiries);
 
-        // setPieData((prev) => ({
-        //   ...prev,
-        //   labels: labels,
-        //   datasets: [
-        //     {
-        //       ...prev.datasets[0],
-        //       data: values,
-        //     },
-        //   ],
-        // }));
+        setPieData((prev) => ({
+          ...prev,
+          labels: labels,
+          datasets: [
+            {
+              ...prev.datasets[0],
+              data: values,
+            },
+          ],
+        }));
         // 3. Bar Chart Data
-        // const barChartRes = await axios.get(
-        //   `${API_PATH}/api/Get_Coursewise_Enquiry`,
-        //   {
-        //     params: {
-        //       APIKEY: API_KEY,
-        //       fromdate: startDate1,
-        //       todate: endDate1,
-        //     },
-        //   }
-        // );
-        // const barLabels = barChartRes.data.map((item) => item.topic_title);
-        // const barValues = barChartRes.data.map((item) => item.enquires);
-        // setBarData((prev) => ({
-        //   ...prev,
-        //   labels: barLabels,
-        //   datasets: [
-        //     {
-        //       ...prev.datasets[0],
-        //       data: barValues,
-        //     },
-        //   ],
-        // }));
+        const barChartRes = await axios.get(
+          `${API_PATH}/api/Get_Coursewise_Enquiry`,
+          {
+            params: {
+              APIKEY: API_KEY,
+              fromdate: startDate1,
+              todate: endDate1,
+            },
+          }
+        );
+        const barLabels = barChartRes.data.map((item) => item.topic_title);
+        const barValues = barChartRes.data.map((item) => item.enquires);
+        setBarData((prev) => ({
+          ...prev,
+          labels: barLabels,
+          datasets: [
+            {
+              ...prev.datasets[0],
+              data: barValues,
+            },
+          ],
+        }));
       } catch (error) {
         console.error("Error loading dashboard data:", error);
       }
