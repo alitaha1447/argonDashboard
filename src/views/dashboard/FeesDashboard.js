@@ -48,6 +48,7 @@ const FeesDashboard = () => {
   const [dateRange, setDateRange] = useState([null, null]);
   const [startDate, endDate] = dateRange;
   const [showGraph, setShowGraph] = useState(false);
+  const [showFilters, setShowFilters] = useState(false);
   const [showPaymentDetail, setShowPaymentDetail] = useState(false);
   const [showFeeDetail, setShowFeeDetail] = useState(false);
   // PieChart
@@ -250,7 +251,23 @@ const FeesDashboard = () => {
         </Row>
 
         <Row className="d-flex flex-column">
-          <Col className={` pb-4`}>
+          <Col>
+            <div className="d-md-none mb-2 d-flex justify-content-end px-2">
+              <Button
+                color="primary"
+                size="sm"
+                onClick={() => setShowFilters((prev) => !prev)}
+                style={{ zIndex: 1, backgroundColor: "#191d4d" }}
+              >
+                {showFilters ? "🔎" : "🔍"}
+              </Button>
+            </div>
+          </Col>
+          <Col
+            className={`pb-4 ${
+              showFilters ? "d-block d-md-block" : "d-none d-md-block"
+            }`}
+          >
             <div
               className="d-flex flex-column flex-lg-row align-items-center justify-content-between p-2 w-100"
               style={{
@@ -361,7 +378,7 @@ const FeesDashboard = () => {
                       size="md"
                       onClick={togglePaymentDetail}
                     >
-                      Payment
+                      Recieve Amount
                     </Button>
                   </div>
                 </div>
