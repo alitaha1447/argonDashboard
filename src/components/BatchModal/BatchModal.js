@@ -260,9 +260,9 @@ const BatchModal = ({ modal, toggle, studentID }) => {
     const formData = new FormData();
     formData.append("file", file, newFileName);
 
-    for (let pair of formData.entries()) {
-      console.log(`${pair[0]}:`, pair[1]);
-    }
+    // for (let pair of formData.entries()) {
+    //   console.log(`${pair[0]}:`, pair[1]);
+    // }
 
     // 🔁 Uncomment when ready to upload
     try {
@@ -339,7 +339,7 @@ const BatchModal = ({ modal, toggle, studentID }) => {
       batch_students: studentID,
       installments_details: installmentsDetails,
     };
-    console.log(batchFormData);
+    // console.log(batchFormData);
 
     try {
       const res = await axios.post(`${API_PATH}/api/Batch`, batchFormData, {

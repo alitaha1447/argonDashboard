@@ -124,8 +124,8 @@ const EnquiryFormCardBody = ({ selectedEnquiry }) => {
           },
         }
       );
-      console.log("fileUpload --> ", response);
-      console.log("Upload success:", response.data);
+      // console.log("fileUpload --> ", response);
+      // console.log("Upload success:", response.data);
     } catch (error) {
       console.error("Upload error:", error);
     }
@@ -185,7 +185,7 @@ const EnquiryFormCardBody = ({ selectedEnquiry }) => {
       ResumePath: selectedFile,
       CreatedBy: "Developer",
     };
-    console.log(enquiryFormdata);
+    // console.log(enquiryFormdata);
     try {
       const res = await axios.post(
         `${API_PATH}/api/SaveEnquiry`,
@@ -197,8 +197,8 @@ const EnquiryFormCardBody = ({ selectedEnquiry }) => {
         }
       );
       toast.success("Enquiry submitted successfully!");
-      console.log("DATA --> ", enquiryFormdata);
-      console.log("✅ Enquiry submitted successfully:", res.data);
+      // console.log("DATA --> ", enquiryFormdata);
+      // console.log("✅ Enquiry submitted successfully:", res.data);
     } catch (error) {
       console.error("❌ Failed to submit enquiry:", error);
     }

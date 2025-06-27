@@ -73,7 +73,6 @@ const Sidebar = (props) => {
   // };
   const createLinks = (routes) => {
     const toggleDropdown = (name) => {
-      console.log(name);
       setOpenDropdowns((prev) => ({
         ...prev,
         [name]: !prev[name],

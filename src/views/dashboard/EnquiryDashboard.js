@@ -31,6 +31,7 @@ import {
 
 import EnquiryModal from "components/EnquiryModal/EnquiryModal";
 import BatchModal from "components/BatchModal/BatchModal";
+import StatusUpdate from "components/CustomModals/statusUpdateModal/StatusUpdate";
 import PieChart from "components/Charts/PieChart";
 import BarChart from "components/Charts/BarChart";
 import Action from "components/ActionDropDown/Action";
@@ -42,18 +43,20 @@ import useBranchList from "customHookApi/EnquiryDashboardApi/useBranchList";
 import axios from "axios";
 import { enquiry } from "DummyData";
 import { FaPlus } from "react-icons/fa";
+import { BsThreeDotsVertical } from "react-icons/bs";
+import useStatusEnquiry from "customHookApi/EnquiryDashboardApi/useStatusEnquiry";
 
 const API_PATH = process.env.REACT_APP_API_PATH;
 const API_KEY = process.env.REACT_APP_API_KEY;
 
-const status = [
-  { value: "all", label: "All" },
-  { value: "enquiredRecieved", label: "Enquired Recieved" },
-  { value: "consultancyGiven", label: "Consultancy Given" },
-  { value: "convertToStudent", label: "Convert To Student" },
-  { value: "followUp", label: "Follow Up" },
-  { value: "rejected", label: "Rejected" },
-];
+// const status = [
+//   { value: "all", label: "All" },
+//   { value: "enquiredRecieved", label: "Enquired Recieved" },
+//   { value: "consultancyGiven", label: "Consultancy Given" },
+//   { value: "convertToStudent", label: "Convert To Student" },
+//   { value: "followUp", label: "Follow Up" },
+//   { value: "rejected", label: "Rejected" },
+// ];
 
 const pageNum = [
   { value: 10, label: "10" },
@@ -68,8 +71,9 @@ const EnquiryDashboard = (props) => {
   //   const [activeNav, setActiveNav] = useState(1);
   const [modalOpen, setModalOpen] = useState(false);
   const [batchModalOpen, setBatchModalOpen] = useState(false);
+  const [statusModalOpen, setStatusModalOpen] = useState(false);
+
   const [openDropdownIndex, setOpenDropdownIndex] = useState(null);
-  const [selectedEnquiry, setSelectedEnquiry] = useState(status[0]);
   const [selectedEnquiryType, setSelectedEnquiryType] = useState(enquiry[0]);
   const [dateRange, setDateRange] = useState([null, null]);
   const [startDate, endDate] = dateRange;
@@ -90,6 +94,10 @@ const EnquiryDashboard = (props) => {
   const pageSize = pageNumDropDown?.value;
 
   const [studentID, setStudentID] = useState([]);
+  const [statusID, setStatusID] = useState(null);
+  // Enquiry
+  // const [statusOptions, setstatusOptions] = useState([]);
+  const [selectedStatus, setSelectedStatus] = useState(null);
 
   // customHookAPI
   const {
@@ -100,6 +108,7 @@ const EnquiryDashboard = (props) => {
     setBranchSearchText,
     branchSearchText,
   } = useBranchList();
+  const { statusOptions, fetchEnquiry } = useStatusEnquiry();
   // PieChart
   const [pieData, setPieData] = useState({
     labels: [],
@@ -210,9 +219,16 @@ const EnquiryDashboard = (props) => {
   const toggleModal = useCallback(() => {
     setModalOpen((prev) => !prev);
   }, []);
+
   const batchModal = useCallback(() => {
     setBatchModalOpen((prev) => !prev);
   }, []);
+
+  const toggleStatusModal = useCallback((id) => {
+    setStatusID(id);
+    setStatusModalOpen((prev) => !prev);
+  }, []);
+
   // const handleEnquiry = (selected) => {
   //   setSelectedEnquiry(selected);
   // };
@@ -228,6 +244,27 @@ const EnquiryDashboard = (props) => {
   const handleEnquiryTypeChange = (selectedOption) => {
     setSelectedEnquiryType(selectedOption); // only update state
   };
+
+  // const fetchEnquiry = async () => {
+  //   try {
+  //     const res = await axios.get(`${API_PATH}/api/Getstatus`, {
+  //       params: {
+  //         APIKEY: API_KEY,
+  //         statusfor: "ENQUIRY",
+  //       },
+  //     });
+  //     console.log(res.data);
+
+  //     const formattedEnquiry = res.data.map((item) => ({
+  //       value: item.id,
+  //       label: item.name,
+  //     }));
+  //     console.log(formattedEnquiry);
+  //     setstatusOptions(formattedEnquiry);
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // };
 
   // const handleDateChange = (date) => {
   //   setDateRange(date);
@@ -405,7 +442,6 @@ const EnquiryDashboard = (props) => {
       }
     });
   };
-  console.log(statsData);
 
   const statsCard1 = {
     title: "Enquiry",
@@ -435,6 +471,7 @@ const EnquiryDashboard = (props) => {
     icon: "fas fa-percent",
     color: "info",
   };
+
   return (
     <>
       <Header
@@ -498,9 +535,11 @@ const EnquiryDashboard = (props) => {
               >
                 <div style={{ width: "170px" }}>
                   <Select
-                    options={status}
-                    value={selectedEnquiry}
-                    onChange={(prev) => setSelectedEnquiry(prev)}
+                    id="status"
+                    options={statusOptions}
+                    value={selectedStatus}
+                    onChange={setSelectedStatus}
+                    onMenuOpen={fetchEnquiry}
                   />
                 </div>
                 <div style={{ width: "170px" }}>
@@ -721,7 +760,49 @@ const EnquiryDashboard = (props) => {
                           <td>{formatDate(item.CreatedOn)}</td>
                           <td>{item.status_txt}</td>
                           <td style={{ textAlign: "center" }}>
-                            <Action />
+                            <UncontrolledDropdown direction="left">
+                              <DropdownToggle
+                                tag="span"
+                                style={{ cursor: "pointer" }}
+                                data-toggle="dropdown"
+                                aria-expanded={false}
+                              >
+                                <BsThreeDotsVertical size={20} />
+                              </DropdownToggle>
+
+                              <DropdownMenu
+                                right
+                                style={{
+                                  minWidth: "120px",
+                                  border: "1px solid #ddd",
+                                  borderRadius: "4px",
+                                  boxShadow: "0px 2px 6px rgba(0,0,0,0.2)",
+                                }}
+                              >
+                                <DropdownItem
+                                  key={index}
+                                  onClick={() => toggleStatusModal(item.Id)}
+                                >
+                                  Update
+                                </DropdownItem>
+                              </DropdownMenu>
+                            </UncontrolledDropdown>
+                            {/* <Action
+                              options={[
+                                // {
+                                //   label: "✏️ Edit",
+                                //   onClick: () => console.log("Edit clicked"),
+                                // },
+                                // {
+                                //   label: "🗑️ Delete",
+                                //   onClick: () => console.log("Delete clicked"),
+                                // },
+                                {
+                                  label: "✏️ Update",
+                                  onClick: (id) => toggleStatusModal(id), // ✅ Will receive the ID
+                                },
+                              ]}
+                            /> */}
                           </td>
                         </tr>
                       ))
@@ -790,7 +871,33 @@ const EnquiryDashboard = (props) => {
                         </div>
                       </div>
 
-                      <Action />
+                      <UncontrolledDropdown direction="left">
+                        <DropdownToggle
+                          tag="span"
+                          style={{ cursor: "pointer" }}
+                          data-toggle="dropdown"
+                          aria-expanded={false}
+                        >
+                          <BsThreeDotsVertical size={20} />
+                        </DropdownToggle>
+
+                        <DropdownMenu
+                          right
+                          style={{
+                            minWidth: "120px",
+                            border: "1px solid #ddd",
+                            borderRadius: "4px",
+                            boxShadow: "0px 2px 6px rgba(0,0,0,0.2)",
+                          }}
+                        >
+                          <DropdownItem
+                            key={index}
+                            onClick={() => toggleStatusModal(item.Id)}
+                          >
+                            Update
+                          </DropdownItem>
+                        </DropdownMenu>
+                      </UncontrolledDropdown>
                     </div>
                   </Card>
                 ))}
@@ -821,7 +928,13 @@ const EnquiryDashboard = (props) => {
       <BatchModal
         modal={batchModalOpen}
         toggle={batchModal}
-        studentID={studentID}
+        // studentID={studentID}
+      />
+      <StatusUpdate
+        modal={statusModalOpen}
+        toggle={toggleStatusModal}
+        selectedId={statusID}
+        refreshList={fetchPaginatedData} // ✅ pass the function
       />
     </>
   );

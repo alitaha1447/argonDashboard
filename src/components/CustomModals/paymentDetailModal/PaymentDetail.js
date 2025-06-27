@@ -1,19 +1,40 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Modal,
-  ModalHeader,
   ModalBody,
   ModalFooter,
   Row,
   Col,
-  Form,
-  FormGroup,
-  Label,
   Input,
   Button,
   Table,
 } from "reactstrap";
+import Select from "react-select";
+import useBranchList from "customHookApi/EnquiryDashboardApi/useBranchList";
+
 const PaymentDetail = ({ modal, toggle }) => {
+  const navigate = useNavigate();
+  const [selectedBranch, setSelectedBranch] = useState(null);
+
+  const {
+    branchOptions,
+    setBranchOptions,
+    isLoading,
+    fetchBranch,
+    setBranchSearchText,
+    branchSearchText,
+  } = useBranchList();
+
+  useEffect(() => {
+    if (branchSearchText.length < 3) {
+      setBranchOptions([]);
+      return;
+    }
+
+    fetchBranch();
+  }, [branchSearchText]);
+
   return (
     <Modal
       isOpen={modal}
@@ -23,19 +44,71 @@ const PaymentDetail = ({ modal, toggle }) => {
       backdrop="static"
       keyboard={false}
     >
-      <ModalHeader
+      {/* <ModalHeader
         toggle={toggle}
         className="bg-white border-bottom"
         style={{ position: "sticky", top: 0, zIndex: 10 }}
       >
         <h1>Payment Details</h1>
-      </ModalHeader>
+      </ModalHeader> */}
       <ModalBody
         style={{
           overflowY: "auto",
-          maxHeight: "50vh",
+          maxHeight: "auto",
         }}
       >
+        {/* Dropdown Filters */}
+        <div className="d-flex flex-column gap-3 mb-3" style={{ gap: "1rem" }}>
+          <Row>
+            <Col md={4}>
+              <div style={{}}>
+                <Select
+                  id="branch-select"
+                  options={branchOptions}
+                  value={selectedBranch}
+                  onChange={(selected) => setSelectedBranch(selected)}
+                  onInputChange={(text) => setBranchSearchText(text)}
+                  placeholder="Select Branch"
+                  isLoading={isLoading}
+                  noOptionsMessage={({ inputValue }) =>
+                    inputValue.length < 3
+                      ? "Type at least 3 characters to search"
+                      : "No branches found"
+                  }
+                />
+              </div>
+            </Col>
+            <Col md={4}>
+              <div style={{}}>
+                <Select
+                  // options={enquiry}
+                  // value={selectedEnquiry}
+                  // onChange={handleEnquiry}
+                  placeholder="Select Batch"
+                />
+              </div>
+            </Col>
+            <Col md={4}>
+              {" "}
+              <div style={{}}>
+                <Select
+                  // options={enquiry}
+                  // value={selectedEnquiry}
+                  // onChange={handleEnquiry}
+                  placeholder="Select Student"
+                />
+              </div>
+            </Col>
+          </Row>
+        </div>
+        {/* Separator */}
+        <div
+          style={{
+            borderBottom: "1px solid #dee2e6",
+            marginBottom: "1rem",
+          }}
+        />
+        <h1>Payment Details</h1>
         <Table className="align-items-center table-flush" responsive>
           <thead className="thead-light">
             <tr>
@@ -70,6 +143,7 @@ const PaymentDetail = ({ modal, toggle }) => {
                   // name={id}
                   placeholder={`Enter Fees`}
                   type={"text"}
+                  style={{ width: "100%", minWidth: "120px" }}
                   // value={value}
                   // onChange={onChange}
                 />
@@ -82,10 +156,12 @@ const PaymentDetail = ({ modal, toggle }) => {
         className="bg-white border-top"
         style={{ position: "sticky", bottom: 0, zIndex: 10 }}
       >
-        <Button color="primary">Payment</Button>
-        {/* <Button color="secondary" onClick={toggle}>
+        <Button color="primary" onClick={() => navigate("/receiptForm")}>
+          Payment
+        </Button>
+        <Button color="secondary" onClick={toggle}>
           Cancel
-        </Button> */}
+        </Button>
       </ModalFooter>
     </Modal>
   );

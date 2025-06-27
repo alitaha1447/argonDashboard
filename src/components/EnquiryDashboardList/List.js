@@ -131,16 +131,16 @@ const List = ({ selectedEnquiryType, isTableLoading, listData }) => {
                       }}
                     >
                       <DropdownItem
-                        onClick={() => {
-                          console.log("Edit clicked for", item.name);
-                        }}
+                      // onClick={() => {
+                      //   console.log("Edit clicked for", item.name);
+                      // }}
                       >
                         ✏️ Edit
                       </DropdownItem>
                       <DropdownItem
-                        onClick={() => {
-                          console.log("Delete clicked for", item.name);
-                        }}
+                      // onClick={() => {
+                      //   console.log("Delete clicked for", item.name);
+                      // }}
                       >
                         🗑️ Delete
                       </DropdownItem>
