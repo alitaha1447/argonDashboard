@@ -60,7 +60,7 @@ const PaymentDetail = ({ modal, toggle }) => {
         {/* Dropdown Filters */}
         <div className="d-flex flex-column gap-3 mb-3" style={{ gap: "1rem" }}>
           <Row>
-            <Col md={4}>
+            <Col md={4} className={` pb-4`}>
               <div style={{}}>
                 <Select
                   id="branch-select"
@@ -78,7 +78,7 @@ const PaymentDetail = ({ modal, toggle }) => {
                 />
               </div>
             </Col>
-            <Col md={4}>
+            <Col md={4} className={` pb-4`}>
               <div style={{}}>
                 <Select
                   // options={enquiry}
@@ -88,7 +88,7 @@ const PaymentDetail = ({ modal, toggle }) => {
                 />
               </div>
             </Col>
-            <Col md={4}>
+            <Col md={4} className={` pb-4`}>
               {" "}
               <div style={{}}>
                 <Select
