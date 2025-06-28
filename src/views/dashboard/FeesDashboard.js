@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+
 import {
   Col,
   Container,
@@ -32,6 +34,10 @@ import "react-datepicker/dist/react-datepicker.css";
 
 import { enquiry } from "DummyData";
 import { FaPlus } from "react-icons/fa";
+import { FaFilter } from "react-icons/fa6";
+import { MdFilterAlt } from "react-icons/md";
+import { MdFilterAltOff } from "react-icons/md";
+
 import { BsThreeDotsVertical } from "react-icons/bs";
 
 import useBranchList from "customHookApi/EnquiryDashboardApi/useBranchList";
@@ -64,7 +70,7 @@ const FeesDashboard = () => {
         backgroundColor: ["#f5365c", "#2dce89", "#11cdef"],
         hoverBackgroundColor: ["#d92e4a", "#24b97d", "#0ebad6"],
         borderColor: "#fff",
-        borderWidth: 0,
+        borderWidth: 2,
       },
     ],
   });
@@ -74,8 +80,8 @@ const FeesDashboard = () => {
     datasets: [
       {
         data: [],
-        backgroundColor: ["#f5365c", "#2dce89"],
-        hoverBackgroundColor: ["#d92e4a", "#24b97d"],
+        backgroundColor: ["#f5365c", "#2dce89", "#11cdef"],
+        hoverBackgroundColor: ["#d92e4a", "#24b97d", "#0ebad6"],
         borderColor: "#fff",
         borderWidth: 0,
       },
@@ -230,6 +236,7 @@ const FeesDashboard = () => {
   //     icon: "fas fa-percent",
   //     color: "info",
   //   };
+
   return (
     <>
       <Header
@@ -256,20 +263,215 @@ const FeesDashboard = () => {
 
         <Row className="d-flex flex-column">
           <Col>
-            <div className="d-md-none mb-2 d-flex justify-content-end px-2">
-              <Button
-                color="primary"
-                size="sm"
-                onClick={() => setShowFilters((prev) => !prev)}
-                style={{ zIndex: 1, backgroundColor: "#191d4d" }}
-              >
-                {showFilters ? "🔎" : "🔍"}
-              </Button>
+            <div
+              className="rounded-3  mb-2 d-flex d-sm-none justify-content-between align-items-center px-2 py-2 w-100"
+              onClick={() => setShowFilters((prev) => !prev)}
+              style={{ cursor: "pointer", backgroundColor: "#191d4d" }}
+            >
+              <h3 className="mb-0" style={{ color: "white" }}>
+                Filter
+              </h3>
+              {showFilters ? (
+                <MdFilterAltOff color="white" />
+              ) : (
+                <MdFilterAlt color="white" />
+              )}
             </div>
           </Col>
-          <Col
+          <Col>
+            <AnimatePresence>
+              {showFilters && (
+                <motion.div
+                  key="mobile-filter"
+                  initial={{ height: 0, opacity: 1 }}
+                  animate={{ height: "auto", opacity: 1 }}
+                  exit={{ height: 0, opacity: 1 }}
+                  transition={{ duration: 0.4, ease: "easeInOut" }}
+                  className="pb-4 d-sm-none d-md-none"
+                >
+                  {/** ⬇️ FILTER CONTENT GOES HERE ⬇️ */}
+                  <div
+                    className="d-flex flex-column flex-md-row align-items-center justify-content-between p-2 w-100 mb-2"
+                    style={{
+                      background: "#f7fafc",
+                      borderRadius: "5px",
+                      border: "1px solid #d3d3d3",
+                      gap: "1rem",
+                    }}
+                  >
+                    <div
+                      className="d-flex flex-wrap justify-content-center align-items-center"
+                      style={{ gap: "1rem" }}
+                    >
+                      <div style={{ width: "170px" }}>
+                        <Input
+                          placeholder="Search by Name or Phone"
+                          type="text"
+                          onChange={handleUnifiedSearchChange}
+                        />
+                      </div>
+                      <div style={{ width: "170px" }}>
+                        <Select
+                          options={enquiry}
+                          value={selectedEnquiryType}
+                          onChange={handleEnquiryTypeChange}
+                        />
+                      </div>
+                      <div style={{ width: "170px" }}>
+                        <Select
+                          id="branch-select"
+                          options={branchOptions}
+                          value={selectedBranch}
+                          onChange={(selected) => setSelectedBranch(selected)}
+                          onInputChange={(text) => setBranchSearchText(text)}
+                          placeholder="branch"
+                          isClearable
+                          isLoading={isLoading}
+                          noOptionsMessage={({ inputValue }) =>
+                            inputValue.length < 3
+                              ? "Type at least 3 characters to search"
+                              : "No branches found"
+                          }
+                        />
+                      </div>
+                      <div className="" style={{ width: "170px" }}>
+                        <DatePicker
+                          selectsRange
+                          startDate={startDate}
+                          endDate={endDate}
+                          onChange={(date) => setDateRange(date)}
+                          monthsShown={2} // ✅ Show two calendars
+                          dateFormat="dd/MM/yyyy"
+                          className="react-datepicker__input-container form-control"
+                          placeholderText="Select date range"
+                          isClearable
+                          // showMonthDropdown
+                          // showYearDropdown
+                          scrollableYearDropdown
+                          yearDropdownItemNumber={50}
+                          minDate={new Date(1900, 0, 1)}
+                          maxDate={new Date(2025, 11, 31)}
+                          popperPlacement="bottom-start" // ✅ Opens dropdown below input
+                        />
+                      </div>
+                    </div>
+                    <div
+                      style={{
+                        padding: "6px 12px",
+                        cursor: "pointer",
+                        border: "1px solid #ccc",
+                        borderRadius: "4px",
+                        backgroundColor: "#5e72e4",
+                        color: "#fff",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        height: "38px",
+                        minWidth: "38px",
+                        // marginLeft: "10px",
+                      }}
+                      // onClick={handleUnifiedSearchChange}
+                      onClick={handleSearchClick}
+                    >
+                      <i className="fas fa-search" />
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </Col>
+          {/* ✅ Filter box for large screens (always visible) */}
+          <Col className="pb-4 d-none d-sm-block">
+            <div
+              className="d-flex flex-column flex-md-row align-items-center justify-content-between p-2 w-100 mb-2"
+              style={{
+                background: "#f7fafc",
+                borderRadius: "5px",
+                border: "1px solid #d3d3d3",
+                gap: "1rem",
+              }}
+            >
+              <div
+                className="d-flex flex-wrap justify-content-center align-items-center"
+                style={{ gap: "1rem" }}
+              >
+                <div style={{ width: "170px" }}>
+                  <Input
+                    placeholder="Search by Name or Phone"
+                    type="text"
+                    onChange={handleUnifiedSearchChange}
+                  />
+                </div>
+                <div style={{ width: "170px" }}>
+                  <Select
+                    options={enquiry}
+                    value={selectedEnquiryType}
+                    onChange={handleEnquiryTypeChange}
+                  />
+                </div>
+                <div style={{ width: "170px" }}>
+                  <Select
+                    id="branch-select"
+                    options={branchOptions}
+                    value={selectedBranch}
+                    onChange={(selected) => setSelectedBranch(selected)}
+                    onInputChange={(text) => setBranchSearchText(text)}
+                    placeholder="branch"
+                    isClearable
+                    isLoading={isLoading}
+                    noOptionsMessage={({ inputValue }) =>
+                      inputValue.length < 3
+                        ? "Type at least 3 characters to search"
+                        : "No branches found"
+                    }
+                  />
+                </div>
+                <div className="" style={{ width: "170px" }}>
+                  <DatePicker
+                    selectsRange
+                    startDate={startDate}
+                    endDate={endDate}
+                    onChange={(date) => setDateRange(date)}
+                    monthsShown={2} // ✅ Show two calendars
+                    dateFormat="dd/MM/yyyy"
+                    className="react-datepicker__input-container form-control"
+                    placeholderText="Select date range"
+                    isClearable
+                    // showMonthDropdown
+                    // showYearDropdown
+                    scrollableYearDropdown
+                    yearDropdownItemNumber={50}
+                    minDate={new Date(1900, 0, 1)}
+                    maxDate={new Date(2025, 11, 31)}
+                    popperPlacement="bottom-start" // ✅ Opens dropdown below input
+                  />
+                </div>
+              </div>
+              <div
+                style={{
+                  padding: "6px 12px",
+                  cursor: "pointer",
+                  border: "1px solid #ccc",
+                  borderRadius: "4px",
+                  backgroundColor: "#5e72e4",
+                  color: "#fff",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  height: "38px",
+                  minWidth: "38px",
+                  // marginLeft: "10px",
+                }}
+                // onClick={handleUnifiedSearchChange}
+                onClick={handleSearchClick}
+              >
+                <i className="fas fa-search" />
+              </div>
+            </div>
+          </Col>
+          {/* <Col
             className={`pb-4 ${
-              showFilters ? "d-block d-md-block" : "d-none d-md-block"
+              showFilters ? "d-block d-md-block" : "d-none d-sm-block"
             }`}
           >
             <div
@@ -281,7 +483,6 @@ const FeesDashboard = () => {
                 gap: "1rem",
               }}
             >
-              {/* Filter Inputs */}
               <div
                 className="d-flex flex-wrap justify-content-center align-items-center"
                 style={{ gap: "1rem" }}
@@ -339,7 +540,6 @@ const FeesDashboard = () => {
                 </div>
               </div>
 
-              {/* Search Icon */}
               <div
                 style={{
                   padding: "6px 12px",
@@ -361,6 +561,40 @@ const FeesDashboard = () => {
                 <i className="fas fa-search" />
               </div>
             </div>
+          </Col> */}
+          <Col>
+            {/* 🔘 Filter Button - Only on small screens */}
+            {/* <div
+              className="rounded-3 d-md-none mb-2 d-flex justify-content-between align-items-center px-2 py-2 w-100"
+              onClick={() => setShowFilters((prev) => !prev)}
+              style={{ cursor: "pointer", backgroundColor: "#191d4d" }}
+            >
+              <h3 className="mb-0" style={{ color: "white" }}>
+                Filter
+              </h3>
+              <FaFilter color="white" />
+            </div> */}
+
+            {/* 📦 Filter Container for Small Screens - Animate */}
+            {/* <AnimatePresence initial={false}>
+              {showFilters && (
+                <motion.div
+                  key="mobile-filters"
+                  initial={{ height: 0, opacity: 1 }}
+                  animate={{ height: "auto", opacity: 1 }}
+                  exit={{ height: 0, opacity: 1 }}
+                  transition={{ duration: 0.4, ease: "easeInOut" }}
+                  className="overflow-hidden d-md-block"
+                >
+                  <YourFilterContent />
+                </motion.div>
+              )}
+            </AnimatePresence> */}
+
+            {/* 🖥️ Filter Container for Desktop - Always Visible */}
+            {/* <div className="d-none d-md-block pb-4">
+              <YourFilterContent />
+            </div> */}
           </Col>
           <Col>
             <Card className="shadow">

@@ -9,6 +9,8 @@ import {
   Input,
   Button,
   Table,
+  Label,
+  FormGroup,
 } from "reactstrap";
 import Select from "react-select";
 import useBranchList from "customHookApi/EnquiryDashboardApi/useBranchList";
@@ -61,7 +63,9 @@ const PaymentDetail = ({ modal, toggle }) => {
         <div className="d-flex flex-column gap-3 mb-3" style={{ gap: "1rem" }}>
           <Row>
             <Col md={4} className={` pb-4`}>
-              <div style={{}}>
+              <FormGroup>
+                <Label>Branch</Label>
+
                 <Select
                   id="branch-select"
                   options={branchOptions}
@@ -76,28 +80,29 @@ const PaymentDetail = ({ modal, toggle }) => {
                       : "No branches found"
                   }
                 />
-              </div>
+              </FormGroup>
             </Col>
             <Col md={4} className={` pb-4`}>
-              <div style={{}}>
+              <FormGroup>
+                <Label>Batch</Label>
                 <Select
                   // options={enquiry}
                   // value={selectedEnquiry}
                   // onChange={handleEnquiry}
                   placeholder="Select Batch"
                 />
-              </div>
+              </FormGroup>
             </Col>
             <Col md={4} className={` pb-4`}>
-              {" "}
-              <div style={{}}>
+              <FormGroup>
+                <Label>Student</Label>
                 <Select
                   // options={enquiry}
                   // value={selectedEnquiry}
                   // onChange={handleEnquiry}
                   placeholder="Select Student"
                 />
-              </div>
+              </FormGroup>
             </Col>
           </Row>
         </div>

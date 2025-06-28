@@ -374,18 +374,20 @@ let chartExample1 = {
           // },
         },
       ],
-      // xAxes: [
-      //   {
-      //     ticks: {
-      //       fontColor: "#525f7f",
-      //     },
-      //     gridLines: {
-      //       drawBorder: false,
-      //       display: true, // Show vertical grid lines
-      //       color: "#f0f0f0",
-      //     },
-      //   },
-      // ],
+      xAxes: [
+        {
+          //     ticks: {
+          //       fontColor: "#525f7f",
+          //     },
+          //     gridLines: {
+          //       drawBorder: false,
+          //       display: true, // Show vertical grid lines
+          //       color: "#f0f0f0",
+          //     },
+          barPercentage: 1, // Controls width of bars (0.0 to 1.0)
+          categoryPercentage: 0.5, // Space between bars
+        },
+      ],
     },
     legend: {
       display: false,

@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 
 import Chart from "chart.js";
 // reactstrap components
@@ -32,6 +33,7 @@ import {
 import EnquiryModal from "components/EnquiryModal/EnquiryModal";
 import BatchModal from "components/BatchModal/BatchModal";
 import StatusUpdate from "components/CustomModals/statusUpdateModal/StatusUpdate";
+import AssignBatch from "components/CustomModals/assignBatchModal/AssignBatch";
 import PieChart from "components/Charts/PieChart";
 import BarChart from "components/Charts/BarChart";
 import Action from "components/ActionDropDown/Action";
@@ -44,6 +46,10 @@ import axios from "axios";
 import { enquiry } from "DummyData";
 import { FaPlus } from "react-icons/fa";
 import { BsThreeDotsVertical } from "react-icons/bs";
+import { FaFilter } from "react-icons/fa6";
+import { MdFilterAlt } from "react-icons/md";
+import { MdFilterAltOff } from "react-icons/md";
+
 import useStatusEnquiry from "customHookApi/EnquiryDashboardApi/useStatusEnquiry";
 
 const API_PATH = process.env.REACT_APP_API_PATH;
@@ -72,6 +78,7 @@ const EnquiryDashboard = (props) => {
   const [modalOpen, setModalOpen] = useState(false);
   const [batchModalOpen, setBatchModalOpen] = useState(false);
   const [statusModalOpen, setStatusModalOpen] = useState(false);
+  const [assignBatchModal, setAssignBatchModal] = useState(false);
 
   const [openDropdownIndex, setOpenDropdownIndex] = useState(null);
   const [selectedEnquiryType, setSelectedEnquiryType] = useState(enquiry[0]);
@@ -229,6 +236,10 @@ const EnquiryDashboard = (props) => {
     setStatusID(id);
     setStatusModalOpen((prev) => !prev);
   }, []);
+
+  const toggleAssignBatch = () => {
+    setAssignBatchModal((prev) => !prev);
+  };
 
   // const handleEnquiry = (selected) => {
   //   setSelectedEnquiry(selected);
@@ -514,19 +525,36 @@ const EnquiryDashboard = (props) => {
               {showFilters ? "Hide Filters" : "Show Filters"}
             </Button>
           </div> */}
+          {/* <Col>
+            <div
+              className="rounded-3 d-sm-none mb-2 d-flex justify-content-between align-items-center px-2 py-2 w-100"
+              onClick={() => setShowFilters((prev) => !prev)}
+              style={{ cursor: "pointer", backgroundColor: "#191d4d" }}
+            >
+              <h3 className="mb-0" style={{ color: "white" }}>
+                Filter
+              </h3>
+              <FaFilter color="white" />
+            </div>
+          </Col> */}
           <Col>
-            <div className="d-md-none mb-2 d-flex justify-content-end px-2">
-              <Button
-                color="primary"
-                size="sm"
-                onClick={() => setShowFilters((prev) => !prev)}
-                style={{ zIndex: 1, backgroundColor: "#191d4d" }}
-              >
-                {showFilters ? "🔎" : "🔍"}
-              </Button>
+            <div
+              className="rounded-3  mb-2 d-flex d-sm-none justify-content-between align-items-center px-2 py-2 w-100"
+              onClick={() => setShowFilters((prev) => !prev)}
+              style={{ cursor: "pointer", backgroundColor: "#191d4d" }}
+            >
+              <h3 className="mb-0" style={{ color: "white" }}>
+                Filter
+              </h3>
+              {showFilters ? (
+                <MdFilterAltOff color="white" />
+              ) : (
+                <MdFilterAlt color="white" />
+              )}
             </div>
           </Col>
-          <Col
+
+          {/* <Col
             className={`pb-4 ${
               showFilters ? "d-block d-md-block" : "d-none d-md-block"
             }`}
@@ -540,7 +568,6 @@ const EnquiryDashboard = (props) => {
                 gap: "1rem",
               }}
             >
-              {/* Filter Inputs */}
               <div
                 className="d-flex flex-wrap justify-content-center align-items-center"
                 style={{ gap: "1rem" }}
@@ -558,6 +585,7 @@ const EnquiryDashboard = (props) => {
                   <Input
                     placeholder="Search by Name or Phone"
                     type="text"
+                    value={searchText}
                     onChange={handleUnifiedSearchChange}
                   />
                 </div>
@@ -607,7 +635,6 @@ const EnquiryDashboard = (props) => {
                 </div>
               </div>
 
-              {/* Search Icon */}
               <div
                 style={{
                   padding: "6px 12px",
@@ -629,7 +656,212 @@ const EnquiryDashboard = (props) => {
                 <i className="fas fa-search" />
               </div>
             </div>
+          </Col> */}
+          <Col>
+            <AnimatePresence>
+              {showFilters && (
+                <motion.div>
+                  <div
+                    className="d-flex flex-column flex-lg-row align-items-center justify-content-between p-2 w-100"
+                    style={{
+                      background: "#f7fafc",
+                      borderRadius: "5px",
+                      border: "1px solid #d3d3d3",
+                      gap: "1rem",
+                    }}
+                  >
+                    <div
+                      className="d-flex flex-wrap justify-content-center align-items-center"
+                      style={{ gap: "1rem" }}
+                    >
+                      <div style={{ width: "170px" }}>
+                        <Select
+                          id="status"
+                          options={statusOptions}
+                          value={selectedStatus}
+                          onChange={setSelectedStatus}
+                          onMenuOpen={fetchEnquiry}
+                        />
+                      </div>
+                      <div style={{ width: "170px" }}>
+                        <Input
+                          placeholder="Search by Name or Phone"
+                          type="text"
+                          value={searchText}
+                          onChange={handleUnifiedSearchChange}
+                        />
+                      </div>
+                      <div style={{ width: "170px" }}>
+                        <Select
+                          options={enquiry}
+                          value={selectedEnquiryType}
+                          onChange={handleEnquiryTypeChange}
+                        />
+                      </div>
+                      <div style={{ width: "170px" }}>
+                        <Select
+                          id="branch-select"
+                          options={branchOptions}
+                          value={selectedBranch}
+                          onChange={(selected) => setSelectedBranch(selected)}
+                          onInputChange={(text) => setBranchSearchText(text)}
+                          placeholder="branch"
+                          isClearable
+                          isLoading={isLoading}
+                          noOptionsMessage={({ inputValue }) =>
+                            inputValue.length < 3
+                              ? "Type at least 3 characters to search"
+                              : "No branches found"
+                          }
+                        />
+                      </div>
+                      <div className="" style={{ width: "170px" }}>
+                        <DatePicker
+                          selectsRange
+                          startDate={startDate}
+                          endDate={endDate}
+                          onChange={(date) => setDateRange(date)}
+                          monthsShown={2} // ✅ Show two calendars
+                          dateFormat="dd/MM/yyyy"
+                          className="react-datepicker__input-container form-control"
+                          placeholderText="Select date range"
+                          isClearable
+                          // showMonthDropdown
+                          // showYearDropdown
+                          scrollableYearDropdown
+                          yearDropdownItemNumber={50}
+                          minDate={new Date(1900, 0, 1)}
+                          maxDate={new Date(2025, 11, 31)}
+                          popperPlacement="bottom-start" // ✅ Opens dropdown below input
+                        />
+                      </div>
+                    </div>
+
+                    <div
+                      style={{
+                        padding: "6px 12px",
+                        cursor: "pointer",
+                        border: "1px solid #ccc",
+                        borderRadius: "4px",
+                        backgroundColor: "#5e72e4",
+                        color: "#fff",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        height: "38px",
+                        minWidth: "38px",
+                        // marginLeft: "10px",
+                      }}
+                      // onClick={handleUnifiedSearchChange}
+                      onClick={handleSearchClick}
+                    >
+                      <i className="fas fa-search" />
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </Col>
+          <Col className="pb-4 d-none d-sm-block">
+            <div
+              className="d-flex flex-column flex-lg-row align-items-center justify-content-between p-2 w-100"
+              style={{
+                background: "#f7fafc",
+                borderRadius: "5px",
+                border: "1px solid #d3d3d3",
+                gap: "1rem",
+              }}
+            >
+              <div
+                className="d-flex flex-wrap justify-content-center align-items-center"
+                style={{ gap: "1rem" }}
+              >
+                <div style={{ width: "170px" }}>
+                  <Select
+                    id="status"
+                    options={statusOptions}
+                    value={selectedStatus}
+                    onChange={setSelectedStatus}
+                    onMenuOpen={fetchEnquiry}
+                  />
+                </div>
+                <div style={{ width: "170px" }}>
+                  <Input
+                    placeholder="Search by Name or Phone"
+                    type="text"
+                    value={searchText}
+                    onChange={handleUnifiedSearchChange}
+                  />
+                </div>
+                <div style={{ width: "170px" }}>
+                  <Select
+                    options={enquiry}
+                    value={selectedEnquiryType}
+                    onChange={handleEnquiryTypeChange}
+                  />
+                </div>
+                <div style={{ width: "170px" }}>
+                  <Select
+                    id="branch-select"
+                    options={branchOptions}
+                    value={selectedBranch}
+                    onChange={(selected) => setSelectedBranch(selected)}
+                    onInputChange={(text) => setBranchSearchText(text)}
+                    placeholder="branch"
+                    isClearable
+                    isLoading={isLoading}
+                    noOptionsMessage={({ inputValue }) =>
+                      inputValue.length < 3
+                        ? "Type at least 3 characters to search"
+                        : "No branches found"
+                    }
+                  />
+                </div>
+                <div className="" style={{ width: "170px" }}>
+                  <DatePicker
+                    selectsRange
+                    startDate={startDate}
+                    endDate={endDate}
+                    onChange={(date) => setDateRange(date)}
+                    monthsShown={2} // ✅ Show two calendars
+                    dateFormat="dd/MM/yyyy"
+                    className="react-datepicker__input-container form-control"
+                    placeholderText="Select date range"
+                    isClearable
+                    // showMonthDropdown
+                    // showYearDropdown
+                    scrollableYearDropdown
+                    yearDropdownItemNumber={50}
+                    minDate={new Date(1900, 0, 1)}
+                    maxDate={new Date(2025, 11, 31)}
+                    popperPlacement="bottom-start" // ✅ Opens dropdown below input
+                  />
+                </div>
+              </div>
+
+              <div
+                style={{
+                  padding: "6px 12px",
+                  cursor: "pointer",
+                  border: "1px solid #ccc",
+                  borderRadius: "4px",
+                  backgroundColor: "#5e72e4",
+                  color: "#fff",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  height: "38px",
+                  minWidth: "38px",
+                  // marginLeft: "10px",
+                }}
+                // onClick={handleUnifiedSearchChange}
+                onClick={handleSearchClick}
+              >
+                <i className="fas fa-search" />
+              </div>
+            </div>{" "}
+          </Col>
+
           <Col>
             <Card className="shadow">
               <CardHeader className="border-0">
@@ -683,7 +915,7 @@ const EnquiryDashboard = (props) => {
                         color="primary"
                         block
                         size="md"
-                        // onClick={batchModal}
+                        onClick={toggleAssignBatch}
                       >
                         Assign Batch
                       </Button>
@@ -948,6 +1180,7 @@ const EnquiryDashboard = (props) => {
         selectedId={statusID}
         refreshList={fetchPaginatedData} // ✅ pass the function
       />
+      <AssignBatch modal={assignBatchModal} toggle={toggleAssignBatch} />
     </>
   );
 };
