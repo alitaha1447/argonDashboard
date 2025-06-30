@@ -20,7 +20,7 @@ import { ToastContainer, toast } from "react-toastify";
 const API_PATH = process.env.REACT_APP_API_PATH;
 const API_KEY = process.env.REACT_APP_API_KEY;
 
-const CourseMasterModal = ({ modal, toggle }) => {
+const CourseMasterModal = ({ modal, toggle, refreshList }) => {
   const [courseName, setCourseName] = useState("");
   const [courseDescription, setCourseDescription] = useState("");
   const [courseSequence, setCourseSequence] = useState("");
@@ -42,6 +42,7 @@ const CourseMasterModal = ({ modal, toggle }) => {
       });
       // console.log("Course created:", res);
       toast.success("Course created Successfully!!");
+      refreshList();
       toggle();
     } catch (error) {
       console.log("Error creating course:", error);

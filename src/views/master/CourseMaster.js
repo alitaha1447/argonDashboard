@@ -55,16 +55,17 @@ const CourseMaster = () => {
     setShowMaster((prev) => !prev);
   };
 
+  const getCourses = async () => {
+    const res = await axios.get(`${API_PATH}/api/GetCourse`, {
+      params: {
+        APIKEY: API_KEY,
+      },
+    });
+    console.log(res?.data);
+    setCourses(res?.data);
+  };
+
   useEffect(() => {
-    const getCourses = async () => {
-      const res = await axios.get(`${API_PATH}/api/GetCourse`, {
-        params: {
-          APIKEY: API_KEY,
-        },
-      });
-      console.log(res?.data);
-      setCourses(res?.data);
-    };
     getCourses();
   }, []);
 
@@ -272,7 +273,11 @@ const CourseMaster = () => {
             </Card>
           </div>
         </Row>
-        <CourseMasterModal modal={showMaster} toggle={toggleMaster} />
+        <CourseMasterModal
+          modal={showMaster}
+          toggle={toggleMaster}
+          refreshList={getCourses}
+        />
       </Container>
       <ToastContainer />
     </>
