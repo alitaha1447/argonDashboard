@@ -19,7 +19,7 @@ export const getValidationErrors = ({
 
   if (!contactNumber.trim()) {
     errors.contactNumber = "Contact number is a mandatory field!";
-  } else if (!/^\d{11}$/.test(contactNumber)) {
+  } else if (!/^\d{10}$/.test(contactNumber)) {
     errors.contactNumber = "Contact number must be exactly 10 digits!";
   }
 

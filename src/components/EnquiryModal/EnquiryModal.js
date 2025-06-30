@@ -18,6 +18,7 @@ const EnquiryModal = ({
   modal,
   toggle,
   //  handleSubmit
+  refreshList,
 }) => {
   const [selectedEnquiry, setSelectedEnquiry] = useState(enquiry[0]);
 
@@ -46,7 +47,11 @@ const EnquiryModal = ({
           </ModalHeader>
 
           <ModalBody style={{ overflowY: "auto" }}>
-            <EnquiryFormCardBody selectedEnquiry={selectedEnquiry} />
+            <EnquiryFormCardBody
+              selectedEnquiry={selectedEnquiry}
+              toggle={toggle}
+              refreshList={refreshList}
+            />
           </ModalBody>
 
           {/* <ModalFooter

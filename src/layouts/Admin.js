@@ -40,27 +40,53 @@ const Admin = (props) => {
   //   });
   // };
 
-  const getRoutes = (routes) => {
-    // console.log(routes);
-    return routes.flatMap((route, key) => {
-      // Render child routes if present
-      if (route.children && route.children.length) {
-        return route.children.map((child, idx) => (
-          <Route
-            path={child.path}
-            element={child.component}
-            key={`${key}-${idx}`}
-          />
-        ));
-      }
+  // const getRoutes = (routes) => {
+  //   // console.log(routes);
+  //   return routes.flatMap((route, key) => {
+  //     // Render child routes if present
+  //     if (route.children && route.children.length) {
+  //       return route.children.map((child, idx) => (
+  //         <Route
+  //           path={child.path}
+  //           element={child.component}
+  //           key={`${key}-${idx}`}
+  //         />
+  //       ));
+  //     }
 
-      // Render normal route
-      if (route.layout === "/admin") {
-        return <Route path={route.path} element={route.component} key={key} />;
-      }
+  //     // Render normal route
+  //     if (route.layout === "/admin") {
+  //       return <Route path={route.path} element={route.component} key={key} />;
+  //     }
 
-      return [];
-    });
+  //     return [];
+  //   });
+  // };
+
+  const getRoutes = (routesList) => {
+    const result = [];
+
+    const traverseRoutes = (routesArray) => {
+      routesArray.forEach((route) => {
+        if (route.layout === "/admin" && route.path && route.component) {
+          result.push(
+            <Route
+              key={route.path}
+              path={route.path}
+              element={route.component}
+            />
+          );
+        }
+
+        if (route.children && route.children.length > 0) {
+          traverseRoutes(route.children);
+        }
+      });
+    };
+
+    traverseRoutes(routesList);
+
+    return result;
   };
 
   const getBrandText = (path) => {

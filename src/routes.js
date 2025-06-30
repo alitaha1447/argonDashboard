@@ -40,6 +40,8 @@ import State from "views/master/State";
 import EnquiryDashboard from "views/dashboard/EnquiryDashboard";
 import FeesDashboard from "views/dashboard/FeesDashboard";
 import Test from "views/master/Test";
+import DailyCollection from "views/transaction/report/fees/DailyCollection";
+import DueBalance from "views/transaction/report/fees/DueBalance";
 
 var routes = [
   {
@@ -500,6 +502,34 @@ var routes = [
         icon: "ni ni-ungroup text-red",
         component: <Billing />,
         layout: "/admin",
+      },
+    ],
+  },
+  {
+    name: "Report",
+    icon: "ni ni-folder-17 text-orange",
+    layout: "/admin",
+    children: [
+      {
+        name: "Fees",
+        icon: "ni ni-folder-17 text-orange",
+        layout: "/admin",
+        children: [
+          {
+            path: "/dailyCollection",
+            name: "Daily Collection",
+            icon: "ni ni-single-copy-04 text-red",
+            component: <DailyCollection />,
+            layout: "/admin",
+          },
+          {
+            path: "/dueBalance",
+            name: "Due Balance",
+            icon: "ni ni-single-copy-04 text-red",
+            component: <DueBalance />,
+            layout: "/admin",
+          },
+        ],
       },
     ],
   },

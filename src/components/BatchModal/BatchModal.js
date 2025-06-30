@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from "uuid";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import {
   Modal,
   ModalHeader,
@@ -30,7 +30,7 @@ import useBranchList from "customHookApi/EnquiryDashboardApi/useBranchList";
 import usePreferredCourse from "customHookApi/EnquiryDashboardApi/usePreferredCourse";
 import axios from "axios";
 import { FaPlus, FaMinus } from "react-icons/fa";
-
+import { ToastContainer, toast } from "react-toastify";
 const API_PATH = process.env.REACT_APP_API_PATH;
 const API_KEY = process.env.REACT_APP_API_KEY;
 
@@ -80,6 +80,14 @@ const CheckboxOption = (props) => (
 );
 
 const BatchModal = ({ modal, toggle, studentID }) => {
+  const fileInputRef = useRef(null);
+
+  const stdId = studentID.map((item) => ({
+    // id: "", // or generate unique id if needed
+    // BatchID: batchId, // provide your BatchID variable here
+    enrollmentid: item.enrollmentid.toString(),
+    // createdon: new Date().toISOString(), // or your preferred date format
+  }));
   const [menuIsOpen, setMenuIsOpen] = useState(false);
 
   const [batchName, setBatchName] = useState("");
@@ -124,7 +132,7 @@ const BatchModal = ({ modal, toggle, studentID }) => {
   const [installmentModalOpen, setinstallmentModalOpen] = useState(false);
   const [installmentsDetails, setInstallmentsDetails] = useState([]);
 
-  const [selectedFile, setSelectedFile] = useState(null);
+  const [selectedFile, setSelectedFile] = useState("");
 
   // customHook
   const { qualificationOptions, fetchQualificationLists, error } =
@@ -166,7 +174,6 @@ const BatchModal = ({ modal, toggle, studentID }) => {
         label: item.Name,
       }));
       setFacultyOptions(formattedFaculty);
-      // console.log("Faculty Data:", res.data);
     } catch (error) {
       console.error("Error fetching faculty data:", error);
     }
@@ -190,7 +197,6 @@ const BatchModal = ({ modal, toggle, studentID }) => {
         label: item.level_name,
       }));
       setBatchOptions(formattedBatch);
-      // console.log(res?.data);
     } catch (error) {
       console.log(`Batch level error --> ${error}`);
     }
@@ -278,10 +284,30 @@ const BatchModal = ({ modal, toggle, studentID }) => {
           },
         }
       );
-      console.log("Upload success:", response.data);
     } catch (error) {
       console.error("Upload error:", error);
     }
+  };
+
+  const resetForm = () => {
+    setBatchName("");
+    setDescription("");
+    setSelectedFaculty(null);
+    setSelectMode(modeOptions[0]);
+    setSelectPayment(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = null;
+    }
+    setSelectedFile("");
+    setFeeStructures([{ selectedFees: null, feesAmount: "" }]);
+    setSelectedOptionsQualification([]);
+    setSelectedCoursesOptions(null); // setAdditionalQuery("");
+    setSelectedOrganization(null);
+    setInstallmentsDetails([]);
+    setSelectedDurations(null);
+    setDurationCount(null);
+    setSelectedBranch([]);
+    setSelectedBatch(null);
   };
 
   const handleSubmit = async (e) => {
@@ -318,6 +344,7 @@ const BatchModal = ({ modal, toggle, studentID }) => {
       BatchName: batchName,
       Description: description,
       courseid: selectedCoursesOptions?.map((c) => c.value).join(","),
+      batch_banner: selectedFile,
       duration_type: selectedDurations?.value,
       duration: parseInt(durationCount),
       StartDate: formattedStartDate,
@@ -336,7 +363,7 @@ const BatchModal = ({ modal, toggle, studentID }) => {
         venue: item.label,
       })),
       batch_fees: cleanedFees,
-      batch_students: studentID,
+      batch_students: stdId,
       installments_details: installmentsDetails,
     };
     // console.log(batchFormData);
@@ -347,10 +374,13 @@ const BatchModal = ({ modal, toggle, studentID }) => {
           APIKEY: API_KEY,
         },
       });
-      console.log("✅ Batch created successfully:", res.data);
+      console.log("✅ Batch created successfully:", res);
+      toast.success("Enquiry submitted successfully!");
     } catch (error) {
       console.error("❌ Failed to create batch:", error);
+      toast.error(error?.name);
     }
+    resetForm();
   };
 
   const toggleInstallment = () => {
@@ -430,13 +460,14 @@ const BatchModal = ({ modal, toggle, studentID }) => {
                   </Col>
                   <Col md={6}>
                     <FormGroup>
-                      <Label>Upload Resume</Label>
+                      <Label>Banner Image</Label>
                       <Input
                         type="file"
                         name="resume"
                         id="resume"
                         accept=".png,.jpeg,"
                         onChange={handleFileChange}
+                        innerRef={fileInputRef}
                       />
                       <p style={{ fontSize: "0.875rem", color: "#6c757d" }}>
                         Supported files: PNG/JPEG. Max 10 MB.
@@ -856,6 +887,7 @@ const BatchModal = ({ modal, toggle, studentID }) => {
         toggle={toggleInstallment}
         onSubmitInstallment={handleInstallmentSubmit}
       />
+      <ToastContainer />
     </div>
   );
 };

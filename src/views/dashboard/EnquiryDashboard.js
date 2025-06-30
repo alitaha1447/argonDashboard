@@ -20,7 +20,7 @@ import {
 } from "reactstrap";
 
 import Header from "components/Headers/Header.js";
-import Select from "react-select";
+import FilterBar from "components/CustomFilter/FilterBar";
 
 // core components
 import {
@@ -36,9 +36,7 @@ import StatusUpdate from "components/CustomModals/statusUpdateModal/StatusUpdate
 import AssignBatch from "components/CustomModals/assignBatchModal/AssignBatch";
 import PieChart from "components/Charts/PieChart";
 import BarChart from "components/Charts/BarChart";
-import Action from "components/ActionDropDown/Action";
 import CustomPagination from "components/CustomPagination/CustomPagination";
-import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { fetchFinancialYearRangeByDate } from "utils/financialYearRange/FinancialYearRange";
 import useBranchList from "customHookApi/EnquiryDashboardApi/useBranchList";
@@ -46,23 +44,14 @@ import axios from "axios";
 import { enquiry } from "DummyData";
 import { FaPlus } from "react-icons/fa";
 import { BsThreeDotsVertical } from "react-icons/bs";
-import { FaFilter } from "react-icons/fa6";
 import { MdFilterAlt } from "react-icons/md";
 import { MdFilterAltOff } from "react-icons/md";
 
 import useStatusEnquiry from "customHookApi/EnquiryDashboardApi/useStatusEnquiry";
+import { generateHexColors } from "utils/dynamicColorGenerator/generateHexColors ";
 
 const API_PATH = process.env.REACT_APP_API_PATH;
 const API_KEY = process.env.REACT_APP_API_KEY;
-
-// const status = [
-//   { value: "all", label: "All" },
-//   { value: "enquiredRecieved", label: "Enquired Recieved" },
-//   { value: "consultancyGiven", label: "Consultancy Given" },
-//   { value: "convertToStudent", label: "Convert To Student" },
-//   { value: "followUp", label: "Follow Up" },
-//   { value: "rejected", label: "Rejected" },
-// ];
 
 const pageNum = [
   { value: 10, label: "10" },
@@ -74,13 +63,11 @@ const pageNum = [
 
 const EnquiryDashboard = (props) => {
   const [statsData, setStatsData] = useState({});
-  //   const [activeNav, setActiveNav] = useState(1);
   const [modalOpen, setModalOpen] = useState(false);
   const [batchModalOpen, setBatchModalOpen] = useState(false);
   const [statusModalOpen, setStatusModalOpen] = useState(false);
   const [assignBatchModal, setAssignBatchModal] = useState(false);
 
-  const [openDropdownIndex, setOpenDropdownIndex] = useState(null);
   const [selectedEnquiryType, setSelectedEnquiryType] = useState(enquiry[0]);
   const [dateRange, setDateRange] = useState([null, null]);
   const [startDate, endDate] = dateRange;
@@ -123,10 +110,10 @@ const EnquiryDashboard = (props) => {
     datasets: [
       {
         data: [],
-        backgroundColor: ["#f5365c", "#2dce89", "#11cdef"],
-        hoverBackgroundColor: ["#d92e4a", "#24b97d", "#0ebad6"],
+        // backgroundColor: ["#f5365c", "#2dce89", "#11cdef"],
+        // hoverBackgroundColor: ["#d92e4a", "#24b97d", "#0ebad6"],
         borderColor: "#fff",
-        borderWidth: 0,
+        borderWidth: 2,
       },
     ],
   });
@@ -136,8 +123,8 @@ const EnquiryDashboard = (props) => {
     datasets: [
       {
         data: [],
-        backgroundColor: ["#f5365c", "#2dce89"],
-        hoverBackgroundColor: ["#d92e4a", "#24b97d"],
+        // backgroundColor: ["#f5365c", "#2dce89"],
+        // hoverBackgroundColor: ["#d92e4a", "#24b97d"],
         borderColor: "#fff",
         borderWidth: 0,
       },
@@ -154,6 +141,7 @@ const EnquiryDashboard = (props) => {
         enquirytype: filters.status || 1,
         searchtext: filters.searchText || "",
         pageno: page,
+        // pageno: 2,
         pagesize: pageSize,
       };
 
@@ -167,6 +155,7 @@ const EnquiryDashboard = (props) => {
       }
 
       const result = res.data;
+      // console.log(res);
       setListData(result?.Data || []);
       setPageNumber(result?.PageNumber || page);
       setTotalPages(result?.TotalPages || 1);
@@ -182,34 +171,6 @@ const EnquiryDashboard = (props) => {
     setPageNumber(1);
     fetchPaginatedData(1);
   }, [pageSize]);
-
-  // const fetchData = async () => {
-  //   setIsLoading(true);
-  //   try {
-  //     const res = await axios.get(`${API_PATH}/api/branches`, {
-  //       params: {
-  //         APIKEY: API_KEY,
-  //         searchtext: branchSearchText,
-  //       },
-  //       // headers: {
-  //       //   APIKEY: API_KEY,
-  //       // },
-  //     });
-
-  //     const options =
-  //       res.data?.map((branch) => ({
-  //         label: branch?.BranchName || `Branch ${branch?.BranchId}`,
-  //         value: branch?.BranchId,
-  //       })) || [];
-
-  //     setBranchOptions(options);
-  //   } catch (err) {
-  //     console.error("Branch fetch error:", err);
-  //     setBranchOptions([]);
-  //   } finally {
-  //     setIsLoading(false);
-  //   }
-  // };
 
   useEffect(() => {
     if (branchSearchText.length < 3) {
@@ -286,11 +247,6 @@ const EnquiryDashboard = (props) => {
   //   }
   // };
 
-  // const parseDDMMYYYY = (dateStr) => {
-  //   const [day, month, year] = dateStr.split("/");
-  //   return new Date(`${year}-${month}-${day}`);
-  // };
-
   const formatDate = (date) => {
     const d = new Date(date);
     const day = String(d.getDate()).padStart(2, "0");
@@ -340,6 +296,8 @@ const EnquiryDashboard = (props) => {
         });
         const labels = pieRes.data.map((item) => item.enquiry_type_name);
         const values = pieRes.data.map((item) => item.enquiries);
+        const dynamicColors = generateHexColors(values.length);
+        // console.log("dynamic colors --> ", dynamicColors);
 
         setPieData((prev) => ({
           ...prev,
@@ -348,6 +306,7 @@ const EnquiryDashboard = (props) => {
             {
               ...prev.datasets[0],
               data: values,
+              backgroundColor: dynamicColors,
             },
           ],
         }));
@@ -364,6 +323,7 @@ const EnquiryDashboard = (props) => {
         );
         const barLabels = barChartRes.data.map((item) => item.topic_title);
         const barValues = barChartRes.data.map((item) => item.enquires);
+
         setBarData((prev) => ({
           ...prev,
           labels: barLabels,
@@ -371,6 +331,7 @@ const EnquiryDashboard = (props) => {
             {
               ...prev.datasets[0],
               data: barValues,
+              backgroundColor: dynamicColors,
             },
           ],
         }));
@@ -378,56 +339,6 @@ const EnquiryDashboard = (props) => {
         console.error("Error loading dashboard data:", error);
       }
     };
-    // const fetchPieData = async () => {
-    //   try {
-    //     const res = await axios.get(`${API_PATH}/api/Get_Typewise_Enquiry`, {
-    //       params: {
-    //         APIKEY: API_KEY,
-    //         fromdate: startDate1,
-    //         todate: endDate1,
-    //       },
-    //     });
-    //     const labels = res.data.map((item) => item.enquiry_type_name);
-    //     const values = res.data.map((item) => item.enquiries);
-
-    //     setPieData((prev) => ({
-    //       ...prev,
-    //       labels: labels,
-    //       datasets: [
-    //         {
-    //           ...prev.datasets[0],
-    //           data: values,
-    //         },
-    //       ],
-    //     }));
-    //     // ✅ Now Fetch Bar Chart Data (replace with your actual endpoint)
-    //     const barChartRes = await axios.get(
-    //       `${API_PATH}/api/Get_Coursewise_Enquiry`,
-    //       {
-    //         params: {
-    //           APIKEY: API_KEY,
-    //           fromdate: startDate1,
-    //           todate: endDate1,
-    //         },
-    //       }
-    //     );
-    //     const barLabels = barChartRes.data.map((item) => item.topic_title);
-    //     const barValues = barChartRes.data.map((item) => item.enquires);
-    //     setBarData((prev) => ({
-    //       ...prev,
-    //       labels: barLabels,
-    //       datasets: [
-    //         {
-    //           ...prev.datasets[0],
-    //           data: barValues,
-    //         },
-    //       ],
-    //     }));
-    //   } catch (err) {
-    //     console.error("Error loading pie chart data:", err);
-    //   }
-    // };
-
     fetchAllDashboardData();
   }, []);
 
@@ -440,7 +351,10 @@ const EnquiryDashboard = (props) => {
   }, [selectedEnquiryType]);
 
   const handleCheckId = (id) => {
-    // console.log(id);
+    // console.log(typeof id);
+    const stringId = String(id); // Ensure id is a string
+    // console.log(typeof stringId);
+
     setStudentID((prev) => {
       // Check if ID already exists
       const exists = prev.some((item) => item.id === id);
@@ -450,7 +364,7 @@ const EnquiryDashboard = (props) => {
         return prev.filter((item) => item.id !== id);
       } else {
         // Add new ID object if not present (check)
-        return [...prev, { studentid: id }];
+        return [...prev, { enrollmentid: id }];
       }
     });
   };
@@ -512,31 +426,6 @@ const EnquiryDashboard = (props) => {
         </Row>
 
         <Row className="d-flex flex-column">
-          {/* <div
-            className={`d-flex justify-content-end d-md-none px-2 ${
-              showFilters ? "mb-0" : "mb-2"
-            }`}
-          >
-            <Button
-              color="primary"
-              size="sm"
-              onClick={() => setShowFilters(!showFilters)}
-            >
-              {showFilters ? "Hide Filters" : "Show Filters"}
-            </Button>
-          </div> */}
-          {/* <Col>
-            <div
-              className="rounded-3 d-sm-none mb-2 d-flex justify-content-between align-items-center px-2 py-2 w-100"
-              onClick={() => setShowFilters((prev) => !prev)}
-              style={{ cursor: "pointer", backgroundColor: "#191d4d" }}
-            >
-              <h3 className="mb-0" style={{ color: "white" }}>
-                Filter
-              </h3>
-              <FaFilter color="white" />
-            </div>
-          </Col> */}
           <Col>
             <div
               className="rounded-3  mb-2 d-flex d-sm-none justify-content-between align-items-center px-2 py-2 w-100"
@@ -554,114 +443,35 @@ const EnquiryDashboard = (props) => {
             </div>
           </Col>
 
-          {/* <Col
-            className={`pb-4 ${
-              showFilters ? "d-block d-md-block" : "d-none d-md-block"
-            }`}
-          >
-            <div
-              className="d-flex flex-column flex-lg-row align-items-center justify-content-between p-2 w-100"
-              style={{
-                background: "#f7fafc",
-                borderRadius: "5px",
-                border: "1px solid #d3d3d3",
-                gap: "1rem",
-              }}
-            >
-              <div
-                className="d-flex flex-wrap justify-content-center align-items-center"
-                style={{ gap: "1rem" }}
-              >
-                <div style={{ width: "170px" }}>
-                  <Select
-                    id="status"
-                    options={statusOptions}
-                    value={selectedStatus}
-                    onChange={setSelectedStatus}
-                    onMenuOpen={fetchEnquiry}
-                  />
-                </div>
-                <div style={{ width: "170px" }}>
-                  <Input
-                    placeholder="Search by Name or Phone"
-                    type="text"
-                    value={searchText}
-                    onChange={handleUnifiedSearchChange}
-                  />
-                </div>
-                <div style={{ width: "170px" }}>
-                  <Select
-                    options={enquiry}
-                    value={selectedEnquiryType}
-                    onChange={handleEnquiryTypeChange}
-                  />
-                </div>
-                <div style={{ width: "170px" }}>
-                  <Select
-                    id="branch-select"
-                    options={branchOptions}
-                    value={selectedBranch}
-                    onChange={(selected) => setSelectedBranch(selected)}
-                    onInputChange={(text) => setBranchSearchText(text)}
-                    placeholder="branch"
-                    isClearable
-                    isLoading={isLoading}
-                    noOptionsMessage={({ inputValue }) =>
-                      inputValue.length < 3
-                        ? "Type at least 3 characters to search"
-                        : "No branches found"
-                    }
-                  />
-                </div>
-                <div className="" style={{ width: "170px" }}>
-                  <DatePicker
-                    selectsRange
-                    startDate={startDate}
-                    endDate={endDate}
-                    onChange={(date) => setDateRange(date)}
-                    monthsShown={2} // ✅ Show two calendars
-                    dateFormat="dd/MM/yyyy"
-                    className="react-datepicker__input-container form-control"
-                    placeholderText="Select date range"
-                    isClearable
-                    // showMonthDropdown
-                    // showYearDropdown
-                    scrollableYearDropdown
-                    yearDropdownItemNumber={50}
-                    minDate={new Date(1900, 0, 1)}
-                    maxDate={new Date(2025, 11, 31)}
-                    popperPlacement="bottom-start" // ✅ Opens dropdown below input
-                  />
-                </div>
-              </div>
-
-              <div
-                style={{
-                  padding: "6px 12px",
-                  cursor: "pointer",
-                  border: "1px solid #ccc",
-                  borderRadius: "4px",
-                  backgroundColor: "#5e72e4",
-                  color: "#fff",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  height: "38px",
-                  minWidth: "38px",
-                  // marginLeft: "10px",
-                }}
-                // onClick={handleUnifiedSearchChange}
-                onClick={handleSearchClick}
-              >
-                <i className="fas fa-search" />
-              </div>
-            </div>
-          </Col> */}
           <Col>
             <AnimatePresence>
               {showFilters && (
-                <motion.div>
-                  <div
+                <motion.div
+                  key="mobile-filter"
+                  initial={{ height: 0, opacity: 1 }}
+                  animate={{ height: "auto", opacity: 1 }}
+                  exit={{ height: 0, opacity: 1 }}
+                  transition={{ duration: 0.4, ease: "easeInOut" }}
+                  className="pb-4 d-sm-none d-md-none"
+                >
+                  <FilterBar
+                    selectedStatus={selectedStatus}
+                    setSelectedStatus={setSelectedStatus}
+                    fetchEnquiry={fetchEnquiry}
+                    searchText={searchText}
+                    handleUnifiedSearchChange={handleUnifiedSearchChange}
+                    enquiry={enquiry}
+                    selectedEnquiryType={selectedEnquiryType}
+                    handleEnquiryTypeChange={handleEnquiryTypeChange}
+                    selectedBranch={selectedBranch}
+                    setSelectedBranch={setSelectedBranch}
+                    startDate={startDate}
+                    endDate={endDate}
+                    setDateRange={setDateRange}
+                    handleSearchClick={handleSearchClick}
+                    showStatus={true}
+                  />
+                  {/* <div
                     className="d-flex flex-column flex-lg-row align-items-center justify-content-between p-2 w-100"
                     style={{
                       background: "#f7fafc",
@@ -757,109 +567,28 @@ const EnquiryDashboard = (props) => {
                     >
                       <i className="fas fa-search" />
                     </div>
-                  </div>
+                  </div> */}
                 </motion.div>
               )}
             </AnimatePresence>
           </Col>
           <Col className="pb-4 d-none d-sm-block">
-            <div
-              className="d-flex flex-column flex-lg-row align-items-center justify-content-between p-2 w-100"
-              style={{
-                background: "#f7fafc",
-                borderRadius: "5px",
-                border: "1px solid #d3d3d3",
-                gap: "1rem",
-              }}
-            >
-              <div
-                className="d-flex flex-wrap justify-content-center align-items-center"
-                style={{ gap: "1rem" }}
-              >
-                <div style={{ width: "170px" }}>
-                  <Select
-                    id="status"
-                    options={statusOptions}
-                    value={selectedStatus}
-                    onChange={setSelectedStatus}
-                    onMenuOpen={fetchEnquiry}
-                  />
-                </div>
-                <div style={{ width: "170px" }}>
-                  <Input
-                    placeholder="Search by Name or Phone"
-                    type="text"
-                    value={searchText}
-                    onChange={handleUnifiedSearchChange}
-                  />
-                </div>
-                <div style={{ width: "170px" }}>
-                  <Select
-                    options={enquiry}
-                    value={selectedEnquiryType}
-                    onChange={handleEnquiryTypeChange}
-                  />
-                </div>
-                <div style={{ width: "170px" }}>
-                  <Select
-                    id="branch-select"
-                    options={branchOptions}
-                    value={selectedBranch}
-                    onChange={(selected) => setSelectedBranch(selected)}
-                    onInputChange={(text) => setBranchSearchText(text)}
-                    placeholder="branch"
-                    isClearable
-                    isLoading={isLoading}
-                    noOptionsMessage={({ inputValue }) =>
-                      inputValue.length < 3
-                        ? "Type at least 3 characters to search"
-                        : "No branches found"
-                    }
-                  />
-                </div>
-                <div className="" style={{ width: "170px" }}>
-                  <DatePicker
-                    selectsRange
-                    startDate={startDate}
-                    endDate={endDate}
-                    onChange={(date) => setDateRange(date)}
-                    monthsShown={2} // ✅ Show two calendars
-                    dateFormat="dd/MM/yyyy"
-                    className="react-datepicker__input-container form-control"
-                    placeholderText="Select date range"
-                    isClearable
-                    // showMonthDropdown
-                    // showYearDropdown
-                    scrollableYearDropdown
-                    yearDropdownItemNumber={50}
-                    minDate={new Date(1900, 0, 1)}
-                    maxDate={new Date(2025, 11, 31)}
-                    popperPlacement="bottom-start" // ✅ Opens dropdown below input
-                  />
-                </div>
-              </div>
-
-              <div
-                style={{
-                  padding: "6px 12px",
-                  cursor: "pointer",
-                  border: "1px solid #ccc",
-                  borderRadius: "4px",
-                  backgroundColor: "#5e72e4",
-                  color: "#fff",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  height: "38px",
-                  minWidth: "38px",
-                  // marginLeft: "10px",
-                }}
-                // onClick={handleUnifiedSearchChange}
-                onClick={handleSearchClick}
-              >
-                <i className="fas fa-search" />
-              </div>
-            </div>{" "}
+            <FilterBar
+              selectedStatus={selectedStatus}
+              setSelectedStatus={setSelectedStatus}
+              fetchEnquiry={fetchEnquiry}
+              searchText={searchText}
+              handleUnifiedSearchChange={handleUnifiedSearchChange}
+              enquiry={enquiry}
+              selectedEnquiryType={selectedEnquiryType}
+              handleEnquiryTypeChange={handleEnquiryTypeChange}
+              selectedBranch={selectedBranch}
+              setSelectedBranch={setSelectedBranch}
+              startDate={startDate}
+              endDate={endDate}
+              setDateRange={setDateRange}
+              handleSearchClick={handleSearchClick}
+            />
           </Col>
 
           <Col>
@@ -1066,7 +795,6 @@ const EnquiryDashboard = (props) => {
 
               {/* ✅ Card View for Mobile & Tablets */}
               <div className="d-block d-lg-none px-3 pb-3">
-                {/* Example of one card item */}
                 {listData.map((item, index) => (
                   <Card key={index} className="mb-3 shadow-sm">
                     <div className="d-flex p-4 justify-content-between">
@@ -1168,19 +896,27 @@ const EnquiryDashboard = (props) => {
           </Col>
         </Row>
       </Container>
-      <EnquiryModal modal={modalOpen} toggle={toggleModal} />
+      <EnquiryModal
+        modal={modalOpen}
+        toggle={toggleModal}
+        refreshList={fetchPaginatedData}
+      />
       <BatchModal
         modal={batchModalOpen}
         toggle={batchModal}
-        // studentID={studentID}
+        studentID={studentID}
       />
       <StatusUpdate
         modal={statusModalOpen}
         toggle={toggleStatusModal}
         selectedId={statusID}
-        refreshList={fetchPaginatedData} // ✅ pass the function
+        refreshList={fetchPaginatedData}
       />
-      <AssignBatch modal={assignBatchModal} toggle={toggleAssignBatch} />
+      <AssignBatch
+        modal={assignBatchModal}
+        toggle={toggleAssignBatch}
+        studentID={studentID}
+      />
     </>
   );
 };

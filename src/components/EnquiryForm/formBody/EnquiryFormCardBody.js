@@ -16,6 +16,7 @@ import useBranchList from "customHookApi/EnquiryDashboardApi/useBranchList";
 
 const API_PATH = process.env.REACT_APP_API_PATH;
 const API_KEY = process.env.REACT_APP_API_KEY;
+
 const CheckboxOption = (props) => (
   <components.Option {...props}>
     <input
@@ -28,7 +29,12 @@ const CheckboxOption = (props) => (
   </components.Option>
 );
 
-const EnquiryFormCardBody = ({ selectedEnquiry }) => {
+const EnquiryFormCardBody = ({
+  selectedEnquiry,
+  toggle = () => {},
+  refreshList = () => {},
+}) => {
+  // console.log("first");
   const isCourseEnquiry =
     selectedEnquiry?.label === "Course Enquiry" ||
     selectedEnquiry?.label === "Internship Enquiry";
@@ -198,11 +204,14 @@ const EnquiryFormCardBody = ({ selectedEnquiry }) => {
       );
       toast.success("Enquiry submitted successfully!");
       // console.log("DATA --> ", enquiryFormdata);
-      // console.log("✅ Enquiry submitted successfully:", res.data);
+      console.log("✅ Enquiry submitted successfully:", res);
+      refreshList(1);
     } catch (error) {
       console.error("❌ Failed to submit enquiry:", error);
+    } finally {
+      resetForm();
+      toggle();
     }
-    resetForm();
   };
   return (
     <Form onSubmit={handleSubmit}>
