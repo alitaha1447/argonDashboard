@@ -43,7 +43,7 @@ const Sidebar = (props) => {
   const navigate = useNavigate();
 
   const user = JSON.parse(localStorage.getItem("user"));
-  console.log(user.name);
+  // console.log(user.name);
 
   const [collapseOpen, setCollapseOpen] = useState();
   const [openDropdowns, setOpenDropdowns] = useState({});

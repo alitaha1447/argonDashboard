@@ -32,12 +32,16 @@ const Login = () => {
   const dispatch = useDispatch();
 
   const handleLogin = async () => {
+    if (!username.trim() || !password.trim()) {
+      toast.error("Username and password are required!");
+      return;
+    }
     try {
       const loginResponse = await axios.get(`${API_PATH}/api/user_validate`, {
         params: {
           APIKEY: API_KEY,
-          username: "admin",
-          pwd: "1234",
+          username: username,
+          pwd: password,
         },
       });
       // console.log(loginResponse?.data);
