@@ -16,8 +16,25 @@ import {
   Container,
   Media,
 } from "reactstrap";
+import { useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { logout } from "features/user/userSlice";
 
 const AdminNavbar = (props) => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const userName = useSelector((state) => state?.user?.name); // Assuming 'user' is your slice name
+  const user = JSON.parse(localStorage.getItem("user"));
+  // console.log(user.name);
+  // const userName = user?.name || "User";
+
+  const handleLogout = () => {
+    localStorage.clear(); // 🔥 Clears everything in localStorage
+    dispatch(logout());
+    navigate("/auth/login"); // Redirect to login
+  };
+
   return (
     <>
       <Navbar className="navbar-top navbar-dark" expand="md" id="navbar-main">
@@ -56,7 +73,7 @@ const AdminNavbar = (props) => {
                   </span>
                   <Media className="ml-2 d-none d-lg-block">
                     <span className="mb-0 text-sm font-weight-bold">
-                      {"Taha"}
+                      {user.name}
                     </span>
                   </Media>
                 </Media>
@@ -82,7 +99,7 @@ const AdminNavbar = (props) => {
                   <span>Support</span>
                 </DropdownItem>
                 <DropdownItem divider />
-                <DropdownItem href="#pablo" onClick={(e) => e.preventDefault()}>
+                <DropdownItem href="#pablo" onClick={handleLogout}>
                   <i className="ni ni-user-run" />
                   <span>Logout</span>
                 </DropdownItem>

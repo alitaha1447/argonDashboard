@@ -1,4 +1,6 @@
+import React, { useState } from "react";
 // reactstrap components
+import axios from "axios";
 import {
   Button,
   Card,
@@ -13,8 +15,55 @@ import {
   Row,
   Col,
 } from "reactstrap";
+import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { login } from "features/user/userSlice";
+import { ToastContainer, toast } from "react-toastify";
+
+const API_PATH = process.env.REACT_APP_API_PATH;
+const API_KEY = process.env.REACT_APP_API_KEY;
 
 const Login = () => {
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+
+  const navigate = useNavigate();
+
+  const dispatch = useDispatch();
+
+  const handleLogin = async () => {
+    try {
+      const loginResponse = await axios.get(`${API_PATH}/api/user_validate`, {
+        params: {
+          APIKEY: API_KEY,
+          username: "admin",
+          pwd: "1234",
+        },
+      });
+      // console.log(loginResponse?.data);
+      const userData = loginResponse?.data;
+
+      // Dispatch Redux action
+      dispatch(
+        login({
+          id: userData.id,
+          name: userData.name,
+          email: userData.email,
+          mobileno: userData.mobileno,
+          isorganisational: userData.isorganisational,
+        })
+      );
+      // Save to localStorage
+      localStorage.setItem("user", JSON.stringify(userData));
+      toast.success("Login Successful!");
+      setTimeout(() => {
+        navigate("/admin/index");
+      }, [1000]);
+    } catch (error) {
+      console.log(error);
+      toast.error("Invalid Credential!!");
+    }
+  };
   return (
     <>
       <Col lg="5" md="7">
@@ -52,9 +101,10 @@ const Login = () => {
                     </InputGroupText>
                   </InputGroupAddon>
                   <Input
-                    placeholder="Email"
-                    type="email"
-                    autoComplete="new-email"
+                    placeholder="UserName"
+                    type="text"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
                   />
                 </InputGroup>
               </FormGroup>
@@ -68,12 +118,18 @@ const Login = () => {
                   <Input
                     placeholder="Password"
                     type="password"
-                    autoComplete="new-password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
                   />
                 </InputGroup>
               </FormGroup>
               <div className="text-center">
-                <Button className="my-0" color="primary" type="button">
+                <Button
+                  className="my-0"
+                  color="primary"
+                  type="button"
+                  onClick={handleLogin}
+                >
                   Sign in
                 </Button>
                 <Button className="my-0" color="primary" type="button">
@@ -143,6 +199,7 @@ const Login = () => {
           </Col>
         </Row>
       </Col>
+      <ToastContainer />
     </>
   );
 };

@@ -74,7 +74,6 @@ const EnquiryDashboard = (props) => {
   const [searchText, setSearchText] = useState("");
   // Branch
   const [selectedBranch, setSelectedBranch] = useState(null);
-
   const [showGraph, setShowGraph] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
 
@@ -93,7 +92,6 @@ const EnquiryDashboard = (props) => {
   // Enquiry
   // const [statusOptions, setstatusOptions] = useState([]);
   const [selectedStatus, setSelectedStatus] = useState(null);
-
   // customHookAPI
   const {
     branchOptions,
@@ -103,7 +101,7 @@ const EnquiryDashboard = (props) => {
     setBranchSearchText,
     branchSearchText,
   } = useBranchList();
-  const { statusOptions, fetchEnquiry } = useStatusEnquiry();
+  // const { statusOptions, fetchEnquiry } = useStatusEnquiry();
   // PieChart
   const [pieData, setPieData] = useState({
     labels: [],
@@ -138,8 +136,10 @@ const EnquiryDashboard = (props) => {
       const params = {
         fromdate: filters.fromDate || startDate1,
         todate: filters.toDate || endDate1,
-        enquirytype: filters.status || 1,
+        enquirytype: filters.enquirytype || 1,
         searchtext: filters.searchText || "",
+        status: filters.status,
+        branch: filters.branch,
         pageno: page,
         // pageno: 2,
         pagesize: pageSize,
@@ -258,7 +258,9 @@ const EnquiryDashboard = (props) => {
   const handleSearch = () => {
     const filters = {
       searchText: searchText.trim(),
-      status: selectedEnquiryType?.value || "",
+      enquirytype: selectedEnquiryType?.value || "",
+      status: selectedStatus?.value,
+      branch: selectedBranch?.value,
     };
     fetchPaginatedData(1, filters);
   };
@@ -268,77 +270,77 @@ const EnquiryDashboard = (props) => {
     handleSearch(); // ✅ Reuse search logic
   };
 
-  useEffect(() => {
+  const fetchAllDashboardData = async () => {
     const { startDate1, endDate1 } = fetchFinancialYearRangeByDate();
+    try {
+      // 1. Enquiry Analytics (for header stats)
+      const analyticsRes = await axios.get(
+        "https://hotelapi.shriyanshnath.com/api/Get_Enquiry_Analytics",
+        {
+          // headers: { APIKEY: "12345678@" },
+          params: {
+            APIKEY: "12345678@",
+            fromdate: "2025-04-01",
+            todate: "2026-03-01",
+          },
+        }
+      );
+      setStatsData(analyticsRes?.data);
+      // 2. Pie Chart Data
+      const pieRes = await axios.get(`${API_PATH}/api/Get_Typewise_Enquiry`, {
+        params: {
+          APIKEY: API_KEY,
+          fromdate: startDate1,
+          todate: endDate1,
+        },
+      });
+      const labels = pieRes.data.map((item) => item.enquiry_type_name);
+      const values = pieRes.data.map((item) => item.enquiries);
+      const dynamicColors = generateHexColors(values.length);
+      // console.log("dynamic colors --> ", dynamicColors);
 
-    const fetchAllDashboardData = async () => {
-      try {
-        // 1. Enquiry Analytics (for header stats)
-        const analyticsRes = await axios.get(
-          "https://hotelapi.shriyanshnath.com/api/Get_Enquiry_Analytics",
+      setPieData((prev) => ({
+        ...prev,
+        labels: labels,
+        datasets: [
           {
-            // headers: { APIKEY: "12345678@" },
-            params: {
-              APIKEY: "12345678@",
-              fromdate: "2025-04-01",
-              todate: "2026-03-01",
-            },
-          }
-        );
-        setStatsData(analyticsRes?.data);
-        // 2. Pie Chart Data
-        const pieRes = await axios.get(`${API_PATH}/api/Get_Typewise_Enquiry`, {
+            ...prev.datasets[0],
+            data: values,
+            backgroundColor: dynamicColors,
+          },
+        ],
+      }));
+      // 3. Bar Chart Data
+      const barChartRes = await axios.get(
+        `${API_PATH}/api/Get_Coursewise_Enquiry`,
+        {
           params: {
             APIKEY: API_KEY,
             fromdate: startDate1,
             todate: endDate1,
           },
-        });
-        const labels = pieRes.data.map((item) => item.enquiry_type_name);
-        const values = pieRes.data.map((item) => item.enquiries);
-        const dynamicColors = generateHexColors(values.length);
-        // console.log("dynamic colors --> ", dynamicColors);
+        }
+      );
+      const barLabels = barChartRes.data.map((item) => item.topic_title);
+      const barValues = barChartRes.data.map((item) => item.enquires);
 
-        setPieData((prev) => ({
-          ...prev,
-          labels: labels,
-          datasets: [
-            {
-              ...prev.datasets[0],
-              data: values,
-              backgroundColor: dynamicColors,
-            },
-          ],
-        }));
-        // 3. Bar Chart Data
-        const barChartRes = await axios.get(
-          `${API_PATH}/api/Get_Coursewise_Enquiry`,
+      setBarData((prev) => ({
+        ...prev,
+        labels: barLabels,
+        datasets: [
           {
-            params: {
-              APIKEY: API_KEY,
-              fromdate: startDate1,
-              todate: endDate1,
-            },
-          }
-        );
-        const barLabels = barChartRes.data.map((item) => item.topic_title);
-        const barValues = barChartRes.data.map((item) => item.enquires);
+            ...prev.datasets[0],
+            data: barValues,
+            backgroundColor: dynamicColors,
+          },
+        ],
+      }));
+    } catch (error) {
+      console.error("Error loading dashboard data:", error);
+    }
+  };
 
-        setBarData((prev) => ({
-          ...prev,
-          labels: barLabels,
-          datasets: [
-            {
-              ...prev.datasets[0],
-              data: barValues,
-              backgroundColor: dynamicColors,
-            },
-          ],
-        }));
-      } catch (error) {
-        console.error("Error loading dashboard data:", error);
-      }
-    };
+  useEffect(() => {
     fetchAllDashboardData();
   }, []);
 
@@ -457,7 +459,7 @@ const EnquiryDashboard = (props) => {
                   <FilterBar
                     selectedStatus={selectedStatus}
                     setSelectedStatus={setSelectedStatus}
-                    fetchEnquiry={fetchEnquiry}
+                    // fetchEnquiry={fetchEnquiry}
                     searchText={searchText}
                     handleUnifiedSearchChange={handleUnifiedSearchChange}
                     enquiry={enquiry}
@@ -576,7 +578,7 @@ const EnquiryDashboard = (props) => {
             <FilterBar
               selectedStatus={selectedStatus}
               setSelectedStatus={setSelectedStatus}
-              fetchEnquiry={fetchEnquiry}
+              // fetchEnquiry={fetchEnquiry}
               searchText={searchText}
               handleUnifiedSearchChange={handleUnifiedSearchChange}
               enquiry={enquiry}
@@ -654,7 +656,7 @@ const EnquiryDashboard = (props) => {
                         size="md"
                         onClick={toggleModal}
                       >
-                        Add
+                        Add Enquiry
                       </Button>
                     </DropdownMenu>
                   </UncontrolledDropdown>
@@ -911,6 +913,7 @@ const EnquiryDashboard = (props) => {
         toggle={toggleStatusModal}
         selectedId={statusID}
         refreshList={fetchPaginatedData}
+        refreshStats={fetchAllDashboardData}
       />
       <AssignBatch
         modal={assignBatchModal}

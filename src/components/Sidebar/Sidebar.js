@@ -33,10 +33,18 @@ import {
   Row,
   Col,
 } from "reactstrap";
-
+import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { logout } from "features/user/userSlice";
 // var ps;
 
 const Sidebar = (props) => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const user = JSON.parse(localStorage.getItem("user"));
+  console.log(user.name);
+
   const [collapseOpen, setCollapseOpen] = useState();
   const [openDropdowns, setOpenDropdowns] = useState({});
 
@@ -235,6 +243,12 @@ const Sidebar = (props) => {
     };
   }
 
+  const handleLogout = () => {
+    localStorage.clear(); // 🔥 Clears everything in localStorage
+    dispatch(logout());
+    navigate("/auth/login"); // Redirect to login
+  };
+
   return (
     <Navbar
       className="navbar-vertical fixed-left navbar-light bg-white"
@@ -290,6 +304,12 @@ const Sidebar = (props) => {
                     src={require("../../assets/img/brand/profilePic.png")}
                   />
                 </span>
+
+                <Media className="ml-2 d-sm-block">
+                  <span className="mb-0 text-sm font-weight-bold">
+                    {user.name}
+                  </span>
+                </Media>
               </Media>
             </DropdownToggle>
             <DropdownMenu className="dropdown-menu-arrow" right>
@@ -313,7 +333,7 @@ const Sidebar = (props) => {
                 <span>Support</span>
               </DropdownItem>
               <DropdownItem divider />
-              <DropdownItem href="#pablo" onClick={(e) => e.preventDefault()}>
+              <DropdownItem href="#pablo" onClick={handleLogout}>
                 <i className="ni ni-user-run" />
                 <span>Logout</span>
               </DropdownItem>

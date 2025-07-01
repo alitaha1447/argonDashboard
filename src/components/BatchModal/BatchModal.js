@@ -478,7 +478,7 @@ const BatchModal = ({ modal, toggle, studentID }) => {
                 <Row>
                   <Col md={6}>
                     <FormGroup>
-                      <Label>Preferred Courses</Label>
+                      <Label>Courses</Label>
                       <Select
                         isMulti
                         closeMenuOnSelect={false}

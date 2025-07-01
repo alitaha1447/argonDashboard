@@ -1,6 +1,8 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
+import { Provider } from "react-redux";
+import { store } from "app/store";
 
 import "assets/plugins/nucleo/css/nucleo.css";
 import "@fortawesome/fontawesome-free/css/all.min.css";
@@ -11,18 +13,40 @@ import AdminLayout from "layouts/Admin.js";
 import AuthLayout from "layouts/Auth.js";
 import EnquiryForm from "layouts/EnquiryForm";
 import Receipt from "layouts/receipt/Receipt";
+import PrivateRoute from "PrivateRoute";
+import PublicRoute from "PublicRoute";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 
 root.render(
-  <BrowserRouter>
-    <Routes>
-      <Route path="/admin/*" element={<AdminLayout />} />
-      <Route path="/auth/*" element={<AuthLayout />} />
-      <Route path="/enquiryForm" element={<EnquiryForm />} />
-      <Route path="/receiptForm" element={<Receipt />} />
-      {/* <Route path="*" element={<Navigate to="/receiptForm" replace />} /> */}
-      <Route path="*" element={<Navigate to="/admin/index" replace />} />
-    </Routes>
-  </BrowserRouter>
+  <Provider store={store}>
+    <BrowserRouter>
+      <Routes>
+        {/* <Route path="/admin/*" element={<AdminLayout />} /> */}
+        <Route
+          path="/admin/*"
+          element={
+            <PrivateRoute>
+              <AdminLayout />
+            </PrivateRoute>
+          }
+        />
+        {/* <Route path="/auth/*" element={<AuthLayout />} /> */}
+        <Route
+          path="/auth/*"
+          element={
+            <PublicRoute>
+              <AuthLayout />
+            </PublicRoute>
+          }
+        />
+
+        <Route path="/enquiryForm" element={<EnquiryForm />} />
+        <Route path="/receiptForm" element={<Receipt />} />
+        {/* <Route path="*" element={<Navigate to="/receiptForm" replace />} /> */}
+        {/* <Route path="*" element={<Navigate to="/admin/index" replace />} /> */}
+        <Route path="*" element={<Navigate to="/auth" replace />} />
+      </Routes>
+    </BrowserRouter>
+  </Provider>
 );

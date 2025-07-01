@@ -19,7 +19,13 @@ import axios from "axios";
 const API_PATH = process.env.REACT_APP_API_PATH;
 const API_KEY = process.env.REACT_APP_API_KEY;
 
-const StatusUpdate = ({ modal, toggle, selectedId, refreshList }) => {
+const StatusUpdate = ({
+  modal,
+  toggle,
+  selectedId,
+  refreshList,
+  refreshStats = () => {},
+}) => {
   const [selectedStatus, setSelectedStatus] = useState(null);
   const { statusOptions, fetchEnquiry } = useStatusEnquiry();
   const [description, setDescription] = useState("");
@@ -40,6 +46,7 @@ const StatusUpdate = ({ modal, toggle, selectedId, refreshList }) => {
         }
       );
       refreshList(1);
+      refreshStats();
     } catch (error) {
       console.log(`status upload error ---> ${error}`);
     } finally {

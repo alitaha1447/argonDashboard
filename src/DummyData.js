@@ -90,3 +90,9 @@ export const studentFeeData = [
     collectionDate: "10-04-2025",
   },
 ];
+
+export const paymentMode = [
+  { value: 0, label: "Cash" },
+  { value: 1, label: "Online" },
+  { value: 2, label: "Check" },
+];

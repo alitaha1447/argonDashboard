@@ -33,6 +33,7 @@ const EnquiryFormCardBody = ({
   selectedEnquiry,
   toggle = () => {},
   refreshList = () => {},
+  // refreshStats = () => {},
 }) => {
   // console.log("first");
   const isCourseEnquiry =
@@ -206,6 +207,7 @@ const EnquiryFormCardBody = ({
       // console.log("DATA --> ", enquiryFormdata);
       console.log("✅ Enquiry submitted successfully:", res);
       refreshList(1);
+      // refreshStats();
     } catch (error) {
       console.error("❌ Failed to submit enquiry:", error);
     } finally {
@@ -312,7 +314,7 @@ const EnquiryFormCardBody = ({
           {isCourseEnquiry ? (
             <FormGroup>
               <Label>
-                Preferred Courses<span className="text-danger">*</span>
+                Courses<span className="text-danger">*</span>
               </Label>
               <Select
                 isMulti

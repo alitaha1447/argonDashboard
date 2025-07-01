@@ -18,6 +18,7 @@ const API_PATH = process.env.REACT_APP_API_PATH;
 const API_KEY = process.env.REACT_APP_API_KEY;
 
 const AssignBatch = ({ modal, toggle, studentID }) => {
+  // console.log(studentID);
   // const stdId = studentID.map((item) => ({
   //   enrollmentid: item.enrollmentid.toString(),
   // }));
@@ -62,7 +63,8 @@ const AssignBatch = ({ modal, toggle, studentID }) => {
           },
         }
       );
-      console.log(assignBatch);
+      // console.log(assignBatch);
+      toast.success("Batch Assigned Successfully!!");
       toggle();
     } catch (error) {
       console.log(error);
