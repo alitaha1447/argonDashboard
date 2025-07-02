@@ -41,6 +41,10 @@ import "react-datepicker/dist/react-datepicker.css";
 import { fetchFinancialYearRangeByDate } from "utils/financialYearRange/FinancialYearRange";
 import useBranchList from "customHookApi/EnquiryDashboardApi/useBranchList";
 import axios from "axios";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import Select from "react-select";
+
 import { enquiry } from "DummyData";
 import { FaPlus } from "react-icons/fa";
 import { BsThreeDotsVertical } from "react-icons/bs";
@@ -62,6 +66,8 @@ const pageNum = [
 ];
 
 const EnquiryDashboard = (props) => {
+  const [activeFilters, setActiveFilters] = useState({});
+
   const [statsData, setStatsData] = useState({});
   const [modalOpen, setModalOpen] = useState(false);
   const [batchModalOpen, setBatchModalOpen] = useState(false);
@@ -89,9 +95,11 @@ const EnquiryDashboard = (props) => {
 
   const [studentID, setStudentID] = useState([]);
   const [statusID, setStatusID] = useState(null);
+
   // Enquiry
   // const [statusOptions, setstatusOptions] = useState([]);
   const [selectedStatus, setSelectedStatus] = useState(null);
+  // console.log(selectedStatus);/
   // customHookAPI
   const {
     branchOptions,
@@ -101,7 +109,8 @@ const EnquiryDashboard = (props) => {
     setBranchSearchText,
     branchSearchText,
   } = useBranchList();
-  // const { statusOptions, fetchEnquiry } = useStatusEnquiry();
+  const { statusOptions, fetchEnquiry } = useStatusEnquiry();
+  // console.log(statusOptions);
   // PieChart
   const [pieData, setPieData] = useState({
     labels: [],
@@ -130,6 +139,7 @@ const EnquiryDashboard = (props) => {
   });
 
   const fetchPaginatedData = async (page = 1, filters = {}) => {
+    // console.log("page", page);
     setIsTableLoading(true); // show loader
     try {
       const { startDate1, endDate1 } = fetchFinancialYearRangeByDate();
@@ -138,7 +148,7 @@ const EnquiryDashboard = (props) => {
         todate: filters.toDate || endDate1,
         enquirytype: filters.enquirytype || 1,
         searchtext: filters.searchText || "",
-        status: filters.status,
+        status: filters?.status || null,
         branch: filters.branch,
         pageno: page,
         // pageno: 2,
@@ -155,12 +165,27 @@ const EnquiryDashboard = (props) => {
       }
 
       const result = res.data;
-      // console.log(res);
-      setListData(result?.Data || []);
+      // console.log(res.data);
+      // ✅ Check if there's no data
+      if (!result?.Data || result?.Data.length === 0) {
+        setListData([]); // Triggers the "No data found" UI
+        setTotalPages(1);
+        setPageNumber(1);
+        return; // Exit early to avoid setting invalid data
+      }
+
+      // ✅ Set valid data if it exists
+      setListData(result?.Data);
       setPageNumber(result?.PageNumber || page);
       setTotalPages(result?.TotalPages || 1);
     } catch (error) {
-      console.error("Error fetching paginated data:", error);
+      if (error.response && error.response.status === 404) {
+        setListData([]);
+        setPageNumber(1);
+        setTotalPages(1);
+      } else {
+        console.error("Error fetching paginated data:", error);
+      }
     } finally {
       setIsTableLoading(false); // hide loader
     }
@@ -262,7 +287,8 @@ const EnquiryDashboard = (props) => {
       status: selectedStatus?.value,
       branch: selectedBranch?.value,
     };
-    fetchPaginatedData(1, filters);
+    setActiveFilters(filters); // ⬅️ Store current filters
+    fetchPaginatedData(1, filters); // ⬅️ Pass them for page 1
   };
 
   const handleSearchClick = (e) => {
@@ -296,8 +322,7 @@ const EnquiryDashboard = (props) => {
       });
       const labels = pieRes.data.map((item) => item.enquiry_type_name);
       const values = pieRes.data.map((item) => item.enquiries);
-      const dynamicColors = generateHexColors(values.length);
-      // console.log("dynamic colors --> ", dynamicColors);
+      const dynamicPieColors = generateHexColors(values.length);
 
       setPieData((prev) => ({
         ...prev,
@@ -306,7 +331,7 @@ const EnquiryDashboard = (props) => {
           {
             ...prev.datasets[0],
             data: values,
-            backgroundColor: dynamicColors,
+            backgroundColor: dynamicPieColors,
           },
         ],
       }));
@@ -323,6 +348,7 @@ const EnquiryDashboard = (props) => {
       );
       const barLabels = barChartRes.data.map((item) => item.topic_title);
       const barValues = barChartRes.data.map((item) => item.enquires);
+      const dynamicBarColors = generateHexColors(barValues.length);
 
       setBarData((prev) => ({
         ...prev,
@@ -331,7 +357,7 @@ const EnquiryDashboard = (props) => {
           {
             ...prev.datasets[0],
             data: barValues,
-            backgroundColor: dynamicColors,
+            backgroundColor: dynamicBarColors,
           },
         ],
       }));
@@ -350,12 +376,10 @@ const EnquiryDashboard = (props) => {
     }, 300); // Optional: debounce for better performance
 
     return () => clearTimeout(debounceTimer);
-  }, [selectedEnquiryType]);
+  }, [selectedStatus, selectedEnquiryType]);
 
   const handleCheckId = (id) => {
-    // console.log(typeof id);
     const stringId = String(id); // Ensure id is a string
-    // console.log(typeof stringId);
 
     setStudentID((prev) => {
       // Check if ID already exists
@@ -456,24 +480,7 @@ const EnquiryDashboard = (props) => {
                   transition={{ duration: 0.4, ease: "easeInOut" }}
                   className="pb-4 d-sm-none d-md-none"
                 >
-                  <FilterBar
-                    selectedStatus={selectedStatus}
-                    setSelectedStatus={setSelectedStatus}
-                    // fetchEnquiry={fetchEnquiry}
-                    searchText={searchText}
-                    handleUnifiedSearchChange={handleUnifiedSearchChange}
-                    enquiry={enquiry}
-                    selectedEnquiryType={selectedEnquiryType}
-                    handleEnquiryTypeChange={handleEnquiryTypeChange}
-                    selectedBranch={selectedBranch}
-                    setSelectedBranch={setSelectedBranch}
-                    startDate={startDate}
-                    endDate={endDate}
-                    setDateRange={setDateRange}
-                    handleSearchClick={handleSearchClick}
-                    showStatus={true}
-                  />
-                  {/* <div
+                  <div
                     className="d-flex flex-column flex-lg-row align-items-center justify-content-between p-2 w-100"
                     style={{
                       background: "#f7fafc",
@@ -486,6 +493,7 @@ const EnquiryDashboard = (props) => {
                       className="d-flex flex-wrap justify-content-center align-items-center"
                       style={{ gap: "1rem" }}
                     >
+                      {/* {showStatus && ( */}
                       <div style={{ width: "170px" }}>
                         <Select
                           id="status"
@@ -495,6 +503,7 @@ const EnquiryDashboard = (props) => {
                           onMenuOpen={fetchEnquiry}
                         />
                       </div>
+                      {/* )} */}
                       <div style={{ width: "170px" }}>
                         <Input
                           placeholder="Search by Name or Phone"
@@ -569,13 +578,31 @@ const EnquiryDashboard = (props) => {
                     >
                       <i className="fas fa-search" />
                     </div>
-                  </div> */}
+                  </div>
+                  {/* <FilterBar
+                    selectedStatus={selectedStatus}
+                    setSelectedStatus={setSelectedStatus}
+                    // fetchEnquiry={fetchEnquiry}
+                    searchText={searchText}
+                    handleUnifiedSearchChange={handleUnifiedSearchChange}
+                    enquiry={enquiry}
+                    selectedEnquiryType={selectedEnquiryType}
+                    handleEnquiryTypeChange={handleEnquiryTypeChange}
+                    selectedBranch={selectedBranch}
+                    setSelectedBranch={setSelectedBranch}
+                    startDate={startDate}
+                    endDate={endDate}
+                    setDateRange={setDateRange}
+                    handleSearchClick={handleSearchClick}
+                    showStatus={true}
+                     showBatch = {false},
+                  /> */}
                 </motion.div>
               )}
             </AnimatePresence>
           </Col>
           <Col className="pb-4 d-none d-sm-block">
-            <FilterBar
+            {/* <FilterBar
               selectedStatus={selectedStatus}
               setSelectedStatus={setSelectedStatus}
               // fetchEnquiry={fetchEnquiry}
@@ -590,7 +617,106 @@ const EnquiryDashboard = (props) => {
               endDate={endDate}
               setDateRange={setDateRange}
               handleSearchClick={handleSearchClick}
-            />
+            /> */}
+            <div
+              className="d-flex flex-column flex-lg-row align-items-center justify-content-between p-2 w-100"
+              style={{
+                background: "#f7fafc",
+                borderRadius: "5px",
+                border: "1px solid #d3d3d3",
+                gap: "1rem",
+              }}
+            >
+              <div
+                className="d-flex flex-wrap justify-content-center align-items-center"
+                style={{ gap: "1rem" }}
+              >
+                {/* {showStatus && ( */}
+                <div style={{ width: "170px" }}>
+                  <Select
+                    id="status"
+                    options={statusOptions}
+                    value={selectedStatus}
+                    onChange={setSelectedStatus}
+                    onMenuOpen={fetchEnquiry}
+                  />
+                </div>
+                {/* )} */}
+                <div style={{ width: "170px" }}>
+                  <Input
+                    placeholder="Search by Name or Phone"
+                    type="text"
+                    value={searchText}
+                    onChange={handleUnifiedSearchChange}
+                  />
+                </div>
+                <div style={{ width: "170px" }}>
+                  <Select
+                    options={enquiry}
+                    value={selectedEnquiryType}
+                    onChange={handleEnquiryTypeChange}
+                  />
+                </div>
+                <div style={{ width: "170px" }}>
+                  <Select
+                    id="branch-select"
+                    options={branchOptions}
+                    value={selectedBranch}
+                    onChange={(selected) => setSelectedBranch(selected)}
+                    onInputChange={(text) => setBranchSearchText(text)}
+                    placeholder="branch"
+                    isClearable
+                    isLoading={isLoading}
+                    noOptionsMessage={({ inputValue }) =>
+                      inputValue.length < 3
+                        ? "Type at least 3 characters to search"
+                        : "No branches found"
+                    }
+                  />
+                </div>
+                <div className="" style={{ width: "170px" }}>
+                  <DatePicker
+                    selectsRange
+                    startDate={startDate}
+                    endDate={endDate}
+                    onChange={(date) => setDateRange(date)}
+                    monthsShown={2} // ✅ Show two calendars
+                    dateFormat="dd/MM/yyyy"
+                    className="react-datepicker__input-container form-control"
+                    placeholderText="Select date range"
+                    isClearable
+                    // showMonthDropdown
+                    // showYearDropdown
+                    scrollableYearDropdown
+                    yearDropdownItemNumber={50}
+                    minDate={new Date(1900, 0, 1)}
+                    maxDate={new Date(2025, 11, 31)}
+                    popperPlacement="bottom-start" // ✅ Opens dropdown below input
+                  />
+                </div>
+              </div>
+
+              <div
+                style={{
+                  padding: "6px 12px",
+                  cursor: "pointer",
+                  border: "1px solid #ccc",
+                  borderRadius: "4px",
+                  backgroundColor: "#5e72e4",
+                  color: "#fff",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  height: "38px",
+                  minWidth: "38px",
+                  // marginLeft: "10px",
+                }}
+                // onClick={handleUnifiedSearchChange}
+                onClick={handleSearchClick}
+              >
+                <i className="fas fa-search" />
+              </div>
+            </div>
           </Col>
 
           <Col>
@@ -716,7 +842,6 @@ const EnquiryDashboard = (props) => {
                               />
                             </div>
                           </td>
-
                           <td>{item.Id}</td>
                           <td>{item.Name}</td>
                           <td>{item.Mobileno}</td>
@@ -734,7 +859,8 @@ const EnquiryDashboard = (props) => {
                           <td>{item.BranchName}</td>
                           <td>{formatDate(item.CreatedOn)}</td>
                           <td>{item.status_txt}</td>
-                          <td style={{ textAlign: "center" }}>
+                          <td>
+                            {" "}
                             <UncontrolledDropdown direction="left">
                               <DropdownToggle
                                 tag="span"
@@ -761,23 +887,7 @@ const EnquiryDashboard = (props) => {
                                   Update
                                 </DropdownItem>
                               </DropdownMenu>
-                            </UncontrolledDropdown>
-                            {/* <Action
-                              options={[
-                                // {
-                                //   label: "✏️ Edit",
-                                //   onClick: () => console.log("Edit clicked"),
-                                // },
-                                // {
-                                //   label: "🗑️ Delete",
-                                //   onClick: () => console.log("Delete clicked"),
-                                // },
-                                {
-                                  label: "✏️ Update",
-                                  onClick: (id) => toggleStatusModal(id), // ✅ Will receive the ID
-                                },
-                              ]}
-                            /> */}
+                            </UncontrolledDropdown>{" "}
                           </td>
                         </tr>
                       ))
@@ -787,6 +897,7 @@ const EnquiryDashboard = (props) => {
                           colSpan="10"
                           className="text-center py-4 text-muted"
                         >
+                          <i className="fas fa-info-circle mr-2" />
                           No data found.
                         </td>
                       </tr>
@@ -797,84 +908,98 @@ const EnquiryDashboard = (props) => {
 
               {/* ✅ Card View for Mobile & Tablets */}
               <div className="d-block d-lg-none px-3 pb-3">
-                {listData.map((item, index) => (
-                  <Card key={index} className="mb-3 shadow-sm">
-                    <div className="d-flex p-4 justify-content-between">
-                      <div className="d-flex">
-                        <div className="mx-2">
-                          <Input
-                            type="checkbox"
-                            onClick={() => handleCheckId(item.Id)}
-                          />
-                        </div>
-                        <div>
-                          <p className="fs-6 fw-semibold mb-1">
-                            <strong>Name:</strong> {item.Name}
-                          </p>
-                          <p className="fs-6 fw-semibold mb-1">
-                            <strong>Contact Number:</strong> {item.Mobileno}
-                          </p>
-                          <p className="fs-6 fw-semibold mb-1">
-                            <strong>Qualification:</strong>{" "}
-                            {item.QualificationCode}
-                          </p>
+                {isTableLoading ? (
+                  <div className="text-center py-4">
+                    <i className="fas fa-spinner fa-spin fa-2x text-primary" />
+                    <p className="mt-2 mb-0">Loading data...</p>
+                  </div>
+                ) : listData.length === 0 ? (
+                  <div className="text-center py-4 text-muted">
+                    <i className="fas fa-info-circle mr-2" />
+                    No data found.
+                  </div>
+                ) : (
+                  listData.map((item, index) => (
+                    <Card key={index} className="mb-3 shadow-sm">
+                      <div className="d-flex p-4 justify-content-between">
+                        <div className="d-flex">
+                          <div className="mx-2">
+                            <Input
+                              type="checkbox"
+                              onClick={() => handleCheckId(item.Id)}
+                            />
+                          </div>
+                          <div>
+                            <p className="fs-6 fw-semibold mb-1">
+                              <strong>Name:</strong> {item.Name}
+                            </p>
+                            <p className="fs-6 fw-semibold mb-1">
+                              <strong>Contact Number:</strong> {item.Mobileno}
+                            </p>
+                            <p className="fs-6 fw-semibold mb-1">
+                              <strong>Qualification:</strong>{" "}
+                              {item.QualificationCode}
+                            </p>
 
-                          <p className="fs-6 fw-semibold mb-1">
-                            <strong>
+                            <p className="fs-6 fw-semibold mb-1">
+                              <strong>
+                                {selectedEnquiryType.label ===
+                                  "Course Enquiry" ||
+                                selectedEnquiryType.label ===
+                                  "Internship Enquiry"
+                                  ? "Course:"
+                                  : "Product"}
+                              </strong>{" "}
                               {selectedEnquiryType.label === "Course Enquiry" ||
                               selectedEnquiryType.label === "Internship Enquiry"
-                                ? "Course:"
-                                : "Product"}
-                            </strong>{" "}
-                            {selectedEnquiryType.label === "Course Enquiry" ||
-                            selectedEnquiryType.label === "Internship Enquiry"
-                              ? item.TopicTitle
-                              : item.product_name}
-                          </p>
+                                ? item.TopicTitle
+                                : item.product_name}
+                            </p>
 
-                          <p className="fs-6 fw-semibold mb-1">
-                            <strong>Branch:</strong> {item.BranchName}
-                          </p>
-                          <p className="fs-6 fw-semibold mb-1">
-                            <strong>Enquiry Date:</strong>{" "}
-                            {formatDate(item.CreatedOn)}
-                          </p>
-                          <p className="fs-6 fw-semibold mb-1">
-                            <strong>Status:</strong> {item.status_txt}
-                          </p>
+                            <p className="fs-6 fw-semibold mb-1">
+                              <strong>Branch:</strong> {item.BranchName}
+                            </p>
+                            <p className="fs-6 fw-semibold mb-1">
+                              <strong>Enquiry Date:</strong>{" "}
+                              {formatDate(item.CreatedOn)}
+                            </p>
+                            <p className="fs-6 fw-semibold mb-1">
+                              <strong>Status:</strong> {item.status_txt}
+                            </p>
+                          </div>
                         </div>
-                      </div>
 
-                      <UncontrolledDropdown direction="left">
-                        <DropdownToggle
-                          tag="span"
-                          style={{ cursor: "pointer" }}
-                          data-toggle="dropdown"
-                          aria-expanded={false}
-                        >
-                          <BsThreeDotsVertical size={20} />
-                        </DropdownToggle>
-
-                        <DropdownMenu
-                          right
-                          style={{
-                            minWidth: "120px",
-                            border: "1px solid #ddd",
-                            borderRadius: "4px",
-                            boxShadow: "0px 2px 6px rgba(0,0,0,0.2)",
-                          }}
-                        >
-                          <DropdownItem
-                            key={index}
-                            onClick={() => toggleStatusModal(item.Id)}
+                        <UncontrolledDropdown direction="left">
+                          <DropdownToggle
+                            tag="span"
+                            style={{ cursor: "pointer" }}
+                            data-toggle="dropdown"
+                            aria-expanded={false}
                           >
-                            Update
-                          </DropdownItem>
-                        </DropdownMenu>
-                      </UncontrolledDropdown>
-                    </div>
-                  </Card>
-                ))}
+                            <BsThreeDotsVertical size={20} />
+                          </DropdownToggle>
+
+                          <DropdownMenu
+                            right
+                            style={{
+                              minWidth: "120px",
+                              border: "1px solid #ddd",
+                              borderRadius: "4px",
+                              boxShadow: "0px 2px 6px rgba(0,0,0,0.2)",
+                            }}
+                          >
+                            <DropdownItem
+                              key={index}
+                              onClick={() => toggleStatusModal(item.Id)}
+                            >
+                              Update
+                            </DropdownItem>
+                          </DropdownMenu>
+                        </UncontrolledDropdown>
+                      </div>
+                    </Card>
+                  ))
+                )}
 
                 {/* You can map more cards dynamically here */}
               </div>
@@ -890,6 +1015,7 @@ const EnquiryDashboard = (props) => {
                   pageNumDropDown={pageNumDropDown}
                   setPageNumDropDown={setPageNumDropDown}
                   pageNum={pageNum}
+                  activeFilters={activeFilters} // ✅ pass it here
                 />
 
                 {/* </nav> */}

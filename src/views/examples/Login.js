@@ -26,6 +26,7 @@ const API_KEY = process.env.REACT_APP_API_KEY;
 const Login = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const navigate = useNavigate();
 
@@ -36,6 +37,7 @@ const Login = () => {
       toast.error("Username and password are required!");
       return;
     }
+    setIsLoading(true);
     try {
       const loginResponse = await axios.get(`${API_PATH}/api/user_validate`, {
         params: {
@@ -60,12 +62,14 @@ const Login = () => {
       // Save to localStorage
       localStorage.setItem("user", JSON.stringify(userData));
       toast.success("Login Successful!");
-      setTimeout(() => {
-        navigate("/admin/index");
-      }, [1000]);
+      navigate("/admin/enquiryDashboard");
+      // setTimeout(() => {
+      // }, [1000]);
     } catch (error) {
       console.log(error);
       toast.error("Invalid Credential!!");
+    } finally {
+      setIsLoading(false);
     }
   };
   return (
@@ -133,8 +137,20 @@ const Login = () => {
                   color="primary"
                   type="button"
                   onClick={handleLogin}
+                  disabled={isLoading}
                 >
-                  Sign in
+                  {isLoading ? (
+                    <>
+                      <span
+                        className="spinner-border spinner-border-sm me-2"
+                        role="status"
+                        aria-hidden="true"
+                      ></span>
+                      Logging in...
+                    </>
+                  ) : (
+                    "Sign in"
+                  )}
                 </Button>
                 <Button className="my-0" color="primary" type="button">
                   Sign up

@@ -40,6 +40,8 @@ const EnquiryFormCardBody = ({
     selectedEnquiry?.label === "Course Enquiry" ||
     selectedEnquiry?.label === "Internship Enquiry";
 
+  const [loading, setLoading] = useState(false);
+
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [contactNumber, setContactNumber] = useState("");
@@ -154,6 +156,7 @@ const EnquiryFormCardBody = ({
   };
   // Submit Form
   const handleSubmit = async (e) => {
+    setLoading(true);
     e.preventDefault();
 
     const isCourseEnquiry =
@@ -171,6 +174,8 @@ const EnquiryFormCardBody = ({
 
     if (Object.keys(errors).length > 0) {
       setFormErrors(errors); // show error messages under fields
+      setLoading(false); // 🔁 This is essential
+
       return;
     }
     const enquiryFormdata = {
@@ -195,7 +200,7 @@ const EnquiryFormCardBody = ({
     // console.log(enquiryFormdata);
     try {
       const res = await axios.post(
-        `${API_PATH}/api/SaveEnquiry`,
+        `${API_PATH}/api/SaveEnq1uiry`,
         enquiryFormdata,
         {
           params: {
@@ -210,13 +215,15 @@ const EnquiryFormCardBody = ({
       // refreshStats();
     } catch (error) {
       console.error("❌ Failed to submit enquiry:", error);
+      toast.error("Request failed with status code 404");
     } finally {
+      setLoading(false);
       resetForm();
       toggle();
     }
   };
   return (
-    <Form onSubmit={handleSubmit}>
+    <Form>
       <Row>
         <Col md={6}>
           <InputField
@@ -415,8 +422,19 @@ const EnquiryFormCardBody = ({
       )}
 
       <div className="text-end">
-        <Button type="submit" color="primary">
-          Submit
+        <Button type="submit" color="primary" onClick={handleSubmit}>
+          {loading ? (
+            <>
+              <span
+                className="spinner-border spinner-border-sm me-2"
+                role="status"
+                aria-hidden="true"
+              ></span>
+              Submitting ...
+            </>
+          ) : (
+            "Submit"
+          )}
         </Button>
       </div>
     </Form>

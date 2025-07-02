@@ -20,6 +20,12 @@ const FilterBar = ({
   setDateRange,
   handleSearchClick,
   showStatus = true,
+  showCourseEnquiry = true,
+  showBatch = true,
+  fetchBatch,
+  batches,
+  selectedBatch,
+  setSelectedBatch,
 }) => {
   const {
     branchOptions,
@@ -72,13 +78,16 @@ const FilterBar = ({
             onChange={handleUnifiedSearchChange}
           />
         </div>
-        <div style={{ width: "170px" }}>
-          <Select
-            options={enquiry}
-            value={selectedEnquiryType}
-            onChange={handleEnquiryTypeChange}
-          />
-        </div>
+        {showCourseEnquiry && (
+          <div style={{ width: "170px" }}>
+            <Select
+              options={enquiry}
+              value={selectedEnquiryType}
+              onChange={handleEnquiryTypeChange}
+            />
+          </div>
+        )}
+
         <div style={{ width: "170px" }}>
           <Select
             id="branch-select"
@@ -96,6 +105,19 @@ const FilterBar = ({
             }
           />
         </div>
+        {showBatch && (
+          <div style={{ width: "170px" }}>
+            <Select
+              id="branch-select"
+              options={batches}
+              value={selectedBatch}
+              onChange={(selected) => setSelectedBatch(selected)}
+              onMenuOpen={fetchBatch}
+              placeholder="batch"
+              isClearable
+            />
+          </div>
+        )}
         <div className="" style={{ width: "170px" }}>
           <DatePicker
             selectsRange

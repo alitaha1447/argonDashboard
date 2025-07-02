@@ -8,6 +8,7 @@ import {
   Button,
   Card,
   CardHeader,
+  CardFooter,
   UncontrolledDropdown,
   DropdownToggle,
   DropdownMenu,
@@ -22,7 +23,7 @@ import PieChart from "components/Charts/PieChart";
 import PaymentDetail from "components/CustomModals/paymentDetailModal/PaymentDetail";
 import FeeDetail from "components/CustomModals/feeDetailModal/FeeDetail";
 import FilterBar from "components/CustomFilter/FilterBar";
-
+import CustomPagination from "components/CustomPagination/CustomPagination";
 import { enquiry } from "DummyData";
 
 import { MdFilterAlt } from "react-icons/md";
@@ -39,7 +40,17 @@ import { generateHexColors } from "utils/dynamicColorGenerator/generateHexColors
 const API_PATH = process.env.REACT_APP_API_PATH;
 const API_KEY = process.env.REACT_APP_API_KEY;
 
+const pageNum = [
+  { value: 10, label: "10" },
+  { value: 25, label: " 25" },
+  { value: 50, label: "50" },
+  { value: 100, label: "100" },
+  { value: 5, label: "5" },
+];
+
 const FeesDashboard = () => {
+  const [activeFilters, setActiveFilters] = useState({});
+
   const [statsData, setStatsData] = useState({});
 
   const [searchText, setSearchText] = useState("");
@@ -51,6 +62,18 @@ const FeesDashboard = () => {
   const [showFilters, setShowFilters] = useState(false);
   const [showPaymentDetail, setShowPaymentDetail] = useState(false);
   const [showFeeDetail, setShowFeeDetail] = useState(false);
+  const [feeList, setFeeList] = useState([]);
+  const [isTableLoading, setIsTableLoading] = useState(false);
+  const [selectedBatch, setSelectedBatch] = useState(null);
+  console.log(selectedBatch?.value);
+  // pagination
+  const [pageNumber, setPageNumber] = useState(1);
+  const [pageStart, setPageStart] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [pageNumDropDown, setPageNumDropDown] = useState(pageNum[0]);
+
+  const [batches, setBatches] = useState([]);
+
   // PieChart
   const [pieData, setPieData] = useState({
     labels: [],
@@ -101,7 +124,11 @@ const FeesDashboard = () => {
     const filters = {
       searchText: searchText.trim(),
       status: selectedEnquiryType?.value || "",
+      branch: selectedBranch?.value,
+      batchid: selectedBatch?.value,
     };
+    setActiveFilters(filters); // ⬅️ Store current filters
+    fetchPaginatedData(1, filters); // ⬅️ Pass them for page 1
   };
 
   const handleSearchClick = (e) => {
@@ -114,6 +141,53 @@ const FeesDashboard = () => {
   };
   const toggleFeeDetail = () => {
     setShowFeeDetail((prev) => !prev);
+  };
+
+  const fetchBatch = async () => {
+    try {
+      const res = await axios.get(`${API_PATH}/api/GetBatch`, {
+        params: {
+          APIKEY: API_KEY,
+          branchid: selectedBranch?.value,
+        },
+      });
+
+      const formattedBatch = res?.data.map((item) => ({
+        value: item.BatchID,
+        label: item.BatchName,
+      }));
+
+      setBatches(formattedBatch);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const fetchPaginatedData = async (page = 1, filter = {}) => {
+    setIsTableLoading(true); // show loader
+    try {
+      const params = {
+        APIKEY: API_KEY,
+        fromdate: "2025-09-02",
+        todate: "2026-02-02",
+        searchtext: filter.searchtext || "",
+      };
+      const res = await axios(`${API_PATH}/api/Collect_List`, {
+        params,
+      });
+      console.log(res);
+      setFeeList(res.data);
+    } catch (error) {
+      if (error.response && error.response.status === 404) {
+        setFeeList([]);
+        setPageNumber(1);
+        setTotalPages(1);
+      } else {
+        console.error("Error fetching paginated data:", error);
+      }
+    } finally {
+      setIsTableLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -170,6 +244,8 @@ const FeesDashboard = () => {
         );
         const barLabels = barChartRes.data.map((item) => item.topic_title);
         const barValues = barChartRes.data.map((item) => item.enquires);
+        const dynamicBarColors = generateHexColors(barValues.length);
+
         setBarData((prev) => ({
           ...prev,
           labels: barLabels,
@@ -177,7 +253,7 @@ const FeesDashboard = () => {
             {
               ...prev.datasets[0],
               data: barValues,
-              backgroundColor: dynamicColors,
+              backgroundColor: dynamicBarColors,
             },
           ],
         }));
@@ -187,6 +263,10 @@ const FeesDashboard = () => {
     };
 
     fetchAllDashboardData();
+  }, []);
+
+  useEffect(() => {
+    fetchPaginatedData();
   }, []);
 
   const statsCard1 = {
@@ -275,6 +355,11 @@ const FeesDashboard = () => {
                     setDateRange={setDateRange}
                     handleSearchClick={handleSearchClick}
                     showStatus={false}
+                    fetchBatch={fetchBatch}
+                    batches={batches}
+                    selectedBatch={selectedBatch}
+                    setSelectedBatch={setSelectedBatch}
+                    activeFilters={activeFilters}
                   />
                 </motion.div>
               )}
@@ -295,6 +380,13 @@ const FeesDashboard = () => {
               setDateRange={setDateRange}
               handleSearchClick={handleSearchClick}
               showStatus={false}
+              showCourseEnquiry={false}
+              showBatch={true}
+              fetchBatch={fetchBatch}
+              batches={batches}
+              selectedBatch={selectedBatch}
+              setSelectedBatch={setSelectedBatch}
+              activeFilters={activeFilters}
             />
           </Col>
 
@@ -334,77 +426,27 @@ const FeesDashboard = () => {
                       <th scope="col">Total Fee Amount</th>
                       <th scope="col">Fee Recieved</th>
                       <th scope="col">Due Fees</th>
-                      <th scope="col">Collection Date</th>
+                      <th scope="col">Branch</th>
+                      <th scope="col">Batch</th>
+                      {/* <th scope="col">Collection Date</th> */}
                       <th scope="col">Action</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {studentFeeData.map((student, index) => (
-                      <tr key={index}>
-                        <td>{student.name}</td>
-                        <td>{student.phone}</td>
-                        <td>
-                          <Button
-                            onClick={toggleFeeDetail}
-                            style={{
-                              padding: "0 6px",
-                              fontSize: "12px",
-                              marginLeft: "8px",
-                              backgroundColor: "#5e72e4",
-                              color: "#ffffff",
-                            }}
-                          >
-                            Fee Details
-                          </Button>
-                        </td>
-                        <td>{student.feeReceived}</td>
-                        <td>{student.dueFee}</td>
-                        <td>{student.collectionDate}</td>
-                        <td style={{ textAlign: "center" }}>
-                          <UncontrolledDropdown direction="left">
-                            <DropdownToggle
-                              tag="span"
-                              style={{ cursor: "pointer" }}
-                              data-toggle="dropdown"
-                              aria-expanded={false}
-                            >
-                              <BsThreeDotsVertical size={20} />
-                            </DropdownToggle>
-
-                            <DropdownMenu
-                              right
-                              style={{
-                                minWidth: "120px",
-                                border: "1px solid #ddd",
-                                borderRadius: "4px",
-                                boxShadow: "0px 2px 6px rgba(0,0,0,0.2)",
-                              }}
-                            >
-                              <DropdownItem>Mail</DropdownItem>
-                              <DropdownItem>Refund</DropdownItem>
-                            </DropdownMenu>
-                          </UncontrolledDropdown>
+                    {isTableLoading ? (
+                      <tr>
+                        <td colSpan="10" className="text-center py-4">
+                          <i className="fas fa-spinner fa-spin fa-2x text-primary" />
+                          <p className="mt-2 mb-0">Loading data...</p>
                         </td>
                       </tr>
-                    ))}
-                  </tbody>
-                </Table>
-              </div>
-              {/* ✅ Card View for Mobile & Tablets */}
-              <div className="d-block d-lg-none px-3 pb-3">
-                {studentFeeData.map((item, index) => (
-                  <Card key={index} className="mb-3 shadow-sm">
-                    <div className="d-flex p-4 justify-content-between">
-                      <div className="d-flex">
-                        <div>
-                          <p className="fs-6 fw-semibold mb-1">
-                            <strong>Student Name:</strong> {item.name}
-                          </p>
-                          <p className="fs-6 fw-semibold mb-1">
-                            <strong>Contact Number:</strong> {item.phone}
-                          </p>
-                          <p className="fs-6 fw-semibold mb-1">
-                            <strong>Total Fee Amount:</strong>{" "}
+                    ) : feeList.length > 0 ? (
+                      feeList.map((student, index) => (
+                        <tr key={index}>
+                          <td>{student.name}</td>
+                          <td>{student.mobileno}</td>
+                          <td>
+                            <span>{student.totalamount}</span>
                             <Button
                               onClick={toggleFeeDetail}
                               style={{
@@ -417,49 +459,159 @@ const FeesDashboard = () => {
                             >
                               Fee Details
                             </Button>
-                          </p>
+                          </td>
+                          <td>{student.fees_received}</td>
+                          <td>{student.due_amount}</td>
+                          <td>{student.branch}</td>
+                          <td>{student.batch}</td>
+                          <td style={{ textAlign: "center" }}>
+                            <UncontrolledDropdown direction="left">
+                              <DropdownToggle
+                                tag="span"
+                                style={{ cursor: "pointer" }}
+                                data-toggle="dropdown"
+                                aria-expanded={false}
+                              >
+                                <BsThreeDotsVertical size={20} />
+                              </DropdownToggle>
 
-                          <p className="fs-6 fw-semibold mb-1">
-                            <strong>Fee Recieved:</strong> {item.feeReceived}
-                          </p>
-                          <p className="fs-6 fw-semibold mb-1">
-                            <strong>Due Fees:</strong> {item.dueFee}
-                          </p>
-                          <p className="fs-6 fw-semibold mb-1">
-                            <strong>Collection Date:</strong>{" "}
-                            {item.collectionDate}
-                          </p>
+                              <DropdownMenu
+                                right
+                                style={{
+                                  minWidth: "120px",
+                                  border: "1px solid #ddd",
+                                  borderRadius: "4px",
+                                  boxShadow: "0px 2px 6px rgba(0,0,0,0.2)",
+                                }}
+                              >
+                                <DropdownItem>Mail</DropdownItem>
+                                <DropdownItem>Refund</DropdownItem>
+                              </DropdownMenu>
+                            </UncontrolledDropdown>
+                          </td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td
+                          colSpan="10"
+                          className="text-center py-4 text-muted"
+                        >
+                          <i className="fas fa-info-circle mr-2" />
+                          No data found.
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </Table>
+              </div>
+              {/* ✅ Card View for Mobile & Tablets */}
+              <div className="d-block d-lg-none px-3 pb-3">
+                {isTableLoading ? (
+                  <div className="text-center py-4">
+                    <i className="fas fa-spinner fa-spin fa-2x text-primary" />
+                    <p className="mt-2 mb-0">Loading data...</p>
+                  </div>
+                ) : feeList.length === 0 ? (
+                  <div className="text-center py-4 text-muted">
+                    <i className="fas fa-info-circle mr-2" />
+                    No data found.
+                  </div>
+                ) : (
+                  feeList.map((item, index) => (
+                    <Card key={index} className="mb-3 shadow-sm">
+                      <div className="d-flex p-4 justify-content-between">
+                        <div className="d-flex">
+                          <div>
+                            <p className="fs-6 fw-semibold mb-1">
+                              <strong>Student Name :</strong> {item.name}
+                            </p>
+                            <p className="fs-6 fw-semibold mb-1">
+                              <strong>Contact Number:</strong> {item.mobileno}
+                            </p>
+                            <p className="fs-6 fw-semibold mb-1">
+                              <strong>Total Fee Amount:</strong>{" "}
+                              <span>{item.totalamount}</span>
+                              <Button
+                                onClick={toggleFeeDetail}
+                                style={{
+                                  padding: "0 6px",
+                                  fontSize: "12px",
+                                  marginLeft: "8px",
+                                  backgroundColor: "#5e72e4",
+                                  color: "#ffffff",
+                                }}
+                              >
+                                Fee Details
+                              </Button>
+                            </p>
+
+                            <p className="fs-6 fw-semibold mb-1">
+                              <strong>Fee Recieved:</strong>{" "}
+                              {item.fees_received}
+                            </p>
+                            <p className="fs-6 fw-semibold mb-1">
+                              <strong>Due Fees:</strong> {item.due_amount}
+                            </p>
+                            <p className="fs-6 fw-semibold mb-1">
+                              <strong>Branch:</strong> {item.branch}
+                            </p>
+                            <p className="fs-6 fw-semibold mb-1">
+                              <strong>Batch:</strong> {item.batch}
+                            </p>
+                            {/* <p className="fs-6 fw-semibold mb-1">
+                              <strong>Collection Date:</strong>{" "}
+                              {item.collectionDate}
+                            </p> */}
+                          </div>
                         </div>
+
+                        <UncontrolledDropdown direction="left">
+                          <DropdownToggle
+                            tag="span"
+                            style={{ cursor: "pointer" }}
+                            data-toggle="dropdown"
+                            aria-expanded={false}
+                          >
+                            <BsThreeDotsVertical size={20} />
+                          </DropdownToggle>
+
+                          <DropdownMenu
+                            right
+                            style={{
+                              minWidth: "120px",
+                              border: "1px solid #ddd",
+                              borderRadius: "4px",
+                              boxShadow: "0px 2px 6px rgba(0,0,0,0.2)",
+                            }}
+                          >
+                            <DropdownItem>Mail</DropdownItem>
+                            <DropdownItem>Refund</DropdownItem>
+                          </DropdownMenu>
+                        </UncontrolledDropdown>
                       </div>
-
-                      <UncontrolledDropdown direction="left">
-                        <DropdownToggle
-                          tag="span"
-                          style={{ cursor: "pointer" }}
-                          data-toggle="dropdown"
-                          aria-expanded={false}
-                        >
-                          <BsThreeDotsVertical size={20} />
-                        </DropdownToggle>
-
-                        <DropdownMenu
-                          right
-                          style={{
-                            minWidth: "120px",
-                            border: "1px solid #ddd",
-                            borderRadius: "4px",
-                            boxShadow: "0px 2px 6px rgba(0,0,0,0.2)",
-                          }}
-                        >
-                          <DropdownItem>Mail</DropdownItem>
-                          <DropdownItem>Refund</DropdownItem>
-                        </DropdownMenu>
-                      </UncontrolledDropdown>
-                    </div>
-                  </Card>
-                ))}
+                    </Card>
+                  ))
+                )}
               </div>
             </Card>
+            <CardFooter className="py-4">
+              {/* <nav aria-label="..."> */}
+              <CustomPagination
+                pageStart={pageStart}
+                setPageStart={setPageStart}
+                totalPages={totalPages}
+                setPageNumber={setPageNumber}
+                // fetchPaginatedData={fetchPaginatedData}
+                pageNumber={pageNumber}
+                pageNumDropDown={pageNumDropDown}
+                setPageNumDropDown={setPageNumDropDown}
+                pageNum={pageNum}
+                // activeFilters={activeFilters} // ✅ pass it here
+              />
+
+              {/* </nav> */}
+            </CardFooter>
           </Col>
         </Row>
         <PaymentDetail modal={showPaymentDetail} toggle={togglePaymentDetail} />

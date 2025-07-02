@@ -48,13 +48,13 @@ var routes = [
     name: "Enquiry Dashboard", // 👈 just a label, no path
     isLabel: true,
   },
-  {
-    path: "/index",
-    name: "Dashboard",
-    icon: "ni ni-tv-2 text-primary",
-    component: <Index />,
-    layout: "/admin",
-  },
+  // {
+  //   path: "/index",
+  //   name: "Dashboard",
+  //   icon: "ni ni-tv-2 text-primary",
+  //   component: <Index />,
+  //   layout: "/admin",
+  // },
 
   {
     path: "/enquiryDashboard",
@@ -70,37 +70,20 @@ var routes = [
     component: <FeesDashboard />,
     layout: "/admin",
   },
-  {
-    path: "/enquiry",
-    name: "Enquiry Form",
-    icon: "ni ni-ungroup text-red",
-    component: <Enquiry />,
-    layout: "/admin",
-  },
-  {
-    path: "/list",
-    name: "List",
-    icon: "ni ni-bullet-list-67 text-red",
-    component: <List />,
-    layout: "/admin",
-    // children: [
-    //   {
-
-    //     path: "/list",
-    //     name: "List",
-    //     icon: "ni ni-single-copy-04 text-red",
-    //     component: <List />,
-    //     layout: "/admin",
-    //   }, {
-
-    //     path: "/test",
-    //     name: "Test",
-    //     icon: "ni ni-single-copy-04 text-red",
-    //     component: <Test />,
-    //     layout: "/admin",
-    //   }
-    // ]
-  },
+  // {
+  //   path: "/enquiry",
+  //   name: "Enquiry Form",
+  //   icon: "ni ni-ungroup text-red",
+  //   component: <Enquiry />,
+  //   layout: "/admin",
+  // },
+  // {
+  //   path: "/list",
+  //   name: "List",
+  //   icon: "ni ni-bullet-list-67 text-red",
+  //   component: <List />,
+  //   layout: "/admin",
+  // },
   {
     path: "/login",
     name: "Login",
@@ -449,6 +432,7 @@ var routes = [
       },
     ],
   },
+
   // {
   //   name: "Course",
   //   icon: "ni ni-folder-17 text-orange",
@@ -506,30 +490,27 @@ var routes = [
     ],
   },
   {
-    name: "Report",
+    name: "Report", // 👈 just a label, no path
+    isLabel: true,
+  },
+  {
+    name: "Fees",
     icon: "ni ni-folder-17 text-orange",
     layout: "/admin",
     children: [
       {
-        name: "Fees",
-        icon: "ni ni-folder-17 text-orange",
+        path: "/dailyCollection",
+        name: "Daily Collection",
+        icon: "ni ni-single-copy-04 text-red",
+        component: <DailyCollection />,
         layout: "/admin",
-        children: [
-          {
-            path: "/dailyCollection",
-            name: "Daily Collection",
-            icon: "ni ni-single-copy-04 text-red",
-            component: <DailyCollection />,
-            layout: "/admin",
-          },
-          {
-            path: "/dueBalance",
-            name: "Due Balance",
-            icon: "ni ni-single-copy-04 text-red",
-            component: <DueBalance />,
-            layout: "/admin",
-          },
-        ],
+      },
+      {
+        path: "/dueBalance",
+        name: "Due Balance",
+        icon: "ni ni-single-copy-04 text-red",
+        component: <DueBalance />,
+        layout: "/admin",
       },
     ],
   },

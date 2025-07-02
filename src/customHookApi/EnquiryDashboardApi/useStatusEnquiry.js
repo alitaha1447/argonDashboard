@@ -19,7 +19,11 @@ const useStatusEnquiry = () => {
         value: item.id,
         label: item.name,
       }));
-      setstatusOptions(formattedEnquiry);
+      // ✅ Add default option at the top
+      const defaultOption = { value: 0, label: "All Status" };
+      setstatusOptions([defaultOption, ...formattedEnquiry]);
+
+      // setstatusOptions(formattedEnquiry);
     } catch (error) {
       console.log(`course_Error ---> ${error}`);
     }

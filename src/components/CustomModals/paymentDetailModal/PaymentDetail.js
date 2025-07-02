@@ -16,26 +16,27 @@ import Select from "react-select";
 import useBranchList from "customHookApi/EnquiryDashboardApi/useBranchList";
 import axios from "axios";
 import { paymentMode } from "DummyData";
+import { toast } from "react-toastify";
 
 const API_PATH = process.env.REACT_APP_API_PATH;
 const API_KEY = process.env.REACT_APP_API_KEY;
 
 const PaymentDetail = ({ modal, toggle }) => {
   const navigate = useNavigate();
+  const [Loading, setLoading] = useState(false);
+
   const [selectedBranch, setSelectedBranch] = useState(null);
   const [selectedBatch, setSelectedBatch] = useState(null);
   const [selectedStudent, setSelectedStudent] = useState(null);
 
   const [installmentList, setInstallmentList] = useState([]);
   const [totalAmount, setTotalAmount] = useState([]);
+  // const [totalAmount, setTotalAmount] = useState({});
 
   const [batches, setBatches] = useState([]);
   const [students, setStudents] = useState([]);
 
-  const [payment, setPayment] = useState({
-    installmentid: "string",
-    amount: "string",
-  });
+  const [payment, setPayment] = useState([]);
 
   const [paymentModeOptions, setPaymentModeOptions] = useState(paymentMode[0]);
 
@@ -85,7 +86,6 @@ const PaymentDetail = ({ modal, toggle }) => {
           batchid: selectedBatch?.value,
         },
       });
-      // console.log(res);
 
       const formattedStudent = res?.data.map((item) => ({
         value: item.id,
@@ -107,7 +107,6 @@ const PaymentDetail = ({ modal, toggle }) => {
         studentid: selectedStudent?.value,
       },
     });
-    // console.log(res.data);
     setInstallmentList(res?.data);
   };
 
@@ -120,23 +119,29 @@ const PaymentDetail = ({ modal, toggle }) => {
   const handleCheckboxChange = (index, id, partAmount, fine) => {
     const total = Number(partAmount) + Number(fine);
     const updatedAmount = [...totalAmount];
+    const updatedPayment = [...payment];
 
-    if (updatedAmount[index]) {
-      // If already checked, uncheck it
+    const existingIndex = updatedPayment.findIndex(
+      (item) => item.installmentid === id
+    );
+
+    if (existingIndex !== -1) {
+      // Already selected → uncheck → remove from payment
       updatedAmount[index] = "";
-      setPayment({ installmentid: "", amount: "" }); // clear payment
+      updatedPayment.splice(existingIndex, 1);
     } else {
+      // Not selected → check → add to payment
       updatedAmount[index] = total;
-      setPayment({
+      updatedPayment.push({
         installmentid: id,
         amount: total.toString(),
       });
     }
 
     setTotalAmount(updatedAmount);
+    setPayment(updatedPayment);
   };
 
-  // console.log(payment);
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     const day = String(date.getDate()).padStart(2, "0");
@@ -146,11 +151,7 @@ const PaymentDetail = ({ modal, toggle }) => {
   };
 
   const handlePayment = async () => {
-    // const paymentData = {
-    //   installmentid: "string",
-    //   amount: totalAmount.toString(),
-    // console.log(paymentModeOptions);
-    // };
+    setLoading(true);
     try {
       const res = await axios.post(`${API_PATH}/api/CollectFees`, payment, {
         params: {
@@ -161,9 +162,12 @@ const PaymentDetail = ({ modal, toggle }) => {
         },
       });
       console.log("Payment Success", res.data);
+      toast.success("Payment Success !!");
       navigate("/receiptForm"); // ✅ navigate after API call success
     } catch (error) {
       console.log(error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -272,7 +276,7 @@ const PaymentDetail = ({ modal, toggle }) => {
           </thead>
           <tbody>
             {installmentList.map((item, index) => (
-              <tr>
+              <tr key={item.installmentid}>
                 <td>
                   <div className="d-flex justify-content-center align-items-center">
                     <Input
@@ -314,8 +318,19 @@ const PaymentDetail = ({ modal, toggle }) => {
         className="bg-white border-top"
         style={{ position: "sticky", bottom: 0, zIndex: 10 }}
       >
-        <Button color="primary" onClick={handlePayment}>
-          Payment
+        <Button color="primary" onClick={handlePayment} disabled={Loading}>
+          {Loading ? (
+            <>
+              <span
+                className="spinner-border spinner-border-sm me-2"
+                role="status"
+                aria-hidden="true"
+              ></span>
+              Logging in...
+            </>
+          ) : (
+            "Payment"
+          )}
         </Button>
         <Button color="secondary" onClick={toggle}>
           Cancel

@@ -123,7 +123,10 @@ const Admin = (props) => {
         <div className="flex-grow-1">
           <Routes>
             {getRoutes(routes)}
-            <Route path="*" element={<Navigate to="/admin/index" replace />} />
+            <Route
+              path="*"
+              element={<Navigate to="/admin/enquiryDashboard" replace />}
+            />
           </Routes>
         </div>
         <Container fluid>

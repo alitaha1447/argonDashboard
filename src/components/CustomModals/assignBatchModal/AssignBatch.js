@@ -22,6 +22,7 @@ const AssignBatch = ({ modal, toggle, studentID }) => {
   // const stdId = studentID.map((item) => ({
   //   enrollmentid: item.enrollmentid.toString(),
   // }));
+  const [loading, setLoading] = useState(false);
   const [batch, setBatch] = useState([]);
   const [selectedBatch, setSelectedBatch] = useState(null);
   // const [batchStudent, setBatchStudent] = useState([
@@ -45,6 +46,7 @@ const AssignBatch = ({ modal, toggle, studentID }) => {
   }, []);
 
   const handleAssignBatch = async () => {
+    setLoading(true);
     const assignBatchData = {
       batchid: selectedBatch?.value.toString(),
       batch_student: studentID.map((item) => ({
@@ -68,6 +70,9 @@ const AssignBatch = ({ modal, toggle, studentID }) => {
       toggle();
     } catch (error) {
       console.log(error);
+      toast.error("Request failed with status code 404");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -114,7 +119,18 @@ const AssignBatch = ({ modal, toggle, studentID }) => {
         style={{ position: "sticky", bottom: 0, zIndex: 10, gap: "1rem" }}
       >
         <Button color="primary" onClick={handleAssignBatch}>
-          Assign
+          {loading ? (
+            <>
+              <span
+                className="spinner-border spinner-border-sm me-2"
+                role="status"
+                aria-hidden="true"
+              ></span>
+              Assigning...
+            </>
+          ) : (
+            " Assign"
+          )}
         </Button>
         <Button color="secondary" onClick={toggle}>
           Cancel

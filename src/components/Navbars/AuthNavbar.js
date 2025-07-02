@@ -19,11 +19,11 @@ const AdminNavbar = () => {
         <Container className="px-0">
           <NavbarBrand to="/" tag={Link}>
             <div style={{ height: "3rem" }}>
-              <img
+              {/* <img
                 alt="..."
                 src={require("../../assets/img/brand/miracleLogo.png")}
                 style={{ height: "100%" }}
-              />
+              /> */}
             </div>
           </NavbarBrand>
           {/* <button className="navbar-toggler" id="navbar-collapse-main">

@@ -80,6 +80,8 @@ const CheckboxOption = (props) => (
 );
 
 const BatchModal = ({ modal, toggle, studentID }) => {
+  const [loading, setLoading] = useState(false);
+
   const fileInputRef = useRef(null);
 
   const stdId = studentID.map((item) => ({
@@ -311,6 +313,7 @@ const BatchModal = ({ modal, toggle, studentID }) => {
   };
 
   const handleSubmit = async (e) => {
+    setLoading(true);
     e.preventDefault();
 
     const isOrganization = selectPayment?.label === "Paid Organization";
@@ -379,6 +382,8 @@ const BatchModal = ({ modal, toggle, studentID }) => {
     } catch (error) {
       console.error("❌ Failed to create batch:", error);
       toast.error(error?.name);
+    } finally {
+      setLoading(false);
     }
     resetForm();
   };
@@ -874,7 +879,18 @@ const BatchModal = ({ modal, toggle, studentID }) => {
             style={{ position: "sticky", bottom: 0, zIndex: 10 }}
           >
             <Button color="primary" onClick={handleSubmit}>
-              Submit
+              {loading ? (
+                <>
+                  <span
+                    className="spinner-border spinner-border-sm me-2"
+                    role="status"
+                    aria-hidden="true"
+                  ></span>
+                  Logging in...
+                </>
+              ) : (
+                " Submit"
+              )}
             </Button>
             <Button color="secondary" onClick={toggle}>
               Cancel

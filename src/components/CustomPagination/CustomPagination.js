@@ -12,10 +12,12 @@ const CustomPagination = ({
   pageNumDropDown,
   setPageNumDropDown,
   pageNum,
+  activeFilters, // 👈 Add this
 }) => {
   const handlePageChange = (page) => {
     setPageNumber(page);
-    fetchPaginatedData(page);
+    // fetchPaginatedData(page);
+    fetchPaginatedData(page, activeFilters); // 👈 Use activeFilters
   };
 
   const handleNext = () => {

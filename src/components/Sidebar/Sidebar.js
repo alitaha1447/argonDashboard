@@ -158,7 +158,7 @@ const Sidebar = (props) => {
   //   });
   // };
   const createLinks = (routes) => {
-    console.log(routes);
+    // console.log(routes);
     const toggleDropdown = (name) => {
       setOpenDropdowns((prev) => ({
         ...prev,
@@ -167,62 +167,64 @@ const Sidebar = (props) => {
     };
 
     const renderRoutes = (routesList, level = 0) => {
-      return routesList.map((route, index) => {
-        // Label
-        if (route.isLabel) {
-          return (
-            <li
-              key={index}
-              className="nav-heading text-uppercase font-weight-bold text-muted mt-3 mb-2 px-3 small"
-            >
-              {route.name}
-            </li>
-          );
-        }
+      return routesList
+        .filter((route) => route.name !== "Login" && route.name !== "Register") // 👈 Exclude these
+        .map((route, index) => {
+          // Label
+          if (route.isLabel) {
+            return (
+              <li
+                key={index}
+                className="nav-heading text-uppercase font-weight-bold text-muted mt-3 mb-2 px-3 small"
+              >
+                {route.name}
+              </li>
+            );
+          }
 
-        // Dropdown with children
-        if (route.children && route.children.length > 0) {
-          return (
-            <div key={index}>
-              <NavItem className={`pl-${level + 2}`}>
-                <div
-                  className="nav-link d-flex align-items-center cursor-pointer"
-                  onClick={() => toggleDropdown(route.name)}
-                  style={{ cursor: "pointer" }}
-                >
-                  <i className={route.icon} />
-                  <span className="ml-0">{route.name}</span>
-                  <i
-                    className={`ml-auto fas fa-chevron-${
-                      openDropdowns[route.name] ? "up" : "down"
-                    }`}
-                  />
-                </div>
-                <Collapse isOpen={openDropdowns[route.name]}>
-                  <Nav className="nav-sm flex-column ml-0">
-                    {renderRoutes(route.children, level + 1)}
-                  </Nav>
-                </Collapse>
-              </NavItem>
-            </div>
-          );
-        }
+          // Dropdown with children
+          if (route.children && route.children.length > 0) {
+            return (
+              <div key={index}>
+                <NavItem className={`pl-${level + 2}`}>
+                  <div
+                    className="nav-link d-flex align-items-center cursor-pointer"
+                    onClick={() => toggleDropdown(route.name)}
+                    style={{ cursor: "pointer" }}
+                  >
+                    <i className={route.icon} />
+                    <span className="ml-0">{route.name}</span>
+                    <i
+                      className={`ml-auto fas fa-chevron-${
+                        openDropdowns[route.name] ? "up" : "down"
+                      }`}
+                    />
+                  </div>
+                  <Collapse isOpen={openDropdowns[route.name]}>
+                    <Nav className="nav-sm flex-column ml-0">
+                      {renderRoutes(route.children, level + 1)}
+                    </Nav>
+                  </Collapse>
+                </NavItem>
+              </div>
+            );
+          }
 
-        // Simple link
-        return (
-          // <NavItem key={index} className={`pl-${level + 2}`}>
-          <NavItem key={index}>
-            <NavLink
-              to={route.layout + route.path}
-              tag={NavLinkRRD}
-              onClick={closeCollapse}
-            >
-              <i className={route.icon} />
-              <span className="ml-2">{route.name}</span>
-            </NavLink>
-          </NavItem>
-        );
-      });
+          // Simple link
+          return (
+            // <NavItem key={index} className={`pl-${level + 2}`}>
+            <NavItem key={index}>
+              <NavLink
+                to={route.layout + route.path}
+                tag={NavLinkRRD}
+                onClick={closeCollapse}
+              >
+                <i className={route.icon} />
+                <span className="ml-2">{route.name}</span>
+              </NavLink>
+            </NavItem>
+          );
+        });
     };
 
     return renderRoutes(routes);
