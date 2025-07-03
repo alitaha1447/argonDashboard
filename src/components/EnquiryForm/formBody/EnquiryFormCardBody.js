@@ -33,7 +33,7 @@ const EnquiryFormCardBody = ({
   selectedEnquiry,
   toggle = () => {},
   refreshList = () => {},
-  // refreshStats = () => {},
+  refreshStats = () => {},
 }) => {
   // console.log("first");
   const isCourseEnquiry =
@@ -186,9 +186,9 @@ const EnquiryFormCardBody = ({
       Address: address,
       Gender: gender?.value,
       Qualification: !isCourseEnquiry ? null : selectedQualification?.value,
-      Course:
-        isCourseEnquiry &&
-        selectedCoursesOptions?.map((c) => c.value).join(","),
+      Course: isCourseEnquiry
+        ? selectedCoursesOptions?.map((c) => c.value).join(",")
+        : 0,
       Product: !isCourseEnquiry ? selectedProduct?.value : null,
       Branch: !isCourseEnquiry ? null : selectedBranch?.value,
       ReferedBy: referedBy?.value,
@@ -200,11 +200,11 @@ const EnquiryFormCardBody = ({
     // console.log(enquiryFormdata);
     try {
       const res = await axios.post(
-        `${API_PATH}/api/SaveEnq1uiry`,
+        `${API_PATH}/api/SaveEnquiry`,
         enquiryFormdata,
         {
           params: {
-            APIKEY: "12345678@",
+            APIKEY: API_KEY,
           },
         }
       );
@@ -212,10 +212,10 @@ const EnquiryFormCardBody = ({
       // console.log("DATA --> ", enquiryFormdata);
       console.log("✅ Enquiry submitted successfully:", res);
       refreshList(1);
-      // refreshStats();
+      refreshStats();
     } catch (error) {
       console.error("❌ Failed to submit enquiry:", error);
-      toast.error("Request failed with status code 404");
+      toast.error(error.message);
     } finally {
       setLoading(false);
       resetForm();
