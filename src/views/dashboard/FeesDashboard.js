@@ -551,8 +551,8 @@ const FeesDashboard = () => {
                               <Button
                                 onClick={() =>
                                   toggleFeeDetail(
-                                    student?.batchid,
-                                    student?.batchstudentid
+                                    item?.batchid,
+                                    item?.batchstudentid
                                   )
                                 }
                                 style={{
