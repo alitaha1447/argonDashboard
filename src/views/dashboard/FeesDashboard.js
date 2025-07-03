@@ -176,7 +176,7 @@ const FeesDashboard = () => {
         params,
       });
       console.log(res);
-      setFeeList(res.data);
+      setFeeList(res?.data?.Data);
     } catch (error) {
       if (error.response && error.response.status === 404) {
         setFeeList([]);
