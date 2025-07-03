@@ -549,7 +549,12 @@ const FeesDashboard = () => {
                               <strong>Total Fee Amount:</strong>{" "}
                               <span>{item.totalamount}</span>
                               <Button
-                                onClick={toggleFeeDetail}
+                                onClick={() =>
+                                  toggleFeeDetail(
+                                    student?.batchid,
+                                    student?.batchstudentid
+                                  )
+                                }
                                 style={{
                                   padding: "0 6px",
                                   fontSize: "12px",
