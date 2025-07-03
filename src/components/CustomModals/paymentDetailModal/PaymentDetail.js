@@ -152,6 +152,7 @@ const PaymentDetail = ({ modal, toggle }) => {
 
   const handlePayment = async () => {
     setLoading(true);
+    console.log(payment);
     try {
       const res = await axios.post(`${API_PATH}/api/CollectFees`, payment, {
         params: {
@@ -305,7 +306,7 @@ const PaymentDetail = ({ modal, toggle }) => {
                     placeholder={`Enter Fees`}
                     type={"text"}
                     style={{ width: "100%", minWidth: "120px" }}
-                    value={totalAmount.toString()}
+                    value={totalAmount[index] || ""}
                     // onChange={onChange}
                   />
                 </td>

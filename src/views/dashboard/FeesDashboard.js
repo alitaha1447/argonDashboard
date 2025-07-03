@@ -49,6 +49,11 @@ const pageNum = [
 ];
 
 const FeesDashboard = () => {
+  const [selectedFeeDetail, setSelectedFeeDetail] = useState({
+    batchid: null,
+    batchstudentid: null,
+  });
+
   const [activeFilters, setActiveFilters] = useState({});
 
   const [statsData, setStatsData] = useState({});
@@ -65,7 +70,6 @@ const FeesDashboard = () => {
   const [feeList, setFeeList] = useState([]);
   const [isTableLoading, setIsTableLoading] = useState(false);
   const [selectedBatch, setSelectedBatch] = useState(null);
-  console.log(selectedBatch?.value);
   // pagination
   const [pageNumber, setPageNumber] = useState(1);
   const [pageStart, setPageStart] = useState(1);
@@ -139,7 +143,12 @@ const FeesDashboard = () => {
   const togglePaymentDetail = () => {
     setShowPaymentDetail((prev) => !prev);
   };
-  const toggleFeeDetail = () => {
+  // const toggleFeeDetail = () => {
+  //   setShowFeeDetail((prev) => !prev);
+  // };
+
+  const toggleFeeDetail = (batchid, batchstudentid) => {
+    setSelectedFeeDetail({ batchid, batchstudentid });
     setShowFeeDetail((prev) => !prev);
   };
 
@@ -175,7 +184,8 @@ const FeesDashboard = () => {
       const res = await axios(`${API_PATH}/api/Collect_List`, {
         params,
       });
-      console.log(res);
+      // console.log(res?.data?.Data);
+      // setStudentId(res?.data?.Data?.batchstudentid);
       setFeeList(res?.data?.Data);
     } catch (error) {
       if (error.response && error.response.status === 404) {
@@ -448,7 +458,13 @@ const FeesDashboard = () => {
                           <td>
                             <span>{student.totalamount}</span>
                             <Button
-                              onClick={toggleFeeDetail}
+                              // onClick={toggleFeeDetail}
+                              onClick={() =>
+                                toggleFeeDetail(
+                                  student?.batchid,
+                                  student?.batchstudentid
+                                )
+                              }
                               style={{
                                 padding: "0 6px",
                                 fontSize: "12px",
@@ -615,7 +631,12 @@ const FeesDashboard = () => {
           </Col>
         </Row>
         <PaymentDetail modal={showPaymentDetail} toggle={togglePaymentDetail} />
-        <FeeDetail modal={showFeeDetail} toggle={toggleFeeDetail} />
+        <FeeDetail
+          modal={showFeeDetail}
+          toggle={toggleFeeDetail}
+          batchid={selectedFeeDetail?.batchid}
+          batchstudentid={selectedFeeDetail?.batchstudentid}
+        />
       </Container>
     </>
   );

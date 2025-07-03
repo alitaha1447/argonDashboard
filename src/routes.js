@@ -42,7 +42,8 @@ import FeesDashboard from "views/dashboard/FeesDashboard";
 import Test from "views/master/Test";
 import DailyCollection from "views/transaction/report/fees/DailyCollection";
 import DueBalance from "views/transaction/report/fees/DueBalance";
-
+import FacultyCourses from "views/reports/course/FacultyCourses";
+import BatchStudent from "views/transaction/course/BatchStudent";
 var routes = [
   {
     name: "Enquiry Dashboard", // 👈 just a label, no path
@@ -490,6 +491,20 @@ var routes = [
     ],
   },
   {
+    name: "Course tr",
+    icon: "ni ni-folder-17 text-orange",
+    layout: "/admin",
+    children: [
+      {
+        path: "/batchStudent",
+        name: "Batch Student",
+        icon: "ni ni-single-copy-04 text-red",
+        component: <BatchStudent />,
+        layout: "/admin",
+      },
+    ],
+  },
+  {
     name: "Report", // 👈 just a label, no path
     isLabel: true,
   },
@@ -510,6 +525,20 @@ var routes = [
         name: "Due Balance",
         icon: "ni ni-single-copy-04 text-red",
         component: <DueBalance />,
+        layout: "/admin",
+      },
+    ],
+  },
+  {
+    name: "Course",
+    icon: "ni ni-folder-17 text-orange",
+    layout: "/admin",
+    children: [
+      {
+        path: "/facultyCourses",
+        name: "Faculty Courses",
+        icon: "ni ni-single-copy-04 text-red",
+        component: <FacultyCourses />,
         layout: "/admin",
       },
     ],

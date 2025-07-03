@@ -53,7 +53,7 @@ import { MdFilterAltOff } from "react-icons/md";
 
 import useStatusEnquiry from "customHookApi/EnquiryDashboardApi/useStatusEnquiry";
 import { generateHexColors } from "utils/dynamicColorGenerator/generateHexColors ";
-
+import { printAndExportExcel } from "utils/printFile/printAndExportExcel";
 const API_PATH = process.env.REACT_APP_API_PATH;
 const API_KEY = process.env.REACT_APP_API_KEY;
 
@@ -783,6 +783,14 @@ const EnquiryDashboard = (props) => {
                         onClick={toggleModal}
                       >
                         Add Enquiry
+                      </Button>
+                      <Button
+                        color="primary"
+                        block
+                        size="md"
+                        onClick={() => printAndExportExcel(listData)}
+                      >
+                        Print & Save as Excel
                       </Button>
                     </DropdownMenu>
                   </UncontrolledDropdown>

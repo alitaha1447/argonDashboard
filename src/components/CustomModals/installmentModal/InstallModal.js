@@ -74,16 +74,16 @@ const InstallModal = ({ modal, toggle, onSubmitInstallment }) => {
       <ModalHeader
         toggle={toggle}
         className="bg-white border-bottom"
-        style={{ position: "sticky", top: 0, zIndex: 10 }}
+        style={{ position: "sticky", top: 0 }}
       >
         <h1>Installments</h1>
       </ModalHeader>
 
       <ModalBody
-        style={{
-          overflowY: "auto",
-          maxHeight: "50vh",
-        }}
+      // style={{
+      //   overflowY: "auto",
+      //   height: "40vh",
+      // }}
       >
         <Form>
           {installmentStructure.map((item, index) => (
@@ -126,8 +126,10 @@ const InstallModal = ({ modal, toggle, onSubmitInstallment }) => {
                       yearDropdownItemNumber={50}
                       minDate={new Date(1900, 0, 1)}
                       maxDate={new Date(2025, 11, 31)}
+                      popperPlacement="bottom-start"
                       className="form-control"
                     />
+
                     <div
                       onClick={handleAddInstallment}
                       style={{

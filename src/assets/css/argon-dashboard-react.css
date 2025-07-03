@@ -21531,3 +21531,21 @@ button:focus,
 }
 
 /*# sourceMappingURL=argon-dashboard-react.css.map */
+
+@media print {
+  .d-none.d-lg-block {
+    display: block !important;
+  }
+
+  .print-hidden {
+    display: none !important;
+  }
+
+  .print-only {
+    display: block !important;
+  }
+}
+
+.react-datepicker-popper {
+  z-index: 9999 !important;
+}
