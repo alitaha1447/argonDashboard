@@ -53,7 +53,8 @@ import { MdFilterAltOff } from "react-icons/md";
 
 import useStatusEnquiry from "customHookApi/EnquiryDashboardApi/useStatusEnquiry";
 import { generateHexColors } from "utils/dynamicColorGenerator/generateHexColors ";
-import { printAndExportExcel } from "utils/printFile/printAndExportExcel";
+// import { printAndExportExcel } from "utils/printFile/printAndExportExcel";
+import { exportToExcel } from "utils/printFile/exportToExcel";
 const API_PATH = process.env.REACT_APP_API_PATH;
 const API_KEY = process.env.REACT_APP_API_KEY;
 
@@ -77,6 +78,7 @@ const EnquiryDashboard = (props) => {
   const [selectedEnquiryType, setSelectedEnquiryType] = useState(enquiry[0]);
   const [dateRange, setDateRange] = useState([null, null]);
   const [startDate, endDate] = dateRange;
+
   const [searchText, setSearchText] = useState("");
   // Branch
   const [selectedBranch, setSelectedBranch] = useState(null);
@@ -139,10 +141,15 @@ const EnquiryDashboard = (props) => {
   });
 
   const fetchPaginatedData = async (page = 1, filters = {}) => {
+    console.log(3);
+    console.log(filters);
     // console.log("page", page);
     setIsTableLoading(true); // show loader
     try {
       const { startDate1, endDate1 } = fetchFinancialYearRangeByDate();
+      console.log(startDate1);
+      console.log(endDate1);
+      // console.log(filters);
       const params = {
         fromdate: filters.fromDate || startDate1,
         todate: filters.toDate || endDate1,
@@ -281,17 +288,21 @@ const EnquiryDashboard = (props) => {
   };
 
   const handleSearch = () => {
+    console.log(2);
     const filters = {
       searchText: searchText.trim(),
       enquirytype: selectedEnquiryType?.value || "",
       status: selectedStatus?.value,
       branch: selectedBranch?.value,
+      fromdate: startDate,
+      todate: endDate,
     };
     setActiveFilters(filters); // ⬅️ Store current filters
     fetchPaginatedData(1, filters); // ⬅️ Pass them for page 1
   };
 
   const handleSearchClick = (e) => {
+    console.log(1);
     e.preventDefault();
     handleSearch(); // ✅ Reuse search logic
   };
@@ -393,6 +404,30 @@ const EnquiryDashboard = (props) => {
         return [...prev, { enrollmentid: id }];
       }
     });
+  };
+
+  const handleExport = () => {
+    const exportData = listData.map((item) => {
+      const isCourseOrInternship =
+        selectedEnquiryType.label === "Course Enquiry" ||
+        selectedEnquiryType.label === "Internship Enquiry";
+      return {
+        Id: item.Id,
+        Name: item.Name,
+        "Contact Number": item.Mobileno,
+        ...(isCourseOrInternship && {
+          "Highest Qualification": item.QualificationCode,
+          Course: item.TopicTitle,
+        }),
+        ...(!isCourseOrInternship && {
+          Product: item.product_name,
+        }),
+        Branch: item.BranchName,
+        "Enquiry Date": formatDate(item.CreatedOn),
+        Status: item.status_txt,
+      };
+    });
+    exportToExcel(exportData, "EnquiryList", "Sheet1");
   };
 
   const statsCard1 = {
@@ -784,13 +819,16 @@ const EnquiryDashboard = (props) => {
                       >
                         Add Enquiry
                       </Button>
+                      <Button color="primary" block size="md">
+                        Print
+                      </Button>
                       <Button
                         color="primary"
                         block
                         size="md"
-                        onClick={() => printAndExportExcel(listData)}
+                        onClick={handleExport}
                       >
-                        Print & Save as Excel
+                        Save as Excel
                       </Button>
                     </DropdownMenu>
                   </UncontrolledDropdown>
@@ -825,6 +863,7 @@ const EnquiryDashboard = (props) => {
                       <th scope="col">Branch</th>
                       <th scope="col">Enquiry Date</th>
                       <th scope="col">Status</th>
+                      <th scope="col">Remark</th>
                       <th scope="col">Action</th>
                     </tr>
                   </thead>
@@ -867,6 +906,7 @@ const EnquiryDashboard = (props) => {
                           <td>{item.BranchName}</td>
                           <td>{formatDate(item.CreatedOn)}</td>
                           <td>{item.status_txt}</td>
+                          <td>{}</td>
                           <td>
                             {" "}
                             <UncontrolledDropdown direction="left">
@@ -973,6 +1013,9 @@ const EnquiryDashboard = (props) => {
                             </p>
                             <p className="fs-6 fw-semibold mb-1">
                               <strong>Status:</strong> {item.status_txt}
+                            </p>
+                            <p className="fs-6 fw-semibold mb-1">
+                              <strong>Remark:</strong> {}
                             </p>
                           </div>
                         </div>

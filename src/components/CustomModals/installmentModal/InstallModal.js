@@ -66,7 +66,7 @@ const InstallModal = ({ modal, toggle, onSubmitInstallment }) => {
     <Modal
       isOpen={modal}
       toggle={toggle}
-      size="lg"
+      size="xl"
       centered
       backdrop="static"
       keyboard={false}
@@ -74,7 +74,7 @@ const InstallModal = ({ modal, toggle, onSubmitInstallment }) => {
       <ModalHeader
         toggle={toggle}
         className="bg-white border-bottom"
-        style={{ position: "sticky", top: 0 }}
+        // style={{ position: "sticky", top: 0 }}
       >
         <h1>Installments</h1>
       </ModalHeader>
@@ -85,7 +85,54 @@ const InstallModal = ({ modal, toggle, onSubmitInstallment }) => {
       //   height: "40vh",
       // }}
       >
+        <div className="d-flex justify-content-end mb-2">
+          <span style={{ fontWeight: 600 }}>Total fees : 80000</span>
+        </div>
         <Form>
+          <Row className="align-items-end">
+            <Col md={2}>
+              <FormGroup>
+                <Label>Initial Deposit</Label>
+                <Input type="text" placeholder="e.g. 10000" />
+              </FormGroup>
+            </Col>
+
+            <Col md={2}>
+              <FormGroup>
+                <Label>Remaining Amount</Label>
+                <Input type="text" placeholder="e.g. 70000" />
+              </FormGroup>
+            </Col>
+
+            <Col md={2}>
+              <FormGroup>
+                <Label>Installments</Label>
+                <Input type="text" placeholder="e.g. 3" />
+              </FormGroup>
+            </Col>
+
+            <Col md={3}>
+              <FormGroup>
+                <Label>Frequency (in days)</Label>
+                <Input type="text" placeholder="e.g. 30" />
+              </FormGroup>
+            </Col>
+
+            <Col md={3}>
+              <FormGroup>
+                <Label className="invisible">.</Label>{" "}
+                {/* invisible to align height */}
+                <Button color="primary" block>
+                  Create Installment
+                </Button>
+              </FormGroup>
+            </Col>
+          </Row>
+
+          <Col md={12}>
+            <hr />
+          </Col>
+
           {installmentStructure.map((item, index) => (
             <Row className="align-items-end mb-3">
               <Col md={4}>

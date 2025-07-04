@@ -31,7 +31,7 @@ import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 
 import { useReactToPrint } from "react-to-print";
-import { printAndExportExcel } from "utils/printFile/printAndExportExcel";
+// import { printAndExportExcel } from "utils/printFile/printAndExportExcel";
 const API_PATH = process.env.REACT_APP_API_PATH;
 const API_KEY = process.env.REACT_APP_API_KEY;
 
@@ -235,9 +235,17 @@ const BatchStudent = () => {
                         color="primary"
                         block
                         size="md"
-                        onClick={() => printAndExportExcel(data)}
+                        // onClick={() => printAndExportExcel(data)}
                       >
-                        Print & Save as Excel
+                        Print
+                      </Button>
+                      <Button
+                        color="primary"
+                        block
+                        size="md"
+                        // onClick={() => printAndExportExcel(data)}
+                      >
+                        Save as Excel
                       </Button>
                     </DropdownMenu>
                   </UncontrolledDropdown>

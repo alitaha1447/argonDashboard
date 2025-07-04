@@ -30,12 +30,14 @@ import { MdFilterAlt } from "react-icons/md";
 import { MdFilterAltOff } from "react-icons/md";
 
 import { BsThreeDotsVertical } from "react-icons/bs";
+import { FaPlus } from "react-icons/fa";
 
 import useBranchList from "customHookApi/EnquiryDashboardApi/useBranchList";
 import axios from "axios";
 import { studentFeeData } from "DummyData";
 import { fetchFinancialYearRangeByDate } from "utils/financialYearRange/FinancialYearRange";
 import { generateHexColors } from "utils/dynamicColorGenerator/generateHexColors ";
+import { exportToExcel } from "utils/printFile/exportToExcel";
 
 const API_PATH = process.env.REACT_APP_API_PATH;
 const API_KEY = process.env.REACT_APP_API_KEY;
@@ -279,6 +281,26 @@ const FeesDashboard = () => {
     fetchPaginatedData();
   }, []);
 
+  const handleExport = () => {
+    const exportData = feeList.map((item, index) => {
+      console.log(item);
+      return {
+        Id: index,
+        "Student Name": item.name,
+        "Contact Number": item.mobileno,
+        "Total Fee Amount": item.totalamount,
+        "Fee Recieved": item.fees_received,
+        "Due Fees": item.due_amount,
+        Branch: item.branch,
+        Batch: item.batch,
+        batchstudentid: item.batchstudentid,
+        branchid: item.branchid,
+        total_records: item.total_records,
+      };
+    });
+    exportToExcel(exportData, "EnquiryList", "Sheet1");
+  };
+
   const statsCard1 = {
     title: "Total fees received",
     value: statsData?.total_enquiry,
@@ -414,7 +436,7 @@ const FeesDashboard = () => {
                   }}
                 >
                   <h3 className="mb-0">Student Fee Lists</h3>
-                  <div>
+                  <div className="d-flex align-item-center">
                     <Button
                       color="primary"
                       block
@@ -423,6 +445,47 @@ const FeesDashboard = () => {
                     >
                       Recieve Amount
                     </Button>
+                    <UncontrolledDropdown direction="down">
+                      <DropdownToggle
+                        tag="span"
+                        style={{
+                          cursor: "pointer",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          width: "38px",
+                          height: "38px",
+                          backgroundColor: "#5e72e4",
+                          color: "#fff",
+                          borderRadius: "4px",
+                        }}
+                      >
+                        <FaPlus />
+                      </DropdownToggle>
+
+                      <DropdownMenu
+                        right
+                        style={{
+                          padding: "10px",
+                          border: "1px solid #ddd",
+                          borderRadius: "4px",
+                          boxShadow: "0px 2px 6px rgba(0,0,0,0.2)",
+                          minWidth: "160px",
+                        }}
+                      >
+                        <Button color="primary" block size="md">
+                          Print
+                        </Button>
+                        <Button
+                          color="primary"
+                          block
+                          size="md"
+                          onClick={handleExport}
+                        >
+                          Save as Excel
+                        </Button>
+                      </DropdownMenu>
+                    </UncontrolledDropdown>
                   </div>
                 </div>
               </CardHeader>
