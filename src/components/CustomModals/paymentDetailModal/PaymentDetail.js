@@ -16,7 +16,7 @@ import Select from "react-select";
 import useBranchList from "customHookApi/EnquiryDashboardApi/useBranchList";
 import axios from "axios";
 import { paymentMode } from "DummyData";
-import { toast } from "react-toastify";
+import { ToastContainer, toast } from "react-toastify";
 import { useLocation } from "react-router-dom";
 
 const API_PATH = process.env.REACT_APP_API_PATH;
@@ -25,9 +25,9 @@ const API_KEY = process.env.REACT_APP_API_KEY;
 const PaymentDetail = ({ modal, toggle, batchId = null, studId = null }) => {
   const location = useLocation();
 
-  console.log("Pathname:", location.pathname);
-  console.log("-----PaymentDetail------", batchId);
-  console.log("-----PaymentDetail------", studId);
+  // console.log("Pathname:", location.pathname);
+  // console.log("-----PaymentDetail------", batchId);
+  // console.log("-----PaymentDetail------", studId);
   const navigate = useNavigate();
   const [Loading, setLoading] = useState(false);
 
@@ -166,6 +166,30 @@ const PaymentDetail = ({ modal, toggle, batchId = null, studId = null }) => {
     setPayment(updatedPayment);
   };
 
+  // const handleFeeInputChange = (index, id, value) => {
+  //   const updatedAmount = [...totalAmount];
+  //   updatedAmount[index] = value;
+
+  //   const updatedPayment = [...payment];
+  //   const existingIndex = updatedPayment.findIndex(
+  //     (item) => item.installmentid === id
+  //   );
+
+  //   if (existingIndex !== -1) {
+  //     // Update existing
+  //     updatedPayment[existingIndex].amount = value;
+  //   } else {
+  //     // Add new entry
+  //     updatedPayment.push({
+  //       installmentid: id,
+  //       amount: value,
+  //     });
+  //   }
+
+  //   setTotalAmount(updatedAmount);
+  //   setPayment(updatedPayment);
+  // };
+
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     const day = String(date.getDate()).padStart(2, "0");
@@ -175,25 +199,31 @@ const PaymentDetail = ({ modal, toggle, batchId = null, studId = null }) => {
   };
 
   const handlePayment = async () => {
-    setLoading(true);
-    console.log(payment);
-    try {
-      const res = await axios.post(`${API_PATH}/api/CollectFees`, payment, {
-        params: {
-          APIKEY: API_KEY,
-          batchid: selectedBatch?.value || batchId,
-          batch_studentid: selectedStudent?.value || studId,
-          paymentmode: paymentModeOptions?.value,
-        },
-      });
-      console.log("Payment Success", res.data);
-      toast.success("Payment Success !!");
-      navigate("/receiptForm"); // ✅ navigate after API call success
-    } catch (error) {
-      console.log(error);
-    } finally {
-      setLoading(false);
+    if (payment.length === 0) {
+      toast.error(
+        "Please select at least one installment to proceed with payment."
+      );
+      return;
     }
+    // setLoading(true);
+    // console.log(payment);
+    // try {
+    //   const res = await axios.post(`${API_PATH}/api/CollectFees`, payment, {
+    //     params: {
+    //       APIKEY: API_KEY,
+    //       batchid: selectedBatch?.value || batchId,
+    //       batch_studentid: selectedStudent?.value || studId,
+    //       paymentmode: paymentModeOptions?.value,
+    //     },
+    //   });
+    //   console.log("Payment Success", res.data);
+    //   toast.success("Payment Success !!");
+    //   navigate("/receiptForm"); // ✅ navigate after API call success
+    // } catch (error) {
+    //   console.log(error);
+    // } finally {
+    //   setLoading(false);
+    // }
   };
 
   return (
@@ -332,7 +362,9 @@ const PaymentDetail = ({ modal, toggle, batchId = null, studId = null }) => {
                     type={"text"}
                     style={{ width: "100%", minWidth: "120px" }}
                     value={totalAmount[index] || ""}
-                    // onChange={onChange}
+                    // onChange={(e) =>
+                    //   handleFeeInputChange(index, item.id, e.target.value)
+                    // }
                   />
                 </td>
               </tr>
@@ -362,6 +394,7 @@ const PaymentDetail = ({ modal, toggle, batchId = null, studId = null }) => {
           Cancel
         </Button>
       </ModalFooter>
+      <ToastContainer />
     </Modal>
   );
 };

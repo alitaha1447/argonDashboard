@@ -49,6 +49,7 @@ const data = [
 ];
 
 const BatchStudent = () => {
+  const [isTableLoading, setisTableLoading] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
   const [showPaymentDetail, setShowPaymentDetail] = useState(false);
 
@@ -92,10 +93,17 @@ const BatchStudent = () => {
         value: item.BatchID,
         label: item.BatchName,
       }));
+      // const formattedBatch = res?.data?.length
+      //   ? res.data.map((item) => ({
+      //       value: item.BatchID,
+      //       label: item.BatchName,
+      //     }))
+      //   : [];
 
       setBatches(formattedBatch);
     } catch (error) {
       console.log(error);
+      // setBatches([]);
     } finally {
       setLoadingBatches(false); // Stop loader
     }
@@ -103,7 +111,12 @@ const BatchStudent = () => {
 
   useEffect(() => {
     const fetchBatchStudent = async () => {
-      if (!selectedBatch?.value) return;
+      setisTableLoading(true);
+      if (!selectedBatch?.value) {
+        setBatchStudent([]); // ✅ Clear student list if no batch selected
+        setisTableLoading(false);
+        return;
+      }
       try {
         const res = await axios.get(`${API_PATH}/api/Get_Batch_student`, {
           params: {
@@ -115,18 +128,23 @@ const BatchStudent = () => {
         setBatchStudent(res?.data);
       } catch (error) {
         console.log(error);
+      } finally {
+        setisTableLoading(false);
       }
     };
     fetchBatchStudent();
   }, [selectedBatch?.value]);
 
   const togglePaymentDetail = (id) => {
-    console.log(showPaymentDetail);
+    // console.log(showPaymentDetail);
     setStudid(id);
     setShowPaymentDetail((prev) => !prev);
   };
   // console.log("student id ---- ", studid);
   // console.log("batch id --- ", selectedBatch?.value);
+
+  console.log(selectedBatch);
+  console.log(selectedBranch);
   return (
     <>
       <Header />
@@ -341,53 +359,62 @@ const BatchStudent = () => {
                       </tr>
                     </thead>
                     <tbody>
-                      {batchStudent.map((item, index) => (
-                        <tr key={item.id}>
-                          <td>{item.id}</td>
-                          <td>{item.enrollmentid}</td>
-                          <td>{item.name}</td>
-                          <td>{item.mobileno}</td>
-                          {/* <td>{item.Course}</td>
-                          <td>{item.Add}</td>
-                          <td>{item.Gender}</td> */}
-
-                          <td style={{}}>
-                            <UncontrolledDropdown direction="up">
-                              <DropdownToggle
-                                tag="span"
-                                style={{ cursor: "pointer" }}
-                                data-toggle="dropdown"
-                                aria-expanded={false}
-                              >
-                                <BsThreeDotsVertical size={20} />
-                              </DropdownToggle>
-
-                              <DropdownMenu
-                                // left
-                                style={{
-                                  minWidth: "120px",
-                                  border: "1px solid #ddd",
-                                  borderRadius: "4px",
-                                  boxShadow: "0px 2px 6px rgba(0,0,0,0.2)",
-                                }}
-                              >
-                                <DropdownItem
-                                  key={item.id}
-                                  // onClick={() => toggleStatusModal(item.Id)}
-                                >
-                                  Installments
-                                </DropdownItem>
-                                <DropdownItem
-                                  key={item.id}
-                                  onClick={() => togglePaymentDetail(item.id)}
-                                >
-                                  Recieve Amount
-                                </DropdownItem>
-                              </DropdownMenu>
-                            </UncontrolledDropdown>
+                      {isTableLoading ? (
+                        <tr>
+                          <td colSpan="10" className="text-center py-4">
+                            <i className="fas fa-spinner fa-spin fa-2x text-primary" />
+                            <p className="mt-2 mb-0">Loading data...</p>
                           </td>
                         </tr>
-                      ))}
+                      ) : (
+                        batchStudent.map((item, index) => (
+                          <tr key={item.id}>
+                            <td>{item.id}</td>
+                            <td>{item.enrollmentid}</td>
+                            <td>{item.name}</td>
+                            <td>{item.mobileno}</td>
+                            {/* <td>{item.Course}</td>
+                            <td>{item.Add}</td>
+                            <td>{item.Gender}</td> */}
+
+                            <td style={{}}>
+                              <UncontrolledDropdown direction="up">
+                                <DropdownToggle
+                                  tag="span"
+                                  style={{ cursor: "pointer" }}
+                                  data-toggle="dropdown"
+                                  aria-expanded={false}
+                                >
+                                  <BsThreeDotsVertical size={20} />
+                                </DropdownToggle>
+
+                                <DropdownMenu
+                                  // left
+                                  style={{
+                                    minWidth: "120px",
+                                    border: "1px solid #ddd",
+                                    borderRadius: "4px",
+                                    boxShadow: "0px 2px 6px rgba(0,0,0,0.2)",
+                                  }}
+                                >
+                                  <DropdownItem
+                                    key={item.id}
+                                    // onClick={() => toggleStatusModal(item.Id)}
+                                  >
+                                    Installments
+                                  </DropdownItem>
+                                  <DropdownItem
+                                    key={item.id}
+                                    onClick={() => togglePaymentDetail(item.id)}
+                                  >
+                                    Recieve Amount
+                                  </DropdownItem>
+                                </DropdownMenu>
+                              </UncontrolledDropdown>
+                            </td>
+                          </tr>
+                        ))
+                      )}
                     </tbody>
                   </Table>
                 </div>
@@ -396,68 +423,77 @@ const BatchStudent = () => {
               {/* ✅ Card View for Mobile & Tablet */}
               <div className="d-block d-lg-none p-3 print-hidden">
                 {batchStudent.length > 0 ? (
-                  <Card className="mb-3 shadow-sm">
-                    <div className="d-flex p-4 justify-content-between">
-                      <div className="d-flex">
-                        <div>
-                          <p className="fs-6 fw-semibold mb-1">
-                            <strong>S.No. :</strong> {"1"}
-                          </p>
-                          <p className="fs-6 fw-semibold mb-1">
-                            <strong>Enrollment No. :</strong> {"Taha"}
-                          </p>
-                          <p className="fs-6 fw-semibold mb-1">
-                            <strong>Name :</strong>
-                            {"React Js"}
-                          </p>
-                          <p className="fs-6 fw-semibold mb-1">
-                            <strong>Mobile :</strong>
-                            {"20-02-2025"}
-                          </p>
-                          <p className="fs-6 fw-semibold mb-1">
-                            <strong>Course :</strong>
-                            {"20-02-2025"}
-                          </p>
-                          <p className="fs-6 fw-semibold mb-1">
-                            <strong>Add :</strong>
-                            {"12"}
-                          </p>
-                          <p className="fs-6 fw-semibold mb-1">
-                            <strong>Gender :</strong>
-                            {"Male"}
-                          </p>
+                  batchStudent.map((item, index) => (
+                    <Card className="mb-3 shadow-sm">
+                      <div className="d-flex p-4 justify-content-between">
+                        <div className="d-flex">
+                          <div>
+                            <p className="fs-6 fw-semibold mb-1">
+                              <strong>S.No. :</strong> {item.id}
+                            </p>
+                            <p className="fs-6 fw-semibold mb-1">
+                              <strong>Enrollment No. :</strong>
+                              {item.enrollmentid}
+                            </p>
+                            <p className="fs-6 fw-semibold mb-1">
+                              <strong>Name :</strong>
+                              {item.name}
+                            </p>
+                            <p className="fs-6 fw-semibold mb-1">
+                              <strong>Mobile :</strong>
+                              {item.mobileno}
+                            </p>
+                            {/* <p className="fs-6 fw-semibold mb-1">
+                              <strong>Course :</strong>
+                              {"20-02-2025"}
+                            </p> */}
+                            {/* <p className="fs-6 fw-semibold mb-1">
+                              <strong>Add :</strong>
+                              {"12"}
+                            </p> */}
+                            {/* <p className="fs-6 fw-semibold mb-1">
+                              <strong>Gender :</strong>
+                              {"Male"}
+                            </p> */}
+                          </div>
                         </div>
-                      </div>
 
-                      <UncontrolledDropdown direction="left">
-                        <DropdownToggle
-                          tag="span"
-                          style={{ cursor: "pointer" }}
-                          data-toggle="dropdown"
-                          aria-expanded={false}
-                        >
-                          <BsThreeDotsVertical size={20} />
-                        </DropdownToggle>
-
-                        <DropdownMenu
-                          right
-                          style={{
-                            minWidth: "120px",
-                            border: "1px solid #ddd",
-                            borderRadius: "4px",
-                            boxShadow: "0px 2px 6px rgba(0,0,0,0.2)",
-                          }}
-                        >
-                          <DropdownItem
-                          // key={index}
-                          // onClick={() => toggleStatusModal(item.Id)}
+                        <UncontrolledDropdown direction="left">
+                          <DropdownToggle
+                            tag="span"
+                            style={{ cursor: "pointer" }}
+                            data-toggle="dropdown"
+                            aria-expanded={false}
                           >
-                            Add Installment
-                          </DropdownItem>
-                        </DropdownMenu>
-                      </UncontrolledDropdown>
-                    </div>
-                  </Card>
+                            <BsThreeDotsVertical size={20} />
+                          </DropdownToggle>
+
+                          <DropdownMenu
+                            right
+                            style={{
+                              minWidth: "120px",
+                              border: "1px solid #ddd",
+                              borderRadius: "4px",
+                              boxShadow: "0px 2px 6px rgba(0,0,0,0.2)",
+                            }}
+                          >
+                            <DropdownItem
+                              key={item.id}
+                              // onClick={() => toggleStatusModal(item.Id)}
+                            >
+                              Installments
+                            </DropdownItem>
+                            <DropdownItem
+                              key={item.id}
+                              onClick={() => togglePaymentDetail(item.id)}
+                            >
+                              Recieve Amount
+                            </DropdownItem>
+                          </DropdownMenu>
+                        </UncontrolledDropdown>
+                      </div>
+                    </Card>
+                  ))
                 ) : (
                   <div className="text-center">
                     <i className="fas fa-info-circle mr-2" />
