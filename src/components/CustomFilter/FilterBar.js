@@ -20,8 +20,11 @@ const FilterBar = ({
   setDateRange,
   handleSearchClick,
   showStatus = true,
-  showCourseEnquiry = true,
-  showBatch = true,
+  showCourseEnquiry,
+  showBatch,
+  showDatePicker = true,
+  showSearchByName = true,
+  showSearchByFacultyName,
   fetchBatch,
   batches,
   selectedBatch,
@@ -36,7 +39,6 @@ const FilterBar = ({
     branchSearchText,
   } = useBranchList();
   const { statusOptions, fetchEnquiry } = useStatusEnquiry();
-
   useEffect(() => {
     if (branchSearchText.length < 3) {
       setBranchOptions([]);
@@ -70,14 +72,17 @@ const FilterBar = ({
             />
           </div>
         )}
-        <div style={{ width: "170px" }}>
-          <Input
-            placeholder="Search by Name or Phone"
-            type="text"
-            value={searchText}
-            onChange={handleUnifiedSearchChange}
-          />
-        </div>
+        {showSearchByName && (
+          <div style={{ width: "170px" }}>
+            <Input
+              placeholder="Search by Name or Phone"
+              type="text"
+              value={searchText}
+              onChange={handleUnifiedSearchChange}
+            />
+          </div>
+        )}
+
         {showCourseEnquiry && (
           <div style={{ width: "170px" }}>
             <Select
@@ -118,26 +123,36 @@ const FilterBar = ({
             />
           </div>
         )}
-        <div className="" style={{ width: "170px" }}>
-          <DatePicker
-            selectsRange
-            startDate={startDate}
-            endDate={endDate}
-            onChange={(date) => setDateRange(date)}
-            monthsShown={2} // ✅ Show two calendars
-            dateFormat="dd/MM/yyyy"
-            className="react-datepicker__input-container form-control"
-            placeholderText="Select date range"
-            isClearable
-            // showMonthDropdown
-            // showYearDropdown
-            scrollableYearDropdown
-            yearDropdownItemNumber={50}
-            minDate={new Date(1900, 0, 1)}
-            maxDate={new Date(2025, 11, 31)}
-            popperPlacement="bottom-start" // ✅ Opens dropdown below input
+        {showSearchByFacultyName && (
+          <Select
+            // options={enquiry}
+            // value={selectedEnquiryType}
+            // onChange={handleEnquiryTypeChange}
+            placeholder="faculty name"
           />
-        </div>
+        )}
+        {showDatePicker && (
+          <div className="" style={{ width: "170px" }}>
+            <DatePicker
+              selectsRange
+              startDate={startDate}
+              endDate={endDate}
+              onChange={(date) => setDateRange(date)}
+              monthsShown={2} // ✅ Show two calendars
+              dateFormat="dd/MM/yyyy"
+              className="react-datepicker__input-container form-control"
+              placeholderText="Select date range"
+              isClearable
+              // showMonthDropdown
+              // showYearDropdown
+              scrollableYearDropdown
+              yearDropdownItemNumber={50}
+              minDate={new Date(1900, 0, 1)}
+              maxDate={new Date(2025, 11, 31)}
+              popperPlacement="bottom-start" // ✅ Opens dropdown below input
+            />
+          </div>
+        )}
       </div>
 
       <div

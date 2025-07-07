@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   Card,
   CardHeader,
@@ -29,8 +30,11 @@ import { Input } from "reactstrap";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { enquiry } from "DummyData";
+import { MdFilterAlt } from "react-icons/md";
+import { MdFilterAltOff } from "react-icons/md";
 
 const DailyCollection = () => {
+  const [showFilters, setShowFilters] = useState(false);
   // const [selectedEnquiryType, setSelectedEnquiryType] = useState(enquiry[0]);
   const [dateRange, setDateRange] = useState([null, null]);
   const [startDate, endDate] = dateRange;
@@ -58,7 +62,58 @@ const DailyCollection = () => {
       <Header />
 
       <Container className="mt--9" fluid>
-        <Row>
+        <Row className="d-flex flex-column">
+          <Col>
+            <div
+              className="rounded-3  mb-2 d-flex d-sm-none justify-content-between align-items-center px-2 py-2 w-100"
+              onClick={() => setShowFilters((prev) => !prev)}
+              style={{ cursor: "pointer", backgroundColor: "#191d4d" }}
+            >
+              <h3 className="mb-0" style={{ color: "white" }}>
+                Filter
+              </h3>
+              {showFilters ? (
+                <MdFilterAltOff color="white" />
+              ) : (
+                <MdFilterAlt color="white" />
+              )}
+            </div>
+          </Col>
+          <Col>
+            <AnimatePresence>
+              {showFilters && (
+                <motion.div
+                  key="mobile-filter"
+                  initial={{ height: 0, opacity: 1 }}
+                  animate={{ height: "auto", opacity: 1 }}
+                  exit={{ height: 0, opacity: 1 }}
+                  transition={{ duration: 0.4, ease: "easeInOut" }}
+                  className="pb-4 d-sm-none d-md-none"
+                >
+                  <FilterBar
+                    selectedStatus={selectedStatus}
+                    setSelectedStatus={setSelectedStatus}
+                    fetchEnquiry={fetchEnquiry}
+                    searchText={searchText}
+                    // handleUnifiedSearchChange={handleUnifiedSearchChange}
+                    enquiry={enquiry}
+                    // selectedEnquiryType={selectedEnquiryType}
+                    // handleEnquiryTypeChange={handleEnquiryTypeChange}
+                    selectedBranch={selectedBranch}
+                    setSelectedBranch={setSelectedBranch}
+                    startDate={startDate}
+                    endDate={endDate}
+                    setDateRange={setDateRange}
+                    // handleSearchClick={handleSearchClick}
+                    showDatePicker={false}
+                    showBatch={true}
+                    showStatus={false}
+                    showSearchByName={false}
+                  />
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </Col>
           <Col className="pb-4 d-none d-sm-block">
             <FilterBar
               selectedStatus={selectedStatus}
@@ -75,7 +130,10 @@ const DailyCollection = () => {
               endDate={endDate}
               setDateRange={setDateRange}
               // handleSearchClick={handleSearchClick}
-              showStatus={true}
+              showDatePicker={false}
+              showBatch={true}
+              showStatus={false}
+              showSearchByName={false}
             />
           </Col>
         </Row>

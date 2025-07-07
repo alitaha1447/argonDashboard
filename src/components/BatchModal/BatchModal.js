@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from "uuid";
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useMemo } from "react";
 import {
   Modal,
   ModalHeader,
@@ -129,13 +129,12 @@ const BatchModal = ({ modal, toggle, studentID }) => {
   ]);
 
   const [courseFeesOptions, setCourseFeesOptions] = useState([]);
-
   // Installment Modal
   const [installmentModalOpen, setinstallmentModalOpen] = useState(false);
   const [installmentsDetails, setInstallmentsDetails] = useState([]);
-
+  console.log(installmentsDetails);
   const [selectedFile, setSelectedFile] = useState("");
-
+  const [totalFess, setTotalFess] = useState(0); // Initialize as 0 (number)
   // customHook
   const { qualificationOptions, fetchQualificationLists, error } =
     useQualificationList();
@@ -378,7 +377,7 @@ const BatchModal = ({ modal, toggle, studentID }) => {
         },
       });
       console.log("✅ Batch created successfully:", res);
-      toast.success("Enquiry submitted successfully!");
+      toast.success("✅ Batch created successfully");
     } catch (error) {
       console.error("❌ Failed to create batch:", error);
       toast.error(error?.name);
@@ -391,6 +390,14 @@ const BatchModal = ({ modal, toggle, studentID }) => {
   const toggleInstallment = () => {
     setinstallmentModalOpen((prev) => !prev);
   };
+
+  // Inside the component
+  const totalFees = useMemo(() => {
+    return feeStructures.reduce((sum, item) => {
+      const amount = parseFloat(item.feesAmount);
+      return sum + (isNaN(amount) ? 0 : amount);
+    }, 0);
+  }, [feeStructures]);
 
   return (
     <div>
@@ -902,6 +909,7 @@ const BatchModal = ({ modal, toggle, studentID }) => {
         modal={installmentModalOpen}
         toggle={toggleInstallment}
         onSubmitInstallment={handleInstallmentSubmit}
+        totalFees={totalFees} // Add this line
       />
       <ToastContainer />
     </div>

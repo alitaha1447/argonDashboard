@@ -387,6 +387,8 @@ const FeesDashboard = () => {
                     setDateRange={setDateRange}
                     handleSearchClick={handleSearchClick}
                     showStatus={false}
+                    showCourseEnquiry={false}
+                    showBatch={true}
                     fetchBatch={fetchBatch}
                     batches={batches}
                     selectedBatch={selectedBatch}

@@ -20,6 +20,7 @@ import {
 import { FaPlus } from "react-icons/fa";
 import { BsThreeDotsVertical } from "react-icons/bs";
 import Header from "components/Headers/Header";
+import FilterBar from "components/CustomFilter/FilterBar";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import Select from "react-select";
@@ -59,7 +60,14 @@ const FacultyCourses = () => {
       <Container className="mt--9" fluid>
         <Row>
           <Col className="pb-4 d-block d-sm-block">
-            <div
+            <FilterBar
+              showSearchByFacultyName={true}
+              showSearchByName={false}
+              showBatch={false}
+              showCourseEnquiry={false}
+              showStatus={false}
+            />
+            {/* <div
               className="d-flex flex-column flex-lg-row align-items-center justify-content-between p-2 w-100"
               style={{
                 background: "#f7fafc",
@@ -139,7 +147,7 @@ const FacultyCourses = () => {
               >
                 <i className="fas fa-search" />
               </div>
-            </div>
+            </div> */}
           </Col>
         </Row>
         <Row>

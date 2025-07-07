@@ -17,11 +17,17 @@ import useBranchList from "customHookApi/EnquiryDashboardApi/useBranchList";
 import axios from "axios";
 import { paymentMode } from "DummyData";
 import { toast } from "react-toastify";
+import { useLocation } from "react-router-dom";
 
 const API_PATH = process.env.REACT_APP_API_PATH;
 const API_KEY = process.env.REACT_APP_API_KEY;
 
-const PaymentDetail = ({ modal, toggle }) => {
+const PaymentDetail = ({ modal, toggle, batchId = null, studId = null }) => {
+  const location = useLocation();
+
+  console.log("Pathname:", location.pathname);
+  console.log("-----PaymentDetail------", batchId);
+  console.log("-----PaymentDetail------", studId);
   const navigate = useNavigate();
   const [Loading, setLoading] = useState(false);
 
@@ -99,22 +105,40 @@ const PaymentDetail = ({ modal, toggle }) => {
   };
 
   // useEffect(() => {
-  const fetchInstallmentAmount = async () => {
-    const res = await axios.get(`${API_PATH}/api/Get_Batch_installment`, {
-      params: {
-        APIKEY: API_KEY,
-        batchid: selectedBatch?.value,
-        studentid: selectedStudent?.value,
-      },
-    });
-    setInstallmentList(res?.data);
+  // const fetchInstallmentAmount = async () => {
+  //   const res = await axios.get(`${API_PATH}/api/Get_Batch_installment`, {
+  //     params: {
+  //       APIKEY: API_KEY,
+  //       batchid: selectedBatch?.value || batchId,
+  //       studentid: selectedStudent?.value || studId,
+  //     },
+  //   });
+  //   setInstallmentList(res?.data);
+  // };
+
+  const fetchInstallmentAmount = async (batchValue, studentValue) => {
+    try {
+      const res = await axios.get(`${API_PATH}/api/Get_Batch_installment`, {
+        params: {
+          APIKEY: API_KEY,
+          batchid: batchValue,
+          studentid: studentValue,
+        },
+      });
+      setInstallmentList(res?.data);
+    } catch (error) {
+      console.error("Error fetching installments:", error);
+    }
   };
 
   useEffect(() => {
-    if (selectedBatch?.value && selectedStudent?.value) {
-      fetchInstallmentAmount();
+    const batch = selectedBatch?.value || batchId;
+    const student = selectedStudent?.value || studId;
+
+    if (batch && student) {
+      fetchInstallmentAmount(batch, student);
     }
-  }, [selectedBatch, selectedStudent]);
+  }, [selectedBatch, selectedStudent, batchId, studId]);
 
   const handleCheckboxChange = (index, id, partAmount, fine) => {
     const total = Number(partAmount) + Number(fine);
@@ -157,8 +181,8 @@ const PaymentDetail = ({ modal, toggle }) => {
       const res = await axios.post(`${API_PATH}/api/CollectFees`, payment, {
         params: {
           APIKEY: API_KEY,
-          batchid: selectedBatch?.value,
-          batch_studentid: selectedStudent?.value,
+          batchid: selectedBatch?.value || batchId,
+          batch_studentid: selectedStudent?.value || studId,
           paymentmode: paymentModeOptions?.value,
         },
       });
@@ -188,6 +212,7 @@ const PaymentDetail = ({ modal, toggle }) => {
         }}
       >
         {/* Dropdown Filters */}
+        {/* {location.pathname !== "/admin/batchStudent"&&()} */}
         <div className="d-flex flex-column gap-3 mb-3" style={{ gap: "1rem" }}>
           <Row>
             <Col md={4} className={``}>
@@ -277,7 +302,7 @@ const PaymentDetail = ({ modal, toggle }) => {
           </thead>
           <tbody>
             {installmentList.map((item, index) => (
-              <tr key={item.installmentid}>
+              <tr key={index}>
                 <td>
                   <div className="d-flex justify-content-center align-items-center">
                     <Input

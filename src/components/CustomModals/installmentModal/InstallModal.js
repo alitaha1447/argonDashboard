@@ -17,10 +17,15 @@ import { FaPlus, FaMinus } from "react-icons/fa";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
-const InstallModal = ({ modal, toggle, onSubmitInstallment }) => {
-  const [installmentStructure, setInstallmentStructure] = useState([
-    { title: "", amount: null, date: new Date() },
-  ]);
+const InstallModal = ({ modal, toggle, onSubmitInstallment, totalFees }) => {
+  const [initialAmount, setInitialAmount] = useState(0);
+  const remainingAmount = totalFees - parseFloat(initialAmount || 0);
+  const [numOfInstallments, setnumOfInstallments] = useState(0);
+  const [frequencyDays, setFrequencyDays] = useState(0);
+  const [installmentStructure, setInstallmentStructure] = useState([]);
+  // const [installmentStructure, setInstallmentStructure] = useState([
+  //   { title: "", amount: null, date: null },
+  // ]);
 
   const handleFeeChange = (index, key, value) => {
     const updated = [...installmentStructure];
@@ -39,6 +44,41 @@ const InstallModal = ({ modal, toggle, onSubmitInstallment }) => {
     setInstallmentStructure((prev) => prev.filter((_, i) => i != index));
   };
 
+  const generateInstallments = () => {
+    const today = new Date();
+    const baseInstallmentAmount = parseFloat(
+      (remainingAmount / numOfInstallments).toFixed(2)
+    );
+    const newStructure = [];
+    // Initial installment
+    newStructure.push({
+      title: "Initial",
+      amount: initialAmount,
+      date: new Date(today), // Clone the date to avoid reference issues
+    });
+
+    // N Installments
+    for (let i = 1; i <= numOfInstallments; i++) {
+      const installmentDate = new Date(today); // Start from today each time
+      installmentDate.setDate(installmentDate.getDate() + frequencyDays * i); // Add 5 days per installment
+
+      newStructure.push({
+        title: `${i}-Install`,
+        amount: baseInstallmentAmount,
+        date: installmentDate,
+      });
+    }
+    // console.log(newStructure);
+    setInstallmentStructure(newStructure);
+  };
+
+  const resetForm = () => {
+    setInitialAmount(0);
+    setnumOfInstallments(0);
+    setFrequencyDays(0);
+    setInstallmentStructure([]);
+  };
+
   const handleSubmit = () => {
     const validInstallments = installmentStructure.filter(
       (inst) => inst.title && inst.amount && inst.date
@@ -50,15 +90,14 @@ const InstallModal = ({ modal, toggle, onSubmitInstallment }) => {
     }
 
     const formatted = validInstallments.map((item) => ({
-      // id: 0,
-      // BatchID: 0,
       installment_title: item.title,
-      // installment_description: "", // optional
-      part_amount: parseFloat(item.amount),
-      due_date: new Date(item.date).toISOString(),
+      part_amount: item.amount.toString(),
+      due_date: new Date(item.date).toISOString().split("T")[0], // ✅ Formats to "YYYY-MM-DD"
     }));
-    // console.log(formatted);
+
+    console.log(formatted);
     onSubmitInstallment(formatted); // ✅ send to parent
+    resetForm();
     toggle(); // close modal
   };
 
@@ -86,35 +125,55 @@ const InstallModal = ({ modal, toggle, onSubmitInstallment }) => {
       // }}
       >
         <div className="d-flex justify-content-end mb-2">
-          <span style={{ fontWeight: 600 }}>Total fees : 80000</span>
+          <span style={{ fontWeight: 600 }}>Total fees : {totalFees}</span>
         </div>
         <Form>
           <Row className="align-items-end">
             <Col md={2}>
               <FormGroup>
                 <Label>Initial Deposit</Label>
-                <Input type="text" placeholder="e.g. 10000" />
+                <Input
+                  type="text"
+                  placeholder="e.g. 10000"
+                  value={initialAmount}
+                  onChange={(e) => setInitialAmount(e.target.value)}
+                />
               </FormGroup>
             </Col>
 
             <Col md={2}>
               <FormGroup>
                 <Label>Remaining Amount</Label>
-                <Input type="text" placeholder="e.g. 70000" />
+                <Input
+                  type="text"
+                  value={remainingAmount >= 0 ? remainingAmount : 0}
+                  readOnly
+                  style={{ backgroundColor: "#f0f0f0", cursor: "not-allowed" }}
+                />{" "}
               </FormGroup>
             </Col>
 
             <Col md={2}>
               <FormGroup>
                 <Label>Installments</Label>
-                <Input type="text" placeholder="e.g. 3" />
+                <Input
+                  type="text"
+                  placeholder="e.g. 3"
+                  value={numOfInstallments}
+                  onChange={(e) => setnumOfInstallments(e.target.value)}
+                />
               </FormGroup>
             </Col>
 
             <Col md={3}>
               <FormGroup>
                 <Label>Frequency (in days)</Label>
-                <Input type="text" placeholder="e.g. 30" />
+                <Input
+                  type="text"
+                  placeholder="e.g. 30"
+                  value={frequencyDays}
+                  onChange={(e) => setFrequencyDays(e.target.value)}
+                />
               </FormGroup>
             </Col>
 
@@ -122,7 +181,7 @@ const InstallModal = ({ modal, toggle, onSubmitInstallment }) => {
               <FormGroup>
                 <Label className="invisible">.</Label>{" "}
                 {/* invisible to align height */}
-                <Button color="primary" block>
+                <Button color="primary" block onClick={generateInstallments}>
                   Create Installment
                 </Button>
               </FormGroup>
@@ -137,13 +196,13 @@ const InstallModal = ({ modal, toggle, onSubmitInstallment }) => {
             <Row className="align-items-end mb-3">
               <Col md={4}>
                 <FormGroup>
-                  <Label>Title</Label>
+                  <Label>{item.title || "Title"}</Label>
                   <Input
                     type="text"
                     value={item.title}
-                    onChange={(e) =>
-                      handleFeeChange(index, "title", e.target.value)
-                    }
+                    // onChange={(e) =>
+                    //   handleFeeChange(index, "title", e.target.value)
+                    // }
                   />
                 </FormGroup>
               </Col>
@@ -153,9 +212,9 @@ const InstallModal = ({ modal, toggle, onSubmitInstallment }) => {
                   <Input
                     type="number"
                     value={item.amount}
-                    onChange={(e) =>
-                      handleFeeChange(index, "amount", e.target.value)
-                    }
+                    // onChange={(e) =>
+                    //   handleFeeChange(index, "amount", e.target.value)
+                    // }
                   />
                 </FormGroup>
               </Col>
@@ -164,9 +223,9 @@ const InstallModal = ({ modal, toggle, onSubmitInstallment }) => {
                   <Label>Date</Label>
                   <div className="d-flex align-items-center">
                     <DatePicker
-                      selected={item.date}
-                      onChange={(date) => handleFeeChange(index, "date", date)}
-                      dateFormat="dd/MM/yyyy"
+                      selected={item.date} // ✅ bind to item.date
+                      // onChange={(date) => handleFeeChange(index, "date", date)}
+                      dateFormat="dd-MM-yyyy"
                       placeholderText="Select start date"
                       isClearable
                       scrollableYearDropdown
@@ -177,7 +236,7 @@ const InstallModal = ({ modal, toggle, onSubmitInstallment }) => {
                       className="form-control"
                     />
 
-                    <div
+                    {/* <div
                       onClick={handleAddInstallment}
                       style={{
                         marginLeft: "8px",
@@ -193,9 +252,9 @@ const InstallModal = ({ modal, toggle, onSubmitInstallment }) => {
                       }}
                     >
                       <FaPlus size={12} />
-                    </div>
+                    </div> */}
 
-                    {installmentStructure.length > 1 && (
+                    {/* {installmentStructure.length > 1 && (
                       <div
                         onClick={() => handleRemoveInstallment(index)}
                         style={{
@@ -213,7 +272,7 @@ const InstallModal = ({ modal, toggle, onSubmitInstallment }) => {
                       >
                         <FaMinus size={12} />
                       </div>
-                    )}
+                    )} */}
                   </div>
                 </FormGroup>
               </Col>

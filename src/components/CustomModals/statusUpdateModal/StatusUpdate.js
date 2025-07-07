@@ -29,6 +29,11 @@ const StatusUpdate = ({
   const [selectedStatus, setSelectedStatus] = useState(null);
   const { statusOptions, fetchEnquiry } = useStatusEnquiry();
   const [description, setDescription] = useState("");
+  console.log(selectedId);
+  const resetForm = () => {
+    setSelectedStatus(null);
+    setDescription("");
+  };
 
   const handleUpdateClick = async () => {
     try {
@@ -50,7 +55,9 @@ const StatusUpdate = ({
     } catch (error) {
       console.log(`status upload error ---> ${error}`);
     } finally {
-      toggle();
+      resetForm();
+      // toggle();
+      toggle(null); // Pass null to reset the selectedId
     }
   };
   return (

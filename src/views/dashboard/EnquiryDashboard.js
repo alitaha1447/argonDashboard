@@ -37,13 +37,11 @@ import AssignBatch from "components/CustomModals/assignBatchModal/AssignBatch";
 import PieChart from "components/Charts/PieChart";
 import BarChart from "components/Charts/BarChart";
 import CustomPagination from "components/CustomPagination/CustomPagination";
+import Loader from "components/CustomLoader/Loader";
 import "react-datepicker/dist/react-datepicker.css";
 import { fetchFinancialYearRangeByDate } from "utils/financialYearRange/FinancialYearRange";
 import useBranchList from "customHookApi/EnquiryDashboardApi/useBranchList";
 import axios from "axios";
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
-import Select from "react-select";
 
 import { enquiry } from "DummyData";
 import { FaPlus } from "react-icons/fa";
@@ -53,7 +51,6 @@ import { MdFilterAltOff } from "react-icons/md";
 
 import useStatusEnquiry from "customHookApi/EnquiryDashboardApi/useStatusEnquiry";
 import { generateHexColors } from "utils/dynamicColorGenerator/generateHexColors ";
-// import { printAndExportExcel } from "utils/printFile/printAndExportExcel";
 import { exportToExcel } from "utils/printFile/exportToExcel";
 const API_PATH = process.env.REACT_APP_API_PATH;
 const API_KEY = process.env.REACT_APP_API_KEY;
@@ -101,26 +98,14 @@ const EnquiryDashboard = (props) => {
   // Enquiry
   // const [statusOptions, setstatusOptions] = useState([]);
   const [selectedStatus, setSelectedStatus] = useState(null);
-  // console.log(selectedStatus);/
   // customHookAPI
-  const {
-    branchOptions,
-    setBranchOptions,
-    isLoading,
-    fetchBranch,
-    setBranchSearchText,
-    branchSearchText,
-  } = useBranchList();
-  const { statusOptions, fetchEnquiry } = useStatusEnquiry();
-  // console.log(statusOptions);
+  const { setBranchOptions, fetchBranch, branchSearchText } = useBranchList();
   // PieChart
   const [pieData, setPieData] = useState({
     labels: [],
     datasets: [
       {
         data: [],
-        // backgroundColor: ["#f5365c", "#2dce89", "#11cdef"],
-        // hoverBackgroundColor: ["#d92e4a", "#24b97d", "#0ebad6"],
         borderColor: "#fff",
         borderWidth: 2,
       },
@@ -132,8 +117,6 @@ const EnquiryDashboard = (props) => {
     datasets: [
       {
         data: [],
-        // backgroundColor: ["#f5365c", "#2dce89"],
-        // hoverBackgroundColor: ["#d92e4a", "#24b97d"],
         borderColor: "#fff",
         borderWidth: 0,
       },
@@ -141,20 +124,21 @@ const EnquiryDashboard = (props) => {
   });
 
   const fetchPaginatedData = async (page = 1, filters = {}) => {
-    console.log(3);
-    console.log(filters);
-    // console.log("page", page);
     setIsTableLoading(true); // show loader
+
     try {
       const { startDate1, endDate1 } = fetchFinancialYearRangeByDate();
-      console.log(startDate1);
-      console.log(endDate1);
-      // console.log(filters);
+
+      // Determine fromdate and todate from filters or fallback
+      const fromDate = filters?.fromdate ? filters.fromdate : startDate1;
+      const toDate = filters?.todate ? filters.todate : endDate1;
+
       const params = {
-        fromdate: filters.fromDate || startDate1,
-        todate: filters.toDate || endDate1,
-        enquirytype: filters.enquirytype || 1,
-        searchtext: filters.searchText || "",
+        fromdate: fromDate,
+        todate: toDate,
+
+        enquirytype: filters?.enquirytype || 1,
+        searchtext: filters?.searchText || "",
         status: filters?.status || null,
         branch: filters.branch,
         pageno: page,
@@ -163,16 +147,16 @@ const EnquiryDashboard = (props) => {
       };
 
       const res = await axios.get(
-        "https://hotelapi.shriyanshnath.com/api/Get_Enquiry_Dashboard_Data",
+        `${API_PATH}/api/Get_Enquiry_Dashboard_Data`,
         { params }
       );
 
-      if (!res.data) {
-        throw new Error("No data received from API");
-      }
+      // if (!res.data) {
+      //   throw new Error("No data received from API");
+      // }
 
       const result = res.data;
-      // console.log(res.data);
+      console.log(result);
       // ✅ Check if there's no data
       if (!result?.Data || result?.Data.length === 0) {
         setListData([]); // Triggers the "No data found" UI
@@ -225,9 +209,18 @@ const EnquiryDashboard = (props) => {
     setBatchModalOpen((prev) => !prev);
   }, []);
 
+  // const toggleStatusModal = useCallback((id) => {
+  //   setStatusID(id);
+  //   setStatusModalOpen((prev) => !prev);
+  // }, []);
   const toggleStatusModal = useCallback((id) => {
     setStatusID(id);
-    setStatusModalOpen((prev) => !prev);
+    setStatusModalOpen((prev) => {
+      if (!prev && id === null) {
+        setStatusID(null); // Reset statusID when explicitly closing
+      }
+      return !prev;
+    });
   }, []);
 
   const toggleAssignBatch = () => {
@@ -250,35 +243,6 @@ const EnquiryDashboard = (props) => {
     setSelectedEnquiryType(selectedOption); // only update state
   };
 
-  // const fetchEnquiry = async () => {
-  //   try {
-  //     const res = await axios.get(`${API_PATH}/api/Getstatus`, {
-  //       params: {
-  //         APIKEY: API_KEY,
-  //         statusfor: "ENQUIRY",
-  //       },
-  //     });
-  //     console.log(res.data);
-
-  //     const formattedEnquiry = res.data.map((item) => ({
-  //       value: item.id,
-  //       label: item.name,
-  //     }));
-  //     console.log(formattedEnquiry);
-  //     setstatusOptions(formattedEnquiry);
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
-  // };
-
-  // const handleDateChange = (date) => {
-  //   setDateRange(date);
-  //   if (dateRange === null) {
-  //     setIsFilterActive(false);
-  //     setFilteredData([]);
-  //   }
-  // };
-
   const formatDate = (date) => {
     const d = new Date(date);
     const day = String(d.getDate()).padStart(2, "0");
@@ -286,23 +250,29 @@ const EnquiryDashboard = (props) => {
     const year = d.getFullYear();
     return `${day}-${month}-${year}`;
   };
+  const formatDate1 = (date) => {
+    const d = new Date(date);
+    const day = String(d.getDate()).padStart(2, "0");
+    const month = String(d.getMonth() + 1).padStart(2, "0"); // months are 0-based
+    const year = d.getFullYear();
+    return `${year}-${month}-${day}`;
+  };
 
   const handleSearch = () => {
-    console.log(2);
     const filters = {
       searchText: searchText.trim(),
       enquirytype: selectedEnquiryType?.value || "",
       status: selectedStatus?.value,
       branch: selectedBranch?.value,
-      fromdate: startDate,
-      todate: endDate,
+      fromdate: startDate ? formatDate1(startDate) : null,
+      todate: endDate ? formatDate1(endDate) : null,
     };
+
     setActiveFilters(filters); // ⬅️ Store current filters
     fetchPaginatedData(1, filters); // ⬅️ Pass them for page 1
   };
 
   const handleSearchClick = (e) => {
-    console.log(1);
     e.preventDefault();
     handleSearch(); // ✅ Reuse search logic
   };
@@ -515,106 +485,7 @@ const EnquiryDashboard = (props) => {
                   transition={{ duration: 0.4, ease: "easeInOut" }}
                   className="pb-4 d-sm-none d-md-none"
                 >
-                  <div
-                    className="d-flex flex-column flex-lg-row align-items-center justify-content-between p-2 w-100"
-                    style={{
-                      background: "#f7fafc",
-                      borderRadius: "5px",
-                      border: "1px solid #d3d3d3",
-                      gap: "1rem",
-                    }}
-                  >
-                    <div
-                      className="d-flex flex-wrap justify-content-center align-items-center"
-                      style={{ gap: "1rem" }}
-                    >
-                      {/* {showStatus && ( */}
-                      <div style={{ width: "170px" }}>
-                        <Select
-                          id="status"
-                          options={statusOptions}
-                          value={selectedStatus}
-                          onChange={setSelectedStatus}
-                          onMenuOpen={fetchEnquiry}
-                        />
-                      </div>
-                      {/* )} */}
-                      <div style={{ width: "170px" }}>
-                        <Input
-                          placeholder="Search by Name or Phone"
-                          type="text"
-                          value={searchText}
-                          onChange={handleUnifiedSearchChange}
-                        />
-                      </div>
-                      <div style={{ width: "170px" }}>
-                        <Select
-                          options={enquiry}
-                          value={selectedEnquiryType}
-                          onChange={handleEnquiryTypeChange}
-                        />
-                      </div>
-                      <div style={{ width: "170px" }}>
-                        <Select
-                          id="branch-select"
-                          options={branchOptions}
-                          value={selectedBranch}
-                          onChange={(selected) => setSelectedBranch(selected)}
-                          onInputChange={(text) => setBranchSearchText(text)}
-                          placeholder="branch"
-                          isClearable
-                          isLoading={isLoading}
-                          noOptionsMessage={({ inputValue }) =>
-                            inputValue.length < 3
-                              ? "Type at least 3 characters to search"
-                              : "No branches found"
-                          }
-                        />
-                      </div>
-                      <div className="" style={{ width: "170px" }}>
-                        <DatePicker
-                          selectsRange
-                          startDate={startDate}
-                          endDate={endDate}
-                          onChange={(date) => setDateRange(date)}
-                          monthsShown={2} // ✅ Show two calendars
-                          dateFormat="dd/MM/yyyy"
-                          className="react-datepicker__input-container form-control"
-                          placeholderText="Select date range"
-                          isClearable
-                          // showMonthDropdown
-                          // showYearDropdown
-                          scrollableYearDropdown
-                          yearDropdownItemNumber={50}
-                          minDate={new Date(1900, 0, 1)}
-                          maxDate={new Date(2025, 11, 31)}
-                          popperPlacement="bottom-start" // ✅ Opens dropdown below input
-                        />
-                      </div>
-                    </div>
-
-                    <div
-                      style={{
-                        padding: "6px 12px",
-                        cursor: "pointer",
-                        border: "1px solid #ccc",
-                        borderRadius: "4px",
-                        backgroundColor: "#5e72e4",
-                        color: "#fff",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        height: "38px",
-                        minWidth: "38px",
-                        // marginLeft: "10px",
-                      }}
-                      // onClick={handleUnifiedSearchChange}
-                      onClick={handleSearchClick}
-                    >
-                      <i className="fas fa-search" />
-                    </div>
-                  </div>
-                  {/* <FilterBar
+                  <FilterBar
                     selectedStatus={selectedStatus}
                     setSelectedStatus={setSelectedStatus}
                     // fetchEnquiry={fetchEnquiry}
@@ -630,14 +501,15 @@ const EnquiryDashboard = (props) => {
                     setDateRange={setDateRange}
                     handleSearchClick={handleSearchClick}
                     showStatus={true}
-                     showBatch = {false},
-                  /> */}
+                    showBatch={false}
+                    showSearchByFacultyName={false}
+                  />
                 </motion.div>
               )}
             </AnimatePresence>
           </Col>
           <Col className="pb-4 d-none d-sm-block">
-            {/* <FilterBar
+            <FilterBar
               selectedStatus={selectedStatus}
               setSelectedStatus={setSelectedStatus}
               // fetchEnquiry={fetchEnquiry}
@@ -652,106 +524,9 @@ const EnquiryDashboard = (props) => {
               endDate={endDate}
               setDateRange={setDateRange}
               handleSearchClick={handleSearchClick}
-            /> */}
-            <div
-              className="d-flex flex-column flex-lg-row align-items-center justify-content-between p-2 w-100"
-              style={{
-                background: "#f7fafc",
-                borderRadius: "5px",
-                border: "1px solid #d3d3d3",
-                gap: "1rem",
-              }}
-            >
-              <div
-                className="d-flex flex-wrap justify-content-center align-items-center"
-                style={{ gap: "1rem" }}
-              >
-                {/* {showStatus && ( */}
-                <div style={{ width: "170px" }}>
-                  <Select
-                    id="status"
-                    options={statusOptions}
-                    value={selectedStatus}
-                    onChange={setSelectedStatus}
-                    onMenuOpen={fetchEnquiry}
-                  />
-                </div>
-                {/* )} */}
-                <div style={{ width: "170px" }}>
-                  <Input
-                    placeholder="Search by Name or Phone"
-                    type="text"
-                    value={searchText}
-                    onChange={handleUnifiedSearchChange}
-                  />
-                </div>
-                <div style={{ width: "170px" }}>
-                  <Select
-                    options={enquiry}
-                    value={selectedEnquiryType}
-                    onChange={handleEnquiryTypeChange}
-                  />
-                </div>
-                <div style={{ width: "170px" }}>
-                  <Select
-                    id="branch-select"
-                    options={branchOptions}
-                    value={selectedBranch}
-                    onChange={(selected) => setSelectedBranch(selected)}
-                    onInputChange={(text) => setBranchSearchText(text)}
-                    placeholder="branch"
-                    isClearable
-                    isLoading={isLoading}
-                    noOptionsMessage={({ inputValue }) =>
-                      inputValue.length < 3
-                        ? "Type at least 3 characters to search"
-                        : "No branches found"
-                    }
-                  />
-                </div>
-                <div className="" style={{ width: "170px" }}>
-                  <DatePicker
-                    selectsRange
-                    startDate={startDate}
-                    endDate={endDate}
-                    onChange={(date) => setDateRange(date)}
-                    monthsShown={2} // ✅ Show two calendars
-                    dateFormat="dd/MM/yyyy"
-                    className="react-datepicker__input-container form-control"
-                    placeholderText="Select date range"
-                    isClearable
-                    // showMonthDropdown
-                    // showYearDropdown
-                    scrollableYearDropdown
-                    yearDropdownItemNumber={50}
-                    minDate={new Date(1900, 0, 1)}
-                    maxDate={new Date(2025, 11, 31)}
-                    popperPlacement="bottom-start" // ✅ Opens dropdown below input
-                  />
-                </div>
-              </div>
-
-              <div
-                style={{
-                  padding: "6px 12px",
-                  cursor: "pointer",
-                  border: "1px solid #ccc",
-                  borderRadius: "4px",
-                  backgroundColor: "#5e72e4",
-                  color: "#fff",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  height: "38px",
-                  minWidth: "38px",
-                  // marginLeft: "10px",
-                }}
-                // onClick={handleUnifiedSearchChange}
-                onClick={handleSearchClick}
-              >
-                <i className="fas fa-search" />
-              </div>
-            </div>
+              showStatus={true}
+              showBatch={false}
+            />
           </Col>
 
           <Col>
@@ -906,7 +681,7 @@ const EnquiryDashboard = (props) => {
                           <td>{item.BranchName}</td>
                           <td>{formatDate(item.CreatedOn)}</td>
                           <td>{item.status_txt}</td>
-                          <td>{}</td>
+                          <td>{item.LatestRemark}</td>
                           <td>
                             {" "}
                             <UncontrolledDropdown direction="left">
@@ -957,10 +732,7 @@ const EnquiryDashboard = (props) => {
               {/* ✅ Card View for Mobile & Tablets */}
               <div className="d-block d-lg-none px-3 pb-3">
                 {isTableLoading ? (
-                  <div className="text-center py-4">
-                    <i className="fas fa-spinner fa-spin fa-2x text-primary" />
-                    <p className="mt-2 mb-0">Loading data...</p>
-                  </div>
+                  <Loader />
                 ) : listData.length === 0 ? (
                   <div className="text-center py-4 text-muted">
                     <i className="fas fa-info-circle mr-2" />
