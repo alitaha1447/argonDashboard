@@ -36,18 +36,6 @@ import axios from "axios";
 const API_PATH = process.env.REACT_APP_API_PATH;
 const API_KEY = process.env.REACT_APP_API_KEY;
 
-const data = [
-  {
-    sNo: 1,
-    enrollmentNo: "TA1132",
-    Name: "Taha",
-    Mobile: "9981341447",
-    Course: "React",
-    Add: "",
-    Gender: "Male",
-  },
-];
-
 const BatchStudent = () => {
   const [isTableLoading, setisTableLoading] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
@@ -124,7 +112,7 @@ const BatchStudent = () => {
             batchid: selectedBatch?.value,
           },
         });
-        console.log(res?.data);
+        // console.log(res?.data);
         setBatchStudent(res?.data);
       } catch (error) {
         console.log(error);
@@ -143,8 +131,45 @@ const BatchStudent = () => {
   // console.log("student id ---- ", studid);
   // console.log("batch id --- ", selectedBatch?.value);
 
-  console.log(selectedBatch);
-  console.log(selectedBranch);
+  // console.log(selectedBatch);
+  // console.log(selectedBranch);
+
+  const printTableData = () => {
+    const printContent = document.getElementById("printable-table").innerHTML;
+
+    // Create a new print window
+    const printWindow = window.open("", "", "height=800,width=1000");
+    printWindow.document.write(`
+      <html>
+        <head>
+          <title>Print Table</title>
+          <style>
+            table {
+              width: 100%;
+              border-collapse: collapse;
+            }
+            th, td {
+              border: 1px solid #ddd;
+              padding: 8px;
+              text-align: left;
+            }
+            th {
+              background-color: #f2f2f2;
+            }
+          </style>
+        </head>
+        <body>
+          <h3>Batch Student List</h3>
+          <div>${printContent}</div>
+        </body>
+      </html>
+    `);
+    // printWindow.document.close();
+    // printWindow.focus();
+    printWindow.print();
+    // printWindow.close();
+  };
+
   return (
     <>
       <Header />
@@ -280,6 +305,7 @@ const BatchStudent = () => {
             <Card className="shadow">
               <CardHeader className="border-0">
                 <div
+                  className="no-print"
                   style={{
                     display: "flex",
                     flexDirection: "row",
@@ -320,7 +346,7 @@ const BatchStudent = () => {
                         color="primary"
                         block
                         size="md"
-                        // onClick={() => printAndExportExcel(data)}
+                        onClick={printTableData}
                       >
                         Print
                       </Button>
@@ -343,7 +369,10 @@ const BatchStudent = () => {
                   No data found.
                 </div>
               ) : (
-                <div className="d-none d-lg-block print-only">
+                <div
+                  id="printable-table"
+                  className="d-none d-lg-block print-only"
+                >
                   <Table className="align-items-center table-flush " responsive>
                     <thead className="thead-light">
                       <tr>
@@ -354,7 +383,9 @@ const BatchStudent = () => {
                         {/* <th scope="col">Course</th>
                         <th scope="col">Add</th>
                         <th scope="col">Gender</th> */}
-                        <th scope="col">Action</th>
+                        <th className="no-print" scope="col">
+                          Action
+                        </th>
                         {/* <th scope="col">Date</th> */}
                       </tr>
                     </thead>
@@ -377,7 +408,7 @@ const BatchStudent = () => {
                             <td>{item.Add}</td>
                             <td>{item.Gender}</td> */}
 
-                            <td style={{}}>
+                            <td className="no-print">
                               <UncontrolledDropdown direction="up">
                                 <DropdownToggle
                                   tag="span"

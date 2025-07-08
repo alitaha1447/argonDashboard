@@ -55,6 +55,18 @@ const PaymentDetail = ({ modal, toggle, batchId = null, studId = null }) => {
     branchSearchText,
   } = useBranchList();
 
+  const resetForm = () => {
+    setSelectedBranch(null);
+    setSelectedBatch(null);
+    setSelectedStudent(null);
+    setBatches([]);
+    setStudents([]);
+    setInstallmentList([]);
+    setTotalAmount([]);
+    setPayment([]);
+    setPaymentModeOptions(paymentMode[0]);
+  };
+
   useEffect(() => {
     if (branchSearchText.length < 3) {
       setBranchOptions([]);
@@ -205,25 +217,28 @@ const PaymentDetail = ({ modal, toggle, batchId = null, studId = null }) => {
       );
       return;
     }
-    // setLoading(true);
-    // console.log(payment);
-    // try {
-    //   const res = await axios.post(`${API_PATH}/api/CollectFees`, payment, {
-    //     params: {
-    //       APIKEY: API_KEY,
-    //       batchid: selectedBatch?.value || batchId,
-    //       batch_studentid: selectedStudent?.value || studId,
-    //       paymentmode: paymentModeOptions?.value,
-    //     },
-    //   });
-    //   console.log("Payment Success", res.data);
-    //   toast.success("Payment Success !!");
-    //   navigate("/receiptForm"); // ✅ navigate after API call success
-    // } catch (error) {
-    //   console.log(error);
-    // } finally {
-    //   setLoading(false);
-    // }
+    setLoading(true);
+    console.log(payment);
+    try {
+      const res = await axios.post(`${API_PATH}/api/CollectFees`, payment, {
+        params: {
+          APIKEY: API_KEY,
+          batchid: selectedBatch?.value || batchId,
+          batch_studentid: selectedStudent?.value || studId,
+          paymentmode: paymentModeOptions?.value,
+        },
+      });
+      console.log("Payment Success", res?.data);
+      console.log("Payment Success", res);
+
+      toast.success("Payment Success !!");
+      resetForm(); // reset before navigating
+      navigate("/receiptForm"); // ✅ navigate after API call success
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -390,7 +405,13 @@ const PaymentDetail = ({ modal, toggle, batchId = null, studId = null }) => {
             "Payment"
           )}
         </Button>
-        <Button color="secondary" onClick={toggle}>
+        <Button
+          color="secondary"
+          onClick={() => {
+            resetForm();
+            toggle();
+          }}
+        >
           Cancel
         </Button>
       </ModalFooter>

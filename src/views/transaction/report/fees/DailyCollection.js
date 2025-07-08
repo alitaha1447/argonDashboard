@@ -33,6 +33,9 @@ import { enquiry } from "DummyData";
 import { MdFilterAlt } from "react-icons/md";
 import { MdFilterAltOff } from "react-icons/md";
 
+const API_PATH = process.env.REACT_APP_API_PATH;
+const API_KEY = process.env.REACT_APP_API_KEY;
+
 const DailyCollection = () => {
   const [showFilters, setShowFilters] = useState(false);
   // const [selectedEnquiryType, setSelectedEnquiryType] = useState(enquiry[0]);
@@ -40,7 +43,9 @@ const DailyCollection = () => {
   const [startDate, endDate] = dateRange;
   const [searchText, setSearchText] = useState("");
   // Branch
+  const [batches, setBatches] = useState([]);
   const [selectedBranch, setSelectedBranch] = useState(null);
+  const [selectedBatch, setSelectedBatch] = useState(null);
 
   // Enquiry
   // const [statusOptions, setstatusOptions] = useState([]);
@@ -56,6 +61,37 @@ const DailyCollection = () => {
     branchSearchText,
   } = useBranchList();
   const { statusOptions, fetchEnquiry } = useStatusEnquiry();
+
+  const fetchBatch = async () => {
+    console.log(1);
+    // setLoadingBatches(true); // Start loader
+    try {
+      const res = await axios.get(`${API_PATH}/api/GetBatch`, {
+        params: {
+          APIKEY: API_KEY,
+          branchid: selectedBranch?.value,
+        },
+      });
+
+      const formattedBatch = res?.data.map((item) => ({
+        value: item.BatchID,
+        label: item.BatchName,
+      }));
+      // const formattedBatch = res?.data?.length
+      //   ? res.data.map((item) => ({
+      //       value: item.BatchID,
+      //       label: item.BatchName,
+      //     }))
+      //   : [];
+
+      setBatches(formattedBatch);
+    } catch (error) {
+      console.log(error);
+      // setBatches([]);
+    } finally {
+      // setLoadingBatches(false); // Stop loader
+    }
+  };
 
   return (
     <>
@@ -99,6 +135,10 @@ const DailyCollection = () => {
                     enquiry={enquiry}
                     // selectedEnquiryType={selectedEnquiryType}
                     // handleEnquiryTypeChange={handleEnquiryTypeChange}
+                    fetchBatch={fetchBatch}
+                    batches={batches}
+                    selectedBatch={selectedBatch}
+                    setSelectedBatch={setSelectedBatch}
                     selectedBranch={selectedBranch}
                     setSelectedBranch={setSelectedBranch}
                     startDate={startDate}
@@ -124,6 +164,10 @@ const DailyCollection = () => {
               enquiry={enquiry}
               // selectedEnquiryType={selectedEnquiryType}
               // handleEnquiryTypeChange={handleEnquiryTypeChange}
+              fetchBatch={fetchBatch}
+              batches={batches}
+              selectedBatch={selectedBatch}
+              setSelectedBatch={setSelectedBatch}
               selectedBranch={selectedBranch}
               setSelectedBranch={setSelectedBranch}
               startDate={startDate}
