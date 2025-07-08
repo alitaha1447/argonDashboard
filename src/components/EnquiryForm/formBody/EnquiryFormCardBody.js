@@ -259,7 +259,7 @@ const EnquiryFormCardBody = ({
           <InputField
             label="Contact Number"
             id="contact"
-            type="tel"
+            type="number"
             value={contactNumber}
             onChange={(e) => {
               setContactNumber(e.target.value);
@@ -324,8 +324,9 @@ const EnquiryFormCardBody = ({
                 Courses<span className="text-danger">*</span>
               </Label>
               <Select
-                isMulti
-                closeMenuOnSelect={false}
+                // isMulti
+                // closeMenuOnSelect={false}
+                closeMenuOnSelect={true}
                 hideSelectedOptions={false}
                 components={{ Option: CheckboxOption }}
                 options={courseOptions}

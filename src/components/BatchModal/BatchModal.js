@@ -28,9 +28,12 @@ import InstallModal from "components/CustomModals/installmentModal/InstallModal"
 import useQualificationList from "customHookApi/EnquiryDashboardApi/useQualificationList";
 import useBranchList from "customHookApi/EnquiryDashboardApi/useBranchList";
 import usePreferredCourse from "customHookApi/EnquiryDashboardApi/usePreferredCourse";
+
 import axios from "axios";
+import { getValidationErrors } from "utils/validations/createBatchValidation";
 import { FaPlus, FaMinus } from "react-icons/fa";
 import { ToastContainer, toast } from "react-toastify";
+
 const API_PATH = process.env.REACT_APP_API_PATH;
 const API_KEY = process.env.REACT_APP_API_KEY;
 
@@ -80,6 +83,7 @@ const CheckboxOption = (props) => (
 );
 
 const BatchModal = ({ modal, toggle, studentID }) => {
+  console.log("   ss  ", studentID);
   const [loading, setLoading] = useState(false);
 
   const fileInputRef = useRef(null);
@@ -132,9 +136,10 @@ const BatchModal = ({ modal, toggle, studentID }) => {
   // Installment Modal
   const [installmentModalOpen, setinstallmentModalOpen] = useState(false);
   const [installmentsDetails, setInstallmentsDetails] = useState([]);
-  console.log(installmentsDetails);
   const [selectedFile, setSelectedFile] = useState("");
   const [totalFess, setTotalFess] = useState(0); // Initialize as 0 (number)
+
+  const [formErrors, setFormErrors] = useState({});
   // customHook
   const { qualificationOptions, fetchQualificationLists, error } =
     useQualificationList();
@@ -307,13 +312,32 @@ const BatchModal = ({ modal, toggle, studentID }) => {
     setInstallmentsDetails([]);
     setSelectedDurations(null);
     setDurationCount(null);
+    setSelectedDurations(null);
     setSelectedBranch([]);
     setSelectedBatch(null);
+    setLoading(false); // ✅ Reset loading state here
   };
 
   const handleSubmit = async (e) => {
-    setLoading(true);
     e.preventDefault();
+    setLoading(true);
+
+    const errors = getValidationErrors({
+      batchName,
+      selectedQualification,
+      selectedCoursesOptions,
+      selectedBatch,
+      selectedBranch,
+      durationCount,
+      selectedDurations,
+    });
+
+    if (Object.keys(errors).length > 0) {
+      setFormErrors(errors); // show error messages under fields
+      setLoading(false); // 🔁 This is essential
+
+      return;
+    }
 
     const isOrganization = selectPayment?.label === "Paid Organization";
 
@@ -345,7 +369,8 @@ const BatchModal = ({ modal, toggle, studentID }) => {
     const batchFormData = {
       BatchName: batchName,
       Description: description,
-      courseid: selectedCoursesOptions?.map((c) => c.value).join(","),
+      // courseid: selectedCoursesOptions?.map((c) => c.value).join(","),
+      courseid: selectedCoursesOptions?.value,
       batch_banner: selectedFile,
       duration_type: selectedDurations?.value,
       duration: parseInt(durationCount),
@@ -368,7 +393,7 @@ const BatchModal = ({ modal, toggle, studentID }) => {
       batch_students: stdId,
       installments_details: installmentsDetails,
     };
-    // console.log(batchFormData);
+    console.log(batchFormData);
 
     try {
       const res = await axios.post(`${API_PATH}/api/Batch`, batchFormData, {
@@ -376,13 +401,14 @@ const BatchModal = ({ modal, toggle, studentID }) => {
           APIKEY: API_KEY,
         },
       });
-      console.log("✅ Batch created successfully:", res);
+      console.log("✅ Batch created successfully:", res?.data);
       toast.success("✅ Batch created successfully");
     } catch (error) {
       console.error("❌ Failed to create batch:", error);
       toast.error(error?.name);
     } finally {
       setLoading(false);
+      toggle();
     }
     resetForm();
   };
@@ -435,17 +461,27 @@ const BatchModal = ({ modal, toggle, studentID }) => {
                       value={batchName}
                       onChange={(e) => {
                         setBatchName(e.target.value);
+                        setFormErrors((prev) => ({ ...prev, batchName: "" }));
                       }}
+                      error={formErrors.batchName}
+                      required
                     />
                   </Col>
                   <Col md={6}>
                     <FormGroup>
-                      <Label>Minimum Qualification</Label>
+                      <Label>
+                        Minimum Qualification
+                        <span className="text-danger">*</span>
+                      </Label>
                       <Select
                         options={qualificationOptions}
                         value={selectedQualification}
                         onChange={(selected) => {
                           setSelectedOptionsQualification(selected);
+                          setFormErrors((prev) => ({
+                            ...prev,
+                            selectedQualification: "",
+                          }));
                         }}
                         onMenuOpen={fetchQualificationLists}
                         menuPortalTarget={document.body}
@@ -455,6 +491,11 @@ const BatchModal = ({ modal, toggle, studentID }) => {
                         }}
                         menuShouldScrollIntoView={false}
                       />
+                      {formErrors.selectedQualification && (
+                        <div className="text-danger mt-1">
+                          {formErrors.selectedQualification}
+                        </div>
+                      )}
                     </FormGroup>
                   </Col>
                 </Row>
@@ -490,16 +531,23 @@ const BatchModal = ({ modal, toggle, studentID }) => {
                 <Row>
                   <Col md={6}>
                     <FormGroup>
-                      <Label>Courses</Label>
+                      <Label>
+                        Courses<span className="text-danger">*</span>
+                      </Label>
                       <Select
-                        isMulti
-                        closeMenuOnSelect={false}
+                        // isMulti
+                        // closeMenuOnSelect={false}
+                        closeMenuOnSelect={true}
                         hideSelectedOptions={false}
                         components={{ Option: CheckboxOption }}
                         options={courseOptions}
                         value={selectedCoursesOptions}
                         onChange={(selected) => {
                           setSelectedCoursesOptions(selected);
+                          setFormErrors((prev) => ({
+                            ...prev,
+                            selectedCoursesOptions: "",
+                          }));
                         }}
                         onMenuOpen={fetchCourseDetails}
                         menuPortalTarget={document.body}
@@ -509,12 +557,17 @@ const BatchModal = ({ modal, toggle, studentID }) => {
                         }}
                         menuShouldScrollIntoView={false}
                       />
+                      {formErrors.selectedCoursesOptions && (
+                        <div className="text-danger mt-1">
+                          {formErrors.selectedCoursesOptions}
+                        </div>
+                      )}
                     </FormGroup>
                   </Col>
                   <Col md={6}>
                     <FormGroup>
                       <Label for="duration" className="form-label">
-                        Duration
+                        Duration<span className="text-danger">*</span>
                       </Label>
                       <Row className="mb-2">
                         <Col xs={12} sm={5} className="mb-2 mb-sm-0">
@@ -523,12 +576,23 @@ const BatchModal = ({ modal, toggle, studentID }) => {
                             placeholder="Duration"
                             min={1}
                             value={durationCount}
-                            onChange={(e) => setDurationCount(e.target.value)}
+                            onChange={(e) => {
+                              setDurationCount(e.target.value);
+                              setFormErrors((prev) => ({
+                                ...prev,
+                                durationCount: "",
+                              }));
+                            }}
                             style={{
                               height: "38px", // match react-select default height
                               borderRadius: "4px",
                             }}
                           />
+                          {formErrors.durationCount && (
+                            <div className="text-danger mt-1">
+                              {formErrors.durationCount}
+                            </div>
+                          )}
                         </Col>
                         <Col xs={12} sm={7}>
                           <div style={{ height: "38px" }}>
@@ -551,6 +615,11 @@ const BatchModal = ({ modal, toggle, studentID }) => {
                               }}
                               menuShouldScrollIntoView={false}
                             />
+                            {formErrors.selectedDurations && (
+                              <div className="text-danger mt-1">
+                                {formErrors.selectedDurations}
+                              </div>
+                            )}
                           </div>
                         </Col>
                       </Row>
@@ -617,7 +686,8 @@ const BatchModal = ({ modal, toggle, studentID }) => {
                       <Label>Faculty</Label>
                       <Select
                         isMulti
-                        closeMenuOnSelect={false}
+                        // closeMenuOnSelect={false}
+                        closeMenuOnSelect={true}
                         hideSelectedOptions={false}
                         components={{ Option: CheckboxOption }}
                         options={facultyOptions}
@@ -640,17 +710,28 @@ const BatchModal = ({ modal, toggle, studentID }) => {
                   <Col md={6}>
                     <FormGroup>
                       <Label for="batchLevel" className="form-label">
-                        Batch Level
+                        Batch Level<span className="text-danger">*</span>
                       </Label>
                       <Select
                         id="batchLevel"
                         options={batchOptions}
                         value={selectedBatch}
-                        onChange={(selected) => setSelectedBatch(selected)}
+                        onChange={(selected) => {
+                          setSelectedBatch(selected);
+                          setFormErrors((prev) => ({
+                            ...prev,
+                            selectedBatch: "",
+                          }));
+                        }}
                         placeholder="Select Batch Level"
                         isClearable
                         onMenuOpen={handleBatchLevel}
                       />
+                      {formErrors.selectedBatch && (
+                        <div className="text-danger mt-1">
+                          {formErrors.selectedBatch}
+                        </div>
+                      )}
                     </FormGroup>
                   </Col>
                   <Col md={6}>
@@ -705,7 +786,7 @@ const BatchModal = ({ modal, toggle, studentID }) => {
                   <Col md={6}>
                     <FormGroup>
                       <Label for="branch" className="form-label">
-                        Batch Locations
+                        Batch Locations<span className="text-danger">*</span>
                       </Label>
                       <Select
                         isMulti
@@ -714,7 +795,13 @@ const BatchModal = ({ modal, toggle, studentID }) => {
                         components={{ Option: CheckboxOption }}
                         options={branchOptions}
                         value={selectedBranch}
-                        onChange={(selected) => setSelectedBranch(selected)}
+                        onChange={(selected) => {
+                          setSelectedBranch(selected);
+                          setFormErrors((prev) => ({
+                            ...prev,
+                            selectedBranch: "",
+                          }));
+                        }}
                         onInputChange={(e) => setBranchSearchText(e)}
                         isClearable
                         isLoading={isLoading}
@@ -725,6 +812,11 @@ const BatchModal = ({ modal, toggle, studentID }) => {
                         }}
                         menuShouldScrollIntoView={false}
                       />
+                      {formErrors.selectedBranch && (
+                        <div className="text-danger mt-1">
+                          {formErrors.selectedBranch}
+                        </div>
+                      )}
                     </FormGroup>
                   </Col>
                 </Row>
@@ -885,7 +977,7 @@ const BatchModal = ({ modal, toggle, studentID }) => {
             className="bg-white border-top"
             style={{ position: "sticky", bottom: 0, zIndex: 10 }}
           >
-            <Button color="primary" onClick={handleSubmit}>
+            <Button color="primary" onClick={handleSubmit} disabled={loading}>
               {loading ? (
                 <>
                   <span
@@ -893,13 +985,20 @@ const BatchModal = ({ modal, toggle, studentID }) => {
                     role="status"
                     aria-hidden="true"
                   ></span>
-                  Logging in...
+                  Submitting...
                 </>
               ) : (
                 " Submit"
               )}
             </Button>
-            <Button color="secondary" onClick={toggle}>
+            <Button
+              color="secondary"
+              onClick={() => {
+                resetForm();
+                setFormErrors({});
+                toggle();
+              }}
+            >
               Cancel
             </Button>
           </ModalFooter>

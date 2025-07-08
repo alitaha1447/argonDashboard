@@ -77,6 +77,7 @@ const FeesDashboard = () => {
   const [pageStart, setPageStart] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [pageNumDropDown, setPageNumDropDown] = useState(pageNum[0]);
+  const pageSize = pageNumDropDown?.value;
 
   const [batches, setBatches] = useState([]);
 
@@ -182,13 +183,19 @@ const FeesDashboard = () => {
         fromdate: "2025-09-02",
         todate: "2026-02-02",
         searchtext: filter.searchtext || "",
+        pageno: page,
+        pagesize: pageSize,
       };
       const res = await axios(`${API_PATH}/api/Collect_List`, {
         params,
       });
       // console.log(res?.data?.Data);
+      // console.log("--------", res?.data?.PageNumber);
+      // console.log(res?.data?.TotalPages);
       // setStudentId(res?.data?.Data?.batchstudentid);
       setFeeList(res?.data?.Data);
+      setPageNumber(res?.data?.PageNumber || page);
+      setTotalPages(res?.data?.TotalPages || 1);
     } catch (error) {
       if (error.response && error.response.status === 404) {
         setFeeList([]);
@@ -278,12 +285,14 @@ const FeesDashboard = () => {
   }, []);
 
   useEffect(() => {
-    fetchPaginatedData();
-  }, []);
+    setPageStart(1);
+    setPageNumber(1);
+    fetchPaginatedData(1);
+  }, [pageSize]);
 
   const handleExport = () => {
     const exportData = feeList.map((item, index) => {
-      console.log(item);
+      // console.log(item);
       return {
         Id: index,
         "Student Name": item.name,
@@ -393,7 +402,7 @@ const FeesDashboard = () => {
                     batches={batches}
                     selectedBatch={selectedBatch}
                     setSelectedBatch={setSelectedBatch}
-                    activeFilters={activeFilters}
+                    // activeFilters={activeFilters}
                   />
                 </motion.div>
               )}
@@ -420,7 +429,7 @@ const FeesDashboard = () => {
               batches={batches}
               selectedBatch={selectedBatch}
               setSelectedBatch={setSelectedBatch}
-              activeFilters={activeFilters}
+              // activeFilters={activeFilters}
             />
           </Col>
 
@@ -688,12 +697,12 @@ const FeesDashboard = () => {
                 setPageStart={setPageStart}
                 totalPages={totalPages}
                 setPageNumber={setPageNumber}
-                // fetchPaginatedData={fetchPaginatedData}
+                fetchPaginatedData={fetchPaginatedData}
                 pageNumber={pageNumber}
                 pageNumDropDown={pageNumDropDown}
                 setPageNumDropDown={setPageNumDropDown}
                 pageNum={pageNum}
-                // activeFilters={activeFilters} // ✅ pass it here
+                activeFilters={activeFilters} // ✅ pass it here
               />
 
               {/* </nav> */}

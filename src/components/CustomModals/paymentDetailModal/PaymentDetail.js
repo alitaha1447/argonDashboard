@@ -13,6 +13,7 @@ import {
   FormGroup,
 } from "reactstrap";
 import Select from "react-select";
+import InputField from "components/FormFields/InputField";
 import useBranchList from "customHookApi/EnquiryDashboardApi/useBranchList";
 import axios from "axios";
 import { paymentMode } from "DummyData";
@@ -26,13 +27,15 @@ const PaymentDetail = ({ modal, toggle, batchId = null, studId = null }) => {
   const location = useLocation();
 
   // console.log("Pathname:", location.pathname);
-  // console.log("-----PaymentDetail------", batchId);
-  // console.log("-----PaymentDetail------", studId);
+  // console.log("-----PaymentDetail batchId------", batchId);
+  // console.log("-----PaymentDetail studId------", studId);
   const navigate = useNavigate();
   const [Loading, setLoading] = useState(false);
 
   const [selectedBranch, setSelectedBranch] = useState(null);
+  // console.log(selectedBranch);
   const [selectedBatch, setSelectedBatch] = useState(null);
+  console.log(selectedBatch);
   const [selectedStudent, setSelectedStudent] = useState(null);
 
   const [installmentList, setInstallmentList] = useState([]);
@@ -84,7 +87,7 @@ const PaymentDetail = ({ modal, toggle, batchId = null, studId = null }) => {
           branchid: selectedBranch?.value,
         },
       });
-
+      console.log(res?.data);
       const formattedBatch = res?.data.map((item) => ({
         value: item.BatchID,
         label: item.BatchName,
@@ -104,9 +107,10 @@ const PaymentDetail = ({ modal, toggle, batchId = null, studId = null }) => {
           batchid: selectedBatch?.value,
         },
       });
-
+      console.log(res.data);
       const formattedStudent = res?.data.map((item) => ({
-        value: item.id,
+        // value: item.id,
+        value: item.studentid,
         label: item.name,
       }));
 
@@ -129,6 +133,8 @@ const PaymentDetail = ({ modal, toggle, batchId = null, studId = null }) => {
   // };
 
   const fetchInstallmentAmount = async (batchValue, studentValue) => {
+    console.log(batchValue);
+    console.log(studentValue);
     try {
       const res = await axios.get(`${API_PATH}/api/Get_Batch_installment`, {
         params: {
@@ -137,6 +143,7 @@ const PaymentDetail = ({ modal, toggle, batchId = null, studId = null }) => {
           studentid: studentValue,
         },
       });
+      console.log(res);
       setInstallmentList(res?.data);
     } catch (error) {
       console.error("Error fetching installments:", error);
@@ -146,6 +153,9 @@ const PaymentDetail = ({ modal, toggle, batchId = null, studId = null }) => {
   useEffect(() => {
     const batch = selectedBatch?.value || batchId;
     const student = selectedStudent?.value || studId;
+
+    console.log("-----PaymentDetail batch------", batch);
+    console.log("-----PaymentDetail student------", student);
 
     if (batch && student) {
       fetchInstallmentAmount(batch, student);
@@ -323,6 +333,17 @@ const PaymentDetail = ({ modal, toggle, batchId = null, studId = null }) => {
                 />
               </FormGroup>
             </Col>
+            {(paymentModeOptions?.value === 1 ||
+              paymentModeOptions?.value === 2) && (
+              <Col md={4}>
+                <InputField
+                  label="Transition Number"
+                  id="transitionNumber"
+                  type="text"
+                  // Add your value and onChange handlers here if needed
+                />
+              </Col>
+            )}
           </Row>
         </div>
         {/* Separator */}

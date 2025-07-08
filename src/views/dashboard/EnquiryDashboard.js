@@ -626,7 +626,7 @@ const EnquiryDashboard = (props) => {
                       <th scope="col">Contact Number</th>
                       {(selectedEnquiryType.label === "Course Enquiry" ||
                         selectedEnquiryType.label === "Internship Enquiry") && (
-                        <th scope="col">Highest Qualification</th>
+                        <th scope="col">Qualification</th>
                       )}
 
                       {selectedEnquiryType.label === "Course Enquiry" ||
@@ -661,6 +661,7 @@ const EnquiryDashboard = (props) => {
                                 type="checkbox"
                                 style={{ margin: 0 }}
                                 onClick={() => handleCheckId(item.Id)}
+                                disabled={item.status_txt === "Admission Done"} // ✅ disable if condition matches
                               />
                             </div>
                           </td>

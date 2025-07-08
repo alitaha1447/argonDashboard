@@ -13,6 +13,7 @@ import {
 import Select from "react-select";
 import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
+import useBranchList from "customHookApi/EnquiryDashboardApi/useBranchList";
 
 const API_PATH = process.env.REACT_APP_API_PATH;
 const API_KEY = process.env.REACT_APP_API_KEY;
@@ -25,9 +26,28 @@ const AssignBatch = ({ modal, toggle, studentID }) => {
   const [loading, setLoading] = useState(false);
   const [batch, setBatch] = useState([]);
   const [selectedBatch, setSelectedBatch] = useState(null);
+  const [selectedBranch, setSelectedBranch] = useState(null);
   // const [batchStudent, setBatchStudent] = useState([
   //   { BatchID: "", enrollmentid: "" },
   // ]);
+
+  const {
+    branchOptions,
+    setBranchOptions,
+    isLoading,
+    fetchBranch,
+    setBranchSearchText,
+    branchSearchText,
+  } = useBranchList();
+
+  useEffect(() => {
+    if (branchSearchText.length < 3) {
+      setBranchOptions([]);
+      return;
+    }
+
+    fetchBranch();
+  }, [branchSearchText]);
 
   useEffect(() => {
     const fetchBatches = async () => {
@@ -36,6 +56,7 @@ const AssignBatch = ({ modal, toggle, studentID }) => {
           APIKEY: API_KEY,
         },
       });
+      console.log(res);
       const formattedEnquiry = res.data.map((item) => ({
         value: item.BatchID,
         label: item.BatchName,
@@ -65,7 +86,7 @@ const AssignBatch = ({ modal, toggle, studentID }) => {
           },
         }
       );
-      // console.log(assignBatch);
+      console.log(assignBatch.data);
       toast.success("Batch Assigned Successfully!!");
       toggle();
     } catch (error) {
@@ -80,7 +101,7 @@ const AssignBatch = ({ modal, toggle, studentID }) => {
     <Modal
       isOpen={modal}
       toggle={toggle}
-      size="md"
+      size="lg"
       centered
       backdrop="static"
       keyboard={false}
@@ -95,7 +116,41 @@ const AssignBatch = ({ modal, toggle, studentID }) => {
       <ModalBody>
         <div className="d-flex flex-column gap-3 mb-3" style={{ gap: "1rem" }}>
           <Row>
-            <Col md={6}>
+            <Col md={4}>
+              <div style={{}}>
+                <Input
+                  placeholder="Search by Faculty Name or Course"
+                  type="text"
+                  // value={searchText}
+                  // onChange={handleUnifiedSearchChange}
+                />
+              </div>
+            </Col>
+            <Col md={4}>
+              <div style={{}}>
+                <Select
+                  id="branch-select"
+                  options={branchOptions}
+                  value={selectedBranch}
+                  onChange={(selected) => setSelectedBranch(selected)}
+                  onInputChange={(text) => setBranchSearchText(text)}
+                  placeholder="Select Branch"
+                  menuPortalTarget={document.body} // ✅ renders dropdown outside modal
+                  menuPosition="fixed" // ✅ fixes position to avoid overflow
+                  styles={{
+                    menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+                  }}
+                  isClearable
+                  isLoading={isLoading}
+                  noOptionsMessage={({ inputValue }) =>
+                    inputValue.length < 3
+                      ? "Type at least 3 characters to search"
+                      : "No branches found"
+                  }
+                />
+              </div>
+            </Col>
+            <Col md={4}>
               <div style={{}}>
                 <Select
                   id="batch-select"

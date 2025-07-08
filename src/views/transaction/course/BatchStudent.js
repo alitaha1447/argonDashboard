@@ -47,7 +47,6 @@ const BatchStudent = () => {
   const [loadingBatches, setLoadingBatches] = useState(false);
   const [batchStudent, setBatchStudent] = useState([]);
   const [studid, setStudid] = useState("");
-
   // customHookAPI
   const {
     branchOptions,
@@ -112,7 +111,7 @@ const BatchStudent = () => {
             batchid: selectedBatch?.value,
           },
         });
-        // console.log(res?.data);
+        console.log(res?.data);
         setBatchStudent(res?.data);
       } catch (error) {
         console.log(error);
@@ -169,6 +168,12 @@ const BatchStudent = () => {
     printWindow.print();
     // printWindow.close();
   };
+
+  // useEffect(()=>{
+  //   const CollectList=async()=>{
+  //     const res = await axios.get(`${API_PATH}` / api / Collect_List);
+  //   }
+  // });
 
   return (
     <>
@@ -401,6 +406,7 @@ const BatchStudent = () => {
                         batchStudent.map((item, index) => (
                           <tr key={item.id}>
                             <td>{item.id}</td>
+                            {/* <td>{item.studentid}</td> */}
                             <td>{item.enrollmentid}</td>
                             <td>{item.name}</td>
                             <td>{item.mobileno}</td>
@@ -436,7 +442,9 @@ const BatchStudent = () => {
                                   </DropdownItem>
                                   <DropdownItem
                                     key={item.id}
-                                    onClick={() => togglePaymentDetail(item.id)}
+                                    onClick={() =>
+                                      togglePaymentDetail(item.studentid)
+                                    }
                                   >
                                     Recieve Amount
                                   </DropdownItem>
