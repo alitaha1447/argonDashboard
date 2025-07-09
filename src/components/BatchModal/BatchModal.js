@@ -82,8 +82,14 @@ const CheckboxOption = (props) => (
   </components.Option>
 );
 
-const BatchModal = ({ modal, toggle, studentID }) => {
-  console.log("   ss  ", studentID);
+const BatchModal = ({
+  modal,
+  toggle,
+  studentID,
+  refreshList = () => {},
+  resetSelected = () => {},
+}) => {
+  // console.log("   ss  ", studentID);
   const [loading, setLoading] = useState(false);
 
   const fileInputRef = useRef(null);
@@ -249,7 +255,7 @@ const BatchModal = ({ modal, toggle, studentID }) => {
   const handleInstallmentSubmit = (receivedInstallments) => {
     setInstallmentsDetails(receivedInstallments);
   };
-
+  console.log(installmentsDetails);
   const handleFileChange = async (event) => {
     const file = event.target.files[0];
     if (!file) return;
@@ -403,11 +409,13 @@ const BatchModal = ({ modal, toggle, studentID }) => {
       });
       console.log("✅ Batch created successfully:", res?.data);
       toast.success("✅ Batch created successfully");
+      refreshList(1);
     } catch (error) {
       console.error("❌ Failed to create batch:", error);
       toast.error(error?.name);
     } finally {
       setLoading(false);
+      refreshList(1);
       toggle();
     }
     resetForm();

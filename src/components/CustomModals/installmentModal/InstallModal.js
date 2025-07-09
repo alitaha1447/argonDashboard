@@ -1,3 +1,4 @@
+import { useLocation } from "react-router-dom";
 import React, { useState, useEffect } from "react";
 import {
   Modal,
@@ -12,7 +13,6 @@ import {
   Input,
   Button,
 } from "reactstrap";
-
 import { FaPlus, FaMinus } from "react-icons/fa";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -22,7 +22,15 @@ import axios from "axios";
 const API_PATH = process.env.REACT_APP_API_PATH;
 const API_KEY = process.env.REACT_APP_API_KEY;
 
-const InstallModal = ({ modal, toggle, onSubmitInstallment, totalFees }) => {
+const InstallModal = ({
+  modal,
+  toggle,
+  onSubmitInstallment,
+  totalFees,
+  batchId = null,
+  studId = null,
+}) => {
+  const location = useLocation();
   const [initialAmount, setInitialAmount] = useState(0);
   const remainingAmount = totalFees - parseFloat(initialAmount || 0);
   const [numOfInstallments, setnumOfInstallments] = useState(0);
@@ -106,36 +114,83 @@ const InstallModal = ({ modal, toggle, onSubmitInstallment, totalFees }) => {
     toggle(); // close modal
   };
 
-  useEffect(() => {
-    const fetchTotalAmount = async () => {
-      try {
-        const res = await axios.get(`${API_PATH}/api/Get_Batch_installment`, {
+  const handleSaveInstallment = async () => {
+    const validInstallments = installmentStructure.filter(
+      (inst) => inst.title && inst.amount && inst.date
+    );
+
+    if (validInstallments.length === 0) {
+      alert("Please fill at least one installment completely.");
+      return;
+    }
+
+    const formatted = validInstallments.map((item) => ({
+      batch_Student_id: studId,
+      installment_title: item.title,
+      part_amount: item.amount.toString(),
+      due_date: new Date(item.date).toISOString().split("T")[0], // ✅ Formats to "YYYY-MM-DD"
+    }));
+    // console.log(formatted);
+
+    const payload = {
+      batch_installments: formatted,
+      CreatedBy: "Developer", // or logged-in user
+    };
+    // console.log(payload);
+    resetForm();
+    toggle();
+    try {
+      const res = await axios.post(
+        `${API_PATH}/api/Save_Student_Installment`,
+        payload,
+        {
           params: {
             APIKEY: API_KEY,
-            batchid: 41,
-            studentid: 53,
+            batch_student_id: studId,
           },
-        });
+        }
+      );
+      console.log(res?.data);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      toggle(); // close modal
+    }
+  };
 
-        const installmentData = res?.data || [];
-        console.log("--------------");
-        console.log(installmentData);
-        console.log("--------------");
-        // ✅ Convert `part_amount` to number and sum it
-        // const total = installmentData.reduce((sum, item) => {
-        //   const amount = parseFloat(item.part_amount || 0);
-        //   return sum + (isNaN(amount) ? 0 : amount);
-        // }, 0);
+  // useEffect(() => {
+  //   const fetchTotalAmount = async () => {
+  //     try {
+  //       const res = await axios.get(`${API_PATH}/api/Get_Batch_installment`, {
+  //         params: {
+  //           APIKEY: API_KEY,
+  //           batchid: 41,
+  //           studentid: 53,
+  //         },
+  //       });
 
-        // console.log("Total Amount:", total);
-        // setTotalAmount(total); // <-- Store the total
-      } catch (err) {
-        console.error("Error fetching installment data:", err);
-      }
-    };
+  //       const installmentData = res?.data || [];
+  //       console.log("--------------");
+  //       console.log(installmentData);
+  //       console.log("--------------");
+  //       // ✅ Convert `part_amount` to number and sum it
+  //       // const total = installmentData.reduce((sum, item) => {
+  //       //   const amount = parseFloat(item.part_amount || 0);
+  //       //   return sum + (isNaN(amount) ? 0 : amount);
+  //       // }, 0);
 
-    fetchTotalAmount();
-  }, []);
+  //       // console.log("Total Amount:", total);
+  //       // setTotalAmount(total); // <-- Store the total
+  //     } catch (err) {
+  //       console.error("Error fetching installment data:", err);
+  //     }
+  //   };
+
+  //   fetchTotalAmount();
+  // }, []);
+
+  // console.log(`batchId --> ${batchId}`);
+  // console.log(`studId --> ${studId}`);
 
   return (
     <Modal
@@ -165,7 +220,7 @@ const InstallModal = ({ modal, toggle, onSubmitInstallment, totalFees }) => {
         </div>
         <Form>
           <Row className="align-items-end">
-            <Col md={2}>
+            <Col lg={2} md={4}>
               <FormGroup>
                 <Label>Initial Deposit</Label>
                 <Input
@@ -177,7 +232,7 @@ const InstallModal = ({ modal, toggle, onSubmitInstallment, totalFees }) => {
               </FormGroup>
             </Col>
 
-            <Col md={2}>
+            <Col lg={2} md={4}>
               <FormGroup>
                 <Label>Remaining Amount</Label>
                 <Input
@@ -189,7 +244,7 @@ const InstallModal = ({ modal, toggle, onSubmitInstallment, totalFees }) => {
               </FormGroup>
             </Col>
 
-            <Col md={2}>
+            <Col lg={2} md={4}>
               <FormGroup>
                 <Label>Installments</Label>
                 <Input
@@ -201,7 +256,7 @@ const InstallModal = ({ modal, toggle, onSubmitInstallment, totalFees }) => {
               </FormGroup>
             </Col>
 
-            <Col md={3}>
+            <Col lg={2} md={4}>
               <FormGroup>
                 <Label>Frequency (in days)</Label>
                 <Input
@@ -213,7 +268,7 @@ const InstallModal = ({ modal, toggle, onSubmitInstallment, totalFees }) => {
               </FormGroup>
             </Col>
 
-            <Col md={3}>
+            <Col lg={3} md={4}>
               <FormGroup>
                 <Label className="invisible">.</Label>{" "}
                 {/* invisible to align height */}
@@ -322,9 +377,16 @@ const InstallModal = ({ modal, toggle, onSubmitInstallment, totalFees }) => {
         className="bg-white border-top"
         style={{ position: "sticky", bottom: 0, zIndex: 10 }}
       >
-        <Button color="primary" onClick={handleSubmit}>
-          Submit
-        </Button>
+        {location.pathname === "/admin/batchStudent" ? (
+          <Button color="primary" onClick={handleSaveInstallment}>
+            Save Installment
+          </Button>
+        ) : (
+          <Button color="primary" onClick={handleSubmit}>
+            Add
+          </Button>
+        )}
+
         <Button
           color="secondary"
           onClick={() => {

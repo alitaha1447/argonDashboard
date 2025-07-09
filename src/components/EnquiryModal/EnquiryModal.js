@@ -27,7 +27,14 @@ const EnquiryModal = ({
   };
   return (
     <div>
-      <Modal isOpen={modal} toggle={toggle} size="lg" centered>
+      <Modal
+        isOpen={modal}
+        toggle={toggle}
+        size="lg"
+        centered
+        backdrop="static"
+        keyboard={false}
+      >
         <Card className="shadow border-0 mb-0" style={{ maxHeight: "90vh" }}>
           <ModalHeader
             toggle={toggle}

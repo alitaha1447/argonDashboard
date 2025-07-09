@@ -1,3 +1,4 @@
+// import { useLocation } from "react-router-dom";
 import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -38,6 +39,8 @@ const API_PATH = process.env.REACT_APP_API_PATH;
 const API_KEY = process.env.REACT_APP_API_KEY;
 
 const BatchStudent = () => {
+  // const location = useLocation();
+  // console.log("----------------------------   ", location);
   const [isTableLoading, setisTableLoading] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
   const [showPaymentDetail, setShowPaymentDetail] = useState(false);
@@ -50,6 +53,7 @@ const BatchStudent = () => {
   const [studid, setStudid] = useState("");
   // const [totalAmount, setTotalAmount] = useState(null);
   const [installModal, setInstallModal] = useState(false);
+  const [installmentStdId, setInstallmentStdId] = useState("");
   // customHookAPI
   const {
     branchOptions,
@@ -162,7 +166,10 @@ const BatchStudent = () => {
     setShowPaymentDetail((prev) => !prev);
   };
 
-  const toggleInstallModal = () => {
+  const toggleInstallModal = (id) => {
+    // console.log(id);
+    // setInstallmentStdId(id);
+    setStudid(id);
     setInstallModal((prev) => !prev);
   };
   // console.log("student id ---- ", studid);
@@ -212,6 +219,8 @@ const BatchStudent = () => {
   //     const res = await axios.get(`${API_PATH}` / api / Collect_List);
   //   }
   // });
+
+  // console.log(batchStudent);
 
   return (
     <>
@@ -474,7 +483,7 @@ const BatchStudent = () => {
                                 >
                                   <DropdownItem
                                     key={item.id}
-                                    onClick={() => toggleInstallModal()}
+                                    onClick={() => toggleInstallModal(item.id)}
                                   >
                                     Installments
                                   </DropdownItem>
@@ -554,7 +563,7 @@ const BatchStudent = () => {
                           >
                             <DropdownItem
                               key={item.id}
-                              onClick={() => toggleInstallModal()}
+                              onClick={() => toggleInstallModal(item.id)}
                             >
                               Installments
                             </DropdownItem>
@@ -640,6 +649,9 @@ const BatchStudent = () => {
         <InstallModal
           modal={installModal}
           toggle={toggleInstallModal}
+          batchId={selectedBatch?.value}
+          studId={studid}
+          // studId={installmentStdId}
           // totalAmount={totalAmount}
         />
       </Container>

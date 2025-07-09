@@ -1,9 +1,62 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Container, Row, Col, Card, Table } from "reactstrap";
 import "../receipt/receipt.css";
 
 import AuthNavbar from "components/Navbars/AuthNavbar.js";
+import { paymentMode } from "DummyData";
+import { numberToWordsIndian } from "utils/numToWords";
+import axios from "axios";
+import { useLocation } from "react-router-dom";
+
+const API_PATH = process.env.REACT_APP_API_PATH;
+const API_KEY = process.env.REACT_APP_API_KEY;
+
 const Receipt = () => {
+  const location = useLocation();
+  console.log("-->", location);
+  const queryParams = new URLSearchParams(location.search);
+  console.log("-->", queryParams);
+  const receiptId = queryParams.get("receiptId");
+  console.log("-->", receiptId);
+  // console.log(paymentMode[0].value);
+  const [data, setData] = useState({});
+  const [paidInstallment, setpaidInstallment] = useState([]);
+
+  useEffect(() => {
+    const receiptData = async () => {
+      const res = await axios.get(`${API_PATH}/api/Get_Receipt_Data`, {
+        params: {
+          APIKEY: API_KEY,
+          receipt_id: receiptId,
+          // receipt_id: "EA3E44DC-D2A2-4FE0-B9E7-E022D7C068F5",
+        },
+      });
+      console.log(res?.data);
+      setData(res?.data);
+      setpaidInstallment(res?.data?.paid_installment);
+    };
+    receiptData();
+  }, []);
+
+  const totalPaid = paidInstallment.reduce(
+    (acc, item) => acc + parseFloat(item.total_paid_amount || 0),
+    0
+  );
+
+  const sgstRate = data?.sgst || 0; // assuming 9
+
+  const cgstRate = data?.cgst || 0; // assuming 9
+
+  // const sgstAmount = (totalPaid * sgstRate) / 100;
+  // const cgstAmount = (totalPaid * cgstRate) / 100;
+
+  // const totalWithGST = totalPaid + sgstAmount + cgstAmount;
+  const totalWithGST = totalPaid + sgstRate + cgstRate;
+  const roundOffAmount = totalWithGST.toFixed(2);
+
+  const paymentModeLabel =
+    paymentMode.find((mode) => mode.value === data.payment_mode)?.label || "-";
+  console.log(paymentModeLabel);
   return (
     <div>
       <AuthNavbar />
@@ -56,8 +109,8 @@ const Receipt = () => {
                   }}
                 >
                   <p className="mb-0">Head Office Copy</p>
-                  <p className="mb-0">Receipt No. : 001</p>
-                  <p className="mb-0">Center Name :</p>
+                  <p className="mb-0">Receipt No. : {data?.receipt_no}</p>
+                  <p className="mb-0">Center Name : {data.branch_name}</p>
                 </td>
               </tr>
             </thead>
@@ -71,11 +124,21 @@ const Receipt = () => {
                     padding: "8px",
                   }}
                 >
-                  Student Name :
+                  Student Name : {data?.name}
                 </td>
               </tr>
               <tr>
                 <td
+                  colSpan={3}
+                  style={{
+                    borderTop: "2px solid black",
+                    borderBottom: "2px solid black",
+                    padding: "8px",
+                  }}
+                >
+                  Roll No : {data?.admission_no}
+                </td>
+                {/* <td
                   colSpan={1}
                   style={{
                     borderTop: "2px solid black",
@@ -84,8 +147,8 @@ const Receipt = () => {
                   }}
                 >
                   Roll No : MP-
-                </td>
-                <td
+                </td> */}
+                {/* <td
                   colSpan={1}
                   style={{
                     borderTop: "2px solid black",
@@ -94,17 +157,7 @@ const Receipt = () => {
                   }}
                 >
                   Roll No : MP-
-                </td>
-                <td
-                  colSpan={1}
-                  style={{
-                    borderTop: "2px solid black",
-                    borderBottom: "2px solid black",
-                    padding: "8px",
-                  }}
-                >
-                  Roll No : MP-
-                </td>
+                </td> */}
               </tr>
               <tr>
                 {/* First column spans 2 cells */}
@@ -113,7 +166,7 @@ const Receipt = () => {
                   style={{
                     border: "1px solid black",
                     padding: "8px",
-                    textAlign: "center",
+                    // textAlign: "center",
                   }}
                 >
                   Particular
@@ -130,7 +183,79 @@ const Receipt = () => {
                   Amount
                 </td>
               </tr>
-              <tr>
+              {paidInstallment.map((item, index) => (
+                <tr>
+                  <td
+                    colSpan={2}
+                    style={{
+                      border: "2px solid black",
+                      padding: "8px",
+                    }}
+                  >
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "8px",
+                      }}
+                    >
+                      {item?.installment_title}
+                      {/* <label
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        margin: 0,
+                      }}
+                    >
+                      Booking&nbsp;
+                      <input type="checkbox" />
+                    </label> */}
+                      {/* <label
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        margin: 0,
+                      }}
+                    >
+                      Registration&nbsp;
+                      <input type="checkbox" />
+                    </label> */}
+                      {/* <label
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        margin: 0,
+                      }}
+                    >
+                      Admission&nbsp;
+                      <input type="checkbox" />
+                    </label> */}
+                      {/* <label
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        margin: 0,
+                      }}
+                    >
+                      Installment&nbsp;
+                      <input type="checkbox" />
+                    </label> */}
+                    </div>
+                  </td>
+                  <td
+                    rowSpan={1}
+                    style={{
+                      border: "2px solid black",
+                      padding: "8px",
+                      // textAlign: "right",
+                      verticalAlign: "top", // optional: aligns to top of the merged cell
+                    }}
+                  >
+                    {item?.total_paid_amount}
+                  </td>
+                </tr>
+              ))}
+              {/* <tr>
                 <td
                   colSpan={2}
                   style={{
@@ -193,14 +318,16 @@ const Receipt = () => {
                   style={{
                     border: "2px solid black",
                     padding: "8px",
-                    textAlign: "right",
+                    // textAlign: "right",
                     verticalAlign: "top", // optional: aligns to top of the merged cell
                   }}
-                ></td>
-              </tr>
+                >
+                  465897
+                </td>
+              </tr> */}
 
               {/* Row 2 - Second Particular */}
-              <tr>
+              {/* <tr>
                 <td
                   colSpan={2}
                   style={{ border: "2px solid black", padding: "8px" }}
@@ -216,7 +343,7 @@ const Receipt = () => {
                     verticalAlign: "top", // optional: aligns to top of the merged cell
                   }}
                 ></td>
-              </tr>
+              </tr> */}
 
               {/* Row 3 - Third Particular */}
               <tr>
@@ -231,11 +358,30 @@ const Receipt = () => {
                   style={{
                     border: "2px solid black",
                     padding: "8px",
-                    textAlign: "right",
+                    // textAlign: "right",
                   }}
-                ></td>
+                >
+                  {`${data?.sgst}`}
+                </td>
               </tr>
               <tr>
+                <td
+                  colSpan={2}
+                  style={{ border: "2px solid black", padding: "8px" }}
+                >
+                  CGST @ 9%
+                </td>
+                <td
+                  style={{
+                    border: "2px solid black",
+                    padding: "8px",
+                    // textAlign: "right",
+                  }}
+                >
+                  {`${data?.cgst}`}
+                </td>
+              </tr>
+              {/* <tr>
                 <td
                   colSpan={2}
                   style={{ border: "2px solid black", padding: "8px" }}
@@ -247,27 +393,14 @@ const Receipt = () => {
                     textAlign: "right",
                   }}
                 ></td>
-              </tr>
-              <tr>
-                <td
-                  colSpan={2}
-                  style={{ border: "2px solid black", padding: "8px" }}
-                ></td>
-                <td
-                  style={{
-                    border: "2px solid black",
-                    padding: "8px",
-                    textAlign: "right",
-                  }}
-                ></td>
-              </tr>
+              </tr> */}
               <tr>
                 <td
                   colSpan={2}
                   style={{
                     border: "1px solid black",
                     padding: "8px",
-                    textAlign: "right",
+                    // textAlign: "right",
                   }}
                 >
                   Total Fees paid
@@ -276,9 +409,11 @@ const Receipt = () => {
                   style={{
                     border: "2px solid black",
                     padding: "8px",
-                    textAlign: "right",
+                    // textAlign: "right",
                   }}
-                ></td>
+                >
+                  {roundOffAmount}
+                </td>
               </tr>
               <tr>
                 {/* Left side - Row 1 */}
@@ -286,7 +421,7 @@ const Receipt = () => {
                   colSpan={2}
                   style={{ border: "2px solid black", padding: "8px" }}
                 >
-                  Amount in Words
+                  Amount in Words :{numberToWordsIndian(roundOffAmount)}
                 </td>
 
                 {/* Right side - Merged (rowSpan=3) */}
@@ -307,7 +442,7 @@ const Receipt = () => {
                   colSpan={2}
                   style={{ border: "2px solid black", padding: "8px" }}
                 >
-                  Paid By : Cash
+                  Paid By : {paymentModeLabel}{" "}
                 </td>
               </tr>
 

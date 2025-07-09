@@ -18,7 +18,13 @@ import useBranchList from "customHookApi/EnquiryDashboardApi/useBranchList";
 const API_PATH = process.env.REACT_APP_API_PATH;
 const API_KEY = process.env.REACT_APP_API_KEY;
 
-const AssignBatch = ({ modal, toggle, studentID }) => {
+const AssignBatch = ({
+  modal,
+  toggle,
+  studentID,
+  refreshList = () => {},
+  resetSelected = () => {},
+}) => {
   // console.log(studentID);
   // const stdId = studentID.map((item) => ({
   //   enrollmentid: item.enrollmentid.toString(),
@@ -77,23 +83,28 @@ const AssignBatch = ({ modal, toggle, studentID }) => {
     };
 
     try {
-      const assignBatch = await axios.post(
-        `${API_PATH}/api/Assign_Batch`,
-        assignBatchData,
-        {
-          params: {
-            APIKEY: API_KEY,
-          },
-        }
-      );
-      console.log(assignBatch.data);
-      toast.success("Batch Assigned Successfully!!");
-      toggle();
+      // const assignBatch = await axios.post(
+      //   `${API_PATH}/api/Assign_Batch`,
+      //   assignBatchData,
+      //   {
+      //     params: {
+      //       APIKEY: API_KEY,
+      //     },
+      //   }
+      // );
+      // console.log(assignBatch.data);
+      // toast.success("Batch Assigned Successfully!!");
+      // refreshList(1);
+      // toggle();
+      // resetSelected(); // ✅ Reset checkbox selection
     } catch (error) {
       console.log(error);
       toast.error("Request failed with status code 404");
     } finally {
       setLoading(false);
+      refreshList(1);
+      toggle();
+      resetSelected();
     }
   };
 

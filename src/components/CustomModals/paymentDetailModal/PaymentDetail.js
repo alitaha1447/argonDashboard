@@ -18,7 +18,7 @@ import useBranchList from "customHookApi/EnquiryDashboardApi/useBranchList";
 import axios from "axios";
 import { paymentMode } from "DummyData";
 import { ToastContainer, toast } from "react-toastify";
-import { useLocation } from "react-router-dom";
+// import { useLocation } from "react-router-dom";
 
 const API_PATH = process.env.REACT_APP_API_PATH;
 const API_KEY = process.env.REACT_APP_API_KEY;
@@ -28,20 +28,15 @@ const PaymentDetail = ({
   toggle,
   batchId = null,
   studId = null,
-  onPaymentSuccess,
+  // onPaymentSuccess,
 }) => {
-  const location = useLocation();
-
-  // console.log("Pathname:", location.pathname);
-  console.log("-----BatchStudent batchId------", batchId);
-  console.log("-----BatchStudent studId------", studId);
-  const navigate = useNavigate();
+  // const location = useLocation();
+  // console.log(studId, "----------------------");
+  // const navigate = useNavigate();
   const [Loading, setLoading] = useState(false);
 
   const [selectedBranch, setSelectedBranch] = useState(null);
-  // console.log(selectedBranch);
   const [selectedBatch, setSelectedBatch] = useState(null);
-  console.log(selectedBatch);
   const [selectedStudent, setSelectedStudent] = useState(null);
 
   const [installmentList, setInstallmentList] = useState([]);
@@ -54,6 +49,8 @@ const PaymentDetail = ({
   const [payment, setPayment] = useState([]);
 
   const [paymentModeOptions, setPaymentModeOptions] = useState(paymentMode[0]);
+
+  const [receiptId, setReceiptId] = useState("");
 
   const {
     branchOptions,
@@ -86,6 +83,8 @@ const PaymentDetail = ({
   }, [branchSearchText]);
 
   const fetchBatch = async () => {
+    // setLoading(true);
+    if (!selectedBranch?.value) return; // ✅ prevent API call if branch not selected
     try {
       const res = await axios.get(`${API_PATH}/api/GetBatch`, {
         params: {
@@ -93,7 +92,7 @@ const PaymentDetail = ({
           branchid: selectedBranch?.value,
         },
       });
-      console.log(res?.data);
+      // console.log(res?.data);
       const formattedBatch = res?.data.map((item) => ({
         value: item.BatchID,
         label: item.BatchName,
@@ -102,10 +101,13 @@ const PaymentDetail = ({
       setBatches(formattedBatch);
     } catch (error) {
       console.log(error);
+    } finally {
+      // setLoading(false);
     }
   };
 
   const fetchStudent = async () => {
+    // setLoading(true);
     try {
       const res = await axios.get(`${API_PATH}/api/Get_Batch_student`, {
         params: {
@@ -113,7 +115,7 @@ const PaymentDetail = ({
           batchid: selectedBatch?.value,
         },
       });
-      console.log(res.data);
+      // console.log(res.data);
       const formattedStudent = res?.data.map((item) => ({
         value: item.id,
         // value: item.studentid,
@@ -123,6 +125,8 @@ const PaymentDetail = ({
       setStudents(formattedStudent);
     } catch (error) {
       console.log(error);
+    } finally {
+      // setLoading(false);
     }
   };
 
@@ -139,8 +143,7 @@ const PaymentDetail = ({
   // };
 
   const fetchInstallmentAmount = async (batchValue, studentValue) => {
-    console.log(batchValue);
-    console.log(studentValue);
+    // console.log(studentValue);
     try {
       const res = await axios.get(`${API_PATH}/api/Get_Batch_installment`, {
         params: {
@@ -156,14 +159,25 @@ const PaymentDetail = ({
     }
   };
 
+  const batch = selectedBatch?.value || batchId;
+  // const student = selectedStudent?.value || studId;
+
+  // const student =
+  //   typeof studId === "object"
+  //     ? studId?.value
+  //     : selectedStudent?.value || studId;
+  const student =
+    selectedStudent?.value ||
+    (typeof studId === "object" ? studId?.value : studId);
+
   useEffect(() => {
-    const batch = selectedBatch?.value || batchId;
-    const student = selectedStudent?.value || studId;
-
-    // console.log("-----PaymentDetail batch------", batch);
-    // console.log("-----PaymentDetail student------", student);
-
     if (batch && student) {
+      // console.log("-------------");
+      // console.log(batch);
+      // console.log(student);
+      // console.log(selectedStudent?.value);
+      // console.log(studId);
+      // console.log("-------------");
       fetchInstallmentAmount(batch, student);
     }
   }, [selectedBatch, selectedStudent, batchId, studId]);
@@ -234,7 +248,7 @@ const PaymentDetail = ({
       return;
     }
     setLoading(true);
-    console.log(payment);
+    // console.log(payment);
     try {
       const res = await axios.post(`${API_PATH}/api/CollectFees`, payment, {
         params: {
@@ -244,20 +258,24 @@ const PaymentDetail = ({
           paymentmode: paymentModeOptions?.value,
         },
       });
-      console.log("Payment Success", res?.data);
-      console.log("Payment Success", res);
+      // console.log("Payment Success", res?.data?.receiptid);
+      setReceiptId(res?.data?.receiptid);
+      // console.log("Payment Success", res);
 
       toast.success("Payment Success !!");
       resetForm(); // reset before navigating
       // ✅ Trigger callback to refresh dashboard
-      if (onPaymentSuccess) {
-        onPaymentSuccess();
-      }
-      // toggle();
-      navigate("/receiptForm"); // ✅ navigate after API call success
+      // if (onPaymentSuccess) {
+      //   onPaymentSuccess();
+      // }
+      toggle();
+      // navigate("/receiptForm"); // ✅ navigate after API call success
+      window.open(`/receiptForm?receiptId=${res?.data?.receiptid}`, "_blank"); // ✅ open in new tab
     } catch (error) {
       console.log(error);
     } finally {
+      resetForm();
+      toggle();
       setLoading(false);
     }
   };
@@ -302,6 +320,7 @@ const PaymentDetail = ({
                       ? "Type at least 3 characters to search"
                       : "No branches found"
                   }
+                  isClearable
                 />
               </FormGroup>
             </Col>
@@ -309,6 +328,7 @@ const PaymentDetail = ({
               <FormGroup>
                 <Label>Batch</Label>
                 <Select
+                  // isDisabled={!selectedBranch}
                   options={batches}
                   value={selectedBatch}
                   onChange={(selected) => {
@@ -316,7 +336,14 @@ const PaymentDetail = ({
                     setSelectedStudent(null); // ✅ Reset student
                   }}
                   placeholder="Select Batch"
+                  // placeholder={
+                  //   selectedBranch ? "Select Batch" : "Select Branch First"
+                  // }
                   onMenuOpen={fetchBatch}
+                  // onMenuOpen={() => {
+                  //   if (selectedBranch) fetchBatch();
+                  // }}
+                  // isLoading={Loading}
                 />
               </FormGroup>
             </Col>
@@ -324,11 +351,19 @@ const PaymentDetail = ({
               <FormGroup>
                 <Label>Student</Label>
                 <Select
+                  // isDisabled={!selectedBatch}
                   options={students}
                   value={selectedStudent}
                   onChange={(selected) => setSelectedStudent(selected)}
-                  onMenuOpen={fetchStudent}
                   placeholder="Select Student"
+                  onMenuOpen={fetchStudent}
+                  // placeholder={
+                  //   selectedBranch ? "Select Student" : "Select Batch First"
+                  // }
+                  // onMenuOpen={() => {
+                  //   if (selectedBatch) fetchStudent();
+                  // }}
+                  // isLoading={Loading}
                 />
               </FormGroup>
             </Col>

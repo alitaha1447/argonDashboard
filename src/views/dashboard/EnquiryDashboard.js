@@ -375,7 +375,7 @@ const EnquiryDashboard = (props) => {
       }
     });
   };
-
+  console.log(studentID);
   const handleExport = () => {
     const exportData = listData.map((item) => {
       const isCourseOrInternship =
@@ -660,6 +660,9 @@ const EnquiryDashboard = (props) => {
                               <Input
                                 type="checkbox"
                                 style={{ margin: 0 }}
+                                checked={studentID.some(
+                                  (s) => s.enrollmentid === item.Id
+                                )} // ✅ controlled state
                                 onClick={() => handleCheckId(item.Id)}
                                 disabled={item.status_txt === "Admission Done"} // ✅ disable if condition matches
                               />
@@ -857,6 +860,8 @@ const EnquiryDashboard = (props) => {
         modal={batchModalOpen}
         toggle={batchModal}
         studentID={studentID}
+        refreshList={fetchPaginatedData}
+        resetSelected={() => setStudentID([])} // ✅ Pass reset function
       />
       <StatusUpdate
         modal={statusModalOpen}
@@ -869,6 +874,8 @@ const EnquiryDashboard = (props) => {
         modal={assignBatchModal}
         toggle={toggleAssignBatch}
         studentID={studentID}
+        refreshList={fetchPaginatedData}
+        resetSelected={() => setStudentID([])} // ✅ Pass reset function
       />
     </>
   );
