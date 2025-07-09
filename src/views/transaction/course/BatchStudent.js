@@ -74,6 +74,7 @@ const BatchStudent = () => {
   }, [branchSearchText]);
 
   const fetchBatch = async () => {
+    if (!selectedBranch?.value) return; // 🚫 Don't proceed if no branch is selected
     setLoadingBatches(true); // Start loader
     try {
       const res = await axios.get(`${API_PATH}/api/GetBatch`, {
