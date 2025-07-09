@@ -709,7 +709,11 @@ const FeesDashboard = () => {
             </CardFooter>
           </Col>
         </Row>
-        <PaymentDetail modal={showPaymentDetail} toggle={togglePaymentDetail} />
+        <PaymentDetail
+          modal={showPaymentDetail}
+          toggle={togglePaymentDetail}
+          onPaymentSuccess={() => fetchPaginatedData(pageNumber, activeFilters)}
+        />
         <FeeDetail
           modal={showFeeDetail}
           toggle={toggleFeeDetail}

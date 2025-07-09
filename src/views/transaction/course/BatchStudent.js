@@ -26,6 +26,7 @@ import { MdFilterAltOff } from "react-icons/md";
 import Header from "components/Headers/Header";
 import FilterBar from "components/CustomFilter/FilterBar";
 import PaymentDetail from "components/CustomModals/paymentDetailModal/PaymentDetail";
+import InstallModal from "components/CustomModals/installmentModal/InstallModal";
 
 import Select from "react-select";
 import useBranchList from "customHookApi/EnquiryDashboardApi/useBranchList";
@@ -47,6 +48,8 @@ const BatchStudent = () => {
   const [loadingBatches, setLoadingBatches] = useState(false);
   const [batchStudent, setBatchStudent] = useState([]);
   const [studid, setStudid] = useState("");
+  // const [totalAmount, setTotalAmount] = useState(null);
+  const [installModal, setInstallModal] = useState(false);
   // customHookAPI
   const {
     branchOptions,
@@ -111,7 +114,7 @@ const BatchStudent = () => {
             batchid: selectedBatch?.value,
           },
         });
-        console.log(res?.data);
+        // console.log(res?.data);
         setBatchStudent(res?.data);
       } catch (error) {
         console.log(error);
@@ -122,10 +125,45 @@ const BatchStudent = () => {
     fetchBatchStudent();
   }, [selectedBatch?.value]);
 
+  // useEffect(() => {
+  //   const fetchTotalAmount = async () => {
+  //     try {
+  //       const res = await axios.get(`${API_PATH}/api/Get_Batch_installment`, {
+  //         params: {
+  //           APIKEY: API_KEY,
+  //           batchid: 41,
+  //           studentid: 53,
+  //         },
+  //       });
+
+  //       const installmentData = res?.data || [];
+
+  //       // ✅ Convert `part_amount` to number and sum it
+  //       const total = installmentData.reduce((sum, item) => {
+  //         const amount = parseFloat(item.part_amount || 0);
+  //         return sum + (isNaN(amount) ? 0 : amount);
+  //       }, 0);
+
+  //       console.log("Total Amount:", total);
+  //       setTotalAmount(total); // <-- Store the total
+  //     } catch (err) {
+  //       console.error("Error fetching installment data:", err);
+  //     }
+  //   };
+
+  //   fetchTotalAmount();
+  // }, []);
+
+  // console.log(totalAmount);
+
   const togglePaymentDetail = (id) => {
     // console.log(showPaymentDetail);
     setStudid(id);
     setShowPaymentDetail((prev) => !prev);
+  };
+
+  const toggleInstallModal = () => {
+    setInstallModal((prev) => !prev);
   };
   // console.log("student id ---- ", studid);
   // console.log("batch id --- ", selectedBatch?.value);
@@ -407,7 +445,7 @@ const BatchStudent = () => {
                           <tr key={item.id}>
                             <td>{item.id}</td>
                             {/* <td>{item.studentid}</td> */}
-                            <td>{item.enrollmentid}</td>
+                            <td>{item.admission_no}</td>
                             <td>{item.name}</td>
                             <td>{item.mobileno}</td>
                             {/* <td>{item.Course}</td>
@@ -436,15 +474,13 @@ const BatchStudent = () => {
                                 >
                                   <DropdownItem
                                     key={item.id}
-                                    // onClick={() => toggleStatusModal(item.Id)}
+                                    onClick={() => toggleInstallModal()}
                                   >
                                     Installments
                                   </DropdownItem>
                                   <DropdownItem
                                     key={item.id}
-                                    onClick={() =>
-                                      togglePaymentDetail(item.studentid)
-                                    }
+                                    onClick={() => togglePaymentDetail(item.id)}
                                   >
                                     Recieve Amount
                                   </DropdownItem>
@@ -518,7 +554,7 @@ const BatchStudent = () => {
                           >
                             <DropdownItem
                               key={item.id}
-                              // onClick={() => toggleStatusModal(item.Id)}
+                              onClick={() => toggleInstallModal()}
                             >
                               Installments
                             </DropdownItem>
@@ -600,6 +636,11 @@ const BatchStudent = () => {
           toggle={togglePaymentDetail}
           batchId={selectedBatch?.value}
           studId={studid}
+        />
+        <InstallModal
+          modal={installModal}
+          toggle={toggleInstallModal}
+          // totalAmount={totalAmount}
         />
       </Container>
     </>

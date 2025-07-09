@@ -186,9 +186,10 @@ const EnquiryFormCardBody = ({
       Address: address,
       Gender: gender?.value,
       Qualification: !isCourseEnquiry ? null : selectedQualification?.value,
-      Course: isCourseEnquiry
-        ? selectedCoursesOptions?.map((c) => c.value).join(",")
-        : 0,
+      Course: isCourseEnquiry ? selectedCoursesOptions?.value : 0,
+      // Course: isCourseEnquiry
+      //   ? selectedCoursesOptions?.map((c) => c.value).join(",")
+      //   : 0,
       Product: !isCourseEnquiry ? selectedProduct?.value : null,
       Branch: !isCourseEnquiry ? null : selectedBranch?.value,
       ReferedBy: referedBy?.value,

@@ -364,11 +364,11 @@ const EnquiryDashboard = (props) => {
 
     setStudentID((prev) => {
       // Check if ID already exists
-      const exists = prev.some((item) => item.id === id);
+      const exists = prev.some((item) => item.enrollmentid === id);
 
       if (exists) {
         // Remove ID if already present (uncheck)
-        return prev.filter((item) => item.id !== id);
+        return prev.filter((item) => item.enrollmentid !== id);
       } else {
         // Add new ID object if not present (check)
         return [...prev, { enrollmentid: id }];

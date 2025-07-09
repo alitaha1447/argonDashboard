@@ -23,12 +23,18 @@ import { useLocation } from "react-router-dom";
 const API_PATH = process.env.REACT_APP_API_PATH;
 const API_KEY = process.env.REACT_APP_API_KEY;
 
-const PaymentDetail = ({ modal, toggle, batchId = null, studId = null }) => {
+const PaymentDetail = ({
+  modal,
+  toggle,
+  batchId = null,
+  studId = null,
+  onPaymentSuccess,
+}) => {
   const location = useLocation();
 
   // console.log("Pathname:", location.pathname);
-  // console.log("-----PaymentDetail batchId------", batchId);
-  // console.log("-----PaymentDetail studId------", studId);
+  console.log("-----BatchStudent batchId------", batchId);
+  console.log("-----BatchStudent studId------", studId);
   const navigate = useNavigate();
   const [Loading, setLoading] = useState(false);
 
@@ -109,8 +115,8 @@ const PaymentDetail = ({ modal, toggle, batchId = null, studId = null }) => {
       });
       console.log(res.data);
       const formattedStudent = res?.data.map((item) => ({
-        // value: item.id,
-        value: item.studentid,
+        value: item.id,
+        // value: item.studentid,
         label: item.name,
       }));
 
@@ -143,7 +149,7 @@ const PaymentDetail = ({ modal, toggle, batchId = null, studId = null }) => {
           studentid: studentValue,
         },
       });
-      console.log(res);
+      // console.log(res);
       setInstallmentList(res?.data);
     } catch (error) {
       console.error("Error fetching installments:", error);
@@ -154,8 +160,8 @@ const PaymentDetail = ({ modal, toggle, batchId = null, studId = null }) => {
     const batch = selectedBatch?.value || batchId;
     const student = selectedStudent?.value || studId;
 
-    console.log("-----PaymentDetail batch------", batch);
-    console.log("-----PaymentDetail student------", student);
+    // console.log("-----PaymentDetail batch------", batch);
+    // console.log("-----PaymentDetail student------", student);
 
     if (batch && student) {
       fetchInstallmentAmount(batch, student);
@@ -243,6 +249,11 @@ const PaymentDetail = ({ modal, toggle, batchId = null, studId = null }) => {
 
       toast.success("Payment Success !!");
       resetForm(); // reset before navigating
+      // ✅ Trigger callback to refresh dashboard
+      if (onPaymentSuccess) {
+        onPaymentSuccess();
+      }
+      // toggle();
       navigate("/receiptForm"); // ✅ navigate after API call success
     } catch (error) {
       console.log(error);
