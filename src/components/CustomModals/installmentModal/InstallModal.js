@@ -136,9 +136,8 @@ const InstallModal = ({
       batch_installments: formatted,
       CreatedBy: "Developer", // or logged-in user
     };
-    // console.log(payload);
-    resetForm();
-    toggle();
+    console.log(payload);
+
     try {
       const res = await axios.post(
         `${API_PATH}/api/Save_Student_Installment`,
@@ -150,7 +149,9 @@ const InstallModal = ({
           },
         }
       );
-      console.log(res?.data);
+      console.log(res);
+      resetForm();
+      // toggle(); // close modal
     } catch (error) {
       console.log(error);
     } finally {

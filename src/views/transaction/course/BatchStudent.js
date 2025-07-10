@@ -160,8 +160,8 @@ const BatchStudent = () => {
     setShowPaymentDetail((prev) => !prev);
   };
 
-  const toggleInstallModal = (id) => {
-    setStudid(id);
+  const toggleInstallModal = (id = null) => {
+    if (id !== null) setStudid(id);
     setInstallModal((prev) => !prev);
   };
 
