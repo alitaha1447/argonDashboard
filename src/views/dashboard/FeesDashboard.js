@@ -738,6 +738,10 @@ const FeesDashboard = () => {
           // branchId={selectedBranchId}
           batchId={selectedBatchId}
           studId={selectedStudentId}
+          resetParentIds={() => {
+            setSelectedBatchId("");
+            setSelectedStudentId("");
+          }}
 
           // onPaymentSuccess={() => fetchPaginatedData(pageNumber, activeFilters)}
         />

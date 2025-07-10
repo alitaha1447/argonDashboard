@@ -30,6 +30,7 @@ const PaymentDetail = ({
   batchId = null,
   studId = null,
   onPaymentSuccess = () => {},
+  resetParentIds = () => {},
 }) => {
   // console.log(`first --> ${branchId}`);
   console.log(`first --> ${batchId}`);
@@ -53,6 +54,7 @@ const PaymentDetail = ({
   const [paymentModeOptions, setPaymentModeOptions] = useState(paymentMode[0]);
 
   const [receiptId, setReceiptId] = useState("");
+  const [isTableLoading, setIsTableLoading] = useState(false);
 
   const batch = selectedBatch?.value || batchId;
   const student = selectedStudent?.value ?? studId; // nullish coalescing operator.
@@ -166,8 +168,8 @@ const PaymentDetail = ({
         fetchInstallmentAmount(batch, student);
       }
     },
-    // [selectedBatch, selectedStudent, batchId, studId]
-    [batch, student]
+    [selectedBatch, selectedStudent, batchId, studId]
+    // [batch, student]
   );
 
   const handleCheckboxChange = (index, id, partAmount, fine) => {
@@ -255,6 +257,7 @@ const PaymentDetail = ({
       // if (onPaymentSuccess) {
       //   onPaymentSuccess();
       // }
+      resetParentIds(); // ✅ reset parent state
       toggle();
       onPaymentSuccess(); // ✅ Refresh parent (fee dashboard)
       window.open(`/receiptForm?receiptId=${res?.data?.receiptid}`, "_blank");
@@ -266,6 +269,7 @@ const PaymentDetail = ({
       console.log(error);
     } finally {
       resetForm();
+      resetParentIds(); // ✅ reset parent state
       toggle();
       setLoading(false);
     }
@@ -403,54 +407,69 @@ const PaymentDetail = ({
             </tr>
           </thead>
           <tbody>
-            {installmentList.map((item, index) => {
-              const isPaid = item.ispaid === 1;
-
-              return (
-                <tr
-                  key={index}
-                  title={isPaid ? "Payment done" : ""}
-                  style={isPaid ? { backgroundColor: "#f8f9fa" } : {}}
-                >
-                  <td>
-                    <div className="d-flex justify-content-center align-items-center">
+            {isTableLoading ? (
+              <tr>
+                <td colSpan="10" className="text-center py-4">
+                  <i className="fas fa-spinner fa-spin fa-2x text-primary" />
+                  <p className="mt-2 mb-0">Loading data...</p>
+                </td>
+              </tr>
+            ) : installmentList.length > 0 ? (
+              installmentList.map((item, index) => {
+                const isPaid = item.ispaid === 1;
+                return (
+                  <tr
+                    key={index}
+                    title={isPaid ? "Payment done" : ""}
+                    style={isPaid ? { backgroundColor: "#f8f9fa" } : {}}
+                  >
+                    <td>
+                      <div className="d-flex justify-content-center align-items-center">
+                        <Input
+                          type="checkbox"
+                          onChange={() =>
+                            handleCheckboxChange(
+                              index,
+                              item.id,
+                              item.part_amount,
+                              item.fine
+                            )
+                          }
+                          disabled={isPaid}
+                          checked={!!totalAmount[index]}
+                        />
+                      </div>
+                    </td>
+                    <td>{item.installment_title}</td>
+                    <td>{item.part_amount}</td>
+                    <td>{formatDate(item.due_date)}</td>
+                    <td>{item.fine}</td>
+                    <td>
                       <Input
-                        type="checkbox"
-                        onChange={() =>
-                          handleCheckboxChange(
-                            index,
-                            item.id,
-                            item.part_amount,
-                            item.fine
-                          )
+                        // id={id}
+                        // name={id}
+                        placeholder={`Enter Fees`}
+                        type={"text"}
+                        style={{ width: "100%", minWidth: "120px" }}
+                        value={
+                          isPaid ? item?.part_amount : totalAmount[index] || ""
                         }
-                        disabled={isPaid}
-                        checked={!!totalAmount[index]}
+                        // onChange={(e) =>
+                        //   handleFeeInputChange(index, item.id, e.target.value)
+                        // }
                       />
-                    </div>
-                  </td>
-                  <td>{item.installment_title}</td>
-                  <td>{item.part_amount}</td>
-                  <td>{formatDate(item.due_date)}</td>
-                  <td>{item.fine}</td>
-                  <td>
-                    <Input
-                      // id={id}
-                      // name={id}
-                      placeholder={`Enter Fees`}
-                      type={"text"}
-                      style={{ width: "100%", minWidth: "120px" }}
-                      value={
-                        isPaid ? item?.part_amount : totalAmount[index] || ""
-                      }
-                      // onChange={(e) =>
-                      //   handleFeeInputChange(index, item.id, e.target.value)
-                      // }
-                    />
-                  </td>
-                </tr>
-              );
-            })}
+                    </td>
+                  </tr>
+                );
+              })
+            ) : (
+              <tr>
+                <td colSpan="10" className="text-center py-4 text-muted">
+                  <i className="fas fa-info-circle mr-2" />
+                  No data found.
+                </td>
+              </tr>
+            )}
           </tbody>
         </Table>
       </ModalBody>
@@ -476,6 +495,7 @@ const PaymentDetail = ({
           color="secondary"
           onClick={() => {
             resetForm();
+            resetParentIds(); // ✅ Reset parent state too
             toggle();
           }}
         >
