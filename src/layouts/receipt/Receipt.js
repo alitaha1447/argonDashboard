@@ -13,29 +13,34 @@ const API_KEY = process.env.REACT_APP_API_KEY;
 
 const Receipt = () => {
   const location = useLocation();
-  console.log("-->", location);
   const queryParams = new URLSearchParams(location.search);
-  console.log("-->", queryParams);
   const receiptId = queryParams.get("receiptId");
-  console.log("-->", receiptId);
-  // console.log(paymentMode[0].value);
   const [data, setData] = useState({});
   const [paidInstallment, setpaidInstallment] = useState([]);
 
   useEffect(() => {
     const receiptData = async () => {
-      const res = await axios.get(`${API_PATH}/api/Get_Receipt_Data`, {
-        params: {
-          APIKEY: API_KEY,
-          receipt_id: receiptId,
-          // receipt_id: "EA3E44DC-D2A2-4FE0-B9E7-E022D7C068F5",
-        },
-      });
-      console.log(res?.data);
-      setData(res?.data);
-      setpaidInstallment(res?.data?.paid_installment);
+      try {
+        const res = await axios.get(`${API_PATH}/api/Get_Receipt_Data`, {
+          params: {
+            APIKEY: API_KEY,
+            receipt_id: receiptId,
+            // receipt_id: "EA3E44DC-D2A2-4FE0-B9E7-E022D7C068F5",
+          },
+        });
+        setData(res?.data);
+        setpaidInstallment(res?.data?.paid_installment);
+        // Trigger print after slight delay to ensure DOM is updated
+        setTimeout(() => {
+          window.print();
+        }, 500);
+      } catch (error) {
+        console.log(`Rciept --> ${error}`);
+      }
     };
-    receiptData();
+    if (receiptId) {
+      receiptData();
+    }
   }, []);
 
   const totalPaid = paidInstallment.reduce(
@@ -56,7 +61,6 @@ const Receipt = () => {
 
   const paymentModeLabel =
     paymentMode.find((mode) => mode.value === data.payment_mode)?.label || "-";
-  console.log(paymentModeLabel);
   return (
     <div>
       <AuthNavbar />

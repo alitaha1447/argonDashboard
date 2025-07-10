@@ -100,6 +100,7 @@ const BatchModal = ({
     enrollmentid: item.enrollmentid.toString(),
     // createdon: new Date().toISOString(), // or your preferred date format
   }));
+  console.log(stdId);
   const [menuIsOpen, setMenuIsOpen] = useState(false);
 
   const [batchName, setBatchName] = useState("");
@@ -255,7 +256,7 @@ const BatchModal = ({
   const handleInstallmentSubmit = (receivedInstallments) => {
     setInstallmentsDetails(receivedInstallments);
   };
-  console.log(installmentsDetails);
+  // console.log(installmentsDetails);
   const handleFileChange = async (event) => {
     const file = event.target.files[0];
     if (!file) return;
@@ -408,15 +409,17 @@ const BatchModal = ({
         },
       });
       console.log("✅ Batch created successfully:", res?.data);
-      toast.success("✅ Batch created successfully");
-      refreshList(1);
+      toast.success("Batch created successfully");
+      // refreshList(1);
     } catch (error) {
       console.error("❌ Failed to create batch:", error);
       toast.error(error?.name);
     } finally {
+      toggle(); // ⬅️ close modal
+      refreshList(); // ⬅️ refresh list after modal closes
+      resetForm();
+      resetSelected();
       setLoading(false);
-      refreshList(1);
-      toggle();
     }
     resetForm();
   };
@@ -1004,6 +1007,7 @@ const BatchModal = ({
               onClick={() => {
                 resetForm();
                 setFormErrors({});
+                resetSelected(); // ✅ Clear selected checkboxes
                 toggle();
               }}
             >

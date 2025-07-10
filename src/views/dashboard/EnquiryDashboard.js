@@ -375,7 +375,6 @@ const EnquiryDashboard = (props) => {
       }
     });
   };
-  console.log(studentID);
   const handleExport = () => {
     const exportData = listData.map((item) => {
       const isCourseOrInternship =
@@ -666,6 +665,18 @@ const EnquiryDashboard = (props) => {
                                 onClick={() => handleCheckId(item.Id)}
                                 disabled={item.status_txt === "Admission Done"} // ✅ disable if condition matches
                               />
+
+                              {/* <Input
+                                type="checkbox"
+                                style={{ margin: 0 }}
+                                checked={
+                                  !!studentID.find(
+                                    (s) => s.enrollmentid === item.Id
+                                  )
+                                } // ✅ safer check
+                                onChange={() => handleCheckId(item.Id)} // ✅ use onChange not onClick
+                                disabled={item.status_txt === "Admission Done"}
+                              /> */}
                             </div>
                           </td>
                           <td>{item.Id}</td>
@@ -860,7 +871,8 @@ const EnquiryDashboard = (props) => {
         modal={batchModalOpen}
         toggle={batchModal}
         studentID={studentID}
-        refreshList={fetchPaginatedData}
+        // refreshList={fetchPaginatedData}
+        refreshList={() => fetchPaginatedData(1, activeFilters)} // ✅ Pass filtered fetch        resetSelected={() => setStudentID([])} // ✅ Pass reset function
         resetSelected={() => setStudentID([])} // ✅ Pass reset function
       />
       <StatusUpdate

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 import {
@@ -51,6 +51,8 @@ const pageNum = [
 ];
 
 const FeesDashboard = () => {
+  const { startDate1, endDate1 } = fetchFinancialYearRangeByDate();
+
   const [selectedFeeDetail, setSelectedFeeDetail] = useState({
     batchid: null,
     batchstudentid: null,
@@ -87,8 +89,6 @@ const FeesDashboard = () => {
     datasets: [
       {
         data: [],
-        // backgroundColor: ["#f5365c", "#2dce89", "#11cdef"],
-        // hoverBackgroundColor: ["#d92e4a", "#24b97d", "#0ebad6"],
         borderColor: "#fff",
         borderWidth: 2,
       },
@@ -100,8 +100,6 @@ const FeesDashboard = () => {
     datasets: [
       {
         data: [],
-        // backgroundColor: ["#f5365c", "#2dce89", "#11cdef"],
-        // hoverBackgroundColor: ["#d92e4a", "#24b97d", "#0ebad6"],
         borderColor: "#fff",
         borderWidth: 0,
       },
@@ -127,28 +125,10 @@ const FeesDashboard = () => {
   const handleEnquiryTypeChange = (selectedOption) => {
     setSelectedEnquiryType(selectedOption);
   };
-  const handleSearch = () => {
-    const filters = {
-      searchText: searchText.trim(),
-      status: selectedEnquiryType?.value || "",
-      branch: selectedBranch?.value,
-      batchid: selectedBatch?.value,
-    };
-    setActiveFilters(filters); // ⬅️ Store current filters
-    fetchPaginatedData(1, filters); // ⬅️ Pass them for page 1
-  };
 
-  const handleSearchClick = (e) => {
-    e.preventDefault();
-    handleSearch();
-  };
-
-  const togglePaymentDetail = () => {
+  const togglePaymentDetail = useCallback(() => {
     setShowPaymentDetail((prev) => !prev);
-  };
-  // const toggleFeeDetail = () => {
-  //   setShowFeeDetail((prev) => !prev);
-  // };
+  }, []);
 
   const toggleFeeDetail = (batchid, batchstudentid) => {
     setSelectedFeeDetail({ batchid, batchstudentid });
@@ -180,19 +160,16 @@ const FeesDashboard = () => {
     try {
       const params = {
         APIKEY: API_KEY,
-        fromdate: "2025-09-02",
-        todate: "2026-02-02",
-        searchtext: filter.searchtext || "",
+        fromdate: startDate1,
+        todate: endDate1,
+        searchtext: filter?.searchtext || "",
         pageno: page,
         pagesize: pageSize,
       };
       const res = await axios(`${API_PATH}/api/Collect_List`, {
         params,
       });
-      // console.log(res?.data?.Data);
-      // console.log("--------", res?.data?.PageNumber);
-      // console.log(res?.data?.TotalPages);
-      // setStudentId(res?.data?.Data?.batchstudentid);
+
       setFeeList(res?.data?.Data);
       setPageNumber(res?.data?.PageNumber || page);
       setTotalPages(res?.data?.TotalPages || 1);
@@ -209,80 +186,21 @@ const FeesDashboard = () => {
     }
   };
 
-  useEffect(() => {
-    const { startDate1, endDate1 } = fetchFinancialYearRangeByDate();
-
-    const fetchAllDashboardData = async () => {
-      try {
-        // 1. Enquiry Analytics (for header stats)
-        const analyticsRes = await axios.get(
-          "https://hotelapi.shriyanshnath.com/api/Get_Enquiry_Analytics",
-          {
-            // headers: { APIKEY: "12345678@" },
-            params: {
-              APIKEY: "12345678@",
-              fromdate: "2025-04-01",
-              todate: "2026-03-01",
-            },
-          }
-        );
-        setStatsData(analyticsRes?.data);
-        // 2. Pie Chart Data
-        const pieRes = await axios.get(`${API_PATH}/api/Get_Typewise_Enquiry`, {
-          params: {
-            APIKEY: API_KEY,
-            fromdate: startDate1,
-            todate: endDate1,
-          },
-        });
-        const labels = pieRes.data.map((item) => item.enquiry_type_name);
-        const values = pieRes.data.map((item) => item.enquiries);
-        const dynamicColors = generateHexColors(values.length);
-
-        setPieData((prev) => ({
-          ...prev,
-          labels: labels,
-          datasets: [
-            {
-              ...prev.datasets[0],
-              data: values,
-              backgroundColor: dynamicColors,
-            },
-          ],
-        }));
-        // 3. Bar Chart Data
-        const barChartRes = await axios.get(
-          `${API_PATH}/api/Get_Coursewise_Enquiry`,
-          {
-            params: {
-              APIKEY: API_KEY,
-              fromdate: startDate1,
-              todate: endDate1,
-            },
-          }
-        );
-        const barLabels = barChartRes.data.map((item) => item.topic_title);
-        const barValues = barChartRes.data.map((item) => item.enquires);
-        const dynamicBarColors = generateHexColors(barValues.length);
-
-        setBarData((prev) => ({
-          ...prev,
-          labels: barLabels,
-          datasets: [
-            {
-              ...prev.datasets[0],
-              data: barValues,
-              backgroundColor: dynamicBarColors,
-            },
-          ],
-        }));
-      } catch (error) {
-        console.error("Error loading dashboard data:", error);
-      }
+  const handleSearch = () => {
+    const filters = {
+      searchText: searchText.trim(),
+      status: selectedEnquiryType?.value || "",
+      branch: selectedBranch?.value,
+      batchid: selectedBatch?.value,
     };
+    setActiveFilters(filters); // ⬅️ Store current filters
+    fetchPaginatedData(1, filters); // ⬅️ Pass them for page 1
+  };
 
-    fetchAllDashboardData();
-  }, []);
+  const handleSearchClick = (e) => {
+    e.preventDefault();
+    handleSearch();
+  };
 
   useEffect(() => {
     setPageStart(1);
@@ -290,9 +208,83 @@ const FeesDashboard = () => {
     fetchPaginatedData(1);
   }, [pageSize]);
 
+  const fetchAllDashboardData = async () => {
+    try {
+      // 1. Enquiry Analytics (for header stats)
+      const analyticsRes = await axios.get(
+        "https://hotelapi.shriyanshnath.com/api/Get_Fee_dashboard_analytics",
+        {
+          params: {
+            APIKEY: API_KEY,
+            fromdate: startDate1,
+            todate: endDate1,
+          },
+        }
+      );
+      setStatsData(analyticsRes?.data);
+      // 2. Pie Chart Data
+      const pieRes = await axios.get(`${API_PATH}/api/Get_Typewise_Enquiry`, {
+        params: {
+          APIKEY: API_KEY,
+          fromdate: startDate1,
+          todate: endDate1,
+        },
+      });
+      const labels = pieRes.data.map((item) => item.enquiry_type_name);
+      const values = pieRes.data.map((item) => item.enquiries);
+      const dynamicColors = generateHexColors(values.length);
+
+      setPieData((prev) => ({
+        ...prev,
+        labels: labels,
+        datasets: [
+          {
+            ...prev.datasets[0],
+            data: values,
+            backgroundColor: dynamicColors,
+          },
+        ],
+      }));
+      // 3. Bar Chart Data
+      const barChartRes = await axios.get(
+        `${API_PATH}/api/Get_Coursewise_Enquiry`,
+        {
+          params: {
+            APIKEY: API_KEY,
+            fromdate: startDate1,
+            todate: endDate1,
+          },
+        }
+      );
+      const barLabels = barChartRes.data.map((item) => item.topic_title);
+      const barValues = barChartRes.data.map((item) => item.enquires);
+      const dynamicBarColors = generateHexColors(barValues.length);
+
+      setBarData((prev) => ({
+        ...prev,
+        labels: barLabels,
+        datasets: [
+          {
+            ...prev.datasets[0],
+            data: barValues,
+            backgroundColor: dynamicBarColors,
+          },
+        ],
+      }));
+    } catch (error) {
+      console.error("Error loading dashboard data:", error);
+    }
+  };
+  useEffect(() => {
+    fetchAllDashboardData();
+  }, []);
+
+  const onPaymentSuccess = useCallback(() => {
+    fetchPaginatedData(pageNumber, activeFilters);
+  }, [pageNumber, activeFilters]);
+
   const handleExport = () => {
     const exportData = feeList.map((item, index) => {
-      // console.log(item);
       return {
         Id: index,
         "Student Name": item.name,
@@ -311,25 +303,37 @@ const FeesDashboard = () => {
   };
 
   const statsCard1 = {
-    title: "Total fees received",
-    value: statsData?.total_enquiry,
-    description: "Total fees received",
+    title: "Total Received Amount",
+    value: statsData?.total_received_Amt,
+    description: "Total Received Amount",
     icon: "fas fa-chart-bar",
     color: "danger",
   };
   const statsCard2 = {
-    title: "Pending Collection",
-    value: statsData?.joined,
-    description: "Pending Collection",
+    title: "Total Receipt Generated",
+    value: statsData?.total_Receipt_generated,
+    description: "Total Receipt Generated",
     icon: "fas fa-chart-pie",
     color: "warning",
   };
   const statsCard3 = {
-    title: "Due fees",
-    value: statsData?.not_interested,
-    description: "Due Fees",
+    title: "Due Amount",
+    value: statsData?.due_amount,
+    description: "Due Amount",
     icon: "fas fa-users",
     color: "yellow",
+  };
+
+  const [selectedBranchId, setSelectedBranchId] = useState("");
+  const [selectedBatchId, setSelectedBatchId] = useState("");
+  const [selectedStudentId, setSelectedStudentId] = useState("");
+
+  const toggleRecievePayment = (branchid, batchid, batchstudentid) => {
+    setSelectedBranchId(branchid);
+    setSelectedBatchId(batchid);
+    setSelectedStudentId(batchstudentid);
+
+    setShowPaymentDetail((prev) => !prev);
   };
 
   return (
@@ -512,7 +516,6 @@ const FeesDashboard = () => {
                       <th scope="col">Due Fees</th>
                       <th scope="col">Branch</th>
                       <th scope="col">Batch</th>
-                      {/* <th scope="col">Collection Date</th> */}
                       <th scope="col">Action</th>
                     </tr>
                   </thead>
@@ -532,7 +535,6 @@ const FeesDashboard = () => {
                           <td>
                             <span>{student.totalamount}</span>
                             <Button
-                              // onClick={toggleFeeDetail}
                               onClick={() =>
                                 toggleFeeDetail(
                                   student?.batchid,
@@ -576,6 +578,18 @@ const FeesDashboard = () => {
                               >
                                 <DropdownItem>Mail</DropdownItem>
                                 <DropdownItem>Refund</DropdownItem>
+                                <DropdownItem
+                                  onClick={() =>
+                                    toggleRecievePayment(
+                                      student.branchid,
+                                      student.batchid,
+                                      student.batchstudentid
+                                    )
+                                  }
+                                >
+                                  {" "}
+                                  Recieve Amount
+                                </DropdownItem>
                               </DropdownMenu>
                             </UncontrolledDropdown>
                           </td>
@@ -654,10 +668,6 @@ const FeesDashboard = () => {
                             <p className="fs-6 fw-semibold mb-1">
                               <strong>Batch:</strong> {item.batch}
                             </p>
-                            {/* <p className="fs-6 fw-semibold mb-1">
-                              <strong>Collection Date:</strong>{" "}
-                              {item.collectionDate}
-                            </p> */}
                           </div>
                         </div>
 
@@ -682,6 +692,18 @@ const FeesDashboard = () => {
                           >
                             <DropdownItem>Mail</DropdownItem>
                             <DropdownItem>Refund</DropdownItem>
+                            <DropdownItem
+                              onClick={() =>
+                                toggleRecievePayment(
+                                  item.branchid,
+                                  item.batchid,
+                                  item.batchstudentid
+                                )
+                              }
+                            >
+                              {" "}
+                              Recieve Amount
+                            </DropdownItem>
                           </DropdownMenu>
                         </UncontrolledDropdown>
                       </div>
@@ -712,7 +734,12 @@ const FeesDashboard = () => {
         <PaymentDetail
           modal={showPaymentDetail}
           toggle={togglePaymentDetail}
-          onPaymentSuccess={() => fetchPaginatedData(pageNumber, activeFilters)}
+          onPaymentSuccess={onPaymentSuccess}
+          // branchId={selectedBranchId}
+          batchId={selectedBatchId}
+          studId={selectedStudentId}
+
+          // onPaymentSuccess={() => fetchPaginatedData(pageNumber, activeFilters)}
         />
         <FeeDetail
           modal={showFeeDetail}

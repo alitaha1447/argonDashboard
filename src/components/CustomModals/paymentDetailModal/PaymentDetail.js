@@ -26,13 +26,15 @@ const API_KEY = process.env.REACT_APP_API_KEY;
 const PaymentDetail = ({
   modal,
   toggle,
+  branchId = null,
   batchId = null,
   studId = null,
-  // onPaymentSuccess,
+  onPaymentSuccess = () => {},
 }) => {
-  // const location = useLocation();
-  // console.log(studId, "----------------------");
-  // const navigate = useNavigate();
+  // console.log(`first --> ${branchId}`);
+  console.log(`first --> ${batchId}`);
+  console.log(`first --> ${studId}`);
+
   const [Loading, setLoading] = useState(false);
 
   const [selectedBranch, setSelectedBranch] = useState(null);
@@ -51,6 +53,9 @@ const PaymentDetail = ({
   const [paymentModeOptions, setPaymentModeOptions] = useState(paymentMode[0]);
 
   const [receiptId, setReceiptId] = useState("");
+
+  const batch = selectedBatch?.value || batchId;
+  const student = selectedStudent?.value ?? studId; // nullish coalescing operator.
 
   const {
     branchOptions,
@@ -92,7 +97,7 @@ const PaymentDetail = ({
           branchid: selectedBranch?.value,
         },
       });
-      // console.log(res?.data);
+
       const formattedBatch = res?.data.map((item) => ({
         value: item.BatchID,
         label: item.BatchName,
@@ -108,6 +113,7 @@ const PaymentDetail = ({
 
   const fetchStudent = async () => {
     // setLoading(true);
+
     try {
       const res = await axios.get(`${API_PATH}/api/Get_Batch_student`, {
         params: {
@@ -115,7 +121,7 @@ const PaymentDetail = ({
           batchid: selectedBatch?.value,
         },
       });
-      // console.log(res.data);
+
       const formattedStudent = res?.data.map((item) => ({
         value: item.id,
         // value: item.studentid,
@@ -130,20 +136,7 @@ const PaymentDetail = ({
     }
   };
 
-  // useEffect(() => {
-  // const fetchInstallmentAmount = async () => {
-  //   const res = await axios.get(`${API_PATH}/api/Get_Batch_installment`, {
-  //     params: {
-  //       APIKEY: API_KEY,
-  //       batchid: selectedBatch?.value || batchId,
-  //       studentid: selectedStudent?.value || studId,
-  //     },
-  //   });
-  //   setInstallmentList(res?.data);
-  // };
-
   const fetchInstallmentAmount = async (batchValue, studentValue) => {
-    // console.log(studentValue);
     try {
       const res = await axios.get(`${API_PATH}/api/Get_Batch_installment`, {
         params: {
@@ -152,35 +145,30 @@ const PaymentDetail = ({
           studentid: studentValue,
         },
       });
-      // console.log(res);
+      // console.log(res.data);
       setInstallmentList(res?.data);
     } catch (error) {
       console.error("Error fetching installments:", error);
     }
   };
 
-  const batch = selectedBatch?.value || batchId;
-  // const student = selectedStudent?.value || studId;
-
   // const student =
   //   typeof studId === "object"
   //     ? studId?.value
   //     : selectedStudent?.value || studId;
-  const student =
-    selectedStudent?.value ||
-    (typeof studId === "object" ? studId?.value : studId);
+  // const student =
+  //   selectedStudent?.value ||
+  //   (typeof studId === "object" ? studId?.value : studId);
 
-  useEffect(() => {
-    if (batch && student) {
-      // console.log("-------------");
-      // console.log(batch);
-      // console.log(student);
-      // console.log(selectedStudent?.value);
-      // console.log(studId);
-      // console.log("-------------");
-      fetchInstallmentAmount(batch, student);
-    }
-  }, [selectedBatch, selectedStudent, batchId, studId]);
+  useEffect(
+    () => {
+      if (batch && student) {
+        fetchInstallmentAmount(batch, student);
+      }
+    },
+    // [selectedBatch, selectedStudent, batchId, studId]
+    [batch, student]
+  );
 
   const handleCheckboxChange = (index, id, partAmount, fine) => {
     const total = Number(partAmount) + Number(fine);
@@ -248,7 +236,6 @@ const PaymentDetail = ({
       return;
     }
     setLoading(true);
-    // console.log(payment);
     try {
       const res = await axios.post(`${API_PATH}/api/CollectFees`, payment, {
         params: {
@@ -258,9 +245,9 @@ const PaymentDetail = ({
           paymentmode: paymentModeOptions?.value,
         },
       });
-      // console.log("Payment Success", res?.data?.receiptid);
+      console.log(res?.data);
+      console.log(res?.data?.receiptid);
       setReceiptId(res?.data?.receiptid);
-      // console.log("Payment Success", res);
 
       toast.success("Payment Success !!");
       resetForm(); // reset before navigating
@@ -269,8 +256,12 @@ const PaymentDetail = ({
       //   onPaymentSuccess();
       // }
       toggle();
+      onPaymentSuccess(); // ✅ Refresh parent (fee dashboard)
+      window.open(`/receiptForm?receiptId=${res?.data?.receiptid}`, "_blank");
       // navigate("/receiptForm"); // ✅ navigate after API call success
-      window.open(`/receiptForm?receiptId=${res?.data?.receiptid}`, "_blank"); // ✅ open in new tab
+      // setTimeout(() => {
+      //   window.open(`/receiptForm?receiptId=${receiptId}`, "_blank");
+      // }, 500); // optional small delay for smoother UI
     } catch (error) {
       console.log(error);
     } finally {
@@ -407,50 +398,59 @@ const PaymentDetail = ({
               <th scope="col">Title</th>
               <th scope="col">Amount</th>
               <th scope="col">Due Date</th>
-              {/* <th scope="col">Late Fee</th> */}
               <th scope="col">Fine</th>
               <th scope="col">Input</th>
             </tr>
           </thead>
           <tbody>
-            {installmentList.map((item, index) => (
-              <tr key={index}>
-                <td>
-                  <div className="d-flex justify-content-center align-items-center">
+            {installmentList.map((item, index) => {
+              const isPaid = item.ispaid === 1;
+
+              return (
+                <tr
+                  key={index}
+                  title={isPaid ? "Payment done" : ""}
+                  style={isPaid ? { backgroundColor: "#f8f9fa" } : {}}
+                >
+                  <td>
+                    <div className="d-flex justify-content-center align-items-center">
+                      <Input
+                        type="checkbox"
+                        onChange={() =>
+                          handleCheckboxChange(
+                            index,
+                            item.id,
+                            item.part_amount,
+                            item.fine
+                          )
+                        }
+                        disabled={isPaid}
+                        checked={!!totalAmount[index]}
+                      />
+                    </div>
+                  </td>
+                  <td>{item.installment_title}</td>
+                  <td>{item.part_amount}</td>
+                  <td>{formatDate(item.due_date)}</td>
+                  <td>{item.fine}</td>
+                  <td>
                     <Input
-                      type="checkbox"
-                      onChange={() =>
-                        handleCheckboxChange(
-                          index,
-                          item.id,
-                          item.part_amount,
-                          item.fine
-                        )
+                      // id={id}
+                      // name={id}
+                      placeholder={`Enter Fees`}
+                      type={"text"}
+                      style={{ width: "100%", minWidth: "120px" }}
+                      value={
+                        isPaid ? item?.part_amount : totalAmount[index] || ""
                       }
-                      checked={!!totalAmount[index]}
+                      // onChange={(e) =>
+                      //   handleFeeInputChange(index, item.id, e.target.value)
+                      // }
                     />
-                  </div>
-                </td>
-                <td>{item.installment_title}</td>
-                <td>{item.part_amount}</td>
-                <td>{formatDate(item.due_date)}</td>
-                {/* <td>{"25000"}</td> */}
-                <td>{item.fine}</td>
-                <td>
-                  <Input
-                    // id={id}
-                    // name={id}
-                    placeholder={`Enter Fees`}
-                    type={"text"}
-                    style={{ width: "100%", minWidth: "120px" }}
-                    value={totalAmount[index] || ""}
-                    // onChange={(e) =>
-                    //   handleFeeInputChange(index, item.id, e.target.value)
-                    // }
-                  />
-                </td>
-              </tr>
-            ))}
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </Table>
       </ModalBody>
@@ -466,7 +466,7 @@ const PaymentDetail = ({
                 role="status"
                 aria-hidden="true"
               ></span>
-              Logging in...
+              Lodding in...
             </>
           ) : (
             "Payment"
@@ -487,4 +487,4 @@ const PaymentDetail = ({
   );
 };
 
-export default PaymentDetail;
+export default React.memo(PaymentDetail);
