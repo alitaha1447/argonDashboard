@@ -46,8 +46,8 @@ const BatchStudent = () => {
 
   const [selectedBranch, setSelectedBranch] = useState(null);
   console.log(selectedBranch);
-  const [selectedBatch, setSelectedBatch] = useState(null);
   const [batches, setBatches] = useState([]);
+  const [selectedBatch, setSelectedBatch] = useState(null);
   const [loadingBatches, setLoadingBatches] = useState(false);
   const [batchStudent, setBatchStudent] = useState([]);
   const [studid, setStudid] = useState("");
@@ -74,13 +74,14 @@ const BatchStudent = () => {
   }, [branchSearchText]);
 
   const fetchBatch = async () => {
-    // if (!selectedBranch?.value) return; // 🚫 Don't proceed if no branch is selected
+    console.log(selectedBranch, "...................");
+    if (!selectedBranch?.value) return; // 🚫 Don't proceed if no branch is selected
     setLoadingBatches(true); // Start loader
     try {
       const res = await axios.get(`${API_PATH}/api/GetBatch`, {
         params: {
           APIKEY: API_KEY,
-          // branchid: selectedBranch?.value,
+          branchid: selectedBranch?.value,
         },
       });
 
@@ -101,11 +102,11 @@ const BatchStudent = () => {
   useEffect(() => {
     const fetchBatchStudent = async () => {
       setisTableLoading(true);
-      // if (!selectedBatch?.value) {
-      //   setBatchStudent([]); // ✅ Clear student list if no batch selected
-      //   setisTableLoading(false);
-      //   return;
-      // }
+      if (!selectedBatch?.value) {
+        setBatchStudent([]); // ✅ Clear student list if no batch selected
+        setisTableLoading(false);
+        return;
+      }
       try {
         const res = await axios.get(`${API_PATH}/api/Get_Batch_student`, {
           params: {
@@ -156,7 +157,6 @@ const BatchStudent = () => {
   // console.log(totalAmount);
 
   const togglePaymentDetail = (id) => {
-    console.log(typeof studid);
     setStudid(id);
     setShowPaymentDetail((prev) => !prev);
   };
@@ -235,7 +235,7 @@ const BatchStudent = () => {
                   className="pb-4 d-sm-none d-md-none"
                 >
                   <FilterBar
-                    saelectedBranch={selectedBranch}
+                    selectedBranch={selectedBranch}
                     setSelectedBranch={setSelectedBranch}
                     fetchBatch={fetchBatch}
                     batches={batches}
@@ -253,7 +253,7 @@ const BatchStudent = () => {
           </Col>
           <Col className="pb-4 d-none d-sm-block ">
             <FilterBar
-              saelectedBranch={selectedBranch}
+              selectedBranch={selectedBranch}
               setSelectedBranch={setSelectedBranch}
               fetchBatch={fetchBatch}
               batches={batches}
@@ -357,49 +357,53 @@ const BatchStudent = () => {
                         </td>
                       </tr>
                     ) : batchStudent.length > 0 ? (
-                      batchStudent.map((item, index) => (
-                        <tr key={item.id}>
-                          <td>{item.id}</td>
-                          <td>{item.admission_no}</td>
-                          <td>{item.name}</td>
-                          <td>{item.mobileno}</td>
-                          <td className="no-print">
-                            <UncontrolledDropdown direction="up">
-                              <DropdownToggle
-                                tag="span"
-                                style={{ cursor: "pointer" }}
-                                data-toggle="dropdown"
-                                aria-expanded={false}
-                              >
-                                <BsThreeDotsVertical size={20} />
-                              </DropdownToggle>
+                      batchStudent.map((item, index) => {
+                        return (
+                          <tr key={item.id}>
+                            <td>{item.id}</td>
+                            <td>{item.admission_no}</td>
+                            <td>{item.name}</td>
+                            <td>{item.mobileno}</td>
+                            <td className="no-print">
+                              <UncontrolledDropdown direction="up">
+                                <DropdownToggle
+                                  tag="span"
+                                  style={{ cursor: "pointer" }}
+                                  data-toggle="dropdown"
+                                  aria-expanded={false}
+                                >
+                                  <BsThreeDotsVertical size={20} />
+                                </DropdownToggle>
 
-                              <DropdownMenu
-                                // left
-                                style={{
-                                  minWidth: "120px",
-                                  border: "1px solid #ddd",
-                                  borderRadius: "4px",
-                                  boxShadow: "0px 2px 6px rgba(0,0,0,0.2)",
-                                }}
-                              >
-                                <DropdownItem
-                                  key={item.id}
-                                  onClick={() => toggleInstallModal(item.id)}
+                                <DropdownMenu
+                                  // left
+                                  style={{
+                                    minWidth: "120px",
+                                    border: "1px solid #ddd",
+                                    borderRadius: "4px",
+                                    boxShadow: "0px 2px 6px rgba(0,0,0,0.2)",
+                                  }}
                                 >
-                                  Installments
-                                </DropdownItem>
-                                <DropdownItem
-                                  key={item.id}
-                                  onClick={() => togglePaymentDetail(item.id)}
-                                >
-                                  Recieve Amount
-                                </DropdownItem>
-                              </DropdownMenu>
-                            </UncontrolledDropdown>
-                          </td>
-                        </tr>
-                      ))
+                                  <DropdownItem
+                                    key={item.id}
+                                    onClick={() => toggleInstallModal(item?.id)}
+                                  >
+                                    Installments
+                                  </DropdownItem>
+                                  <DropdownItem
+                                    key={item.id}
+                                    onClick={() =>
+                                      togglePaymentDetail(item?.id)
+                                    }
+                                  >
+                                    Recieve Amount
+                                  </DropdownItem>
+                                </DropdownMenu>
+                              </UncontrolledDropdown>
+                            </td>
+                          </tr>
+                        );
+                      })
                     ) : (
                       <tr>
                         <td
@@ -421,7 +425,7 @@ const BatchStudent = () => {
                   <Loader />
                 ) : batchStudent.length > 0 ? (
                   batchStudent.map((item, index) => (
-                    <Card className="mb-3 shadow-sm">
+                    <Card key={item?.id} className="mb-3 shadow-sm">
                       <div className="d-flex p-4 justify-content-between">
                         <div className="d-flex">
                           <div>

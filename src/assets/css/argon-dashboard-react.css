@@ -21555,3 +21555,7 @@ button:focus,
     display: none !important;
   }
 }
+/* Modal Cross icon remove */
+/* .border-bottom .close {
+  display: none;          
+} */

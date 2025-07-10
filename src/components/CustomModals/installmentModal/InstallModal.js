@@ -154,8 +154,6 @@ const InstallModal = ({
       // toggle(); // close modal
     } catch (error) {
       console.log(error);
-    } finally {
-      toggle(); // close modal
     }
   };
 

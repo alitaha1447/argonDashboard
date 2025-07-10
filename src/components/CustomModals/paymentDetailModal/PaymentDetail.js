@@ -56,9 +56,6 @@ const PaymentDetail = ({
   const [receiptId, setReceiptId] = useState("");
   const [isTableLoading, setIsTableLoading] = useState(false);
 
-  const batch = selectedBatch?.value || batchId;
-  const student = selectedStudent?.value ?? studId; // nullish coalescing operator.
-
   const {
     branchOptions,
     setBranchOptions,
@@ -154,10 +151,15 @@ const PaymentDetail = ({
     }
   };
 
+  const batch = selectedBatch?.value || batchId;
+  const student = selectedStudent?.value ?? studId; // nullish coalescing operator.
   // const student =
   //   typeof studId === "object"
   //     ? studId?.value
   //     : selectedStudent?.value || studId;
+  console.log("----------------------");
+  console.log(typeof student);
+  console.log("----------------------");
   // const student =
   //   selectedStudent?.value ||
   //   (typeof studId === "object" ? studId?.value : studId);
