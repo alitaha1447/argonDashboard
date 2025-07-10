@@ -45,6 +45,7 @@ const BatchStudent = () => {
   const [showPaymentDetail, setShowPaymentDetail] = useState(false);
 
   const [selectedBranch, setSelectedBranch] = useState(null);
+  console.log(selectedBranch);
   const [selectedBatch, setSelectedBatch] = useState(null);
   const [batches, setBatches] = useState([]);
   const [loadingBatches, setLoadingBatches] = useState(false);
@@ -73,13 +74,13 @@ const BatchStudent = () => {
   }, [branchSearchText]);
 
   const fetchBatch = async () => {
-    if (!selectedBranch?.value) return; // 🚫 Don't proceed if no branch is selected
+    // if (!selectedBranch?.value) return; // 🚫 Don't proceed if no branch is selected
     setLoadingBatches(true); // Start loader
     try {
       const res = await axios.get(`${API_PATH}/api/GetBatch`, {
         params: {
           APIKEY: API_KEY,
-          branchid: selectedBranch?.value,
+          // branchid: selectedBranch?.value,
         },
       });
 
@@ -100,11 +101,11 @@ const BatchStudent = () => {
   useEffect(() => {
     const fetchBatchStudent = async () => {
       setisTableLoading(true);
-      if (!selectedBatch?.value) {
-        setBatchStudent([]); // ✅ Clear student list if no batch selected
-        setisTableLoading(false);
-        return;
-      }
+      // if (!selectedBatch?.value) {
+      //   setBatchStudent([]); // ✅ Clear student list if no batch selected
+      //   setisTableLoading(false);
+      //   return;
+      // }
       try {
         const res = await axios.get(`${API_PATH}/api/Get_Batch_student`, {
           params: {
@@ -112,7 +113,7 @@ const BatchStudent = () => {
             batchid: selectedBatch?.value,
           },
         });
-        // console.log(res?.data);
+        console.log(res?.data);
         setBatchStudent(res?.data);
       } catch (error) {
         console.log(error);

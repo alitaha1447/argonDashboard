@@ -58,7 +58,7 @@ const EnquiryFormCardBody = ({
   const [selectedCoursesOptions, setSelectedCoursesOptions] = useState(null);
   // Branch
   const [selectedBranch, setSelectedBranch] = useState(null);
-
+  // console.log("B --> ", selectedBranch);
   //  Products
   const [productOptions, setProductOptions] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);

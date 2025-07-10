@@ -25,7 +25,7 @@ const AssignBatch = ({
   refreshList = () => {},
   resetSelected = () => {},
 }) => {
-  // console.log(studentID);
+  console.log(studentID);
   // const stdId = studentID.map((item) => ({
   //   enrollmentid: item.enrollmentid.toString(),
   // }));
@@ -62,7 +62,7 @@ const AssignBatch = ({
           APIKEY: API_KEY,
         },
       });
-      console.log(res);
+      // console.log(res);
       const formattedEnquiry = res.data.map((item) => ({
         value: item.BatchID,
         label: item.BatchName,
@@ -81,22 +81,22 @@ const AssignBatch = ({
         enrollmentid: item?.enrollmentid.toString(),
       })),
     };
-
+    console.log(assignBatchData);
     try {
-      // const assignBatch = await axios.post(
-      //   `${API_PATH}/api/Assign_Batch`,
-      //   assignBatchData,
-      //   {
-      //     params: {
-      //       APIKEY: API_KEY,
-      //     },
-      //   }
-      // );
-      // console.log(assignBatch.data);
-      // toast.success("Batch Assigned Successfully!!");
-      // refreshList(1);
+      const assignBatch = await axios.post(
+        `${API_PATH}/api/Assign_Batch`,
+        assignBatchData,
+        {
+          params: {
+            APIKEY: API_KEY,
+          },
+        }
+      );
+      console.log(assignBatch);
+      toast.success("Batch Assigned Successfully!!");
+      refreshList(1);
       // toggle();
-      // resetSelected(); // ✅ Reset checkbox selection
+      resetSelected(); // ✅ Reset checkbox selection
     } catch (error) {
       console.log(error);
       toast.error("Request failed with status code 404");

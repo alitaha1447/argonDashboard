@@ -44,6 +44,8 @@ import DailyCollection from "views/transaction/report/fees/DailyCollection";
 import DueBalance from "views/transaction/report/fees/DueBalance";
 import FacultyCourses from "views/reports/course/FacultyCourses";
 import BatchStudent from "views/transaction/course/BatchStudent";
+import ReceiptList from "views/reports/fees/ReceiptList";
+
 var routes = [
   {
     name: "Enquiry Dashboard", // 👈 just a label, no path
@@ -525,6 +527,13 @@ var routes = [
         name: "Due Balance",
         icon: "ni ni-single-copy-04 text-red",
         component: <DueBalance />,
+        layout: "/admin",
+      },
+      {
+        path: "/receiptList",
+        name: "Receipt List",
+        icon: "ni ni-single-copy-04 text-red",
+        component: <ReceiptList />,
         layout: "/admin",
       },
     ],

@@ -335,7 +335,7 @@ const FeesDashboard = () => {
 
     setShowPaymentDetail((prev) => !prev);
   };
-
+  console.log(feeList);
   return (
     <>
       <Header

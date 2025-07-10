@@ -761,8 +761,17 @@ const EnquiryDashboard = (props) => {
                           <div className="mx-2">
                             <Input
                               type="checkbox"
+                              style={{ margin: 0 }}
+                              checked={studentID.some(
+                                (s) => s.enrollmentid === item.Id
+                              )} // ✅ controlled state
                               onClick={() => handleCheckId(item.Id)}
+                              disabled={item.status_txt === "Admission Done"} // ✅ disable if condition matches
                             />
+                            {/* <Input
+                              type="checkbox"
+                              onClick={() => handleCheckId(item.Id)}
+                            /> */}
                           </div>
                           <div>
                             <p className="fs-6 fw-semibold mb-1">
