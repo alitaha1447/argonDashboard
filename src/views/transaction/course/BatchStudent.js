@@ -28,7 +28,8 @@ import Header from "components/Headers/Header";
 import FilterBar from "components/CustomFilter/FilterBar";
 import PaymentDetail from "components/CustomModals/paymentDetailModal/PaymentDetail";
 import InstallModal from "components/CustomModals/installmentModal/InstallModal";
-
+import { exportToExcel } from "utils/printFile/exportToExcel";
+import { printTableData } from "utils/printFile/printFile";
 // import Select from "react-select";
 import useBranchList from "customHookApi/EnquiryDashboardApi/useBranchList";
 // import useStatusEnquiry from "customHookApi/EnquiryDashboardApi/useStatusEnquiry";
@@ -45,7 +46,6 @@ const BatchStudent = () => {
   const [showPaymentDetail, setShowPaymentDetail] = useState(false);
 
   const [selectedBranch, setSelectedBranch] = useState(null);
-  console.log(selectedBranch);
   const [batches, setBatches] = useState([]);
   const [selectedBatch, setSelectedBatch] = useState(null);
   const [loadingBatches, setLoadingBatches] = useState(false);
@@ -74,7 +74,6 @@ const BatchStudent = () => {
   }, [branchSearchText]);
 
   const fetchBatch = async () => {
-    console.log(selectedBranch, "...................");
     if (!selectedBranch?.value) return; // 🚫 Don't proceed if no branch is selected
     setLoadingBatches(true); // Start loader
     try {
@@ -114,7 +113,6 @@ const BatchStudent = () => {
             batchid: selectedBatch?.value,
           },
         });
-        console.log(res?.data);
         setBatchStudent(res?.data);
       } catch (error) {
         console.log(error);
@@ -124,37 +122,6 @@ const BatchStudent = () => {
     };
     fetchBatchStudent();
   }, [selectedBatch?.value]);
-
-  // useEffect(() => {
-  //   const fetchTotalAmount = async () => {
-  //     try {
-  //       const res = await axios.get(`${API_PATH}/api/Get_Batch_installment`, {
-  //         params: {
-  //           APIKEY: API_KEY,
-  //           batchid: 41,
-  //           studentid: 53,
-  //         },
-  //       });
-
-  //       const installmentData = res?.data || [];
-
-  //       // ✅ Convert `part_amount` to number and sum it
-  //       const total = installmentData.reduce((sum, item) => {
-  //         const amount = parseFloat(item.part_amount || 0);
-  //         return sum + (isNaN(amount) ? 0 : amount);
-  //       }, 0);
-
-  //       console.log("Total Amount:", total);
-  //       setTotalAmount(total); // <-- Store the total
-  //     } catch (err) {
-  //       console.error("Error fetching installment data:", err);
-  //     }
-  //   };
-
-  //   fetchTotalAmount();
-  // }, []);
-
-  // console.log(totalAmount);
 
   const togglePaymentDetail = (id) => {
     setStudid(id);
@@ -166,40 +133,21 @@ const BatchStudent = () => {
     setInstallModal((prev) => !prev);
   };
 
-  const printTableData = () => {
-    const printContent = document.getElementById("printable-table").innerHTML;
+  const resetBatchAndStudent = () => {
+    setSelectedBatch(null);
+    setStudid("");
+  };
 
-    // Create a new print window
-    const printWindow = window.open("", "", "height=800,width=1000");
-    printWindow.document.write(`
-      <html>
-        <head>
-          <title>Print Table</title>
-          <style>
-            table {
-              width: 100%;
-              border-collapse: collapse;
-            }
-            th, td {
-              border: 1px solid #ddd;
-              padding: 8px;
-              text-align: left;
-            }
-            th {
-              background-color: #f2f2f2;
-            }
-          </style>
-        </head>
-        <body>
-          <h3>Batch Student List</h3>
-          <div>${printContent}</div>
-        </body>
-      </html>
-    `);
-    // printWindow.document.close();
-    // printWindow.focus();
-    printWindow.print();
-    // printWindow.close();
+  const handleExport = () => {
+    const exportData = batchStudent.map((item, index) => {
+      return {
+        "S.No	": index + 1,
+        "Enrollment No.": item.admission_no,
+        Name: item.name,
+        Mobile: item.mobileno,
+      };
+    });
+    exportToExcel(exportData, "BatchStudent", "Sheet1");
   };
 
   return (
@@ -281,7 +229,7 @@ const BatchStudent = () => {
                   }}
                 >
                   <h3 className="mb-0 list">Lists</h3>
-                  <UncontrolledDropdown direction="down">
+                  <UncontrolledDropdown direction="left">
                     <DropdownToggle
                       tag="span"
                       style={{
@@ -300,7 +248,6 @@ const BatchStudent = () => {
                     </DropdownToggle>
 
                     <DropdownMenu
-                      right
                       style={{
                         padding: "10px",
                         border: "1px solid #ddd",
@@ -321,9 +268,17 @@ const BatchStudent = () => {
                         color="primary"
                         block
                         size="md"
-                        // onClick={() => printAndExportExcel(data)}
+                        onClick={handleExport}
                       >
                         Save as Excel
+                      </Button>
+                      <Button
+                        color="primary"
+                        block
+                        size="md"
+                        // onClick={() => printAndExportExcel(data)}
+                      >
+                        Add Student
                       </Button>
                     </DropdownMenu>
                   </UncontrolledDropdown>
@@ -331,11 +286,12 @@ const BatchStudent = () => {
               </CardHeader>
               {/* ✅ Table View for Desktop (Large screens only) */}
 
-              <div
-                id="printable-table"
-                className="d-none d-lg-block print-only"
-              >
-                <Table className="align-items-center table-flush " responsive>
+              <div className="d-none d-lg-block print-only">
+                <Table
+                  id="printable-table"
+                  className="align-items-center table-flush "
+                  responsive
+                >
                   <thead className="thead-light">
                     <tr>
                       <th scope="col">S.No</th>
@@ -376,7 +332,6 @@ const BatchStudent = () => {
                                 </DropdownToggle>
 
                                 <DropdownMenu
-                                  // left
                                   style={{
                                     minWidth: "120px",
                                     border: "1px solid #ddd",
@@ -385,13 +340,13 @@ const BatchStudent = () => {
                                   }}
                                 >
                                   <DropdownItem
-                                    key={item.id}
+                                    key={`${index}-installments`}
                                     onClick={() => toggleInstallModal(item?.id)}
                                   >
                                     Installments
                                   </DropdownItem>
                                   <DropdownItem
-                                    key={item.id}
+                                    key={`${index}-receiveAmount`}
                                     onClick={() =>
                                       togglePaymentDetail(item?.id)
                                     }
@@ -425,7 +380,7 @@ const BatchStudent = () => {
                   <Loader />
                 ) : batchStudent.length > 0 ? (
                   batchStudent.map((item, index) => (
-                    <Card key={item?.id} className="mb-3 shadow-sm">
+                    <Card key={index} className="mb-3 shadow-sm">
                       <div className="d-flex p-4 justify-content-between">
                         <div className="d-flex">
                           <div>
@@ -467,13 +422,13 @@ const BatchStudent = () => {
                             }}
                           >
                             <DropdownItem
-                              key={item.id}
+                              key={`${index}-installments`}
                               onClick={() => toggleInstallModal(item.id)}
                             >
                               Installments
                             </DropdownItem>
                             <DropdownItem
-                              key={item.id}
+                              key={`${index}-receiveAmount`}
                               onClick={() => togglePaymentDetail(item.id)}
                             >
                               Recieve Amount
@@ -557,6 +512,7 @@ const BatchStudent = () => {
           toggle={toggleInstallModal}
           batchId={selectedBatch?.value}
           studId={studid}
+          resetParentIds={resetBatchAndStudent}
         />
       </Container>
     </>

@@ -32,10 +32,6 @@ const PaymentDetail = ({
   onPaymentSuccess = () => {},
   resetParentIds = () => {},
 }) => {
-  // console.log(`first --> ${branchId}`);
-  console.log(`first --> ${batchId}`);
-  console.log(`first --> ${studId}`);
-
   const [Loading, setLoading] = useState(false);
 
   const [selectedBranch, setSelectedBranch] = useState(null);
@@ -144,7 +140,6 @@ const PaymentDetail = ({
           studentid: studentValue,
         },
       });
-      // console.log(res.data);
       setInstallmentList(res?.data);
     } catch (error) {
       console.error("Error fetching installments:", error);
@@ -157,9 +152,7 @@ const PaymentDetail = ({
   //   typeof studId === "object"
   //     ? studId?.value
   //     : selectedStudent?.value || studId;
-  console.log("----------------------");
-  console.log(typeof student);
-  console.log("----------------------");
+
   // const student =
   //   selectedStudent?.value ||
   //   (typeof studId === "object" ? studId?.value : studId);
@@ -249,8 +242,7 @@ const PaymentDetail = ({
           paymentmode: paymentModeOptions?.value,
         },
       });
-      console.log(res?.data);
-      console.log(res?.data?.receiptid);
+
       setReceiptId(res?.data?.receiptid);
 
       toast.success("Payment Success !!");

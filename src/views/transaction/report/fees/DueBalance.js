@@ -74,6 +74,7 @@ const DueBalance = () => {
               startDate={startDate}
               endDate={endDate}
               setDateRange={setDateRange}
+              showDatePicker={false}
               // handleSearchClick={handleSearchClick}
               showStatus={true}
             />
@@ -92,22 +93,47 @@ const DueBalance = () => {
                   }}
                 >
                   <h3 className="mb-0">Lists</h3>
-                  <div
-                    // onClick={toggleMaster}
-                    style={{
-                      cursor: "pointer",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      width: "38px",
-                      height: "38px",
-                      backgroundColor: "#5e72e4",
-                      color: "#fff",
-                      borderRadius: "4px",
-                    }}
-                  >
-                    <FaPlus />
-                  </div>
+                  <UncontrolledDropdown direction="down">
+                    <DropdownToggle
+                      tag="span"
+                      style={{
+                        cursor: "pointer",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        width: "38px",
+                        height: "38px",
+                        backgroundColor: "#5e72e4",
+                        color: "#fff",
+                        borderRadius: "4px",
+                      }}
+                    >
+                      <FaPlus />
+                    </DropdownToggle>
+
+                    <DropdownMenu
+                      right
+                      style={{
+                        padding: "10px",
+                        border: "1px solid #ddd",
+                        borderRadius: "4px",
+                        boxShadow: "0px 2px 6px rgba(0,0,0,0.2)",
+                        minWidth: "160px",
+                      }}
+                    >
+                      <Button color="primary" block size="md">
+                        Print
+                      </Button>
+                      <Button
+                        color="primary"
+                        block
+                        size="md"
+                        // onClick={handleExport}
+                      >
+                        Save as Excel
+                      </Button>
+                    </DropdownMenu>
+                  </UncontrolledDropdown>
                 </div>
               </CardHeader>
               {/* ✅ Table View for Desktop (Large screens only) */}

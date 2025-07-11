@@ -38,6 +38,7 @@ import { studentFeeData } from "DummyData";
 import { fetchFinancialYearRangeByDate } from "utils/financialYearRange/FinancialYearRange";
 import { generateHexColors } from "utils/dynamicColorGenerator/generateHexColors ";
 import { exportToExcel } from "utils/printFile/exportToExcel";
+import { printTableData } from "utils/printFile/printFile";
 
 const API_PATH = process.env.REACT_APP_API_PATH;
 const API_KEY = process.env.REACT_APP_API_KEY;
@@ -488,7 +489,12 @@ const FeesDashboard = () => {
                           minWidth: "160px",
                         }}
                       >
-                        <Button color="primary" block size="md">
+                        <Button
+                          color="primary"
+                          block
+                          size="md"
+                          onClick={printTableData}
+                        >
                           Print
                         </Button>
                         <Button
@@ -506,7 +512,11 @@ const FeesDashboard = () => {
               </CardHeader>
               {/* ✅ Table View for Large Screens */}
               <div className="d-none d-lg-block">
-                <Table className="align-items-center table-flush" responsive>
+                <Table
+                  id="printable-table"
+                  className="align-items-center table-flush"
+                  responsive
+                >
                   <thead className="thead-light">
                     <tr>
                       <th scope="col">Student Name</th>

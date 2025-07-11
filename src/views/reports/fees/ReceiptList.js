@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 import Header from "components/Headers/Header";
@@ -18,6 +18,7 @@ import {
   DropdownMenu,
   DropdownItem,
   Col,
+  Spinner,
 } from "reactstrap";
 import { MdFilterAlt } from "react-icons/md";
 import { MdFilterAltOff } from "react-icons/md";
@@ -26,9 +27,21 @@ import { BsThreeDotsVertical } from "react-icons/bs";
 import axios from "axios";
 
 import FilterBar from "components/CustomFilter/FilterBar";
+import CustomPagination from "components/CustomPagination/CustomPagination";
+import { paymentMode } from "DummyData";
+import { exportToExcel } from "utils/printFile/exportToExcel";
+import { printTableData } from "utils/printFile/printFile";
 
 const API_PATH = process.env.REACT_APP_API_PATH;
 const API_KEY = process.env.REACT_APP_API_KEY;
+
+const pageNum = [
+  { value: 10, label: "10" },
+  { value: 25, label: " 25" },
+  { value: 50, label: "50" },
+  { value: 100, label: "100" },
+  { value: 5, label: "5" },
+];
 
 const ReceiptList = () => {
   const [showFilters, setShowFilters] = useState(false);
@@ -37,6 +50,17 @@ const ReceiptList = () => {
   const [selectedBranch, setSelectedBranch] = useState(null);
   const [selectedBatch, setSelectedBatch] = useState(null);
   const [searchText, setSearchText] = useState("");
+
+  const [receiptLists, setReceiptLists] = useState([]);
+  const [isTableLoading, setIsTableLoading] = useState(false);
+
+  const [pageNumber, setPageNumber] = useState(1);
+  const [pageStart, setPageStart] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [pageNumDropDown, setPageNumDropDown] = useState(pageNum[0]);
+  const pageSize = pageNumDropDown?.value;
+
+  const [receiptId, setReceiptId] = useState("");
 
   const fetchBatch = async () => {
     console.log(1);
@@ -76,6 +100,57 @@ const ReceiptList = () => {
     // setIsFilterActive(false);
     // setFilteredData([]);
     // }
+  };
+
+  const fetchReceiptList = async (page = 1) => {
+    setIsTableLoading(true);
+    try {
+      const res = await axios.get(`${API_PATH}/api/Get_Receipt_list`, {
+        params: {
+          fromdate: "2025-02-02",
+          todate: "2026-01-01",
+          pageno: page,
+          pagesize: pageSize,
+        },
+      });
+      // console.log(res.data.Data);
+      setReceiptLists(res?.data?.Data);
+      setPageNumber(res.data.PageNumber);
+      setTotalPages(res.data.TotalPages);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsTableLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchReceiptList(1);
+  }, [pageSize]);
+
+  const handleReceiptId = (id) => {
+    window.open(`/receiptForm?receiptId=${id}`, "_blank");
+  };
+
+  const handleExport = () => {
+    const exportData = receiptLists.map((item, index) => {
+      const getDateOnly = (datetimeString) => {
+        if (!datetimeString) return "";
+        const datePart = datetimeString.split(" ")[0]; // "10/07/2025"
+        return datePart.replace(/\//g, "-"); // "10-07-2025"
+      };
+      const paymentModeLabel =
+        paymentMode.find((mode) => mode.value === item.payment_mode)?.label ||
+        "-";
+      return {
+        "Receipt.No": item.receipt_no,
+        "Receipt Date	": getDateOnly(item.receipt_date),
+        "Student Name	": item.name,
+        "Receipt Amount	": item.receipt_amt,
+        "Payment Mode	": paymentModeLabel,
+      };
+    });
+    exportToExcel(exportData, "ReceiptList", "Sheet1");
   };
 
   return (
@@ -160,209 +235,229 @@ const ReceiptList = () => {
                   }}
                 >
                   <h3 className="mb-0">Receipt Lists</h3>
-                  <div
-                    // onClick={toggleMaster}
-                    style={{
-                      cursor: "pointer",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      width: "38px",
-                      height: "38px",
-                      backgroundColor: "#5e72e4",
-                      color: "#fff",
-                      borderRadius: "4px",
-                    }}
-                  >
-                    <FaPlus />
-                  </div>
+                  <UncontrolledDropdown direction="down">
+                    <DropdownToggle
+                      tag="span"
+                      style={{
+                        cursor: "pointer",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        width: "38px",
+                        height: "38px",
+                        backgroundColor: "#5e72e4",
+                        color: "#fff",
+                        borderRadius: "4px",
+                      }}
+                    >
+                      <FaPlus />
+                    </DropdownToggle>
+
+                    <DropdownMenu
+                      right
+                      style={{
+                        padding: "10px",
+                        border: "1px solid #ddd",
+                        borderRadius: "4px",
+                        boxShadow: "0px 2px 6px rgba(0,0,0,0.2)",
+                        minWidth: "160px",
+                      }}
+                    >
+                      <Button
+                        color="primary"
+                        block
+                        size="md"
+                        onClick={printTableData}
+                      >
+                        Print
+                      </Button>
+                      <Button
+                        color="primary"
+                        block
+                        size="md"
+                        onClick={handleExport}
+                      >
+                        Save as Excel
+                      </Button>
+                    </DropdownMenu>
+                  </UncontrolledDropdown>
                 </div>
               </CardHeader>
               {/* ✅ Table View for Desktop (Large screens only) */}
               <div className="d-none d-lg-block">
-                <Table className="align-items-center table-flush" responsive>
+                <Table
+                  id="printable-table"
+                  className="align-items-center table-flush"
+                  responsive
+                >
                   <thead className="thead-light">
                     <tr>
                       <th scope="col">Receipt.No</th>
                       <th scope="col">Receipt Date</th>
                       <th scope="col">Student Name</th>
                       <th scope="col">Receipt Amount</th>
-                      <th scope="col">Total Amount</th>
+                      <th scope="col">Payment Mode</th>
                       <th scope="col">Action</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {/* {daily.map((item, index) => (
-                              <tr key={index}>
-                                <td>{item.Id}</td>
-                                <td>{item.TopicTitle}</td>
-                                <td>{item.IsActive === 1 ? "Yes" : "No"}</td>
-                                <td>{item.IsActive === 1 ? "Yes" : "No"}</td>
-                                <td>{item.IsActive === 1 ? "Yes" : "No"}</td>
-                                <td style={{}}>
-                                  <UncontrolledDropdown direction="">
-                                    <DropdownToggle
-                                      tag="span"
-                                      style={{ cursor: "pointer" }}
-                                      data-toggle="dropdown"
-                                      aria-expanded={false}
-                                    >
-                                      <BsThreeDotsVertical size={20} />
-                                    </DropdownToggle>
-        
-                                    <DropdownMenu
-                                      left
-                                      style={{
-                                        minWidth: "120px",
-                                        border: "1px solid #ddd",
-                                        borderRadius: "4px",
-                                        boxShadow: "0px 2px 6px rgba(0,0,0,0.2)",
-                                      }}
-                                    >
-                                      <DropdownItem
-                                        key={index}
-                                        // onClick={() => toggleStatusModal(item.Id)}
-                                      >
-                                        Edit
-                                      </DropdownItem>
-                                      <DropdownItem
-                                        key={index}
-                                        // onClick={() => toggleStatusModal(item.Id)}
-                                      >
-                                        Delete
-                                      </DropdownItem>
-                                    </DropdownMenu>
-                                  </UncontrolledDropdown>
-                                </td>
-                              </tr>
-                            ))} */}
+                    {isTableLoading ? (
+                      <tr>
+                        <td colSpan="10" className="text-center py-4">
+                          <Spinner color="primary">Loading...</Spinner>
+                          {/* <i className="fas fa-spinner fa-spin fa-2x text-primary" />
+                          <p className="mt-2 mb-0">Loading data...</p> */}
+                        </td>
+                      </tr>
+                    ) : receiptLists.length > 0 ? (
+                      receiptLists.map((item, index) => {
+                        const getDateOnly = (datetimeString) => {
+                          if (!datetimeString) return "";
+                          const datePart = datetimeString.split(" ")[0]; // "10/07/2025"
+                          return datePart.replace(/\//g, "-"); // "10-07-2025"
+                        };
+
+                        const paymentModeLabel =
+                          paymentMode.find(
+                            (mode) => mode.value === item.payment_mode
+                          )?.label || "-";
+
+                        return (
+                          <tr key={index}>
+                            <td>{item.receipt_no}</td>
+                            <td>{getDateOnly(item.receipt_date)}</td>
+                            <td>{item.name}</td>
+                            <td>{item.receipt_amt}</td>
+                            <td>{paymentModeLabel}</td>
+                            <td>
+                              <UncontrolledDropdown direction="left">
+                                <DropdownToggle
+                                  tag="span"
+                                  style={{ cursor: "pointer" }}
+                                  data-toggle="dropdown"
+                                  aria-expanded={false}
+                                >
+                                  <BsThreeDotsVertical size={20} />
+                                </DropdownToggle>
+
+                                <DropdownMenu
+                                  style={{
+                                    minWidth: "120px",
+                                    border: "1px solid #ddd",
+                                    borderRadius: "4px",
+                                    boxShadow: "0px 2px 6px rgba(0,0,0,0.2)",
+                                  }}
+                                >
+                                  <DropdownItem
+                                    key={`${index}-print`}
+                                    onClick={() =>
+                                      handleReceiptId(item.receipt_id)
+                                    }
+                                  >
+                                    Print Receipt
+                                  </DropdownItem>
+                                </DropdownMenu>
+                              </UncontrolledDropdown>
+                            </td>
+                          </tr>
+                        );
+                      })
+                    ) : (
+                      <tr>
+                        <td
+                          colSpan="10"
+                          className="text-center py-4 text-muted"
+                        >
+                          <i className="fas fa-info-circle mr-2" />
+                          No data found.
+                        </td>
+                      </tr>
+                    )}
                   </tbody>
                 </Table>
               </div>
               {/* ✅ Card View for Mobile & Tablet */}
               <div className="d-block d-lg-none p-3">
-                {/* {courses.map((item, index) => ( */}
-                <Card className="mb-3 shadow-sm">
-                  <div className="d-flex p-4 justify-content-between">
-                    <div className="d-flex">
-                      <div>
-                        <p className="fs-6 fw-semibold mb-1">
-                          <strong>S.No. :</strong> {"1"}
-                        </p>
-                        <p className="fs-6 fw-semibold mb-1">
-                          <strong>Student Name:</strong> {"Taha"}
-                        </p>
-                        <p className="fs-6 fw-semibold mb-1">
-                          <strong>Batch :</strong>
-                          {"React Js"}
-                        </p>
-                        <p className="fs-6 fw-semibold mb-1">
-                          <strong>Bracnh :</strong>
-                          {"Bhopal"}
-                        </p>
-                        <p className="fs-6 fw-semibold mb-1">
-                          <strong>Total Amount :</strong>
-                          {"75500"}
-                        </p>
-                        <p className="fs-6 fw-semibold mb-1">
-                          <strong>Amount Recieved :</strong>
-                          {"12500"}
-                        </p>
-                        <p className="fs-6 fw-semibold mb-1">
-                          <strong>Date :</strong>
-                          {"20-02-2025"}
-                        </p>
-                      </div>
-                    </div>
+                {isTableLoading ? (
+                  <Spinner color="primary">Loading...</Spinner>
+                ) : receiptLists.length > 0 ? (
+                  receiptLists.map((item, index) => {
+                    return (
+                      <Card key={index} className="mb-3 shadow-sm">
+                        <div className="d-flex p-4 justify-content-between">
+                          <div className="d-flex">
+                            <div>
+                              <p className="fs-6 fw-semibold mb-1">
+                                <strong>Receipt.No.:</strong> {item.receipt_no}
+                              </p>
+                              <p className="fs-6 fw-semibold mb-1">
+                                <strong>Receipt Date :</strong>{" "}
+                                {item.receipt_date}
+                              </p>
+                              <p className="fs-6 fw-semibold mb-1">
+                                <strong>Student Name :</strong>
+                                {item.name}
+                              </p>
+                              <p className="fs-6 fw-semibold mb-1">
+                                <strong>Receipt Amount :</strong>
+                                {item.receipt_amt}
+                              </p>
+                              <p className="fs-6 fw-semibold mb-1">
+                                <strong>Payment Mode :</strong>
+                                {item.payment_mode}
+                              </p>
+                            </div>
+                          </div>
 
-                    <UncontrolledDropdown direction="left">
-                      <DropdownToggle
-                        tag="span"
-                        style={{ cursor: "pointer" }}
-                        data-toggle="dropdown"
-                        aria-expanded={false}
-                      >
-                        <BsThreeDotsVertical size={20} />
-                      </DropdownToggle>
+                          <UncontrolledDropdown direction="left">
+                            <DropdownToggle
+                              tag="span"
+                              style={{ cursor: "pointer" }}
+                              data-toggle="dropdown"
+                              aria-expanded={false}
+                            >
+                              <BsThreeDotsVertical size={20} />
+                            </DropdownToggle>
 
-                      <DropdownMenu
-                        right
-                        style={{
-                          minWidth: "120px",
-                          border: "1px solid #ddd",
-                          borderRadius: "4px",
-                          boxShadow: "0px 2px 6px rgba(0,0,0,0.2)",
-                        }}
-                      >
-                        <DropdownItem
-                        // key={index}
-                        // onClick={() => toggleStatusModal(item.Id)}
-                        >
-                          Edit
-                        </DropdownItem>
-                        <DropdownItem
-                        // key={index}
-                        // onClick={() => toggleStatusModal(item.Id)}
-                        >
-                          Delete
-                        </DropdownItem>
-                      </DropdownMenu>
-                    </UncontrolledDropdown>
+                            <DropdownMenu
+                              style={{
+                                minWidth: "120px",
+                                border: "1px solid #ddd",
+                                borderRadius: "4px",
+                                boxShadow: "0px 2px 6px rgba(0,0,0,0.2)",
+                              }}
+                            >
+                              <DropdownItem
+                                key={`${index}-print`}
+                                onClick={() => handleReceiptId(item.receipt_id)}
+                              >
+                                Print Receipt
+                              </DropdownItem>
+                            </DropdownMenu>
+                          </UncontrolledDropdown>
+                        </div>
+                      </Card>
+                    );
+                  })
+                ) : (
+                  <div className="text-center py-4 text-muted">
+                    <i className="fas fa-info-circle mr-2" />
+                    No data found.
                   </div>
-                </Card>
-                {/* ))} */}
+                )}
               </div>
               <CardFooter className="py-4">
-                <nav aria-label="...">
-                  <Pagination
-                    className="pagination justify-content-end mb-0"
-                    listClassName="justify-content-end mb-0"
-                  >
-                    <PaginationItem className="disabled">
-                      <PaginationLink
-                        href="#pablo"
-                        onClick={(e) => e.preventDefault()}
-                        tabIndex="-1"
-                      >
-                        <i className="fas fa-angle-left" />
-                        <span className="sr-only">Previous</span>
-                      </PaginationLink>
-                    </PaginationItem>
-                    <PaginationItem className="active">
-                      <PaginationLink
-                        href="#pablo"
-                        onClick={(e) => e.preventDefault()}
-                      >
-                        1
-                      </PaginationLink>
-                    </PaginationItem>
-                    <PaginationItem>
-                      <PaginationLink
-                        href="#pablo"
-                        onClick={(e) => e.preventDefault()}
-                      >
-                        2 <span className="sr-only">(current)</span>
-                      </PaginationLink>
-                    </PaginationItem>
-                    <PaginationItem>
-                      <PaginationLink
-                        href="#pablo"
-                        onClick={(e) => e.preventDefault()}
-                      >
-                        3
-                      </PaginationLink>
-                    </PaginationItem>
-                    <PaginationItem>
-                      <PaginationLink
-                        href="#pablo"
-                        onClick={(e) => e.preventDefault()}
-                      >
-                        <i className="fas fa-angle-right" />
-                        <span className="sr-only">Next</span>
-                      </PaginationLink>
-                    </PaginationItem>
-                  </Pagination>
-                </nav>
+                <CustomPagination
+                  pageStart={pageStart}
+                  setPageStart={setPageStart}
+                  totalPages={totalPages}
+                  setPageNumber={setPageNumber}
+                  fetchPaginatedData={fetchReceiptList}
+                  pageNumber={pageNumber}
+                  pageNumDropDown={pageNumDropDown}
+                  setPageNumDropDown={setPageNumDropDown}
+                  pageNum={pageNum}
+                />
               </CardFooter>
             </Card>
           </div>

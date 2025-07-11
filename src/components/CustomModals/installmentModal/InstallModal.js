@@ -29,6 +29,7 @@ const InstallModal = ({
   totalFees,
   batchId = null,
   studId = null,
+  resetParentIds = () => {}, // ✅ Default fallback
 }) => {
   const location = useLocation();
   const [initialAmount, setInitialAmount] = useState(0);
@@ -39,6 +40,31 @@ const InstallModal = ({
   const [installmentStructure, setInstallmentStructure] = useState([
     { title: "", amount: null, date: null },
   ]);
+
+  const fetchBatchinstallment = async (batchid, studid) => {
+    try {
+      const res = await axios.get(`${API_PATH}/api/Get_Batch_installment`, {
+        params: {
+          APIKEY: API_KEY,
+          batchid: batchid,
+          studentid: studid,
+        },
+      });
+      const transformed = res.data.map((item) => ({
+        title: item.installment_title ?? "",
+        amount: parseFloat(item.part_amount ?? 0),
+        date: new Date(item.due_date), // Convert from "7/10/2025 12:00:00 AM"
+      }));
+      setInstallmentStructure(transformed); // ✅ Update the structure
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  useEffect(() => {
+    if (modal && batchId && studId) {
+      fetchBatchinstallment(batchId, studId);
+    }
+  }, [modal && batchId && studId]);
 
   const handleFeeChange = (index, key, value) => {
     const updated = [...installmentStructure];
@@ -81,7 +107,6 @@ const InstallModal = ({
         date: installmentDate,
       });
     }
-    // console.log(newStructure);
     setInstallmentStructure(newStructure);
   };
 
@@ -108,10 +133,10 @@ const InstallModal = ({
       due_date: new Date(item.date).toISOString().split("T")[0], // ✅ Formats to "YYYY-MM-DD"
     }));
 
-    // console.log(formatted);
     onSubmitInstallment(formatted); // ✅ send to parent
     resetForm();
-    toggle(); // close modal
+    resetParentIds(); // ✅ resets in parent
+    toggle(); // ✅ closes modal
   };
 
   const handleSaveInstallment = async () => {
@@ -130,13 +155,11 @@ const InstallModal = ({
       part_amount: item.amount.toString(),
       due_date: new Date(item.date).toISOString().split("T")[0], // ✅ Formats to "YYYY-MM-DD"
     }));
-    // console.log(formatted);
 
     const payload = {
       batch_installments: formatted,
       CreatedBy: "Developer", // or logged-in user
     };
-    console.log(payload);
 
     try {
       const res = await axios.post(
@@ -149,47 +172,12 @@ const InstallModal = ({
           },
         }
       );
-      console.log(res);
       resetForm();
-      // toggle(); // close modal
+      toggle(); // close modal
     } catch (error) {
       console.log(error);
     }
   };
-
-  // useEffect(() => {
-  //   const fetchTotalAmount = async () => {
-  //     try {
-  //       const res = await axios.get(`${API_PATH}/api/Get_Batch_installment`, {
-  //         params: {
-  //           APIKEY: API_KEY,
-  //           batchid: 41,
-  //           studentid: 53,
-  //         },
-  //       });
-
-  //       const installmentData = res?.data || [];
-  //       console.log("--------------");
-  //       console.log(installmentData);
-  //       console.log("--------------");
-  //       // ✅ Convert `part_amount` to number and sum it
-  //       // const total = installmentData.reduce((sum, item) => {
-  //       //   const amount = parseFloat(item.part_amount || 0);
-  //       //   return sum + (isNaN(amount) ? 0 : amount);
-  //       // }, 0);
-
-  //       // console.log("Total Amount:", total);
-  //       // setTotalAmount(total); // <-- Store the total
-  //     } catch (err) {
-  //       console.error("Error fetching installment data:", err);
-  //     }
-  //   };
-
-  //   fetchTotalAmount();
-  // }, []);
-
-  // console.log(`batchId --> ${batchId}`);
-  // console.log(`studId --> ${studId}`);
 
   return (
     <Modal
@@ -283,14 +271,14 @@ const InstallModal = ({
           </Col>
 
           {installmentStructure.map((item, index) => (
-            <Row className="align-items-end mb-3">
+            <Row key={index} className="align-items-end mb-3">
               <Col md={4}>
                 <FormGroup>
                   {/* <Label>{item.title || "Title"}</Label> */}
                   <Label>{"Title"}</Label>
                   <Input
                     type="text"
-                    value={item.title}
+                    value={item.title ?? ""}
                     onChange={(e) =>
                       handleFeeChange(index, "title", e.target.value)
                     }
@@ -302,7 +290,7 @@ const InstallModal = ({
                   <Label>Amount</Label>
                   <Input
                     type="number"
-                    value={item.amount}
+                    value={item.amount ?? ""}
                     onChange={(e) =>
                       handleFeeChange(index, "amount", e.target.value)
                     }
@@ -390,6 +378,7 @@ const InstallModal = ({
           color="secondary"
           onClick={() => {
             resetForm();
+            resetParentIds(); // ✅ Reset parent state
             toggle();
           }}
         >

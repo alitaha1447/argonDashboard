@@ -32,9 +32,21 @@ import "react-datepicker/dist/react-datepicker.css";
 import { enquiry } from "DummyData";
 import { MdFilterAlt } from "react-icons/md";
 import { MdFilterAltOff } from "react-icons/md";
+import Loader from "components/CustomLoader/Loader";
+import CustomPagination from "components/CustomPagination/CustomPagination";
+import { exportToExcel } from "utils/printFile/exportToExcel";
+import { printTableData } from "utils/printFile/printFile";
 
 const API_PATH = process.env.REACT_APP_API_PATH;
 const API_KEY = process.env.REACT_APP_API_KEY;
+
+const pageNum = [
+  { value: 10, label: "10" },
+  { value: 25, label: " 25" },
+  { value: 50, label: "50" },
+  { value: 100, label: "100" },
+  { value: 5, label: "5" },
+];
 
 const DailyCollection = () => {
   const [showFilters, setShowFilters] = useState(false);
@@ -51,6 +63,14 @@ const DailyCollection = () => {
   // const [statusOptions, setstatusOptions] = useState([]);
   const [selectedStatus, setSelectedStatus] = useState(null);
 
+  const [dailyLists, setDailyLists] = useState([]);
+  const [isTableLoading, setIsTableLoading] = useState(false);
+
+  const [pageNumber, setPageNumber] = useState(1);
+  const [pageStart, setPageStart] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [pageNumDropDown, setPageNumDropDown] = useState(pageNum[0]);
+  const pageSize = pageNumDropDown?.value;
   // customHookAPI
   const {
     branchOptions,
@@ -91,6 +111,52 @@ const DailyCollection = () => {
     } finally {
       // setLoadingBatches(false); // Stop loader
     }
+  };
+
+  const fetchDailyCollection = async (page = 1) => {
+    setIsTableLoading(true);
+    try {
+      const res = await axios.get(`${API_PATH}/api/Get_Daily_Fee_Collection`, {
+        params: {
+          fromdate: "2025-02-02",
+          todate: "2026-01-01",
+          pageno: page,
+          pagesize: pageSize,
+        },
+      });
+      setDailyLists(res?.data?.Data);
+      setPageNumber(res.data.PageNumber);
+      setTotalPages(res.data.TotalPages);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsTableLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchDailyCollection(1);
+  }, [pageSize]);
+
+  const handleExport = () => {
+    const exportData = dailyLists.map((item, index) => {
+      const getDateOnly = (datetimeString) => {
+        if (!datetimeString) return "";
+        const datePart = datetimeString.split(" ")[0]; // "10/07/2025"
+        return datePart.replace(/\//g, "-"); // "10-07-2025"
+      };
+
+      return {
+        "S.No	": index + 1,
+        "Student Name	": item.name,
+        Batch: item.batchname,
+        Branch: item.branch_name,
+        "Total Amount": item.totalAmount,
+        "Amount Recieved": item.amount_received,
+        Date: getDateOnly(item.received_date),
+      };
+    });
+    exportToExcel(exportData, "DailyCollection", "Sheet1");
   };
 
   return (
@@ -145,7 +211,7 @@ const DailyCollection = () => {
                     endDate={endDate}
                     setDateRange={setDateRange}
                     // handleSearchClick={handleSearchClick}
-                    showDatePicker={false}
+                    showDatePicker={true}
                     showBatch={true}
                     showStatus={false}
                     showSearchByName={false}
@@ -174,7 +240,7 @@ const DailyCollection = () => {
               endDate={endDate}
               setDateRange={setDateRange}
               // handleSearchClick={handleSearchClick}
-              showDatePicker={false}
+              showDatePicker={true}
               showBatch={true}
               showStatus={false}
               showSearchByName={false}
@@ -193,28 +259,62 @@ const DailyCollection = () => {
                     justifyContent: "space-between",
                   }}
                 >
-                  <h3 className="mb-0">Lists</h3>
-                  <div
-                    // onClick={toggleMaster}
-                    style={{
-                      cursor: "pointer",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      width: "38px",
-                      height: "38px",
-                      backgroundColor: "#5e72e4",
-                      color: "#fff",
-                      borderRadius: "4px",
-                    }}
-                  >
-                    <FaPlus />
-                  </div>
+                  <h3 className="mb-0">Daily Collections</h3>
+                  <UncontrolledDropdown direction="down">
+                    <DropdownToggle
+                      tag="span"
+                      style={{
+                        cursor: "pointer",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        width: "38px",
+                        height: "38px",
+                        backgroundColor: "#5e72e4",
+                        color: "#fff",
+                        borderRadius: "4px",
+                      }}
+                    >
+                      <FaPlus />
+                    </DropdownToggle>
+
+                    <DropdownMenu
+                      right
+                      style={{
+                        padding: "10px",
+                        border: "1px solid #ddd",
+                        borderRadius: "4px",
+                        boxShadow: "0px 2px 6px rgba(0,0,0,0.2)",
+                        minWidth: "160px",
+                      }}
+                    >
+                      <Button
+                        color="primary"
+                        block
+                        size="md"
+                        onClick={printTableData}
+                      >
+                        Print
+                      </Button>
+                      <Button
+                        color="primary"
+                        block
+                        size="md"
+                        onClick={handleExport}
+                      >
+                        Save as Excel
+                      </Button>
+                    </DropdownMenu>
+                  </UncontrolledDropdown>
                 </div>
               </CardHeader>
               {/* ✅ Table View for Desktop (Large screens only) */}
               <div className="d-none d-lg-block">
-                <Table className="align-items-center table-flush" responsive>
+                <Table
+                  id="printable-table"
+                  className="align-items-center table-flush"
+                  responsive
+                >
                   <thead className="thead-light">
                     <tr>
                       <th scope="col">S.No</th>
@@ -224,178 +324,168 @@ const DailyCollection = () => {
                       <th scope="col">Total Amount</th>
                       <th scope="col">Amount Recieved</th>
                       <th scope="col">Date</th>
+                      <th scope="col">Action</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {/* {daily.map((item, index) => (
-                      <tr key={index}>
-                        <td>{item.Id}</td>
-                        <td>{item.TopicTitle}</td>
-                        <td>{item.IsActive === 1 ? "Yes" : "No"}</td>
-                        <td style={{}}>
-                          <UncontrolledDropdown direction="">
-                            <DropdownToggle
-                              tag="span"
-                              style={{ cursor: "pointer" }}
-                              data-toggle="dropdown"
-                              aria-expanded={false}
-                            >
-                              <BsThreeDotsVertical size={20} />
-                            </DropdownToggle>
-
-                            <DropdownMenu
-                              left
-                              style={{
-                                minWidth: "120px",
-                                border: "1px solid #ddd",
-                                borderRadius: "4px",
-                                boxShadow: "0px 2px 6px rgba(0,0,0,0.2)",
-                              }}
-                            >
-                              <DropdownItem
-                                key={index}
-                                // onClick={() => toggleStatusModal(item.Id)}
-                              >
-                                Edit
-                              </DropdownItem>
-                              <DropdownItem
-                                key={index}
-                                // onClick={() => toggleStatusModal(item.Id)}
-                              >
-                                Delete
-                              </DropdownItem>
-                            </DropdownMenu>
-                          </UncontrolledDropdown>
+                    {isTableLoading ? (
+                      <tr>
+                        <td colSpan="10" className="text-center py-4">
+                          <i className="fas fa-spinner fa-spin fa-2x text-primary" />
+                          <p className="mt-2 mb-0">Loading data...</p>
                         </td>
                       </tr>
-                    ))} */}
+                    ) : dailyLists.length > 0 ? (
+                      dailyLists.map((item, index) => {
+                        const getDateOnly = (datetimeString) => {
+                          if (!datetimeString) return "";
+                          const datePart = datetimeString.split(" ")[0]; // "10/07/2025"
+                          return datePart.replace(/\//g, "-"); // "10-07-2025"
+                        };
+
+                        return (
+                          <tr key={index}>
+                            <td>{index + 1}</td>
+                            <td>{item.name}</td>
+                            <td>{item.batchname}</td>
+                            <td>{item.branch_name}</td>
+                            <td>{item.totalAmount}</td>
+                            <td>{item.amount_received}</td>
+                            <td>{getDateOnly(item.received_date)}</td>
+
+                            <td style={{}}>
+                              <UncontrolledDropdown direction="">
+                                <DropdownToggle
+                                  tag="span"
+                                  style={{ cursor: "pointer" }}
+                                  data-toggle="dropdown"
+                                  aria-expanded={false}
+                                >
+                                  <BsThreeDotsVertical size={20} />
+                                </DropdownToggle>
+
+                                <DropdownMenu
+                                  left
+                                  style={{
+                                    minWidth: "120px",
+                                    border: "1px solid #ddd",
+                                    borderRadius: "4px",
+                                    boxShadow: "0px 2px 6px rgba(0,0,0,0.2)",
+                                  }}
+                                >
+                                  <DropdownItem
+                                    key={index}
+                                    // onClick={() => toggleStatusModal(item.Id)}
+                                  >
+                                    Edit
+                                  </DropdownItem>
+                                  <DropdownItem
+                                    key={index}
+                                    // onClick={() => toggleStatusModal(item.Id)}
+                                  >
+                                    Delete
+                                  </DropdownItem>
+                                </DropdownMenu>
+                              </UncontrolledDropdown>
+                            </td>
+                          </tr>
+                        );
+                      })
+                    ) : (
+                      <tr>
+                        <td
+                          colSpan="10"
+                          className="text-center py-4 text-muted"
+                        >
+                          <i className="fas fa-info-circle mr-2" />
+                          No data found.
+                        </td>
+                      </tr>
+                    )}
                   </tbody>
                 </Table>
               </div>
               {/* ✅ Card View for Mobile & Tablet */}
               <div className="d-block d-lg-none p-3">
-                {/* {courses.map((item, index) => ( */}
-                <Card className="mb-3 shadow-sm">
-                  <div className="d-flex p-4 justify-content-between">
-                    <div className="d-flex">
-                      <div>
-                        <p className="fs-6 fw-semibold mb-1">
-                          <strong>S.No. :</strong> {"1"}
-                        </p>
-                        <p className="fs-6 fw-semibold mb-1">
-                          <strong>Student Name:</strong> {"Taha"}
-                        </p>
-                        <p className="fs-6 fw-semibold mb-1">
-                          <strong>Batch :</strong>
-                          {"React Js"}
-                        </p>
-                        <p className="fs-6 fw-semibold mb-1">
-                          <strong>Bracnh :</strong>
-                          {"Bhopal"}
-                        </p>
-                        <p className="fs-6 fw-semibold mb-1">
-                          <strong>Total Amount :</strong>
-                          {"75500"}
-                        </p>
-                        <p className="fs-6 fw-semibold mb-1">
-                          <strong>Amount Recieved :</strong>
-                          {"12500"}
-                        </p>
-                        <p className="fs-6 fw-semibold mb-1">
-                          <strong>Date :</strong>
-                          {"20-02-2025"}
-                        </p>
+                {isTableLoading ? (
+                  <Loader />
+                ) : dailyLists.length > 0 ? (
+                  dailyLists.map((item, index) => (
+                    <Card key={index} className="mb-3 shadow-sm">
+                      <div className="d-flex p-4 justify-content-between">
+                        <div className="d-flex">
+                          <div>
+                            <p className="fs-6 fw-semibold mb-1">
+                              <strong>S.No. :</strong> {index + 1}
+                            </p>
+                            <p className="fs-6 fw-semibold mb-1">
+                              <strong>Student Name:</strong> {item.name}
+                            </p>
+                            <p className="fs-6 fw-semibold mb-1">
+                              <strong>Batch :</strong> {item.batchname}
+                            </p>
+                            <p className="fs-6 fw-semibold mb-1">
+                              <strong>Branch :</strong> {item.branch_name}
+                            </p>
+                            <p className="fs-6 fw-semibold mb-1">
+                              <strong>Total Amount :</strong> {item.totalAmount}
+                            </p>
+                            <p className="fs-6 fw-semibold mb-1">
+                              <strong>Amount Received :</strong>{" "}
+                              {item.amount_received}
+                            </p>
+                            <p className="fs-6 fw-semibold mb-1">
+                              <strong>Date :</strong> {item.received_date}
+                            </p>
+                          </div>
+                        </div>
+
+                        <UncontrolledDropdown direction="left">
+                          <DropdownToggle
+                            tag="span"
+                            style={{ cursor: "pointer" }}
+                            data-toggle="dropdown"
+                            aria-expanded={false}
+                          >
+                            <BsThreeDotsVertical size={20} />
+                          </DropdownToggle>
+
+                          <DropdownMenu
+                            right
+                            style={{
+                              minWidth: "120px",
+                              border: "1px solid #ddd",
+                              borderRadius: "4px",
+                              boxShadow: "0px 2px 6px rgba(0,0,0,0.2)",
+                            }}
+                          >
+                            <DropdownItem>Edit</DropdownItem>
+                            <DropdownItem>Delete</DropdownItem>
+                          </DropdownMenu>
+                        </UncontrolledDropdown>
                       </div>
-                    </div>
-
-                    <UncontrolledDropdown direction="left">
-                      <DropdownToggle
-                        tag="span"
-                        style={{ cursor: "pointer" }}
-                        data-toggle="dropdown"
-                        aria-expanded={false}
-                      >
-                        <BsThreeDotsVertical size={20} />
-                      </DropdownToggle>
-
-                      <DropdownMenu
-                        right
-                        style={{
-                          minWidth: "120px",
-                          border: "1px solid #ddd",
-                          borderRadius: "4px",
-                          boxShadow: "0px 2px 6px rgba(0,0,0,0.2)",
-                        }}
-                      >
-                        <DropdownItem
-                        // key={index}
-                        // onClick={() => toggleStatusModal(item.Id)}
-                        >
-                          Edit
-                        </DropdownItem>
-                        <DropdownItem
-                        // key={index}
-                        // onClick={() => toggleStatusModal(item.Id)}
-                        >
-                          Delete
-                        </DropdownItem>
-                      </DropdownMenu>
-                    </UncontrolledDropdown>
+                    </Card>
+                  ))
+                ) : (
+                  <div className="text-center py-4 text-muted">
+                    <i className="fas fa-info-circle mr-2" />
+                    No data found.
                   </div>
-                </Card>
-                {/* ))} */}
+                )}
               </div>
+
               <CardFooter className="py-4">
-                <nav aria-label="...">
-                  <Pagination
-                    className="pagination justify-content-end mb-0"
-                    listClassName="justify-content-end mb-0"
-                  >
-                    <PaginationItem className="disabled">
-                      <PaginationLink
-                        href="#pablo"
-                        onClick={(e) => e.preventDefault()}
-                        tabIndex="-1"
-                      >
-                        <i className="fas fa-angle-left" />
-                        <span className="sr-only">Previous</span>
-                      </PaginationLink>
-                    </PaginationItem>
-                    <PaginationItem className="active">
-                      <PaginationLink
-                        href="#pablo"
-                        onClick={(e) => e.preventDefault()}
-                      >
-                        1
-                      </PaginationLink>
-                    </PaginationItem>
-                    <PaginationItem>
-                      <PaginationLink
-                        href="#pablo"
-                        onClick={(e) => e.preventDefault()}
-                      >
-                        2 <span className="sr-only">(current)</span>
-                      </PaginationLink>
-                    </PaginationItem>
-                    <PaginationItem>
-                      <PaginationLink
-                        href="#pablo"
-                        onClick={(e) => e.preventDefault()}
-                      >
-                        3
-                      </PaginationLink>
-                    </PaginationItem>
-                    <PaginationItem>
-                      <PaginationLink
-                        href="#pablo"
-                        onClick={(e) => e.preventDefault()}
-                      >
-                        <i className="fas fa-angle-right" />
-                        <span className="sr-only">Next</span>
-                      </PaginationLink>
-                    </PaginationItem>
-                  </Pagination>
-                </nav>
+                <CustomPagination
+                  pageStart={pageStart}
+                  setPageStart={setPageStart}
+                  totalPages={totalPages}
+                  setPageNumber={setPageNumber}
+                  fetchPaginatedData={fetchDailyCollection}
+                  pageNumber={pageNumber}
+                  pageNumDropDown={pageNumDropDown}
+                  setPageNumDropDown={setPageNumDropDown}
+                  pageNum={pageNum}
+                />
               </CardFooter>
             </Card>
           </div>

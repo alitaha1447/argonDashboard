@@ -52,6 +52,8 @@ import { MdFilterAltOff } from "react-icons/md";
 import useStatusEnquiry from "customHookApi/EnquiryDashboardApi/useStatusEnquiry";
 import { generateHexColors } from "utils/dynamicColorGenerator/generateHexColors ";
 import { exportToExcel } from "utils/printFile/exportToExcel";
+import { printTableData } from "utils/printFile/printFile";
+
 const API_PATH = process.env.REACT_APP_API_PATH;
 const API_KEY = process.env.REACT_APP_API_KEY;
 
@@ -593,7 +595,12 @@ const EnquiryDashboard = (props) => {
                       >
                         Add Enquiry
                       </Button>
-                      <Button color="primary" block size="md">
+                      <Button
+                        color="primary"
+                        block
+                        size="md"
+                        onClick={printTableData}
+                      >
                         Print
                       </Button>
                       <Button
@@ -616,7 +623,11 @@ const EnquiryDashboard = (props) => {
                   isTableLoading={isTableLoading}
                   selectedEnquiryType={selectedEnquiryType}
                 /> */}
-                <Table className="align-items-center table-flush" responsive>
+                <Table
+                  id="printable-table"
+                  className="align-items-center table-flush"
+                  responsive
+                >
                   <thead className="thead-light">
                     <tr>
                       <th scope="col" className="text-center"></th>
