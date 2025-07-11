@@ -96,3 +96,14 @@ export const paymentMode = [
   { value: 1, label: "Online" },
   { value: 2, label: "Check" },
 ];
+
+export const questionType = [
+  { value: 1, label: "MCQ" },
+  { value: 2, label: "Descriptive" },
+  { value: 3, label: "Coding Challenge" },
+];
+
+export const Type = [
+  { label: "Create Manually", value: "CreateManually" },
+  { label: "Bulk Upload", value: "BulkUpload" },
+];
