@@ -14,11 +14,12 @@ import Select from "react-select";
 import axios from "axios";
 import { toast } from "react-toastify";
 import Papa from "papaparse";
+import { jsPDF } from "jspdf";
 import RadioGroupField from "components/FormFields/RadioGroup";
 import TextAreaField from "components/FormFields/TextAreaField";
 import FileUploadFieldK from "components/FormFields/FileUploadFieldK";
 import DownloadSampleFile from "components/FormFields/DownloadSampleFile";
-import { printTableData } from "utils/printFile/printFile";
+// import { printTableData } from "utils/printFile/printFile";
 
 const Type = [
   { label: "Create Manually", value: "CreateManually" },
@@ -47,7 +48,7 @@ const QuestionBankBody = ({ selectedQuestionType }) => {
   const [selectedRows, setSelectedRows] = useState([]);
   const [selectAll, setSelectAll] = useState(false);
   const [uploadedFilePath, setUploadedFilePath] = useState(null);
-  console.log(uploadedFilePath);
+
   // Local options (static fallback)
   const [courses, setCourses] = useState([
     { value: "course1", label: "Computer Science" },
@@ -59,8 +60,9 @@ const QuestionBankBody = ({ selectedQuestionType }) => {
   ]);
 
   const handleFileChange = (e) => {
-    const file = e.target.files[0];
+    const file = e.target.files.name;
     console.log(e);
+    console.log(file);
 
     if (!file) return;
 
@@ -175,9 +177,62 @@ const QuestionBankBody = ({ selectedQuestionType }) => {
     link.remove();
   };
 
-  //   const download = () => {
-  //     doc.save(uploadedFilePath); // This triggers automatic browser download
-  //   };
+  const printTableData = () => {
+    const printContent = document.getElementById("printable-table");
+    // if (!printContent) return;
+
+    // Clone the table so we don't modify the original DOM
+    const tableClone = printContent.cloneNode(true);
+
+    // Remove first column (Action) from header
+    const theadRow = tableClone.querySelector("thead tr");
+    if (theadRow) {
+      theadRow.removeChild(theadRow.firstElementChild);
+    }
+
+    // Remove first column from each row in tbody
+    const rows = tableClone.querySelectorAll("tbody tr");
+    rows.forEach((row) => {
+      row.removeChild(row.firstElementChild);
+    });
+    // Open print window
+    const printWindow = window.open("", "", "height=800,width=1000");
+    printWindow.document.write(`
+    <html>
+  <head>
+    <title>Print Table</title>
+    <style>
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        table-layout: fixed;
+      }
+      th,
+      td {
+        border: 1px solid #000;
+        padding: 8px;
+        text-align: left;
+        word-break: break-word;
+      }
+      th {
+        background-color: #f2f2f2;
+      }
+      th:last-child,
+      td:last-child {
+        min-width: 100px; /* 👈 Ensures proper spacing and border for last column */
+      }
+    </style>
+  </head>
+  <body>
+    ${tableClone.outerHTML}
+  </body>
+</html>
+
+  `);
+    printWindow.document.close();
+    printWindow.focus();
+    printWindow.print();
+  };
 
   return (
     <Form onSubmit={handleSubmit}>
@@ -261,6 +316,10 @@ const QuestionBankBody = ({ selectedQuestionType }) => {
                   Download
                 </Button>
               </FormGroup>
+              {/* <div>
+                <h4>Upload CSV and Download PDF</h4>
+                <input type="file" accept=".csv" onChange={handleCsvToPdf} />
+              </div> */}
 
               {/* <DownloadSampleFile
                 filePath="/sample-files/sample-question.pdf"

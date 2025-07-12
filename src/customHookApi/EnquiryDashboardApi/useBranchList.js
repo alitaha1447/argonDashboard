@@ -11,7 +11,7 @@ const useBranchList = () => {
 
   const fetchBranch = async () => {
     try {
-      const res = await axios.get(`${API_PATH}/api/branches`, {
+      const res = await axios.get(`${API_PATH}/api/Branches`, {
         params: {
           APIKEY: API_KEY,
           searchtext: branchSearchText,
@@ -20,7 +20,7 @@ const useBranchList = () => {
 
       const options =
         res.data?.map((branch) => ({
-          label: branch?.BranchName || `Branch ${branch?.BranchId}`,
+          label: branch?.BranchName,
           value: branch?.BranchId,
         })) || [];
 

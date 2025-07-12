@@ -19,6 +19,7 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { login } from "features/user/userSlice";
 import { ToastContainer, toast } from "react-toastify";
+import BrachModal from "components/CustomModals/branchModal/BrachModal";
 
 const API_PATH = process.env.REACT_APP_API_PATH;
 const API_KEY = process.env.REACT_APP_API_KEY;
@@ -27,6 +28,7 @@ const Login = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
 
   const navigate = useNavigate();
 
@@ -62,7 +64,8 @@ const Login = () => {
       // Save to localStorage
       localStorage.setItem("user", JSON.stringify(userData));
       toast.success("Login Successful!");
-      navigate("/admin/enquiryDashboard");
+      setShowConfirmModal(true); // open modal
+      // navigate("/admin/enquiryDashboard");
       // setTimeout(() => {
       // }, [1000]);
     } catch (error) {
@@ -71,6 +74,10 @@ const Login = () => {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const toggleBranchModal = () => {
+    setShowConfirmModal((prev) => !prev);
   };
   return (
     <>
@@ -220,6 +227,14 @@ const Login = () => {
         </Row>
       </Col>
       <ToastContainer />
+      <BrachModal
+        show={showConfirmModal}
+        toggle={toggleBranchModal}
+        // onConfirm={() => {
+        //   setShowConfirmModal(false);
+        //   navigate("/admin/enquiryDashboard");
+        // }}
+      />
     </>
   );
 };
