@@ -260,7 +260,7 @@ const BatchStudent = () => {
                         color="primary"
                         block
                         size="md"
-                        onClick={printTableData}
+                        onClick={() => printTableData("Student Batch Lists")}
                       >
                         Print
                       </Button>

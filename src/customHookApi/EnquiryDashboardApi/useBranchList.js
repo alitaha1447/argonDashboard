@@ -9,11 +9,13 @@ const useBranchList = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [branchSearchText, setBranchSearchText] = useState("");
 
-  const fetchBranch = async () => {
+  const fetchBranch = async (branchtype = "", parent_branch_id = "") => {
     try {
       const res = await axios.get(`${API_PATH}/api/Branches`, {
         params: {
           APIKEY: API_KEY,
+          branchtype: branchtype,
+          parent_branch_id: parent_branch_id,
           searchtext: branchSearchText,
         },
       });
@@ -23,8 +25,16 @@ const useBranchList = () => {
           label: branch?.BranchName,
           value: branch?.BranchId,
         })) || [];
-
       setBranchOptions(options);
+
+      if (branchtype === "2") {
+        const districtOptions =
+          res.data?.map((branch) => ({
+            label: branch?.BranchName,
+            value: branch?.BranchId,
+          })) || [];
+        return districtOptions;
+      }
     } catch (error) {
       console.error("Branch fetch error:", error);
     } finally {

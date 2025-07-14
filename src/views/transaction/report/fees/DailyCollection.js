@@ -292,7 +292,9 @@ const DailyCollection = () => {
                         color="primary"
                         block
                         size="md"
-                        onClick={printTableData}
+                        onClick={() =>
+                          printTableData("Daily Fee Collection Lists")
+                        }
                       >
                         Print
                       </Button>

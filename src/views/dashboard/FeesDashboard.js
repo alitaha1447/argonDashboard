@@ -336,7 +336,7 @@ const FeesDashboard = () => {
 
     setShowPaymentDetail((prev) => !prev);
   };
-  console.log(feeList);
+  // console.log(feeList);
   return (
     <>
       <Header
@@ -493,7 +493,7 @@ const FeesDashboard = () => {
                           color="primary"
                           block
                           size="md"
-                          onClick={printTableData}
+                          onClick={() => printTableData("Student Fee Lists")}
                         >
                           Print
                         </Button>

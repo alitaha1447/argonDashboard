@@ -15,6 +15,7 @@ import { BsThreeDotsVertical } from "react-icons/bs";
 
 import Header from "components/Headers/Header";
 import EnquiryModal from "components/EnquiryModal/EnquiryModal";
+import VillageModal from "components/CustomModals/branchMasterModal/village/VillageModal";
 
 const data = [
   {
@@ -245,7 +246,8 @@ const Village = () => {
           </div>
         </Row>
       </Container>
-      <EnquiryModal
+
+      <VillageModal
         modal={modalOpen}
         toggle={toggleModal}
         handleSubmit={handleFormSubmit}

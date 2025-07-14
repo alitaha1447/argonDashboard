@@ -18,18 +18,18 @@ import {
 } from "reactstrap";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { logout } from "features/user/userSlice";
+import { logout } from "reducer/auth/authSlice";
+import { googleLogout } from "@react-oauth/google";
 
 const AdminNavbar = (props) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const userName = useSelector((state) => state?.user?.name); // Assuming 'user' is your slice name
+  // const userName = useSelector((state) => state?.auth?.name); // Assuming 'user' is your slice name
   const user = JSON.parse(localStorage.getItem("user"));
-  // console.log(user.name);
-  // const userName = user?.name || "User";
 
   const handleLogout = () => {
+    googleLogout(); // revoke Google session
     localStorage.clear(); // 🔥 Clears everything in localStorage
     dispatch(logout());
     navigate("/auth/login"); // Redirect to login

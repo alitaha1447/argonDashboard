@@ -135,6 +135,7 @@ var routes = [
     isLabel: true,
   },
   {
+    id: "master-user",
     name: "User",
     icon: "ni ni-folder-17 text-orange",
     layout: "/admin",
@@ -149,6 +150,7 @@ var routes = [
     ],
   },
   {
+    id: "master-course",
     name: "Course",
     icon: "ni ni-folder-17 text-orange",
     layout: "/admin",
@@ -170,6 +172,7 @@ var routes = [
     ],
   },
   {
+    id: "master-inventory",
     name: "Inventory",
     icon: "ni ni-folder-17 text-orange",
     layout: "/admin",
@@ -191,6 +194,7 @@ var routes = [
     ],
   },
   {
+    id: "master-content",
     name: "Content",
     icon: "ni ni-folder-17 text-orange",
     layout: "/admin",
@@ -212,6 +216,7 @@ var routes = [
     ],
   },
   {
+    id: "master-enquiry",
     name: "Enquiry",
     icon: "ni ni-folder-17 text-orange",
     layout: "/admin",
@@ -233,6 +238,7 @@ var routes = [
     ],
   },
   {
+    id: "master-test",
     name: "Test",
     icon: "ni ni-folder-17 text-orange",
     layout: "/admin",
@@ -247,6 +253,7 @@ var routes = [
     ],
   },
   {
+    id: "master-fees",
     name: "Fees",
     icon: "ni ni-folder-17 text-orange",
     layout: "/admin",
@@ -261,6 +268,7 @@ var routes = [
     ],
   },
   {
+    id: "master-branch",
     name: "Branch",
     icon: "ni ni-folder-17 text-orange",
     layout: "/admin",
@@ -365,6 +373,7 @@ var routes = [
     isLabel: true,
   },
   {
+    id: "transaction-hr",
     name: "HR",
     icon: "ni ni-folder-17 text-orange",
     layout: "/admin",
@@ -451,6 +460,7 @@ var routes = [
   //   ],
   // },
   {
+    id: "transaction-certifcate",
     name: "Certifcate",
     icon: "ni ni-folder-17 text-orange",
     layout: "/admin",
@@ -465,6 +475,7 @@ var routes = [
     ],
   },
   {
+    id: "transaction-inventory",
     name: "Inventory",
     icon: "ni ni-folder-17 text-orange",
     layout: "/admin",
@@ -493,7 +504,8 @@ var routes = [
     ],
   },
   {
-    name: "Course tr",
+    id: "transaction-course",
+    name: "Course",
     icon: "ni ni-folder-17 text-orange",
     layout: "/admin",
     children: [
@@ -511,6 +523,7 @@ var routes = [
     isLabel: true,
   },
   {
+    id: "report-fees",
     name: "Fees",
     icon: "ni ni-folder-17 text-orange",
     layout: "/admin",
@@ -539,6 +552,7 @@ var routes = [
     ],
   },
   {
+    id: "report-course",
     name: "Course",
     icon: "ni ni-folder-17 text-orange",
     layout: "/admin",

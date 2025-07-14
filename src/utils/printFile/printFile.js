@@ -1,4 +1,4 @@
-export const printTableData = () => {
+export const printTableData = (Title) => {
   const printContent = document.getElementById("printable-table");
   // if (!printContent) return;
 
@@ -38,7 +38,7 @@ export const printTableData = () => {
         </style>
       </head>
       <body>
-        <h3>Batch Student List</h3>
+        <h3>${Title}</h3>
         ${tableClone.outerHTML}
       </body>
     </html>

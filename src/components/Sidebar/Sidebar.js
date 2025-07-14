@@ -35,7 +35,7 @@ import {
 } from "reactstrap";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import { logout } from "features/user/userSlice";
+import { logout } from "reducer/auth/authSlice";
 // var ps;
 
 const Sidebar = (props) => {
@@ -158,15 +158,27 @@ const Sidebar = (props) => {
   //   });
   // };
   const createLinks = (routes) => {
+    // console.log("===============");
     // console.log(routes);
-    const toggleDropdown = (name) => {
+    // console.log("===============");
+    // const toggleDropdown = (name) => {
+    //   setOpenDropdowns((prev) => ({
+    //     ...prev,
+    //     [name]: !prev[name],
+    //   }));
+    // };
+
+    const toggleDropdown = (id) => {
+      // console.log(id);
       setOpenDropdowns((prev) => ({
         ...prev,
-        [name]: !prev[name],
+        [id]: !prev[id],
       }));
     };
+    // console.log(openDropdowns);
 
     const renderRoutes = (routesList, level = 0) => {
+      // console.log(routesList);
       return routesList
         .filter((route) => route.name !== "Login" && route.name !== "Register") // 👈 Exclude these
         .map((route, index) => {
@@ -189,18 +201,19 @@ const Sidebar = (props) => {
                 <NavItem className={`pl-${level + 2}`}>
                   <div
                     className="nav-link d-flex align-items-center cursor-pointer"
-                    onClick={() => toggleDropdown(route.name)}
+                    // onClick={() => toggleDropdown(route.name)}
+                    onClick={() => toggleDropdown(route.id)}
                     style={{ cursor: "pointer" }}
                   >
                     <i className={route.icon} />
                     <span className="ml-0">{route.name}</span>
                     <i
                       className={`ml-auto fas fa-chevron-${
-                        openDropdowns[route.name] ? "up" : "down"
+                        openDropdowns[route.id] ? "up" : "down"
                       }`}
                     />
                   </div>
-                  <Collapse isOpen={openDropdowns[route.name]}>
+                  <Collapse isOpen={openDropdowns[route.id]}>
                     <Nav className="nav-sm flex-column ml-0">
                       {renderRoutes(route.children, level + 1)}
                     </Nav>

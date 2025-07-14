@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 // reactstrap components
 import axios from "axios";
+
 import {
   Button,
   Card,
@@ -17,9 +18,12 @@ import {
 } from "reactstrap";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import { login } from "features/user/userSlice";
+import { login as loginAction } from "reducer/auth/authSlice";
 import { ToastContainer, toast } from "react-toastify";
 import BrachModal from "components/CustomModals/branchModal/BrachModal";
+import { useLoginMutation } from "reducer/auth/authApiSlice";
+import { GoogleLogin } from "@react-oauth/google";
+import { jwtDecode } from "jwt-decode";
 
 const API_PATH = process.env.REACT_APP_API_PATH;
 const API_KEY = process.env.REACT_APP_API_KEY;
@@ -29,6 +33,8 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
+
+  // const [login, { isLoading }] = useLoginMutation();
 
   const navigate = useNavigate();
 
@@ -48,12 +54,17 @@ const Login = () => {
           pwd: password,
         },
       });
-      // console.log(loginResponse?.data);
+      // const response = await login({
+      //   APIKEY: API_KEY,
+      //   username: username,
+      //   pwd: password,
+      // }).unwrap();
+      // console.log(response);
       const userData = loginResponse?.data;
 
       // Dispatch Redux action
       dispatch(
-        login({
+        loginAction({
           id: userData.id,
           name: userData.name,
           email: userData.email,
@@ -66,8 +77,7 @@ const Login = () => {
       toast.success("Login Successful!");
       setShowConfirmModal(true); // open modal
       // navigate("/admin/enquiryDashboard");
-      // setTimeout(() => {
-      // }, [1000]);
+      // setTimeout(() => {}, [1000]);
     } catch (error) {
       console.log(error);
       toast.error("Invalid Credential!!");
@@ -186,12 +196,12 @@ const Login = () => {
                 <span className="btn-inner--text">Github</span>
               </Button> */}
               <Button
-                className="btn-neutral btn-icon"
-                color="default"
-                href="#pablo"
-                onClick={(e) => e.preventDefault()}
+              // className="btn-neutral btn-icon"
+              // color="default"
+              // href="#pablo"
+              // onClick={(e) => e.preventDefault()}
               >
-                <span className="btn-inner--icon">
+                {/* <span className="btn-inner--icon">
                   <img
                     alt="..."
                     src={
@@ -199,8 +209,38 @@ const Login = () => {
                         .default
                     }
                   />
-                </span>
-                <span className="btn-inner--text">Google</span>
+                </span> */}
+                {/* <span className="btn-inner--text">Google</span> */}
+                <GoogleLogin
+                  onSuccess={(credentialResponse) => {
+                    try {
+                      const decoded = jwtDecode(credentialResponse.credential);
+                      console.log("Google Login Success:", decoded);
+                      const userData = {
+                        id: decoded.sub, // Unique Google ID
+                        name: decoded.name,
+                        email: decoded.email,
+                        mobileno: "", // Google doesn't provide phone by default
+                        isorganisational: false, // You decide based on your logic
+                        picture: decoded.picture, // Optional, can be used in UI
+                      };
+                      // Save to Redux
+                      dispatch(loginAction(userData));
+                      // Save to localStorage
+                      localStorage.setItem("user", JSON.stringify(userData));
+                      toast.success("Google Login Successful!");
+                      setShowConfirmModal(true);
+                    } catch (error) {
+                      console.error("Google JWT Decode Error:", error);
+                      toast.error("Something went wrong with Google login.");
+                    }
+                  }}
+                  onError={() => {
+                    console.log("Login Failed");
+                    toast.error("Google Login Failed!");
+                  }}
+                  useOneTap
+                />
               </Button>
             </div>
           </CardBody>

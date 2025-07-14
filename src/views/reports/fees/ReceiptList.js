@@ -267,7 +267,7 @@ const ReceiptList = () => {
                         color="primary"
                         block
                         size="md"
-                        onClick={printTableData}
+                        onClick={() => printTableData("Receipt Lists")}
                       >
                         Print
                       </Button>

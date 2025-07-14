@@ -15,7 +15,7 @@ import { BsThreeDotsVertical } from "react-icons/bs";
 
 import Header from "components/Headers/Header";
 import EnquiryModal from "components/EnquiryModal/EnquiryModal";
-
+import GramPanchayatModal from "components/CustomModals/branchMasterModal/gramPanchayat/GramPanchayatModal";
 const data = [
   {
     gramPanchayat: "Test",
@@ -238,7 +238,12 @@ const GramPanchayat = () => {
           </div>
         </Row>
       </Container>
-      <EnquiryModal
+      {/* <EnquiryModal
+        modal={modalOpen}
+        toggle={toggleModal}
+        handleSubmit={handleFormSubmit}
+      /> */}
+      <GramPanchayatModal
         modal={modalOpen}
         toggle={toggleModal}
         handleSubmit={handleFormSubmit}

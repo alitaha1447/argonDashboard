@@ -53,6 +53,7 @@ import useStatusEnquiry from "customHookApi/EnquiryDashboardApi/useStatusEnquiry
 import { generateHexColors } from "utils/dynamicColorGenerator/generateHexColors ";
 import { exportToExcel } from "utils/printFile/exportToExcel";
 import { printTableData } from "utils/printFile/printFile";
+import { useSelector } from "react-redux";
 
 const API_PATH = process.env.REACT_APP_API_PATH;
 const API_KEY = process.env.REACT_APP_API_KEY;
@@ -158,7 +159,7 @@ const EnquiryDashboard = (props) => {
       // }
 
       const result = res.data;
-      console.log(result);
+      // console.log(result);
       // ✅ Check if there's no data
       if (!result?.Data || result?.Data.length === 0) {
         setListData([]); // Triggers the "No data found" UI
@@ -599,7 +600,7 @@ const EnquiryDashboard = (props) => {
                         color="primary"
                         block
                         size="md"
-                        onClick={printTableData}
+                        onClick={() => printTableData("Student Enquiry Lists")}
                       >
                         Print
                       </Button>
@@ -673,7 +674,7 @@ const EnquiryDashboard = (props) => {
                                 checked={studentID.some(
                                   (s) => s.enrollmentid === item.Id
                                 )} // ✅ controlled state
-                                onClick={() => handleCheckId(item.Id)}
+                                onChange={() => handleCheckId(item.Id)}
                                 disabled={item.status_txt === "Admission Done"} // ✅ disable if condition matches
                               />
 
@@ -776,7 +777,7 @@ const EnquiryDashboard = (props) => {
                               checked={studentID.some(
                                 (s) => s.enrollmentid === item.Id
                               )} // ✅ controlled state
-                              onClick={() => handleCheckId(item.Id)}
+                              onChange={() => handleCheckId(item.Id)}
                               disabled={item.status_txt === "Admission Done"} // ✅ disable if condition matches
                             />
                             {/* <Input
