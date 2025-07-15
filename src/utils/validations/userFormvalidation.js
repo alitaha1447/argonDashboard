@@ -16,7 +16,7 @@ export const getValidationErrors = ({ fullName, email, pass, confirmPass }) => {
 
   if (!pass.trim()) {
     errors.pass = "Password is required";
-  } else if (pass.length < 6) {
+  } else if (pass.length < 4) {
     errors.pass = "Password must be at least 6 characters";
   }
 

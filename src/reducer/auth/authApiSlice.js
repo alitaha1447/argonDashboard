@@ -13,9 +13,6 @@ export const authApi = createApi({
   endpoints: (builder) => ({
     login: builder.mutation({
       query: ({ APIKEY, username, pwd }) => {
-        // console.log(API_KEY);
-        // console.log(username);
-        // console.log(pwd);
         return {
           url: "/api/user_validate",
           method: "get",

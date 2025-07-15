@@ -34,16 +34,18 @@ import {
   Col,
 } from "reactstrap";
 import { useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { logout } from "reducer/auth/authSlice";
+import { persistor } from "app/store";
 // var ps;
 
 const Sidebar = (props) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const user = JSON.parse(localStorage.getItem("user"));
-  // console.log(user.name);
+  // const user = JSON.parse(localStorage.getItem("user"));
+  const user = useSelector((state) => state.auth);
+  console.log(user.name);
 
   const [collapseOpen, setCollapseOpen] = useState();
   const [openDropdowns, setOpenDropdowns] = useState({});
@@ -158,9 +160,6 @@ const Sidebar = (props) => {
   //   });
   // };
   const createLinks = (routes) => {
-    // console.log("===============");
-    // console.log(routes);
-    // console.log("===============");
     // const toggleDropdown = (name) => {
     //   setOpenDropdowns((prev) => ({
     //     ...prev,
@@ -169,16 +168,13 @@ const Sidebar = (props) => {
     // };
 
     const toggleDropdown = (id) => {
-      // console.log(id);
       setOpenDropdowns((prev) => ({
         ...prev,
         [id]: !prev[id],
       }));
     };
-    // console.log(openDropdowns);
 
     const renderRoutes = (routesList, level = 0) => {
-      // console.log(routesList);
       return routesList
         .filter((route) => route.name !== "Login" && route.name !== "Register") // 👈 Exclude these
         .map((route, index) => {
@@ -259,8 +255,9 @@ const Sidebar = (props) => {
   }
 
   const handleLogout = () => {
-    localStorage.clear(); // 🔥 Clears everything in localStorage
+    // localStorage.clear(); // 🔥 Clears everything in localStorage
     dispatch(logout());
+    persistor.purge(); // ✅ clear persisted storage (safe here)
     navigate("/auth/login"); // Redirect to login
   };
 

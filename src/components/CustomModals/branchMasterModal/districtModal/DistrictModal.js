@@ -13,45 +13,83 @@ import {
   Input,
 } from "reactstrap";
 import Select from "react-select";
+import InputField from "components/FormFields/InputField";
 import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 import useBranchList from "customHookApi/EnquiryDashboardApi/useBranchList";
+import { useBranchQuery } from "reducer/admin/branch/branchSliceApi";
+import { skipToken } from "@reduxjs/toolkit/query";
 
 const API_PATH = process.env.REACT_APP_API_PATH;
 const API_KEY = process.env.REACT_APP_API_KEY;
 
 const DistrictModal = ({ modal, toggle }) => {
   const [loading, setLoading] = useState(false);
+  const [branchSearchText, setBranchSearchText] = useState("");
   const [selectedBranch, setSelectedBranch] = useState(null);
-  const [district, setDistrict] = useState([]);
   const [selectedDistrict, setSelectedDistrict] = useState(null);
+  const [districtMenuOpen, setDistrictMenuOpen] = useState(false);
 
-  const {
-    branchOptions,
-    setBranchOptions,
-    isLoading,
-    fetchBranch,
-    setBranchSearchText,
-    branchSearchText,
-  } = useBranchList();
+  // const {
+  //   branchOptions,
+  //   setBranchOptions,
+  //   isLoading,
+  //   fetchBranch,
+  //   setBranchSearchText,
+  //   branchSearchText,
+  // } = useBranchList();
+
+  const { data: stateOptionsRaw = [], isLoading } = useBranchQuery(
+    branchSearchText.length >= 3
+      ? { branchtype: "1", parent_branch_id: "", searchtext: branchSearchText }
+      : skipToken,
+    {
+      refetchOnMountOrArgChange: true,
+    }
+  );
+
+  const { data: districtOptionsRaw = [], isLoading: isLoadingDistrict } =
+    useBranchQuery(
+      selectedBranch?.value
+        ? {
+            branchtype: "2",
+            parent_branch_id: selectedBranch?.value,
+            searchtext: "",
+          }
+        : skipToken,
+      {
+        refetchOnMountOrArgChange: true,
+      }
+    );
+
+  // Convert to react-select format
+  const branchOptions =
+    stateOptionsRaw?.map((branch) => ({
+      label: branch?.BranchName,
+      value: branch?.BranchId,
+    })) || [];
+
+  const districtOptions =
+    districtOptionsRaw?.map((branch) => ({
+      label: branch?.BranchName,
+      value: branch?.BranchId,
+    })) || [];
 
   const resetAll = () => {
     setSelectedBranch(null);
     setBranchSearchText("");
-    setBranchOptions([]);
-
     setSelectedDistrict(null);
-    setDistrict([]);
+    // setDistrictMenuOpen(false); // 👈 Reset trigger
   };
 
-  useEffect(() => {
-    if (branchSearchText.length < 3) {
-      setBranchOptions([]);
-      return;
-    }
+  // useEffect(() => {
+  //   if (branchSearchText.length < 3) {
+  //     setBranchOptions([]);
+  //     return;
+  //   }
 
-    fetchBranch("1");
-  }, [branchSearchText]);
+  //   fetchBranch("1");
+  // }, [branchSearchText]);
 
   const fetchDistrict = async () => {
     // console.log(selectedBranch?.value);
@@ -69,9 +107,9 @@ const DistrictModal = ({ modal, toggle }) => {
     //     value: branch?.BranchId,
     //   })) || [];
     // setDistrict(options);
-    const districtOptions = await fetchBranch("2", selectedBranch?.value);
+    // const districtOptions = await fetchBranch("2", selectedBranch?.value);
     // console.log(districtOptions);
-    setDistrict(districtOptions); // ✅ This will work
+    // setDistrict(districtOptions); // ✅ This will work
   };
   // console.log(district);
   return (
@@ -104,7 +142,6 @@ const DistrictModal = ({ modal, toggle }) => {
                   onChange={(selected) => {
                     setSelectedBranch(selected);
                     setSelectedDistrict(null);
-                    setDistrict([]);
                   }}
                   onInputChange={(e) => setBranchSearchText(e)}
                   isClearable
@@ -113,19 +150,25 @@ const DistrictModal = ({ modal, toggle }) => {
               </FormGroup>
             </Col>
             <Col md={6}>
-              <FormGroup>
+              {/* <FormGroup>
                 <Label>District</Label>
                 <Select
-                  options={district}
+                  options={districtOptions}
                   value={selectedDistrict}
                   onChange={(selected) => {
                     setSelectedDistrict(selected);
                   }}
-                  onMenuOpen={fetchDistrict}
-                  isClearable
+                  // onMenuOpen={() => setDistrictMenuOpen(true)} // 👈 Trigger API call                  isClearable
                   isLoading={isLoading}
                 />
-              </FormGroup>
+              </FormGroup> */}
+              <InputField
+                label="District"
+                id="district"
+                type="text"
+                // value={batchCapacity}
+                // onChange={(e) => setBatchCapacity(e.target.value)}
+              />
             </Col>
           </Row>
         </Form>

@@ -133,18 +133,27 @@ const VillageModal = ({
         <Form>
           <Row>
             <Col md={6}>
-              <InputField
-                label="State"
-                id="state"
-                type="text"
-                //   value={batchName}
-                //   onChange={(e) => {
-                //     setBatchName(e.target.value);
-                //     setFormErrors((prev) => ({ ...prev, batchName: "" }));
-                //   }}
-                //   error={formErrors.batchName}
-                //   required
-              />
+              <FormGroup>
+                <Label>State</Label>
+                <Select
+                // options={qualificationOptions}
+                // value={selectedQualification}
+                // onChange={(selected) => {
+                //   setSelectedOptionsQualification(selected);
+                //   setFormErrors((prev) => ({
+                //     ...prev,
+                //     selectedQualification: "",
+                //   }));
+                // }}
+                // onMenuOpen={fetchQualificationLists}
+                // menuPortalTarget={document.body}
+                // menuPosition="fixed"
+                // styles={{
+                //   menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+                // }}
+                // menuShouldScrollIntoView={false}
+                />
+              </FormGroup>
             </Col>
             <Col md={6}>
               <FormGroup>
@@ -220,27 +229,18 @@ const VillageModal = ({
           </Row>
           <Row>
             <Col md={6}>
-              <FormGroup>
-                <Label>Village</Label>
-                <Select
-                // options={qualificationOptions}
-                // value={selectedQualification}
-                // onChange={(selected) => {
-                //   setSelectedOptionsQualification(selected);
-                //   setFormErrors((prev) => ({
-                //     ...prev,
-                //     selectedQualification: "",
-                //   }));
-                // }}
-                // onMenuOpen={fetchQualificationLists}
-                // menuPortalTarget={document.body}
-                // menuPosition="fixed"
-                // styles={{
-                //   menuPortal: (base) => ({ ...base, zIndex: 9999 }),
-                // }}
-                // menuShouldScrollIntoView={false}
-                />
-              </FormGroup>
+              <InputField
+                label="Village"
+                id="village"
+                type="text"
+                //   value={batchName}
+                //   onChange={(e) => {
+                //     setBatchName(e.target.value);
+                //     setFormErrors((prev) => ({ ...prev, batchName: "" }));
+                //   }}
+                //   error={formErrors.batchName}
+                //   required
+              />
             </Col>
           </Row>
         </Form>

@@ -59,7 +59,7 @@ const Login = () => {
       //   username: username,
       //   pwd: password,
       // }).unwrap();
-      // console.log(response);
+      console.log(loginResponse);
       const userData = loginResponse?.data;
 
       // Dispatch Redux action
@@ -73,7 +73,7 @@ const Login = () => {
         })
       );
       // Save to localStorage
-      localStorage.setItem("user", JSON.stringify(userData));
+      // localStorage.setItem("user", JSON.stringify(userData));
       toast.success("Login Successful!");
       setShowConfirmModal(true); // open modal
       // navigate("/admin/enquiryDashboard");
@@ -196,12 +196,12 @@ const Login = () => {
                 <span className="btn-inner--text">Github</span>
               </Button> */}
               <Button
-              // className="btn-neutral btn-icon"
-              // color="default"
-              // href="#pablo"
-              // onClick={(e) => e.preventDefault()}
+                className="btn-neutral btn-icon"
+                color="default"
+                href="#pablo"
+                // onClick={(e) => e.preventDefault()}
               >
-                {/* <span className="btn-inner--icon">
+                <span className="btn-inner--icon">
                   <img
                     alt="..."
                     src={
@@ -209,9 +209,9 @@ const Login = () => {
                         .default
                     }
                   />
-                </span> */}
-                {/* <span className="btn-inner--text">Google</span> */}
-                <GoogleLogin
+                </span>
+                <span className="btn-inner--text">Google</span>
+                {/* <GoogleLogin
                   onSuccess={(credentialResponse) => {
                     try {
                       const decoded = jwtDecode(credentialResponse.credential);
@@ -240,7 +240,7 @@ const Login = () => {
                     toast.error("Google Login Failed!");
                   }}
                   useOneTap
-                />
+                /> */}
               </Button>
             </div>
           </CardBody>

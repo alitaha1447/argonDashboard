@@ -17,6 +17,7 @@ import {
   DropdownToggle,
   DropdownMenu,
   DropdownItem,
+  Spinner,
 } from "reactstrap";
 
 import Header from "components/Headers/Header.js";
@@ -54,6 +55,7 @@ import { generateHexColors } from "utils/dynamicColorGenerator/generateHexColors
 import { exportToExcel } from "utils/printFile/exportToExcel";
 import { printTableData } from "utils/printFile/printFile";
 import { useSelector } from "react-redux";
+import { toast } from "react-toastify";
 
 const API_PATH = process.env.REACT_APP_API_PATH;
 const API_KEY = process.env.REACT_APP_API_KEY;
@@ -67,6 +69,17 @@ const pageNum = [
 ];
 
 const EnquiryDashboard = (props) => {
+  // const storedBranches = localStorage.getItem("branches");
+  const storedBranches = useSelector((state) => state.auth.selectedBranch);
+  console.log(storedBranches);
+  // const parsedBranches = storedBranches ? JSON.parse(storedBranches) : null;
+
+  const branchLabel = storedBranches?.label; // or parsedBranches?.[0]?.label if it's an array
+  const branchValue = storedBranches?.value;
+
+  // const name = useSelector((state) => state.auth.name);
+  // console.log(name);
+
   const [activeFilters, setActiveFilters] = useState({});
 
   const [statsData, setStatsData] = useState({});
@@ -127,6 +140,7 @@ const EnquiryDashboard = (props) => {
   });
 
   const fetchPaginatedData = async (page = 1, filters = {}) => {
+    const selectedBranch = filters?.branch || branchValue;
     setIsTableLoading(true); // show loader
 
     try {
@@ -143,7 +157,8 @@ const EnquiryDashboard = (props) => {
         enquirytype: filters?.enquirytype || 1,
         searchtext: filters?.searchText || "",
         status: filters?.status || null,
-        branch: filters.branch,
+        // branch: filters.branch,
+        branch: selectedBranch,
         pageno: page,
         // pageno: 2,
         pagesize: pageSize,
@@ -174,11 +189,14 @@ const EnquiryDashboard = (props) => {
       setTotalPages(result?.TotalPages || 1);
     } catch (error) {
       if (error.response && error.response.status === 404) {
+        // console.log(error);
+        toast.error(error?.message);
         setListData([]);
         setPageNumber(1);
         setTotalPages(1);
       } else {
-        console.error("Error fetching paginated data:", error);
+        toast.error(error?.message);
+        // console.error("Error fetching paginated data:", error);
       }
     } finally {
       setIsTableLoading(false); // hide loader
@@ -346,6 +364,7 @@ const EnquiryDashboard = (props) => {
         ],
       }));
     } catch (error) {
+      toast(error);
       console.error("Error loading dashboard data:", error);
     }
   };
@@ -659,8 +678,9 @@ const EnquiryDashboard = (props) => {
                     {isTableLoading ? (
                       <tr>
                         <td colSpan="10" className="text-center py-4">
-                          <i className="fas fa-spinner fa-spin fa-2x text-primary" />
-                          <p className="mt-2 mb-0">Loading data...</p>
+                          <Spinner color="primary" />
+                          {/* <i className="fas fa-spinner fa-spin fa-2x text-primary" />
+                          <p className="mt-2 mb-0">Loading data...</p> */}
                         </td>
                       </tr>
                     ) : listData.length > 0 ? (
@@ -759,9 +779,12 @@ const EnquiryDashboard = (props) => {
               {/* ✅ Card View for Mobile & Tablets */}
               <div className="d-block d-lg-none px-3 pb-3">
                 {isTableLoading ? (
-                  <Loader />
+                  <div className="text-center py-4 text-muted">
+                    <Spinner color="primary" />
+                  </div>
                 ) : listData.length === 0 ? (
                   <div className="text-center py-4 text-muted">
+                    {/* <Spinner /> */}
                     <i className="fas fa-info-circle mr-2" />
                     No data found.
                   </div>

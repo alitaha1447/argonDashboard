@@ -9,7 +9,7 @@ import "assets/plugins/nucleo/css/nucleo.css";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import "assets/scss/argon-dashboard-react.scss";
 import "../src/assets/css/argon-dashboard-react.css";
-import { GoogleOAuthProvider } from "@react-oauth/google";
+// import { GoogleOAuthProvider } from "@react-oauth/google";
 
 import AdminLayout from "layouts/Admin.js";
 import AuthLayout from "layouts/Auth.js";
@@ -25,8 +25,8 @@ const CLIENT_ID =
 
 root.render(
   <Provider store={store}>
-    {/* <PersistGate loading={null} persistor={persistor}> */}
-    <GoogleOAuthProvider clientId={CLIENT_ID}>
+    <PersistGate loading={null} persistor={persistor}>
+      {/* <GoogleOAuthProvider clientId={CLIENT_ID}> */}
       <BrowserRouter>
         <Routes>
           {/* <Route path="/admin/*" element={<AdminLayout />} /> */}
@@ -55,7 +55,7 @@ root.render(
           <Route path="*" element={<Navigate to="/auth" replace />} />
         </Routes>
       </BrowserRouter>
-      {/* </PersistGate> */}
-    </GoogleOAuthProvider>
+    </PersistGate>
+    {/* </GoogleOAuthProvider> */}
   </Provider>
 );

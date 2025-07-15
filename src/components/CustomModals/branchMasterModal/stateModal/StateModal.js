@@ -19,37 +19,56 @@ import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 import useBranchList from "customHookApi/EnquiryDashboardApi/useBranchList";
 import InputField from "components/FormFields/InputField";
-
+import { useBranchQuery } from "reducer/admin/branch/branchSliceApi";
 const API_PATH = process.env.REACT_APP_API_PATH;
 const API_KEY = process.env.REACT_APP_API_KEY;
 
 const StateModal = ({ modal, toggle }) => {
   const [loading, setLoading] = useState(false);
+  const [branchSearchText, setBranchSearchText] = useState("");
   const [selectedBranch, setSelectedBranch] = useState(null);
   // console.log(selectedBranch);
-  const {
-    branchOptions,
-    setBranchOptions,
-    isLoading,
-    fetchBranch,
-    setBranchSearchText,
-    branchSearchText,
-  } = useBranchList();
+  // const {
+  //   branchOptions,
+  //   setBranchOptions,
+  //   isLoading,
+  //   fetchBranch,
+  //   setBranchSearchText,
+  //   branchSearchText,
+  // } = useBranchList();
+
+  const shouldSkip = branchSearchText.length < 3;
+  const { data: branchOptionsRaw = [], isLoading } = useBranchQuery(
+    {
+      branchtype: "1",
+      parent_branch_id: "",
+      searchtext: branchSearchText,
+    },
+    {
+      skip: shouldSkip,
+    }
+  );
+
+  const branchOptions =
+    branchOptionsRaw?.map((branch) => ({
+      label: branch?.BranchName,
+      value: branch?.BranchId,
+    })) || [];
 
   const resetAll = () => {
     setSelectedBranch(null);
     setBranchSearchText("");
-    setBranchOptions([]);
+    // setBranchOptions([]);
   };
 
-  useEffect(() => {
-    if (branchSearchText.length < 3) {
-      setBranchOptions([]);
-      return;
-    }
+  // useEffect(() => {
+  //   if (branchSearchText.length < 3) {
+  //     setBranchOptions([]);
+  //     return;
+  //   }
 
-    fetchBranch("1");
-  }, [branchSearchText]);
+  //   fetchBranch("1");
+  // }, [branchSearchText]);
 
   //   const handleAssignBatch = async () => {
   //     setLoading(true);
@@ -86,7 +105,7 @@ const StateModal = ({ modal, toggle }) => {
   //       resetSelected();
   //     }
   //   };
-  const fetchState = async () => {};
+  // const fetchState = async () => {};
   return (
     <Modal
       isOpen={modal}
@@ -110,11 +129,10 @@ const StateModal = ({ modal, toggle }) => {
         <Form>
           <Row>
             <Col md={7}>
-              <FormGroup>
+              {/* <FormGroup>
                 <Label for="branchSearch">Search Branch</Label>
                 <Select
-                  //   closeMenuOnSelect={false}
-                  //   hideSelectedOptions={false}
+             
                   options={branchOptions}
                   value={selectedBranch}
                   onChange={(selected) => {
@@ -124,7 +142,14 @@ const StateModal = ({ modal, toggle }) => {
                   isClearable
                   isLoading={isLoading}
                 />
-              </FormGroup>
+              </FormGroup> */}
+              <InputField
+                label="State"
+                id="state"
+                type="text"
+                // value={batchCapacity}
+                // onChange={(e) => setBatchCapacity(e.target.value)}
+              />
             </Col>
           </Row>
         </Form>

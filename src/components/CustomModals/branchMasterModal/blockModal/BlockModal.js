@@ -15,10 +15,10 @@ import {
   Input,
 } from "reactstrap";
 import Select from "react-select";
+import InputField from "components/FormFields/InputField";
 import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 import useBranchList from "customHookApi/EnquiryDashboardApi/useBranchList";
-import InputField from "components/FormFields/InputField";
 
 const API_PATH = process.env.REACT_APP_API_PATH;
 const API_KEY = process.env.REACT_APP_API_KEY;
@@ -156,7 +156,7 @@ const BlockModal = ({ modal, toggle }) => {
           </Row>
           <Row>
             <Col md={6}>
-              <FormGroup>
+              {/* <FormGroup>
                 <Label>Block</Label>
                 <Select
                   options={block}
@@ -168,7 +168,14 @@ const BlockModal = ({ modal, toggle }) => {
                   isClearable
                   isLoading={isLoading}
                 />
-              </FormGroup>
+              </FormGroup> */}
+              <InputField
+                label="Block"
+                id="block"
+                type="text"
+                // value={batchCapacity}
+                // onChange={(e) => setBatchCapacity(e.target.value)}
+              />
             </Col>
           </Row>
         </Form>

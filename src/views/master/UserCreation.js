@@ -28,12 +28,6 @@ import { toast, ToastContainer } from "react-toastify";
 const API_PATH = process.env.REACT_APP_API_PATH;
 const API_KEY = process.env.REACT_APP_API_KEY;
 
-const roles = [
-  { value: 0, label: "Admin" },
-  { value: 1, label: "Manager" },
-  { value: 1, label: "Faculty" },
-];
-
 const UserCreation = () => {
   const [loading, setLoading] = useState(false);
 
@@ -49,9 +43,10 @@ const UserCreation = () => {
   // branches
   const [selectedBranches, setSelectedBranches] = useState([]); // Changed from selectedBranch
   const [formErrors, setFormErrors] = useState({});
-  // const [roleOptions, setRoleOptions] = useState(roles[0]);
+  const [roleOptions, setRoleOptions] = useState([]);
   const [selectedRole, setSelectedRole] = useState(null);
-  const [isAll, setIsAll] = useState(false); // 0 = unchecked, 1 = checked
+  const [isAll, setIsAll] = useState(true); // 0 = unchecked, 1 = checked
+  const [isBranchActive, setIsBranchActive] = useState(false);
 
   const {
     branchOptions,
@@ -71,23 +66,40 @@ const UserCreation = () => {
     fetchBranch();
   }, [branchSearchText]);
 
+  useEffect(() => {
+    const fetchRole = async () => {
+      const res = await axios.get(`${API_PATH}/api/Get_Role`, {
+        params: {
+          APIKEY: API_KEY,
+        },
+      });
+      const roles = res?.data.map((item) => ({
+        value: item?.RoleID,
+        label: item?.RoleName,
+      }));
+      setRoleOptions(roles);
+    };
+    fetchRole();
+  }, []);
+
   const userName = email.split("@")[0];
 
   const branches = selectedBranches.map((branch) => ({
-    userid: "string", // Replace with actual user ID if needed
+    // userid: "string", // Replace with actual user ID if needed
     branchid: branch.value.toString(), // ✅ convert to string safely (if needed)
-    isactive: 0,
+    isactive: isBranchActive ? "1" : "0",
   }));
 
-  const userroles = selectedRole
-    ? [
-        {
-          userroleid: 0,
-          userid: 0, // replace with actual user ID if available
-          roleid: selectedRole.value,
-        },
-      ]
-    : [];
+  const userroles =
+    selectedRole && selectedRole.value
+      ? [
+          {
+            // userroleid: 0,
+            // userid: 0, // replace with actual user ID if available
+            roleid: selectedRole.value.toString(),
+          },
+        ]
+      : [];
 
   const resetForm = () => {
     setFullName("");
@@ -101,7 +113,8 @@ const UserCreation = () => {
     setSelectedRole([]);
     setIsOrganisational(false);
     setIsActive(false);
-    setIsAll(0);
+    setIsAll(true);
+    setIsBranchActive(false);
   };
 
   const handleSubmit = async (e) => {
@@ -282,13 +295,18 @@ const UserCreation = () => {
                             <Select
                               options={branchOptions}
                               value={selectedBranches}
-                              onChange={setSelectedBranches}
+                              onChange={(selected) => {
+                                setSelectedBranches(selected);
+                                setIsBranchActive(
+                                  !!selected && selected.length > 0
+                                ); // true if selected branches exist
+                              }}
                               onInputChange={setBranchSearchText}
                               placeholder="Type at least 3 letters..."
                               isClearable
                               isLoading={isLoading}
                               isMulti
-                              isDisabled={isAll} // ✅ disables dropdown if checkbox is selected
+                              // isDisabled={isAll} // ✅ disables dropdown if checkbox is selected
                             />
                           </div>
                         </div>
@@ -296,29 +314,16 @@ const UserCreation = () => {
                     </Col>
                   </Row>
 
-                  <Row></Row>
                   <Row>
                     <Col md={6}>
                       <FormGroup>
                         <Label>Role</Label>
                         <Select
-                          options={roles}
+                          options={roleOptions}
                           value={selectedRole}
                           onChange={setSelectedRole}
                           placeholder="Select Role"
                           isClearable
-                        />
-                      </FormGroup>
-                    </Col>
-                    <Col md={6}>
-                      <FormGroup>
-                        <Label>Permission</Label>
-                        <Select
-                          //   options={branchOptions}
-                          //   value={selectedBranches}
-                          //   onChange={setSelectedBranches}
-                          placeholder="Permission"
-                          //   isClearable
                         />
                       </FormGroup>
                     </Col>
@@ -328,7 +333,7 @@ const UserCreation = () => {
                     <Col md={6} className="d-flex align-items-center mt-4">
                       <FormGroup check className="d-flex align-items-center">
                         <Input
-                          id="active"
+                          id="isOrganisational"
                           type="checkbox"
                           checked={isOrganisational}
                           onChange={(e) =>
@@ -336,7 +341,7 @@ const UserCreation = () => {
                           }
                           className="me-2"
                         />
-                        <Label for="active" className="mb-0">
+                        <Label for="isOrganisational" className="mb-0">
                           Is Organizational / Staff
                         </Label>
                       </FormGroup>
@@ -346,13 +351,13 @@ const UserCreation = () => {
                     <Col md={6} className="d-flex align-items-center mt-4">
                       <FormGroup check className="d-flex align-items-center">
                         <Input
-                          id="active"
+                          id="isActive"
                           type="checkbox"
                           checked={isActive}
                           onChange={(e) => setIsActive(e.target.checked)}
                           className="me-2"
                         />
-                        <Label for="active" className="mb-0">
+                        <Label for="isActive" className="mb-0">
                           Is Active
                         </Label>
                       </FormGroup>

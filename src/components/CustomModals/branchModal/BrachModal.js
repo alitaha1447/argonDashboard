@@ -13,9 +13,12 @@ import {
 import Select from "react-select";
 import { useNavigate } from "react-router-dom";
 import useBranchList from "customHookApi/EnquiryDashboardApi/useBranchList";
+import { useDispatch } from "react-redux";
+import { selectBranch } from "reducer/auth/authSlice";
 
 const BrachModal = ({ show, toggle, onConfirm }) => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [selectedBranch, setSelectedBranch] = useState(null);
 
   const {
@@ -36,10 +39,18 @@ const BrachModal = ({ show, toggle, onConfirm }) => {
     fetchBranch();
   }, [branchSearchText]);
 
+  // const handleConfirm = () => {
+  //   // localStorage.setItem("branches", JSON.stringify(selectedBranch));
+  //   dispatch(selectBranch(selectedBranch)); // ✅ Save selected branch in Redux store
+  //   toggle();
+  //   navigate("/admin/enquiryDashboard");
+  // };
   const handleConfirm = () => {
-    localStorage.setItem("branches", JSON.stringify(selectedBranch));
-    toggle();
-    navigate("/admin/enquiryDashboard");
+    if (selectedBranch) {
+      dispatch(selectBranch(selectedBranch)); // ✅ Sets both selectedBranch and branchSelected = true
+      toggle();
+      navigate("/admin/enquiryDashboard");
+    }
   };
   const handleCancel = () => {
     // Reset selected branches here (inside modal)
@@ -86,7 +97,7 @@ const BrachModal = ({ show, toggle, onConfirm }) => {
                       ? "Type at least 3 characters to search"
                       : "No branches found"
                   }
-                  isMulti
+                  // isMulti
                 />
               </div>
             </Col>
