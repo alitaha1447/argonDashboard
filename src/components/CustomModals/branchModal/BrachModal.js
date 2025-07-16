@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   Modal,
   ModalHeader,
@@ -6,45 +6,40 @@ import {
   ModalFooter,
   Row,
   Col,
-  Input,
   Button,
-  Table,
 } from "reactstrap";
 import Select from "react-select";
 import { useNavigate } from "react-router-dom";
-import useBranchList from "customHookApi/EnquiryDashboardApi/useBranchList";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { selectBranch } from "reducer/auth/authSlice";
+import axios from "axios";
+
+const API_PATH = process.env.REACT_APP_API_PATH;
+const API_KEY = process.env.REACT_APP_API_KEY;
 
 const BrachModal = ({ show, toggle, onConfirm }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const [branchOptions, setBranchOptions] = useState([]);
   const [selectedBranch, setSelectedBranch] = useState(null);
 
-  const {
-    branchOptions,
-    setBranchOptions,
-    isLoading,
-    fetchBranch,
-    setBranchSearchText,
-    branchSearchText,
-  } = useBranchList();
+  const userID = useSelector((state) => state?.auth?.id);
 
-  // Custom Option component with checkbox
-  useEffect(() => {
-    if (branchSearchText.length < 3) {
-      setBranchOptions([]);
-      return;
-    }
-    fetchBranch();
-  }, [branchSearchText]);
+  const handleBranches = async () => {
+    const res = await axios.get(`${API_PATH}/api/Get_user_branches`, {
+      params: {
+        APIKEY: API_KEY,
+        userid: userID,
+      },
+    });
+    console.log(res?.data);
+    const formattedData = res?.data.map((branch) => ({
+      value: branch?.branchid,
+      label: branch?.branchname,
+    }));
+    setBranchOptions(formattedData);
+  };
 
-  // const handleConfirm = () => {
-  //   // localStorage.setItem("branches", JSON.stringify(selectedBranch));
-  //   dispatch(selectBranch(selectedBranch)); // ✅ Save selected branch in Redux store
-  //   toggle();
-  //   navigate("/admin/enquiryDashboard");
-  // };
   const handleConfirm = () => {
     if (selectedBranch) {
       dispatch(selectBranch(selectedBranch)); // ✅ Sets both selectedBranch and branchSelected = true
@@ -53,9 +48,8 @@ const BrachModal = ({ show, toggle, onConfirm }) => {
     }
   };
   const handleCancel = () => {
-    // Reset selected branches here (inside modal)
-    setSelectedBranch([]); // or null
-    toggle(); // Close modal
+    setSelectedBranch([]);
+    toggle();
   };
   return (
     <Modal
@@ -83,7 +77,6 @@ const BrachModal = ({ show, toggle, onConfirm }) => {
                   options={branchOptions}
                   value={selectedBranch}
                   onChange={(selected) => setSelectedBranch(selected)}
-                  onInputChange={(text) => setBranchSearchText(text)}
                   placeholder="Select Branch"
                   menuPortalTarget={document.body} // ✅ renders dropdown outside modal
                   menuPosition="fixed" // ✅ fixes position to avoid overflow
@@ -91,13 +84,7 @@ const BrachModal = ({ show, toggle, onConfirm }) => {
                     menuPortal: (base) => ({ ...base, zIndex: 9999 }),
                   }}
                   isClearable
-                  isLoading={isLoading}
-                  noOptionsMessage={({ inputValue }) =>
-                    inputValue.length < 3
-                      ? "Type at least 3 characters to search"
-                      : "No branches found"
-                  }
-                  // isMulti
+                  onMenuOpen={handleBranches}
                 />
               </div>
             </Col>

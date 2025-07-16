@@ -29,7 +29,7 @@ const StatusUpdate = ({
   const [selectedStatus, setSelectedStatus] = useState(null);
   const { statusOptions, fetchEnquiry } = useStatusEnquiry();
   const [description, setDescription] = useState("");
-  console.log(selectedId);
+  // console.log(selectedId);
   const resetForm = () => {
     setSelectedStatus(null);
     setDescription("");

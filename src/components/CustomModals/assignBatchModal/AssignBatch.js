@@ -25,7 +25,7 @@ const AssignBatch = ({
   refreshList = () => {},
   resetSelected = () => {},
 }) => {
-  console.log(studentID);
+  // console.log(studentID);
   // const stdId = studentID.map((item) => ({
   //   enrollmentid: item.enrollmentid.toString(),
   // }));
@@ -81,7 +81,7 @@ const AssignBatch = ({
         enrollmentid: item?.enrollmentid.toString(),
       })),
     };
-    console.log(assignBatchData);
+    // console.log(assignBatchData);
     try {
       const assignBatch = await axios.post(
         `${API_PATH}/api/Assign_Batch`,
@@ -92,7 +92,7 @@ const AssignBatch = ({
           },
         }
       );
-      console.log(assignBatch);
+      // console.log(assignBatch);
       toast.success("Batch Assigned Successfully!!");
       refreshList(1);
       // toggle();

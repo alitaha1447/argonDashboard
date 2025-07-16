@@ -100,7 +100,7 @@ const BatchModal = ({
     enrollmentid: item.enrollmentid.toString(),
     // createdon: new Date().toISOString(), // or your preferred date format
   }));
-  console.log(stdId);
+  // console.log(stdId);
   const [menuIsOpen, setMenuIsOpen] = useState(false);
 
   const [batchName, setBatchName] = useState("");
@@ -400,7 +400,7 @@ const BatchModal = ({
       batch_students: stdId,
       installments_details: installmentsDetails,
     };
-    console.log(batchFormData);
+    // console.log(batchFormData);
 
     try {
       const res = await axios.post(`${API_PATH}/api/Batch`, batchFormData, {
@@ -408,7 +408,7 @@ const BatchModal = ({
           APIKEY: API_KEY,
         },
       });
-      console.log("✅ Batch created successfully:", res?.data);
+      // console.log("✅ Batch created successfully:", res?.data);
       toast.success("Batch created successfully");
       // refreshList(1);
     } catch (error) {

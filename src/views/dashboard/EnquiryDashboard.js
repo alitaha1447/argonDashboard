@@ -71,7 +71,7 @@ const pageNum = [
 const EnquiryDashboard = (props) => {
   // const storedBranches = localStorage.getItem("branches");
   const storedBranches = useSelector((state) => state.auth.selectedBranch);
-  console.log(storedBranches);
+  // console.log(storedBranches);
   // const parsedBranches = storedBranches ? JSON.parse(storedBranches) : null;
 
   const branchLabel = storedBranches?.label; // or parsedBranches?.[0]?.label if it's an array

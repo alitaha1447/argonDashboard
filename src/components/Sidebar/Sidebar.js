@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { NavLink as NavLinkRRD, Link } from "react-router-dom";
 // nodejs library to set properties for components
 import { PropTypes } from "prop-types";
@@ -37,18 +37,26 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "reducer/auth/authSlice";
 import { persistor } from "app/store";
+import axios from "axios";
+
+const API_PATH = process.env.REACT_APP_API_PATH;
+const API_KEY = process.env.REACT_APP_API_KEY;
 // var ps;
 
 const Sidebar = (props) => {
+  // console.log(props.routes);
+  const { routes, logo } = props;
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   // const user = JSON.parse(localStorage.getItem("user"));
   const user = useSelector((state) => state.auth);
-  console.log(user.name);
+  const userId = useSelector((state) => state.auth.id);
+  // console.log(userId);
 
   const [collapseOpen, setCollapseOpen] = useState();
   const [openDropdowns, setOpenDropdowns] = useState({});
+  const [permissionsId, setPermissionsId] = useState([]);
 
   // verifies if routeName is the one active (in browser input)
   // const activeRoute = (routeName) => {
@@ -62,6 +70,26 @@ const Sidebar = (props) => {
   const closeCollapse = () => {
     setCollapseOpen(false);
   };
+
+  useEffect(() => {
+    const fetchPermissions = async () => {
+      try {
+        const res = await axios.get(`${API_PATH}/api/Get_user_permission`, {
+          params: {
+            APIKEY: API_KEY,
+            userid: userId,
+          },
+        });
+        // console.log(res?.data);
+        const permissionID = res.data.map((p) => p.PermissionID) || [];
+        // console.log(permissionID);
+        setPermissionsId(permissionID);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    if (userId) fetchPermissions();
+  }, [userId]);
 
   // creates the links that appear in the left menu / Sidebar
   // const createLinks = (routes) => {
@@ -159,7 +187,8 @@ const Sidebar = (props) => {
   //     );
   //   });
   // };
-  const createLinks = (routes) => {
+  const createLinks = (routes, permissionsId) => {
+    // console.log(permissionsId);
     // const toggleDropdown = (name) => {
     //   setOpenDropdowns((prev) => ({
     //     ...prev,
@@ -174,9 +203,27 @@ const Sidebar = (props) => {
       }));
     };
 
+    const hasPermission = (route) => {
+      // console.log("hasPermission");
+      // console.log(route);
+      // console.log("hasPermission");
+      // console.log(route.isLabel);
+      // if (route.isLabel || route.name === "Login" || route.name === "Register")
+      //   return true;
+      if (route.children && route.children.length > 0) {
+        // console.log("children");
+        // console.log(route.children);
+        // console.log(route.children.some((child) => hasPermission(child)));
+        return route.children.some((child) => hasPermission(child));
+      }
+      return permissionsId.includes(route.id);
+    };
     const renderRoutes = (routesList, level = 0) => {
+      // console.log("renderRoutes");
+      // console.log(routesList);
       return routesList
         .filter((route) => route.name !== "Login" && route.name !== "Register") // 👈 Exclude these
+        .filter((route) => hasPermission(route))
         .map((route, index) => {
           // Label
           if (route.isLabel) {
@@ -240,7 +287,7 @@ const Sidebar = (props) => {
   };
 
   // const { bgColor, routes, logo } = props;
-  const { routes, logo } = props;
+
   let navbarBrandProps;
   if (logo && logo.innerLink) {
     navbarBrandProps = {
@@ -399,9 +446,17 @@ const Sidebar = (props) => {
             </InputGroup>
           </Form>
           {/* Navigation */}
-          <Nav navbar>{createLinks(routes)}</Nav>
+          <Nav navbar>{createLinks(routes, permissionsId)}</Nav>
           {/* Divider */}
-          <hr className="my-3" />
+          {/* <hr className="my-3" /> */}
+          {/* <Nav className="mb-md-3" navbar>
+            <NavItem>
+              <NavLink>
+                <i className="ni ni-spaceship" />
+                Support
+              </NavLink>
+            </NavItem>
+          </Nav> */}
           {/* <Nav className="mb-md-3" navbar>
             <NavItem className="active-pro active">
               <NavLink>
@@ -413,14 +468,44 @@ const Sidebar = (props) => {
           {/* Heading */}
           {/* <h6 className="navbar-heading text-muted">Documentation</h6> */}
           {/* Navigation */}
-          <Nav className="mb-md-3" navbar>
+          {/* Additional Routes */}
+
+          {/* <Nav navbar>
+            {routes.slice(22).map((route, index) => {
+              if (route.isLabel) {
+                return (
+                  <li
+                    key={`extra-${index}`}
+                    className="nav-heading text-uppercase font-weight-bold text-muted mt-3 mb-2 px-3 small"
+                  >
+                    {route.name}
+                  </li>
+                );
+              }
+
+              return (
+                <NavItem key={`extra-${index}`}>
+                  <NavLink
+                  // to={route.layout + route.path}
+                  // tag={NavLinkRRD}
+                  // onClick={closeCollapse}
+                  >
+                    <i className={route.icon} />
+                    <span className="ml-2">{route.name}</span>
+                  </NavLink>
+                </NavItem>
+              );
+            })}
+          </Nav> */}
+          {/* <Nav className="mb-md-3" navbar>
             <NavItem>
               <NavLink>
                 <i className="ni ni-spaceship" />
                 Support
               </NavLink>
             </NavItem>
-            {/* <NavItem>
+
+            <NavItem>
               <NavLink href="https://demos.creative-tim.com/argon-dashboard-react/#/documentation/overview?ref=adr-admin-sidebar">
                 <i className="ni ni-spaceship" />
                 Getting started
@@ -437,8 +522,8 @@ const Sidebar = (props) => {
                 <i className="ni ni-ui-04" />
                 Components
               </NavLink>
-            </NavItem> */}
-          </Nav>
+            </NavItem>
+          </Nav> */}
           {/* <Nav className="mb-md-3" navbar>
             <NavItem className="active-pro active">
               <NavLink href="https://www.creative-tim.com/product/argon-dashboard-pro-react?ref=adr-admin-sidebar">

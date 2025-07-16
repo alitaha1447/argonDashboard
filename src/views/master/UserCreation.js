@@ -136,7 +136,7 @@ const UserCreation = () => {
       Gender: gender?.value,
       username: email.split("@")[0],
       password: pass,
-      isactive: isAll ? 1 : 0,
+      isactive: isActive ? 1 : 0,
       userbranches: branches,
       userroles: userroles,
     };
@@ -306,7 +306,7 @@ const UserCreation = () => {
                               isClearable
                               isLoading={isLoading}
                               isMulti
-                              // isDisabled={isAll} // ✅ disables dropdown if checkbox is selected
+                              isDisabled={isAll} // ✅ disables dropdown if checkbox is selected
                             />
                           </div>
                         </div>
