@@ -137,7 +137,7 @@ const UserCreation = () => {
       username: email.split("@")[0],
       password: pass,
       isactive: isAll ? 1 : 0,
-      userbranche: branches,
+      userbranches: branches,
       userroles: userroles,
     };
 
