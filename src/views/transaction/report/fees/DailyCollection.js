@@ -36,6 +36,7 @@ import Loader from "components/CustomLoader/Loader";
 import CustomPagination from "components/CustomPagination/CustomPagination";
 import { exportToExcel } from "utils/printFile/exportToExcel";
 import { printTableData } from "utils/printFile/printFile";
+import { useSelector } from "react-redux";
 
 const API_PATH = process.env.REACT_APP_API_PATH;
 const API_KEY = process.env.REACT_APP_API_KEY;
@@ -49,6 +50,8 @@ const pageNum = [
 ];
 
 const DailyCollection = () => {
+  const Branch = useSelector((state) => state.auth.selectedBranch);
+
   const [showFilters, setShowFilters] = useState(false);
   // const [selectedEnquiryType, setSelectedEnquiryType] = useState(enquiry[0]);
   const [dateRange, setDateRange] = useState([null, null]);
@@ -83,13 +86,17 @@ const DailyCollection = () => {
   const { statusOptions, fetchEnquiry } = useStatusEnquiry();
 
   const fetchBatch = async () => {
+    const branchIDToUse = selectedBranch?.value || Branch?.value;
+
+    if (!branchIDToUse) return; // ✅ exit if nothing to use
     console.log(1);
     // setLoadingBatches(true); // Start loader
     try {
       const res = await axios.get(`${API_PATH}/api/GetBatch`, {
         params: {
           APIKEY: API_KEY,
-          branchid: selectedBranch?.value,
+          branchid: branchIDToUse,
+          // branchid: selectedBranch?.value,
         },
       });
 
@@ -203,6 +210,7 @@ const DailyCollection = () => {
                     // handleEnquiryTypeChange={handleEnquiryTypeChange}
                     fetchBatch={fetchBatch}
                     batches={batches}
+                    branch={Branch} // 👈 pass it here
                     selectedBatch={selectedBatch}
                     setSelectedBatch={setSelectedBatch}
                     selectedBranch={selectedBranch}
@@ -232,6 +240,7 @@ const DailyCollection = () => {
               // handleEnquiryTypeChange={handleEnquiryTypeChange}
               fetchBatch={fetchBatch}
               batches={batches}
+              branch={Branch} // 👈 pass it here
               selectedBatch={selectedBatch}
               setSelectedBatch={setSelectedBatch}
               selectedBranch={selectedBranch}

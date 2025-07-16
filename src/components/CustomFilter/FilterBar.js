@@ -13,6 +13,7 @@ const FilterBar = ({
   enquiry,
   selectedEnquiryType,
   handleEnquiryTypeChange,
+  branch,
   selectedBranch,
   setSelectedBranch,
   startDate,
@@ -38,15 +39,23 @@ const FilterBar = ({
     setBranchSearchText,
     branchSearchText,
   } = useBranchList();
+
   const { statusOptions, fetchEnquiry } = useStatusEnquiry();
+
   useEffect(() => {
     if (branchSearchText.length < 3) {
       setBranchOptions([]);
       return;
     }
-
     fetchBranch();
   }, [branchSearchText]);
+
+  useEffect(() => {
+    if (branch && !branchOptions.some((opt) => opt.value === branch.value)) {
+      setBranchOptions((prev) => [...prev, branch]);
+    }
+  }, [branch]);
+
   return (
     <div
       className="d-flex flex-column flex-lg-row align-items-center justify-content-between p-2 w-100"
@@ -97,7 +106,13 @@ const FilterBar = ({
           <Select
             id="branch-select"
             options={branchOptions}
-            value={selectedBranch}
+            value={
+              selectedBranch ||
+              (branch &&
+                branchOptions.find((opt) => opt.value === branch.value)) ||
+              null
+            }
+            // value={selectedBranch}
             onChange={(selected) => setSelectedBranch(selected)}
             onInputChange={(text) => setBranchSearchText(text)}
             placeholder="branch"

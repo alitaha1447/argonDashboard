@@ -16,23 +16,55 @@ import {
   DropdownItem,
   Col,
   Input,
+  Spinner,
 } from "reactstrap";
 import { FaPlus } from "react-icons/fa";
 import { BsThreeDotsVertical } from "react-icons/bs";
 import Header from "components/Headers/Header";
 import FilterBar from "components/CustomFilter/FilterBar";
+import CustomPagination from "components/CustomPagination/CustomPagination";
+import { exportToExcel } from "utils/printFile/exportToExcel";
+import { printTableData } from "utils/printFile/printFile";
 import DatePicker from "react-datepicker";
+import { fetchFinancialYearRangeByDate } from "utils/financialYearRange/FinancialYearRange";
 import "react-datepicker/dist/react-datepicker.css";
 import Select from "react-select";
 import { enquiry } from "DummyData";
 import useBranchList from "customHookApi/EnquiryDashboardApi/useBranchList";
 import useStatusEnquiry from "customHookApi/EnquiryDashboardApi/useStatusEnquiry";
+import axios from "axios";
+
+const API_PATH = process.env.REACT_APP_API_PATH;
+const API_KEY = process.env.REACT_APP_API_KEY;
+
+const pageNum = [
+  { value: 10, label: "10" },
+  { value: 25, label: " 25" },
+  { value: 50, label: "50" },
+  { value: 100, label: "100" },
+  { value: 5, label: "5" },
+];
+
 const FacultyCourses = () => {
+  const [courses, setCourses] = useState([]);
+
+  const { startDate1, endDate1 } = fetchFinancialYearRangeByDate();
+
   const [selectedStatus, setSelectedStatus] = useState(null);
   const [searchText, setSearchText] = useState("");
   const [dateRange, setDateRange] = useState([null, null]);
   const [startDate, endDate] = dateRange;
   const [selectedBranch, setSelectedBranch] = useState(null);
+  const [facultyBatch, setFacultyBatch] = useState([]);
+  const [isTableLoading, setIsTableLoading] = useState(false);
+
+  const [pageNumber, setPageNumber] = useState(1);
+  const [pageStart, setPageStart] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [pageNumDropDown, setPageNumDropDown] = useState(pageNum[0]);
+  const pageSize = pageNumDropDown?.value;
+
+  const [activeFilters, setActiveFilters] = useState({});
 
   // customHookAPI
   const {
@@ -45,14 +77,96 @@ const FacultyCourses = () => {
   } = useBranchList();
   const { statusOptions, fetchEnquiry } = useStatusEnquiry();
 
-  useEffect(() => {
-    if (branchSearchText.length < 3) {
-      setBranchOptions([]);
-      return;
-    }
+  // useEffect(() => {
+  //   if (branchSearchText.length < 3) {
+  //     setBranchOptions([]);
+  //     return;
+  //   }
+  //   fetchBranch();
+  // }, [branchSearchText]);
 
-    fetchBranch();
-  }, [branchSearchText]);
+  useEffect(() => {
+    const fetchCourse = async () => {
+      const res = await axios.get(`${API_PATH}/api/GetCourse`, {
+        params: {
+          APIKEY: API_KEY,
+        },
+      });
+      console.log(res.data);
+      setCourses(res.data); // ✅ Save in state
+    };
+    fetchCourse();
+  }, []);
+
+  const fetchFacultyBatch = async (page = 1, filters = {}) => {
+    setIsTableLoading(true);
+    try {
+      const res = await axios.get(`${API_PATH}/api/Get_Faculty_Batch_Report`, {
+        params: {
+          APIKEY: API_KEY,
+          fromdate: startDate1,
+          todate: endDate1,
+          branch: filters?.branch,
+          facultyid: filters?.facultyid,
+          pageno: page,
+          pagesize: pageSize,
+        },
+      });
+      setFacultyBatch(res.data.Data);
+      setPageNumber(res.data.PageNumber);
+      setTotalPages(res.data.TotalPages);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsTableLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchFacultyBatch(1);
+  }, [pageSize]);
+
+  const handleSearch = () => {
+    const filters = {
+      // fromdate: startDate ? formatDate1(startDate) : null,
+      // todate: endDate ? formatDate1(endDate) : null,
+      branch: null,
+      facultyid: null,
+    };
+
+    setActiveFilters(filters); // ⬅️ Store current filters
+    fetchFacultyBatch(1, filters); // ⬅️ Pass them for page 1
+  };
+
+  const handleSearchClick = (e) => {
+    e.preventDefault();
+    handleSearch(); // ✅ Reuse search logic
+  };
+
+  const formatDate = (date) => {
+    const d = new Date(date);
+    const day = String(d.getDate()).padStart(2, "0");
+    const month = String(d.getMonth() + 1).padStart(2, "0"); // months are 0-based
+    const year = d.getFullYear();
+    return `${day}-${month}-${year}`;
+  };
+
+  const getCourseNameById = (id) => {
+    const course = courses.find((course) => course.Id === id);
+    return course ? course.TopicTitle : "-";
+  };
+
+  const handleExport = () => {
+    const exportData = facultyBatch.map((item, index) => {
+      return {
+        "S.No	": index + 1,
+        "Enrollment No.": item.admission_no,
+        Name: item.name,
+        Mobile: item.mobileno,
+      };
+    });
+    exportToExcel(exportData, "FacultyBatch", "Sheet1");
+  };
 
   return (
     <>
@@ -61,6 +175,9 @@ const FacultyCourses = () => {
         <Row>
           <Col className="pb-4 d-block d-sm-block">
             <FilterBar
+              selectedBranch={selectedBranch}
+              setSelectedBranch={setSelectedBranch}
+              handleSearchClick={handleSearchClick}
               showSearchByFacultyName={true}
               showSearchByName={false}
               showBatch={false}
@@ -163,7 +280,60 @@ const FacultyCourses = () => {
                   }}
                 >
                   <h3 className="mb-0">Lists</h3>
-                  <div
+                  <UncontrolledDropdown direction="left">
+                    <DropdownToggle
+                      tag="span"
+                      style={{
+                        cursor: "pointer",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        width: "38px",
+                        height: "38px",
+                        backgroundColor: "#5e72e4",
+                        color: "#fff",
+                        borderRadius: "4px",
+                      }}
+                    >
+                      <FaPlus />
+                    </DropdownToggle>
+
+                    <DropdownMenu
+                      style={{
+                        padding: "10px",
+                        border: "1px solid #ddd",
+                        borderRadius: "4px",
+                        boxShadow: "0px 2px 6px rgba(0,0,0,0.2)",
+                        minWidth: "160px",
+                      }}
+                    >
+                      <Button
+                        color="primary"
+                        block
+                        size="md"
+                        onClick={() => printTableData("Faculty Batch Lists")}
+                      >
+                        Print
+                      </Button>
+                      <Button
+                        color="primary"
+                        block
+                        size="md"
+                        onClick={handleExport}
+                      >
+                        Save as Excel
+                      </Button>
+                      <Button
+                        color="primary"
+                        block
+                        size="md"
+                        // onClick={() => printAndExportExcel(data)}
+                      >
+                        Add Student
+                      </Button>
+                    </DropdownMenu>
+                  </UncontrolledDropdown>
+                  {/* <div
                     // onClick={toggleMaster}
                     style={{
                       cursor: "pointer",
@@ -178,7 +348,7 @@ const FacultyCourses = () => {
                     }}
                   >
                     <FaPlus />
-                  </div>
+                  </div> */}
                 </div>
               </CardHeader>
               {/* ✅ Table View for Desktop (Large screens only) */}
@@ -188,180 +358,179 @@ const FacultyCourses = () => {
                     <tr>
                       <th scope="col">S.No</th>
                       <th scope="col">Faculty Name</th>
+                      <th scope="col">Batch Title</th>
                       <th scope="col">Course</th>
                       <th scope="col">Start date</th>
                       <th scope="col">End date</th>
                       <th scope="col">Capacity</th>
-                      {/* <th scope="col">Date</th> */}
+                      <th scope="col">Action</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {/* {daily.map((item, index) => (
-                              <tr key={index}>
-                                <td>{item.Id}</td>
-                                <td>{item.TopicTitle}</td>
-                                <td>{item.IsActive === 1 ? "Yes" : "No"}</td>
-                                <td style={{}}>
-                                  <UncontrolledDropdown direction="">
-                                    <DropdownToggle
-                                      tag="span"
-                                      style={{ cursor: "pointer" }}
-                                      data-toggle="dropdown"
-                                      aria-expanded={false}
-                                    >
-                                      <BsThreeDotsVertical size={20} />
-                                    </DropdownToggle>
-        
-                                    <DropdownMenu
-                                      left
-                                      style={{
-                                        minWidth: "120px",
-                                        border: "1px solid #ddd",
-                                        borderRadius: "4px",
-                                        boxShadow: "0px 2px 6px rgba(0,0,0,0.2)",
-                                      }}
-                                    >
-                                      <DropdownItem
-                                        key={index}
-                                        // onClick={() => toggleStatusModal(item.Id)}
-                                      >
-                                        Edit
-                                      </DropdownItem>
-                                      <DropdownItem
-                                        key={index}
-                                        // onClick={() => toggleStatusModal(item.Id)}
-                                      >
-                                        Delete
-                                      </DropdownItem>
-                                    </DropdownMenu>
-                                  </UncontrolledDropdown>
-                                </td>
-                              </tr>
-                            ))} */}
+                    {isTableLoading ? (
+                      <tr>
+                        <td colSpan="10" className="text-center py-4">
+                          <Spinner color="primary">Loading...</Spinner>
+                          {/* <i className="fas fa-spinner fa-spin fa-2x text-primary" />
+                                                <p className="mt-2 mb-0">Loading data...</p> */}
+                        </td>
+                      </tr>
+                    ) : facultyBatch.length > 0 ? (
+                      facultyBatch.map((item, index) => (
+                        <tr key={index}>
+                          <td>{item.batchid}</td>
+                          <td>{item.facultyname}</td>
+                          <td>{item.batchname}</td>
+                          <td>{getCourseNameById(item.courseid)}</td>{" "}
+                          <td>{formatDate(item.startdate)}</td>
+                          <td>{formatDate(item.enddate)}</td>
+                          <td>{item.batchcapacity}</td>
+                          <td style={{}}>
+                            <UncontrolledDropdown direction="">
+                              <DropdownToggle
+                                tag="span"
+                                style={{ cursor: "pointer" }}
+                                data-toggle="dropdown"
+                                aria-expanded={false}
+                              >
+                                <BsThreeDotsVertical size={20} />
+                              </DropdownToggle>
+
+                              <DropdownMenu
+                                left
+                                style={{
+                                  minWidth: "120px",
+                                  border: "1px solid #ddd",
+                                  borderRadius: "4px",
+                                  boxShadow: "0px 2px 6px rgba(0,0,0,0.2)",
+                                }}
+                              >
+                                <DropdownItem
+                                  key={`${index}-edit`}
+                                  // onClick={() => toggleStatusModal(item.Id)}
+                                >
+                                  Edit
+                                </DropdownItem>
+                                <DropdownItem
+                                  key={`${index}-delete`}
+                                  // onClick={() => toggleStatusModal(item.Id)}
+                                >
+                                  Delete
+                                </DropdownItem>
+                              </DropdownMenu>
+                            </UncontrolledDropdown>
+                          </td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td
+                          colSpan="10"
+                          className="text-center py-4 text-muted"
+                        >
+                          <i className="fas fa-info-circle mr-2" />
+                          No data found.
+                        </td>
+                      </tr>
+                    )}
                   </tbody>
                 </Table>
               </div>
               {/* ✅ Card View for Mobile & Tablet */}
               <div className="d-block d-lg-none p-3">
-                {/* {courses.map((item, index) => ( */}
-                <Card className="mb-3 shadow-sm">
-                  <div className="d-flex p-4 justify-content-between">
-                    <div className="d-flex">
-                      <div>
-                        <p className="fs-6 fw-semibold mb-1">
-                          <strong>S.No. :</strong> {"1"}
-                        </p>
-                        <p className="fs-6 fw-semibold mb-1">
-                          <strong>Faculty Name:</strong> {"Taha"}
-                        </p>
-                        <p className="fs-6 fw-semibold mb-1">
-                          <strong>Course :</strong>
-                          {"React Js"}
-                        </p>
-                        <p className="fs-6 fw-semibold mb-1">
-                          <strong>Start date :</strong>
-                          {"20-02-2025"}
-                        </p>
-                        <p className="fs-6 fw-semibold mb-1">
-                          <strong>End date :</strong>
-                          {"20-02-2025"}
-                        </p>
-                        <p className="fs-6 fw-semibold mb-1">
-                          <strong>Capacity :</strong>
-                          {"12"}
-                        </p>
-                      </div>
-                    </div>
+                {isTableLoading ? (
+                  <Spinner color="primary">Loading...</Spinner>
+                ) : facultyBatch.length > 0 ? (
+                  facultyBatch.map((item, index) => (
+                    <Card className="mb-3 shadow-sm">
+                      <div className="d-flex p-4 justify-content-between">
+                        <div className="d-flex">
+                          <div>
+                            <p className="fs-6 fw-semibold mb-1">
+                              <strong>S.No. :</strong> {item.batchid}
+                            </p>
+                            <p className="fs-6 fw-semibold mb-1">
+                              <strong>Faculty Name:</strong> {item.facultyname}
+                            </p>
+                            <p className="fs-6 fw-semibold mb-1">
+                              <strong>Batch Title :</strong>
+                              {item.batchname}
+                            </p>
+                            <p className="fs-6 fw-semibold mb-1">
+                              <strong>Course :</strong>
+                              {getCourseNameById(item.courseid)}
+                            </p>
+                            <p className="fs-6 fw-semibold mb-1">
+                              <strong>Start date :</strong>
+                              {formatDate(item.startdate)}
+                            </p>
+                            <p className="fs-6 fw-semibold mb-1">
+                              <strong>End date :</strong>
+                              {formatDate(item.enddate)}
+                            </p>
+                            <p className="fs-6 fw-semibold mb-1">
+                              <strong>Capacity :</strong>
+                              {item.batchcapacity}
+                            </p>
+                          </div>
+                        </div>
 
-                    <UncontrolledDropdown direction="left">
-                      <DropdownToggle
-                        tag="span"
-                        style={{ cursor: "pointer" }}
-                        data-toggle="dropdown"
-                        aria-expanded={false}
-                      >
-                        <BsThreeDotsVertical size={20} />
-                      </DropdownToggle>
-
-                      <DropdownMenu
-                        right
-                        style={{
-                          minWidth: "120px",
-                          border: "1px solid #ddd",
-                          borderRadius: "4px",
-                          boxShadow: "0px 2px 6px rgba(0,0,0,0.2)",
-                        }}
-                      >
-                        <DropdownItem
-                        // key={index}
-                        // onClick={() => toggleStatusModal(item.Id)}
-                        >
-                          Edit
-                        </DropdownItem>
-                        <DropdownItem
-                        // key={index}
-                        // onClick={() => toggleStatusModal(item.Id)}
-                        >
-                          Delete
-                        </DropdownItem>
-                      </DropdownMenu>
-                    </UncontrolledDropdown>
-                  </div>
-                </Card>
-                {/* ))} */}
-              </div>
-              {/* <CardFooter className="py-4">
-                        <nav aria-label="...">
-                          <Pagination
-                            className="pagination justify-content-end mb-0"
-                            listClassName="justify-content-end mb-0"
+                        <UncontrolledDropdown direction="left">
+                          <DropdownToggle
+                            tag="span"
+                            style={{ cursor: "pointer" }}
+                            data-toggle="dropdown"
+                            aria-expanded={false}
                           >
-                            <PaginationItem className="disabled">
-                              <PaginationLink
-                                href="#pablo"
-                                onClick={(e) => e.preventDefault()}
-                                tabIndex="-1"
-                              >
-                                <i className="fas fa-angle-left" />
-                                <span className="sr-only">Previous</span>
-                              </PaginationLink>
-                            </PaginationItem>
-                            <PaginationItem className="active">
-                              <PaginationLink
-                                href="#pablo"
-                                onClick={(e) => e.preventDefault()}
-                              >
-                                1
-                              </PaginationLink>
-                            </PaginationItem>
-                            <PaginationItem>
-                              <PaginationLink
-                                href="#pablo"
-                                onClick={(e) => e.preventDefault()}
-                              >
-                                2 <span className="sr-only">(current)</span>
-                              </PaginationLink>
-                            </PaginationItem>
-                            <PaginationItem>
-                              <PaginationLink
-                                href="#pablo"
-                                onClick={(e) => e.preventDefault()}
-                              >
-                                3
-                              </PaginationLink>
-                            </PaginationItem>
-                            <PaginationItem>
-                              <PaginationLink
-                                href="#pablo"
-                                onClick={(e) => e.preventDefault()}
-                              >
-                                <i className="fas fa-angle-right" />
-                                <span className="sr-only">Next</span>
-                              </PaginationLink>
-                            </PaginationItem>
-                          </Pagination>
-                        </nav>
-                      </CardFooter> */}
+                            <BsThreeDotsVertical size={20} />
+                          </DropdownToggle>
+
+                          <DropdownMenu
+                            right
+                            style={{
+                              minWidth: "120px",
+                              border: "1px solid #ddd",
+                              borderRadius: "4px",
+                              boxShadow: "0px 2px 6px rgba(0,0,0,0.2)",
+                            }}
+                          >
+                            <DropdownItem
+                              key={`${index}-edit`}
+                              // onClick={() => toggleStatusModal(item.Id)}
+                            >
+                              Edit
+                            </DropdownItem>
+                            <DropdownItem
+                              key={`${index}-delete`}
+                              // onClick={() => toggleStatusModal(item.Id)}
+                            >
+                              Delete
+                            </DropdownItem>
+                          </DropdownMenu>
+                        </UncontrolledDropdown>
+                      </div>
+                    </Card>
+                  ))
+                ) : (
+                  <div className="text-center py-4 text-muted">
+                    <i className="fas fa-info-circle mr-2" />
+                    No data found.
+                  </div>
+                )}
+              </div>
+              <CardFooter className="py-4">
+                <CustomPagination
+                  pageStart={pageStart}
+                  setPageStart={setPageStart}
+                  totalPages={totalPages}
+                  setPageNumber={setPageNumber}
+                  fetchPaginatedData={fetchFacultyBatch}
+                  pageNumber={pageNumber}
+                  pageNumDropDown={pageNumDropDown}
+                  setPageNumDropDown={setPageNumDropDown}
+                  pageNum={pageNum}
+                />
+              </CardFooter>
             </Card>
           </div>
         </Row>

@@ -39,6 +39,7 @@ import { fetchFinancialYearRangeByDate } from "utils/financialYearRange/Financia
 import { generateHexColors } from "utils/dynamicColorGenerator/generateHexColors ";
 import { exportToExcel } from "utils/printFile/exportToExcel";
 import { printTableData } from "utils/printFile/printFile";
+import { useSelector } from "react-redux";
 
 const API_PATH = process.env.REACT_APP_API_PATH;
 const API_KEY = process.env.REACT_APP_API_KEY;
@@ -52,6 +53,8 @@ const pageNum = [
 ];
 
 const FeesDashboard = () => {
+  const Branch = useSelector((state) => state.auth.selectedBranch);
+
   const { startDate1, endDate1 } = fetchFinancialYearRangeByDate();
 
   const [selectedFeeDetail, setSelectedFeeDetail] = useState({
@@ -394,6 +397,7 @@ const FeesDashboard = () => {
                     enquiry={enquiry}
                     selectedEnquiryType={selectedEnquiryType}
                     handleEnquiryTypeChange={handleEnquiryTypeChange}
+                    branch={Branch}
                     selectedBranch={selectedBranch}
                     setSelectedBranch={setSelectedBranch}
                     startDate={startDate}
@@ -421,6 +425,7 @@ const FeesDashboard = () => {
               enquiry={enquiry}
               selectedEnquiryType={selectedEnquiryType}
               handleEnquiryTypeChange={handleEnquiryTypeChange}
+              branch={Branch}
               selectedBranch={selectedBranch}
               setSelectedBranch={setSelectedBranch}
               startDate={startDate}

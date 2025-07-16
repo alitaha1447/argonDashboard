@@ -69,6 +69,8 @@ const pageNum = [
 ];
 
 const EnquiryDashboard = (props) => {
+  // const Branch = useSelector((state) => state.auth.selectedBranch);
+  // console.log(Branch);
   // const storedBranches = localStorage.getItem("branches");
   const storedBranches = useSelector((state) => state.auth.selectedBranch);
   // console.log(storedBranches);
@@ -190,7 +192,7 @@ const EnquiryDashboard = (props) => {
     } catch (error) {
       if (error.response && error.response.status === 404) {
         // console.log(error);
-        toast.error(error?.message);
+        toast.warning("No Data" || error?.message);
         setListData([]);
         setPageNumber(1);
         setTotalPages(1);
@@ -515,6 +517,7 @@ const EnquiryDashboard = (props) => {
                     enquiry={enquiry}
                     selectedEnquiryType={selectedEnquiryType}
                     handleEnquiryTypeChange={handleEnquiryTypeChange}
+                    branch={storedBranches}
                     selectedBranch={selectedBranch}
                     setSelectedBranch={setSelectedBranch}
                     startDate={startDate}
@@ -539,6 +542,7 @@ const EnquiryDashboard = (props) => {
               enquiry={enquiry}
               selectedEnquiryType={selectedEnquiryType}
               handleEnquiryTypeChange={handleEnquiryTypeChange}
+              branch={storedBranches}
               selectedBranch={selectedBranch}
               setSelectedBranch={setSelectedBranch}
               startDate={startDate}

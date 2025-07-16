@@ -36,11 +36,15 @@ import useBranchList from "customHookApi/EnquiryDashboardApi/useBranchList";
 
 import axios from "axios";
 import Loader from "components/CustomLoader/Loader";
+import { useSelector } from "react-redux";
 
 const API_PATH = process.env.REACT_APP_API_PATH;
 const API_KEY = process.env.REACT_APP_API_KEY;
 
 const BatchStudent = () => {
+  const Branch = useSelector((state) => state.auth.selectedBranch);
+  console.log(Branch);
+
   const [isTableLoading, setisTableLoading] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
   const [showPaymentDetail, setShowPaymentDetail] = useState(false);
@@ -74,13 +78,16 @@ const BatchStudent = () => {
   }, [branchSearchText]);
 
   const fetchBatch = async () => {
-    if (!selectedBranch?.value) return; // 🚫 Don't proceed if no branch is selected
+    const branchIDToUse = selectedBranch?.value || Branch?.value;
+
+    if (!branchIDToUse) return; // ✅ exit if nothing to use
+    // if (!selectedBranch?.value) return; // 🚫 Don't proceed if no branch is selected
     setLoadingBatches(true); // Start loader
     try {
       const res = await axios.get(`${API_PATH}/api/GetBatch`, {
         params: {
           APIKEY: API_KEY,
-          branchid: selectedBranch?.value,
+          branchid: branchIDToUse,
         },
       });
 
@@ -183,6 +190,7 @@ const BatchStudent = () => {
                   className="pb-4 d-sm-none d-md-none"
                 >
                   <FilterBar
+                    branch={Branch} // 👈 pass it here
                     selectedBranch={selectedBranch}
                     setSelectedBranch={setSelectedBranch}
                     fetchBatch={fetchBatch}
@@ -201,6 +209,7 @@ const BatchStudent = () => {
           </Col>
           <Col className="pb-4 d-none d-sm-block ">
             <FilterBar
+              branch={Branch} // 👈 pass it here
               selectedBranch={selectedBranch}
               setSelectedBranch={setSelectedBranch}
               fetchBatch={fetchBatch}
