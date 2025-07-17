@@ -35,6 +35,7 @@ import { fetchFinancialYearRangeByDate } from "utils/financialYearRange/Financia
 import { useSelector } from "react-redux";
 import { MdFilterAlt } from "react-icons/md";
 import { MdFilterAltOff } from "react-icons/md";
+import Loader from "components/CustomLoader/Loader";
 
 const API_PATH = process.env.REACT_APP_API_PATH;
 const API_KEY = process.env.REACT_APP_API_KEY;
@@ -109,6 +110,15 @@ const DueBalance = () => {
   useEffect(() => {
     fetchDueCollection(1);
   }, [pagesize]);
+
+  const formattedDate = (date) => {
+    const d = new Date(date);
+    const day = String(d.getDate()).padStart(2, "0");
+    const month = String(d.getMonth() + 1).padStart(2, "0");
+    const year = String(d.getFullYear());
+
+    return `${day}-${month}-${year}`;
+  };
 
   return (
     <>
@@ -259,58 +269,87 @@ const DueBalance = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {dueLists.map((item, index) => (
-                      <tr key={index}>
-                        <td>{item.batch_student_id}</td>
-                        <td>{item.name}</td>
-                        <td>{item.installment_title}</td>
-                        <td>{item.part_amount}</td>
-                        <td>{item.due_date}</td>
-                        <td>{item.late_fees}</td>
-                        <td>{item.part_amount + item.late_fees}</td>
+                    {isTableLoading ? (
+                      <tr>
+                        <td colSpan="10" className="text-center py-4">
+                          <i className="fas fa-spinner fa-spin fa-2x text-primary" />
+                          <p className="mt-2 mb-0">Loading data...</p>
+                        </td>
                       </tr>
-                    ))}
+                    ) : dueLists.length > 0 ? (
+                      dueLists.map((item, index) => (
+                        <tr key={index}>
+                          <td>{item.batch_student_id}</td>
+                          <td>{item.name}</td>
+                          <td>{item.installment_title}</td>
+                          <td>{item.part_amount}</td>
+                          <td>{formattedDate(item.due_date)}</td>
+                          <td>{item.late_fees}</td>
+                          <td>{item.part_amount + item.late_fees}</td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td
+                          colSpan="10"
+                          className="text-center py-4 text-muted"
+                        >
+                          <i className="fas fa-info-circle mr-2" />
+                          No data found.
+                        </td>
+                      </tr>
+                    )}
                   </tbody>
                 </Table>
               </div>
               {/* ✅ Card View for Mobile & Tablet */}
               <div className="d-block d-lg-none p-3">
-                {/* {courses.map((item, index) => ( */}
-                <Card className="mb-3 shadow-sm">
-                  <div className="d-flex p-4 justify-content-between">
-                    <div className="d-flex">
-                      <div>
-                        <p className="fs-6 fw-semibold mb-1">
-                          <strong>S.No. :</strong> {"1"}
-                        </p>
-                        <p className="fs-6 fw-semibold mb-1">
-                          <strong>Student Name:</strong> {"Taha"}
-                        </p>
-                        <p className="fs-6 fw-semibold mb-1">
-                          <strong>Batch :</strong>
-                          {"React Js"}
-                        </p>
-                        <p className="fs-6 fw-semibold mb-1">
-                          <strong>Bracnh :</strong>
-                          {"Bhopal"}
-                        </p>
-                        <p className="fs-6 fw-semibold mb-1">
-                          <strong>Total Amount :</strong>
-                          {"75500"}
-                        </p>
-                        <p className="fs-6 fw-semibold mb-1">
-                          <strong>Amount Recieved :</strong>
-                          {"12500"}
-                        </p>
-                        <p className="fs-6 fw-semibold mb-1">
-                          <strong>Date :</strong>
-                          {"20-02-2025"}
-                        </p>
+                {isTableLoading ? (
+                  <Loader />
+                ) : dueLists.length > 0 ? (
+                  dueLists.map((item, index) => (
+                    <Card key={index} className="mb-3 shadow-sm">
+                      <div className="d-flex p-4 justify-content-between">
+                        <div className="d-flex">
+                          <div>
+                            <p className="fs-6 fw-semibold mb-1">
+                              <strong>S.No. :</strong> {item.batch_student_id}
+                            </p>
+                            <p className="fs-6 fw-semibold mb-1">
+                              {" "}
+                              <strong>Student Name:</strong> {item.name}
+                            </p>
+                            <p className="fs-6 fw-semibold mb-1">
+                              <strong>Due Detail :</strong>
+                              {item.installment_title}
+                            </p>
+                            <p className="fs-6 fw-semibold mb-1">
+                              <strong>Due Amount :</strong>
+                              {item.part_amount}
+                            </p>
+                            <p className="fs-6 fw-semibold mb-1">
+                              <strong>Due Date :</strong>
+                              {formattedDate(item.due_date)}
+                            </p>
+                            <p className="fs-6 fw-semibold mb-1">
+                              <strong>Late Fees :</strong>
+                              {item.late_fees}
+                            </p>
+                            <p className="fs-6 fw-semibold mb-1">
+                              <strong>Total Amount :</strong>
+                              {item.part_amount + item.late_fees}
+                            </p>
+                          </div>
+                        </div>
                       </div>
-                    </div>
+                    </Card>
+                  ))
+                ) : (
+                  <div className="text-center py-4 text-muted">
+                    <i className="fas fa-info-circle mr-2" />
+                    No data found.
                   </div>
-                </Card>
-                {/* ))} */}
+                )}
               </div>
               <CardFooter className="py-4">
                 <CustomPagination
