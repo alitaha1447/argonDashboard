@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   Card,
   CardHeader,
@@ -24,13 +25,31 @@ import { ToastContainer } from "react-toastify";
 import useBranchList from "customHookApi/EnquiryDashboardApi/useBranchList";
 import useStatusEnquiry from "customHookApi/EnquiryDashboardApi/useStatusEnquiry";
 import FilterBar from "components/CustomFilter/FilterBar";
+import CustomPagination from "components/CustomPagination/CustomPagination";
 import Select from "react-select";
 import { Input } from "reactstrap";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { enquiry } from "DummyData";
+import { fetchFinancialYearRangeByDate } from "utils/financialYearRange/FinancialYearRange";
+import { useSelector } from "react-redux";
+import { MdFilterAlt } from "react-icons/md";
+import { MdFilterAltOff } from "react-icons/md";
+
+const API_PATH = process.env.REACT_APP_API_PATH;
+const API_KEY = process.env.REACT_APP_API_KEY;
+
+const pageNum = [
+  { value: 10, label: "10" },
+  { value: 25, label: " 25" },
+  { value: 50, label: "50" },
+  { value: 100, label: "100" },
+];
 
 const DueBalance = () => {
+  const defaultBranch = useSelector((state) => state.auth.selectedBranch);
+
+  const [showFilters, setShowFilters] = useState(false);
   // const [selectedEnquiryType, setSelectedEnquiryType] = useState(enquiry[0]);
   const [dateRange, setDateRange] = useState([null, null]);
   const [startDate, endDate] = dateRange;
@@ -41,6 +60,15 @@ const DueBalance = () => {
   // Enquiry
   // const [statusOptions, setstatusOptions] = useState([]);
   const [selectedStatus, setSelectedStatus] = useState(null);
+  const [isTableLoading, setIsTableLoading] = useState(false);
+  const { startDate1, endDate1 } = fetchFinancialYearRangeByDate();
+  const [dueLists, setDueLists] = useState([]);
+
+  const [pageNumber, setPageNumber] = useState(1);
+  const [pageStart, setPageStart] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [pageNumDropDown, setPageNumDropDown] = useState(pageNum[0]);
+  const pagesize = pageNumDropDown?.value;
 
   // customHookAPI
   const {
@@ -53,12 +81,91 @@ const DueBalance = () => {
   } = useBranchList();
   const { statusOptions, fetchEnquiry } = useStatusEnquiry();
 
+  const fetchDueCollection = async (page = 1) => {
+    setIsTableLoading(true);
+    try {
+      const res = await axios.get(`${API_PATH}/api/Get_due_balance_report`, {
+        params: {
+          APIKEY: API_KEY,
+          fromdate: startDate1,
+          todate: endDate1,
+          branchid: null,
+          batchid: null,
+          searchtext: "",
+          pageno: page,
+          pagesize: pagesize,
+        },
+      });
+      setDueLists(res?.data?.Data);
+      setPageNumber(res?.data?.PageNumber);
+      setTotalPages(res?.data?.TotalPages);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsTableLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchDueCollection(1);
+  }, [pagesize]);
+
   return (
     <>
       <Header />
 
       <Container className="mt--9" fluid>
-        <Row>
+        <Row className="d-flex flex-column">
+          <Col>
+            <div
+              className="rounded-3  mb-2 d-flex d-sm-none justify-content-between align-items-center px-2 py-2 w-100"
+              onClick={() => setShowFilters((prev) => !prev)}
+              style={{ cursor: "pointer", backgroundColor: "#191d4d" }}
+            >
+              <h3 className="mb-0" style={{ color: "white" }}>
+                Filter
+              </h3>
+              {showFilters ? (
+                <MdFilterAltOff color="white" />
+              ) : (
+                <MdFilterAlt color="white" />
+              )}
+            </div>
+          </Col>
+          <Col>
+            <AnimatePresence>
+              {showFilters && (
+                <motion.div
+                  key="mobile-filter"
+                  initial={{ height: 0, opacity: 1 }}
+                  animate={{ height: "auto", opacity: 1 }}
+                  exit={{ height: 0, opacity: 1 }}
+                  transition={{ duration: 0.4, ease: "easeInOut" }}
+                  className="pb-4 d-sm-none d-md-none"
+                >
+                  <FilterBar
+                    selectedStatus={selectedStatus}
+                    setSelectedStatus={setSelectedStatus}
+                    fetchEnquiry={fetchEnquiry}
+                    searchText={searchText}
+                    // handleUnifiedSearchChange={handleUnifiedSearchChange}
+                    enquiry={enquiry}
+                    // selectedEnquiryType={selectedEnquiryType}
+                    // handleEnquiryTypeChange={handleEnquiryTypeChange}
+                    branch={defaultBranch}
+                    selectedBranch={selectedBranch}
+                    setSelectedBranch={setSelectedBranch}
+                    startDate={startDate}
+                    endDate={endDate}
+                    setDateRange={setDateRange}
+                    showDatePicker={false}
+                    // handleSearchClick={handleSearchClick}
+                    showStatus={true}
+                  />
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </Col>
           <Col className="pb-4 d-none d-sm-block">
             <FilterBar
               selectedStatus={selectedStatus}
@@ -69,6 +176,7 @@ const DueBalance = () => {
               enquiry={enquiry}
               // selectedEnquiryType={selectedEnquiryType}
               // handleEnquiryTypeChange={handleEnquiryTypeChange}
+              branch={defaultBranch}
               selectedBranch={selectedBranch}
               setSelectedBranch={setSelectedBranch}
               startDate={startDate}
@@ -143,54 +251,25 @@ const DueBalance = () => {
                     <tr>
                       <th scope="col">S.No</th>
                       <th scope="col">Student Name</th>
+                      <th scope="col">Due Detail</th>
+                      <th scope="col">Due Amount</th>
+                      <th scope="col">Due Date</th>
+                      <th scope="col">Late Fees</th>
                       <th scope="col">Total Amount</th>
-                      <th scope="col">Amount Paid</th>
-                      <th scope="col">Amount Due</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {/* {daily.map((item, index) => (
+                    {dueLists.map((item, index) => (
                       <tr key={index}>
-                        <td>{item.Id}</td>
-                        <td>{item.TopicTitle}</td>
-                        <td>{item.IsActive === 1 ? "Yes" : "No"}</td>
-                        <td style={{}}>
-                          <UncontrolledDropdown direction="">
-                            <DropdownToggle
-                              tag="span"
-                              style={{ cursor: "pointer" }}
-                              data-toggle="dropdown"
-                              aria-expanded={false}
-                            >
-                              <BsThreeDotsVertical size={20} />
-                            </DropdownToggle>
-
-                            <DropdownMenu
-                              left
-                              style={{
-                                minWidth: "120px",
-                                border: "1px solid #ddd",
-                                borderRadius: "4px",
-                                boxShadow: "0px 2px 6px rgba(0,0,0,0.2)",
-                              }}
-                            >
-                              <DropdownItem
-                                key={index}
-                                // onClick={() => toggleStatusModal(item.Id)}
-                              >
-                                Edit
-                              </DropdownItem>
-                              <DropdownItem
-                                key={index}
-                                // onClick={() => toggleStatusModal(item.Id)}
-                              >
-                                Delete
-                              </DropdownItem>
-                            </DropdownMenu>
-                          </UncontrolledDropdown>
-                        </td>
+                        <td>{item.batch_student_id}</td>
+                        <td>{item.name}</td>
+                        <td>{item.installment_title}</td>
+                        <td>{item.part_amount}</td>
+                        <td>{item.due_date}</td>
+                        <td>{item.late_fees}</td>
+                        <td>{item.part_amount + item.late_fees}</td>
                       </tr>
-                    ))} */}
+                    ))}
                   </tbody>
                 </Table>
               </div>
@@ -229,95 +308,22 @@ const DueBalance = () => {
                         </p>
                       </div>
                     </div>
-
-                    <UncontrolledDropdown direction="left">
-                      <DropdownToggle
-                        tag="span"
-                        style={{ cursor: "pointer" }}
-                        data-toggle="dropdown"
-                        aria-expanded={false}
-                      >
-                        <BsThreeDotsVertical size={20} />
-                      </DropdownToggle>
-
-                      <DropdownMenu
-                        right
-                        style={{
-                          minWidth: "120px",
-                          border: "1px solid #ddd",
-                          borderRadius: "4px",
-                          boxShadow: "0px 2px 6px rgba(0,0,0,0.2)",
-                        }}
-                      >
-                        <DropdownItem
-                        // key={index}
-                        // onClick={() => toggleStatusModal(item.Id)}
-                        >
-                          Edit
-                        </DropdownItem>
-                        <DropdownItem
-                        // key={index}
-                        // onClick={() => toggleStatusModal(item.Id)}
-                        >
-                          Delete
-                        </DropdownItem>
-                      </DropdownMenu>
-                    </UncontrolledDropdown>
                   </div>
                 </Card>
                 {/* ))} */}
               </div>
               <CardFooter className="py-4">
-                <nav aria-label="...">
-                  <Pagination
-                    className="pagination justify-content-end mb-0"
-                    listClassName="justify-content-end mb-0"
-                  >
-                    <PaginationItem className="disabled">
-                      <PaginationLink
-                        href="#pablo"
-                        onClick={(e) => e.preventDefault()}
-                        tabIndex="-1"
-                      >
-                        <i className="fas fa-angle-left" />
-                        <span className="sr-only">Previous</span>
-                      </PaginationLink>
-                    </PaginationItem>
-                    <PaginationItem className="active">
-                      <PaginationLink
-                        href="#pablo"
-                        onClick={(e) => e.preventDefault()}
-                      >
-                        1
-                      </PaginationLink>
-                    </PaginationItem>
-                    <PaginationItem>
-                      <PaginationLink
-                        href="#pablo"
-                        onClick={(e) => e.preventDefault()}
-                      >
-                        2 <span className="sr-only">(current)</span>
-                      </PaginationLink>
-                    </PaginationItem>
-                    <PaginationItem>
-                      <PaginationLink
-                        href="#pablo"
-                        onClick={(e) => e.preventDefault()}
-                      >
-                        3
-                      </PaginationLink>
-                    </PaginationItem>
-                    <PaginationItem>
-                      <PaginationLink
-                        href="#pablo"
-                        onClick={(e) => e.preventDefault()}
-                      >
-                        <i className="fas fa-angle-right" />
-                        <span className="sr-only">Next</span>
-                      </PaginationLink>
-                    </PaginationItem>
-                  </Pagination>
-                </nav>
+                <CustomPagination
+                  pageStart={pageStart}
+                  setPageStart={setPageStart}
+                  totalPages={totalPages}
+                  setPageNumber={setPageNumber}
+                  fetchPaginatedData={fetchDueCollection}
+                  pageNumber={pageNumber}
+                  pageNumDropDown={pageNumDropDown}
+                  setPageNumDropDown={setPageNumDropDown}
+                  pageNum={pageNum}
+                />
               </CardFooter>
             </Card>
           </div>

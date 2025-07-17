@@ -24,6 +24,7 @@ import { MdFilterAlt } from "react-icons/md";
 import { MdFilterAltOff } from "react-icons/md";
 import { FaPlus } from "react-icons/fa";
 import { BsThreeDotsVertical } from "react-icons/bs";
+import { useSelector } from "react-redux";
 import axios from "axios";
 
 import FilterBar from "components/CustomFilter/FilterBar";
@@ -44,6 +45,8 @@ const pageNum = [
 ];
 
 const ReceiptList = () => {
+  const defaultBranch = useSelector((state) => state?.auth?.selectedBranch);
+
   const [showFilters, setShowFilters] = useState(false);
 
   const [batches, setBatches] = useState([]);
@@ -192,6 +195,7 @@ const ReceiptList = () => {
                     batches={batches}
                     selectedBatch={selectedBatch}
                     setSelectedBatch={setSelectedBatch}
+                    branch={defaultBranch}
                     selectedBranch={selectedBranch}
                     setSelectedBranch={setSelectedBranch}
                     showSearchByName={true}
@@ -212,6 +216,7 @@ const ReceiptList = () => {
               batches={batches}
               selectedBatch={selectedBatch}
               setSelectedBatch={setSelectedBatch}
+              branch={defaultBranch}
               selectedBranch={selectedBranch}
               setSelectedBranch={setSelectedBranch}
               showSearchByName={true}

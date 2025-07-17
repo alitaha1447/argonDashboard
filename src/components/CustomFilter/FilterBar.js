@@ -30,6 +30,10 @@ const FilterBar = ({
   batches,
   selectedBatch,
   setSelectedBatch,
+  fetchFaculties,
+  facultyNameOptions,
+  selectedFacultyName,
+  setSelectedFacultyName,
 }) => {
   const {
     branchOptions,
@@ -51,10 +55,23 @@ const FilterBar = ({
   }, [branchSearchText]);
 
   useEffect(() => {
-    if (branch && !branchOptions.some((opt) => opt.value === branch.value)) {
+    if (!branch || selectedBranch) return;
+
+    const existsInOptions = branchOptions.some(
+      (opt) => opt.value === branch.value
+    );
+    if (!existsInOptions) {
       setBranchOptions((prev) => [...prev, branch]);
+      setSelectedBranch(branch);
     }
-  }, [branch]);
+
+    // else {
+    //   const matched = branchOptions.find(
+    //     (opt) => opt.value === defaultBranch.value
+    //   );
+    //   if (matched) setSelectedBranch(matched);
+    // }
+  }, [branch, branchOptions, selectedBranch]);
 
   return (
     <div
@@ -106,13 +123,7 @@ const FilterBar = ({
           <Select
             id="branch-select"
             options={branchOptions}
-            value={
-              selectedBranch ||
-              (branch &&
-                branchOptions.find((opt) => opt.value === branch.value)) ||
-              null
-            }
-            // value={selectedBranch}
+            value={selectedBranch}
             onChange={(selected) => setSelectedBranch(selected)}
             onInputChange={(text) => setBranchSearchText(text)}
             placeholder="branch"
@@ -140,9 +151,10 @@ const FilterBar = ({
         )}
         {showSearchByFacultyName && (
           <Select
-            // options={enquiry}
-            // value={selectedEnquiryType}
-            // onChange={handleEnquiryTypeChange}
+            options={facultyNameOptions}
+            value={selectedFacultyName}
+            onChange={setSelectedFacultyName}
+            onMenuOpen={fetchFaculties}
             placeholder="faculty name"
           />
         )}

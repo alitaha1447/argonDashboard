@@ -50,7 +50,7 @@ const pageNum = [
 ];
 
 const DailyCollection = () => {
-  const Branch = useSelector((state) => state.auth.selectedBranch);
+  const defaultBranch = useSelector((state) => state.auth.selectedBranch);
 
   const [showFilters, setShowFilters] = useState(false);
   // const [selectedEnquiryType, setSelectedEnquiryType] = useState(enquiry[0]);
@@ -86,10 +86,9 @@ const DailyCollection = () => {
   const { statusOptions, fetchEnquiry } = useStatusEnquiry();
 
   const fetchBatch = async () => {
-    const branchIDToUse = selectedBranch?.value || Branch?.value;
+    const branchIDToUse = selectedBranch?.value || defaultBranch?.value;
 
     if (!branchIDToUse) return; // ✅ exit if nothing to use
-    console.log(1);
     // setLoadingBatches(true); // Start loader
     try {
       const res = await axios.get(`${API_PATH}/api/GetBatch`, {
@@ -210,7 +209,7 @@ const DailyCollection = () => {
                     // handleEnquiryTypeChange={handleEnquiryTypeChange}
                     fetchBatch={fetchBatch}
                     batches={batches}
-                    branch={Branch} // 👈 pass it here
+                    branch={defaultBranch} // 👈 pass it here
                     selectedBatch={selectedBatch}
                     setSelectedBatch={setSelectedBatch}
                     selectedBranch={selectedBranch}
@@ -240,7 +239,7 @@ const DailyCollection = () => {
               // handleEnquiryTypeChange={handleEnquiryTypeChange}
               fetchBatch={fetchBatch}
               batches={batches}
-              branch={Branch} // 👈 pass it here
+              branch={defaultBranch} // 👈 pass it here
               selectedBatch={selectedBatch}
               setSelectedBatch={setSelectedBatch}
               selectedBranch={selectedBranch}
@@ -335,7 +334,6 @@ const DailyCollection = () => {
                       <th scope="col">Total Amount</th>
                       <th scope="col">Amount Recieved</th>
                       <th scope="col">Date</th>
-                      <th scope="col">Action</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -356,49 +354,13 @@ const DailyCollection = () => {
 
                         return (
                           <tr key={index}>
-                            <td>{index + 1}</td>
+                            <td>{(pageNumber - 1) * pageSize + index + 1}</td>
                             <td>{item.name}</td>
                             <td>{item.batchname}</td>
                             <td>{item.branch_name}</td>
                             <td>{item.totalAmount}</td>
                             <td>{item.amount_received}</td>
                             <td>{getDateOnly(item.received_date)}</td>
-
-                            <td style={{}}>
-                              <UncontrolledDropdown direction="">
-                                <DropdownToggle
-                                  tag="span"
-                                  style={{ cursor: "pointer" }}
-                                  data-toggle="dropdown"
-                                  aria-expanded={false}
-                                >
-                                  <BsThreeDotsVertical size={20} />
-                                </DropdownToggle>
-
-                                <DropdownMenu
-                                  left
-                                  style={{
-                                    minWidth: "120px",
-                                    border: "1px solid #ddd",
-                                    borderRadius: "4px",
-                                    boxShadow: "0px 2px 6px rgba(0,0,0,0.2)",
-                                  }}
-                                >
-                                  <DropdownItem
-                                    key={index}
-                                    // onClick={() => toggleStatusModal(item.Id)}
-                                  >
-                                    Edit
-                                  </DropdownItem>
-                                  <DropdownItem
-                                    key={index}
-                                    // onClick={() => toggleStatusModal(item.Id)}
-                                  >
-                                    Delete
-                                  </DropdownItem>
-                                </DropdownMenu>
-                              </UncontrolledDropdown>
-                            </td>
                           </tr>
                         );
                       })
@@ -450,30 +412,6 @@ const DailyCollection = () => {
                             </p>
                           </div>
                         </div>
-
-                        <UncontrolledDropdown direction="left">
-                          <DropdownToggle
-                            tag="span"
-                            style={{ cursor: "pointer" }}
-                            data-toggle="dropdown"
-                            aria-expanded={false}
-                          >
-                            <BsThreeDotsVertical size={20} />
-                          </DropdownToggle>
-
-                          <DropdownMenu
-                            right
-                            style={{
-                              minWidth: "120px",
-                              border: "1px solid #ddd",
-                              borderRadius: "4px",
-                              boxShadow: "0px 2px 6px rgba(0,0,0,0.2)",
-                            }}
-                          >
-                            <DropdownItem>Edit</DropdownItem>
-                            <DropdownItem>Delete</DropdownItem>
-                          </DropdownMenu>
-                        </UncontrolledDropdown>
                       </div>
                     </Card>
                   ))

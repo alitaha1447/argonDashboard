@@ -18,6 +18,8 @@ import useBranchList from "customHookApi/EnquiryDashboardApi/useBranchList";
 import axios from "axios";
 import { paymentMode } from "DummyData";
 import { ToastContainer, toast } from "react-toastify";
+import { useSelector } from "react-redux";
+
 // import { useLocation } from "react-router-dom";
 
 const API_PATH = process.env.REACT_APP_API_PATH;
@@ -32,6 +34,8 @@ const PaymentDetail = ({
   onPaymentSuccess = () => {},
   resetParentIds = () => {},
 }) => {
+  const defaultBranch = useSelector((state) => state.auth.selectedBranch);
+
   const [Loading, setLoading] = useState(false);
 
   const [selectedBranch, setSelectedBranch] = useState(null);
@@ -269,6 +273,18 @@ const PaymentDetail = ({
     }
   };
 
+  useEffect(() => {
+    if (!defaultBranch || selectedBranch) return;
+
+    const existsInOptions = branchOptions.some(
+      (opt) => opt.value === defaultBranch.value
+    );
+    if (!existsInOptions) {
+      setBranchOptions((prev) => [...prev, defaultBranch]);
+      setSelectedBranch(defaultBranch);
+    }
+  }, [defaultBranch, branchOptions, selectedBranch]);
+  console.log(selectedBranch);
   return (
     <Modal
       isOpen={modal}

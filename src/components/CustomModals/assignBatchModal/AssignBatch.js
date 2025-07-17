@@ -9,11 +9,14 @@ import {
   Input,
   Button,
   Table,
+  FormGroup,
+  Label,
 } from "reactstrap";
 import Select from "react-select";
 import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 import useBranchList from "customHookApi/EnquiryDashboardApi/useBranchList";
+import { useSelector } from "react-redux";
 
 const API_PATH = process.env.REACT_APP_API_PATH;
 const API_KEY = process.env.REACT_APP_API_KEY;
@@ -29,10 +32,15 @@ const AssignBatch = ({
   // const stdId = studentID.map((item) => ({
   //   enrollmentid: item.enrollmentid.toString(),
   // }));
+  const defaultBranch = useSelector((state) => state.auth.selectedBranch);
+
   const [loading, setLoading] = useState(false);
   const [batch, setBatch] = useState([]);
   const [selectedBatch, setSelectedBatch] = useState(null);
   const [selectedBranch, setSelectedBranch] = useState(null);
+  const [facultyNameOptions, setFacultyNameOptions] = useState([]);
+  const [selectedFacultyName, setSelectedFacultyName] = useState(null);
+
   // const [batchStudent, setBatchStudent] = useState([
   //   { BatchID: "", enrollmentid: "" },
   // ]);
@@ -51,26 +59,41 @@ const AssignBatch = ({
       setBranchOptions([]);
       return;
     }
-
     fetchBranch();
   }, [branchSearchText]);
 
-  useEffect(() => {
-    const fetchBatches = async () => {
-      const res = await axios.get(`${API_PATH}/api/GetBatch`, {
+  const fetchFaculties = async () => {
+    try {
+      const res = await axios.get(`${API_PATH}/api/Get_Faculties`, {
         params: {
           APIKEY: API_KEY,
+          branchid: null,
         },
       });
-      // console.log(res);
-      const formattedEnquiry = res.data.map((item) => ({
-        value: item.BatchID,
-        label: item.BatchName,
+      // console.log(res.data);
+      const formatted = res?.data.map((item, index) => ({
+        value: item?.Id,
+        label: item?.Name,
       }));
-      setBatch(formattedEnquiry);
-    };
-    fetchBatches();
-  }, []);
+      setFacultyNameOptions(formatted);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const fetchBatches = async () => {
+    const res = await axios.get(`${API_PATH}/api/GetBatch`, {
+      params: {
+        APIKEY: API_KEY,
+      },
+    });
+    // console.log(res);
+    const formattedEnquiry = res.data.map((item) => ({
+      value: item.BatchID,
+      label: item.BatchName,
+    }));
+    setBatch(formattedEnquiry);
+  };
 
   const handleAssignBatch = async () => {
     setLoading(true);
@@ -108,6 +131,24 @@ const AssignBatch = ({
     }
   };
 
+  useEffect(() => {
+    if (!defaultBranch || selectedBranch) return;
+
+    const existsInOptions = branchOptions.some(
+      (opt) => opt.value === defaultBranch.value
+    );
+    if (!existsInOptions) {
+      setBranchOptions((prev) => [...prev, defaultBranch]);
+      setSelectedBranch(defaultBranch);
+    }
+    // else {
+    //   const matched = branchOptions.find(
+    //     (opt) => opt.value === defaultBranch.value
+    //   );
+    //   if (matched) setSelectedBranch(matched);
+    // }
+  }, [defaultBranch, branchOptions, selectedBranch]);
+
   return (
     <Modal
       isOpen={modal}
@@ -127,18 +168,9 @@ const AssignBatch = ({
       <ModalBody>
         <div className="d-flex flex-column gap-3 mb-3" style={{ gap: "1rem" }}>
           <Row>
-            <Col md={4}>
-              <div style={{}}>
-                <Input
-                  placeholder="Search by Faculty Name or Course"
-                  type="text"
-                  // value={searchText}
-                  // onChange={handleUnifiedSearchChange}
-                />
-              </div>
-            </Col>
-            <Col md={4}>
-              <div style={{}}>
+            <Col lg={4}>
+              <FormGroup>
+                <Label>Branch</Label>
                 <Select
                   id="branch-select"
                   options={branchOptions}
@@ -159,15 +191,39 @@ const AssignBatch = ({
                       : "No branches found"
                   }
                 />
-              </div>
+              </FormGroup>
             </Col>
-            <Col md={4}>
-              <div style={{}}>
+            <Col lg={4}>
+              <FormGroup>
+                <Label>Faculty Name</Label>
+
+                <Select
+                  id="selectedFacultyName"
+                  options={facultyNameOptions}
+                  value={selectedFacultyName}
+                  onChange={(selected) => setSelectedFacultyName(selected)}
+                  onMenuOpen={fetchFaculties}
+                  placeholder="Select Faculty Name"
+                  menuPortalTarget={document.body} // ✅ renders dropdown outside modal
+                  menuPosition="fixed" // ✅ fixes position to avoid overflow
+                  styles={{
+                    menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+                  }}
+                  // isClearable
+                />
+              </FormGroup>
+            </Col>
+
+            <Col lg={4}>
+              <FormGroup>
+                <Label>Batch</Label>
+
                 <Select
                   id="batch-select"
                   options={batch}
                   value={selectedBatch}
                   onChange={setSelectedBatch}
+                  onMenuOpen={fetchBatches}
                   placeholder="Select Batch"
                   menuPortalTarget={document.body} // ✅ renders dropdown outside modal
                   menuPosition="fixed" // ✅ fixes position to avoid overflow
@@ -175,7 +231,7 @@ const AssignBatch = ({
                     menuPortal: (base) => ({ ...base, zIndex: 9999 }),
                   }}
                 />
-              </div>
+              </FormGroup>
             </Col>
           </Row>
         </div>

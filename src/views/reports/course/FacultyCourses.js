@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   Card,
   CardHeader,
@@ -33,6 +34,9 @@ import { enquiry } from "DummyData";
 import useBranchList from "customHookApi/EnquiryDashboardApi/useBranchList";
 import useStatusEnquiry from "customHookApi/EnquiryDashboardApi/useStatusEnquiry";
 import axios from "axios";
+import { useSelector } from "react-redux";
+import { MdFilterAlt } from "react-icons/md";
+import { MdFilterAltOff } from "react-icons/md";
 
 const API_PATH = process.env.REACT_APP_API_PATH;
 const API_KEY = process.env.REACT_APP_API_KEY;
@@ -46,6 +50,10 @@ const pageNum = [
 ];
 
 const FacultyCourses = () => {
+  const defaultBranch = useSelector((state) => state?.auth?.selectedBranch);
+
+  const [showFilters, setShowFilters] = useState(false);
+
   const [courses, setCourses] = useState([]);
 
   const { startDate1, endDate1 } = fetchFinancialYearRangeByDate();
@@ -55,6 +63,8 @@ const FacultyCourses = () => {
   const [dateRange, setDateRange] = useState([null, null]);
   const [startDate, endDate] = dateRange;
   const [selectedBranch, setSelectedBranch] = useState(null);
+  const [facultyNameOptions, setFacultyNameOptions] = useState([]);
+  const [selectedFacultyName, setSelectedFacultyName] = useState(null);
   const [facultyBatch, setFacultyBatch] = useState([]);
   const [isTableLoading, setIsTableLoading] = useState(false);
 
@@ -67,15 +77,15 @@ const FacultyCourses = () => {
   const [activeFilters, setActiveFilters] = useState({});
 
   // customHookAPI
-  const {
-    branchOptions,
-    setBranchOptions,
-    isLoading,
-    fetchBranch,
-    setBranchSearchText,
-    branchSearchText,
-  } = useBranchList();
-  const { statusOptions, fetchEnquiry } = useStatusEnquiry();
+  // const {
+  //   branchOptions,
+  //   setBranchOptions,
+  //   isLoading,
+  //   fetchBranch,
+  //   setBranchSearchText,
+  //   branchSearchText,
+  // } = useBranchList();
+  // const { statusOptions, fetchEnquiry } = useStatusEnquiry();
 
   // useEffect(() => {
   //   if (branchSearchText.length < 3) {
@@ -85,6 +95,25 @@ const FacultyCourses = () => {
   //   fetchBranch();
   // }, [branchSearchText]);
 
+  const fetchFaculties = async () => {
+    try {
+      const res = await axios.get(`${API_PATH}/api/Get_Faculties`, {
+        params: {
+          APIKEY: API_KEY,
+          branchid: null,
+        },
+      });
+      console.log(res.data);
+      const formatted = res?.data.map((item, index) => ({
+        value: item?.Id,
+        label: item?.Name,
+      }));
+      setFacultyNameOptions(formatted);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   useEffect(() => {
     const fetchCourse = async () => {
       const res = await axios.get(`${API_PATH}/api/GetCourse`, {
@@ -92,7 +121,6 @@ const FacultyCourses = () => {
           APIKEY: API_KEY,
         },
       });
-      console.log(res.data);
       setCourses(res.data); // ✅ Save in state
     };
     fetchCourse();
@@ -172,11 +200,62 @@ const FacultyCourses = () => {
     <>
       <Header />
       <Container className="mt--9" fluid>
-        <Row>
-          <Col className="pb-4 d-block d-sm-block">
+        <Row className="d-flex flex-column">
+          <Col>
+            <div
+              className="rounded-3  mb-2 d-flex d-sm-none justify-content-between align-items-center px-2 py-2 w-100"
+              onClick={() => setShowFilters((prev) => !prev)}
+              style={{ cursor: "pointer", backgroundColor: "#191d4d" }}
+            >
+              <h3 className="mb-0" style={{ color: "white" }}>
+                Filter
+              </h3>
+              {showFilters ? (
+                <MdFilterAltOff color="white" />
+              ) : (
+                <MdFilterAlt color="white" />
+              )}
+            </div>
+          </Col>
+          <Col>
+            <AnimatePresence>
+              {showFilters && (
+                <motion.div
+                  key="mobile-filter"
+                  initial={{ height: 0, opacity: 1 }}
+                  animate={{ height: "auto", opacity: 1 }}
+                  exit={{ height: 0, opacity: 1 }}
+                  transition={{ duration: 0.4, ease: "easeInOut" }}
+                  className="pb-4 d-sm-none d-md-none"
+                >
+                  <FilterBar
+                    branch={defaultBranch}
+                    selectedBranch={selectedBranch}
+                    setSelectedBranch={setSelectedBranch}
+                    fetchFaculties={fetchFaculties}
+                    facultyNameOptions={facultyNameOptions}
+                    selectedFacultyName={selectedFacultyName}
+                    setSelectedFacultyName={setSelectedFacultyName}
+                    handleSearchClick={handleSearchClick}
+                    showSearchByFacultyName={true}
+                    showSearchByName={false}
+                    showBatch={false}
+                    showCourseEnquiry={false}
+                    showStatus={false}
+                  />
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </Col>
+          <Col className="pb-4 d-none d-sm-block">
             <FilterBar
+              branch={defaultBranch}
               selectedBranch={selectedBranch}
               setSelectedBranch={setSelectedBranch}
+              fetchFaculties={fetchFaculties}
+              facultyNameOptions={facultyNameOptions}
+              selectedFacultyName={selectedFacultyName}
+              setSelectedFacultyName={setSelectedFacultyName}
               handleSearchClick={handleSearchClick}
               showSearchByFacultyName={true}
               showSearchByName={false}
@@ -184,87 +263,6 @@ const FacultyCourses = () => {
               showCourseEnquiry={false}
               showStatus={false}
             />
-            {/* <div
-              className="d-flex flex-column flex-lg-row align-items-center justify-content-between p-2 w-100"
-              style={{
-                background: "#f7fafc",
-                borderRadius: "5px",
-                border: "1px solid #d3d3d3",
-                gap: "1rem",
-              }}
-            >
-              <div
-                className="d-flex flex-wrap justify-content-center align-items-center"
-                style={{ gap: "1rem" }}
-              >
-                <div style={{ width: "170px" }}>
-                  <Select
-                    // options={enquiry}
-                    // value={selectedEnquiryType}
-                    // onChange={handleEnquiryTypeChange}
-                    placeholder="faculty name"
-                  />
-                </div>
-                <div style={{ width: "170px" }}>
-                  <Select
-                    id="branch-select"
-                    options={branchOptions}
-                    value={selectedBranch}
-                    onChange={(selected) => setSelectedBranch(selected)}
-                    onInputChange={(text) => setBranchSearchText(text)}
-                    placeholder="branch"
-                    isClearable
-                    isLoading={isLoading}
-                    noOptionsMessage={({ inputValue }) =>
-                      inputValue.length < 3
-                        ? "Type at least 3 characters to search"
-                        : "No branches found"
-                    }
-                  />
-                </div>
-                <div className="" style={{ width: "170px" }}>
-                  <DatePicker
-                    selectsRange
-                    startDate={startDate}
-                    endDate={endDate}
-                    onChange={(date) => setDateRange(date)}
-                    monthsShown={2} // ✅ Show two calendars
-                    dateFormat="dd/MM/yyyy"
-                    className="react-datepicker__input-container form-control"
-                    placeholderText="Select date range"
-                    isClearable
-                    // showMonthDropdown
-                    // showYearDropdown
-                    scrollableYearDropdown
-                    yearDropdownItemNumber={50}
-                    minDate={new Date(1900, 0, 1)}
-                    maxDate={new Date(2025, 11, 31)}
-                    popperPlacement="bottom-start" // ✅ Opens dropdown below input
-                  />
-                </div>
-              </div>
-
-              <div
-                style={{
-                  padding: "6px 12px",
-                  cursor: "pointer",
-                  border: "1px solid #ccc",
-                  borderRadius: "4px",
-                  backgroundColor: "#5e72e4",
-                  color: "#fff",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  height: "38px",
-                  minWidth: "38px",
-                  // marginLeft: "10px",
-                }}
-                // onClick={handleUnifiedSearchChange}
-                // onClick={handleSearchClick}
-              >
-                <i className="fas fa-search" />
-              </div>
-            </div> */}
           </Col>
         </Row>
         <Row>
@@ -333,22 +331,6 @@ const FacultyCourses = () => {
                       </Button>
                     </DropdownMenu>
                   </UncontrolledDropdown>
-                  {/* <div
-                    // onClick={toggleMaster}
-                    style={{
-                      cursor: "pointer",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      width: "38px",
-                      height: "38px",
-                      backgroundColor: "#5e72e4",
-                      color: "#fff",
-                      borderRadius: "4px",
-                    }}
-                  >
-                    <FaPlus />
-                  </div> */}
                 </div>
               </CardHeader>
               {/* ✅ Table View for Desktop (Large screens only) */}

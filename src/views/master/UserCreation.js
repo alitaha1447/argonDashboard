@@ -39,13 +39,14 @@ const UserCreation = () => {
   const [confirmPass, setConfirmPass] = useState("");
   const [gender, setGender] = useState(null);
   const [isOrganisational, setIsOrganisational] = useState(false);
-  const [isActive, setIsActive] = useState(false);
+  const [isActive, setIsActive] = useState(true);
   // branches
   const [selectedBranches, setSelectedBranches] = useState([]); // Changed from selectedBranch
   const [formErrors, setFormErrors] = useState({});
   const [roleOptions, setRoleOptions] = useState([]);
   const [selectedRole, setSelectedRole] = useState(null);
-  const [isAll, setIsAll] = useState(true); // 0 = unchecked, 1 = checked
+  const [isAll, setIsAll] = useState(false); // 0 = unchecked, 1 = checked
+  // const [isAllBranches, setIsAllBranches] = useState(false);
   const [isBranchActive, setIsBranchActive] = useState(false);
 
   const {
@@ -82,8 +83,6 @@ const UserCreation = () => {
     fetchRole();
   }, []);
 
-  const userName = email.split("@")[0];
-
   const branches = selectedBranches.map((branch) => ({
     // userid: "string", // Replace with actual user ID if needed
     branchid: branch.value.toString(), // ✅ convert to string safely (if needed)
@@ -112,8 +111,8 @@ const UserCreation = () => {
     setSelectedBranches([]);
     setSelectedRole([]);
     setIsOrganisational(false);
-    setIsActive(false);
-    setIsAll(true);
+    setIsActive(true);
+    setIsAll(false);
     setIsBranchActive(false);
   };
 
@@ -137,6 +136,7 @@ const UserCreation = () => {
       username: email.split("@")[0],
       password: pass,
       isactive: isActive ? 1 : 0,
+      isallbranches: isAll ? 1 : 0,
       userbranches: branches,
       userroles: userroles,
     };
