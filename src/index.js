@@ -17,7 +17,8 @@ import EnquiryForm from "layouts/EnquiryForm";
 import Receipt from "layouts/receipt/Receipt";
 import PrivateRoute from "PrivateRoute";
 import PublicRoute from "PublicRoute";
-
+import App from "./App.js";
+// import { StrictMode } from "react";
 const root = ReactDOM.createRoot(document.getElementById("root"));
 
 const CLIENT_ID =
@@ -58,4 +59,7 @@ root.render(
     </PersistGate>
     {/* </GoogleOAuthProvider> */}
   </Provider>
+  // <StrictMode>
+  // <App />
+  // </StrictMode>
 );

@@ -240,6 +240,7 @@ const UserCreation = () => {
                         }}
                         error={formErrors.pass}
                         required
+                        eyeIcon
                       />
                     </Col>
                     <Col md={6}>
@@ -257,6 +258,7 @@ const UserCreation = () => {
                         }}
                         error={formErrors.confirmPass}
                         required
+                        eyeIcon
                       />
                     </Col>
                   </Row>

@@ -5,6 +5,7 @@ export const getValidationErrors = ({
   isCourseEnquiry,
   selectedQualification,
   selectedCoursesOptions,
+  gender,
 }) => {
   const errors = {};
 
@@ -27,6 +28,10 @@ export const getValidationErrors = ({
     errors.email = "Email is a mandatory field!";
   } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     errors.email = "Please enter a valid email address!";
+  }
+
+  if (!gender) {
+    errors.gender = "Gender is a mandatory field!";
   }
 
   if (isCourseEnquiry) {

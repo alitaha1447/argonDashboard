@@ -170,6 +170,7 @@ const EnquiryFormCardBody = ({
       isCourseEnquiry,
       selectedQualification,
       selectedCoursesOptions,
+      gender,
     });
 
     if (Object.keys(errors).length > 0) {
@@ -223,6 +224,7 @@ const EnquiryFormCardBody = ({
       toggle();
     }
   };
+  console.log(gender);
   return (
     <Form>
       <Row>
@@ -248,7 +250,14 @@ const EnquiryFormCardBody = ({
             value={email}
             onChange={(e) => {
               setEmail(e.target.value);
-              setFormErrors((prev) => ({ ...prev, email: "" }));
+              // Validate email on every change
+              let errorMessage = "";
+              if (!e.target.value.trim()) {
+                errorMessage = "Email is a mandatory field!";
+              } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e.target.value)) {
+                errorMessage = "Please enter a valid email address!";
+              }
+              setFormErrors((prev) => ({ ...prev, email: errorMessage }));
             }}
             error={formErrors.email}
             required
@@ -260,11 +269,28 @@ const EnquiryFormCardBody = ({
           <InputField
             label="Contact Number"
             id="contact"
-            type="number"
+            type="text" // Use text instead of number
+            inputMode="numeric" // Shows numeric keyboard on mobile
             value={contactNumber}
             onChange={(e) => {
-              setContactNumber(e.target.value);
-              setFormErrors((prev) => ({ ...prev, contactNumber: "" }));
+              const value = e.target.value;
+
+              // Allow only digits
+              if (/^\d*$/.test(value)) {
+                setContactNumber(value);
+
+                let errorMessage = "";
+                if (!value.trim()) {
+                  errorMessage = "Contact number is a mandatory field!";
+                } else if (!/^\d{10}$/.test(value)) {
+                  errorMessage = "Contact number must be exactly 10 digits!";
+                }
+
+                setFormErrors((prev) => ({
+                  ...prev,
+                  contactNumber: errorMessage,
+                }));
+              }
             }}
             error={formErrors.contactNumber}
             required
@@ -287,6 +313,8 @@ const EnquiryFormCardBody = ({
         options={genderOptions}
         selected={gender}
         onChange={setGender}
+        error={formErrors.gender}
+        setFormErrors={setFormErrors} // ✅ only this is passed
         required
       />
 
@@ -308,6 +336,12 @@ const EnquiryFormCardBody = ({
                   }));
                 }}
                 onMenuOpen={fetchQualificationLists}
+                menuPortalTarget={document.body}
+                menuPosition="fixed"
+                styles={{
+                  menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+                }}
+                menuShouldScrollIntoView={false}
               />
               {formErrors.selectedQualification && (
                 <div className="text-danger mt-1">
@@ -340,6 +374,12 @@ const EnquiryFormCardBody = ({
                   }));
                 }}
                 onMenuOpen={fetchCourseDetails}
+                menuPortalTarget={document.body}
+                menuPosition="fixed"
+                styles={{
+                  menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+                }}
+                menuShouldScrollIntoView={false}
               />
               {formErrors.selectedCoursesOptions && (
                 <div className="text-danger mt-1">
@@ -355,6 +395,12 @@ const EnquiryFormCardBody = ({
                 value={selectedProduct}
                 onChange={setSelectedProduct}
                 onMenuOpen={fetchProductLists}
+                menuPortalTarget={document.body}
+                menuPosition="fixed"
+                styles={{
+                  menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+                }}
+                menuShouldScrollIntoView={false}
               />
             </FormGroup>
           )}
@@ -372,6 +418,12 @@ const EnquiryFormCardBody = ({
                 placeholder="Type at least 3 letters..."
                 isClearable
                 isLoading={isLoading}
+                menuPortalTarget={document.body}
+                menuPosition="fixed"
+                styles={{
+                  menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+                }}
+                menuShouldScrollIntoView={false}
               />
             </FormGroup>
           </Col>

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Modal,
   ModalHeader,
@@ -20,11 +20,28 @@ import { ToastContainer, toast } from "react-toastify";
 const API_PATH = process.env.REACT_APP_API_PATH;
 const API_KEY = process.env.REACT_APP_API_KEY;
 
-const CourseMasterModal = ({ modal, toggle, refreshList }) => {
+const CourseMasterModal = ({ modal, toggle, refreshList, course }) => {
   const [courseName, setCourseName] = useState("");
   const [courseDescription, setCourseDescription] = useState("");
   const [courseSequence, setCourseSequence] = useState("");
   const [isActive, setIsActive] = useState(false);
+
+  const isEdit = course && course.Id;
+
+  useEffect(() => {
+    if (modal && isEdit) {
+      setCourseName(course.TopicTitle || "");
+      setCourseDescription(course.TopicDescription || "");
+      setCourseSequence(course.DisplaySequence || "");
+      setIsActive(course.IsActive === 1);
+    } else if (modal) {
+      // Clear form when opening in create mode
+      setCourseName("");
+      setCourseDescription("");
+      setCourseSequence("");
+      setIsActive(false);
+    }
+  }, [modal, course]);
 
   const handleSubmit = async () => {
     const courseData = {
@@ -33,15 +50,36 @@ const CourseMasterModal = ({ modal, toggle, refreshList }) => {
       IsActive: isActive ? 1 : 0,
       DisplaySequence: courseSequence || null,
     };
-    // console.log(courseData);
+    const courseDataEdit = {
+      Id: course.Id,
+      TopicTitle: courseName,
+      TopicDescription: courseDescription,
+      IsActive: isActive ? 1 : 0,
+      DisplaySequence: courseSequence || null,
+    };
+
     try {
-      const res = await axios.post(`${API_PATH}/api/Course`, courseData, {
-        params: {
-          APIKEY: API_KEY,
-        },
-      });
-      // console.log("Course created:", res);
-      toast.success("Course created Successfully!!");
+      if (isEdit) {
+        const res = await axios.post(`${API_PATH}/api/Course`, courseDataEdit, {
+          params: {
+            APIKEY: API_KEY,
+          },
+        });
+        toast.success("Course edited Successfully!!");
+      } else {
+        const res = await axios.post(`${API_PATH}/api/Course`, courseData, {
+          params: {
+            APIKEY: API_KEY,
+          },
+        });
+        toast.success("Course created Successfully!!");
+      }
+      // const res = await axios.post(`${API_PATH}/api/Course`, courseData, {
+      //   params: {
+      //     APIKEY: API_KEY,
+      //   },
+      // });
+      // toast.success("Course created Successfully!!");
       refreshList();
       toggle();
     } catch (error) {
@@ -64,7 +102,9 @@ const CourseMasterModal = ({ modal, toggle, refreshList }) => {
         className="bg-white border-bottom"
         style={{ position: "sticky", top: 0, zIndex: 10 }}
       >
-        <h1 className="mb-0 fs-4">Create Course</h1>
+        <h1 className="mb-0 fs-4">
+          {isEdit ? "Edit Course" : "Create Course"}
+        </h1>
       </ModalHeader>
 
       <ModalBody>
@@ -124,7 +164,7 @@ const CourseMasterModal = ({ modal, toggle, refreshList }) => {
         style={{ position: "sticky", bottom: 0, zIndex: 10 }}
       >
         <Button color="primary" onClick={handleSubmit}>
-          Submit
+          {isEdit ? "Update" : "Submit"}
         </Button>
         <Button color="secondary" onClick={toggle}>
           Cancel

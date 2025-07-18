@@ -29,29 +29,10 @@ const API_KEY = process.env.REACT_APP_API_KEY;
 const CourseMaster = () => {
   const [courses, setCourses] = useState([]);
   const [showMaster, setShowMaster] = useState(false);
-  const data = [
-    {
-      id: 1,
-      courseName: "React JS",
-      isActive: "Yes",
-    },
-    {
-      id: 2,
-      courseName: "React JS",
-      isActive: "Yes",
-    },
-    {
-      id: 3,
-      courseName: "React JS",
-      isActive: "Yes",
-    },
-    {
-      id: 4,
-      courseName: "React JS",
-      isActive: "Yes",
-    },
-  ];
+  const [course, setCourse] = useState({});
+
   const toggleMaster = () => {
+    setCourse({});
     setShowMaster((prev) => !prev);
   };
 
@@ -61,13 +42,18 @@ const CourseMaster = () => {
         APIKEY: API_KEY,
       },
     });
-    console.log(res?.data);
+    // console.log(res?.data);
     setCourses(res?.data);
   };
 
   useEffect(() => {
     getCourses();
   }, []);
+
+  const handleEdit = (item) => {
+    setCourse(item);
+    setShowMaster((prev) => !prev);
+  };
 
   return (
     <>
@@ -122,7 +108,7 @@ const CourseMaster = () => {
                         <td>{item.TopicTitle}</td>
                         <td>{item.IsActive === 1 ? "Yes" : "No"}</td>
                         <td style={{}}>
-                          <UncontrolledDropdown direction="">
+                          <UncontrolledDropdown direction="left">
                             <DropdownToggle
                               tag="span"
                               style={{ cursor: "pointer" }}
@@ -133,7 +119,7 @@ const CourseMaster = () => {
                             </DropdownToggle>
 
                             <DropdownMenu
-                              left
+                              // left
                               style={{
                                 minWidth: "120px",
                                 border: "1px solid #ddd",
@@ -142,16 +128,10 @@ const CourseMaster = () => {
                               }}
                             >
                               <DropdownItem
-                                key={index}
-                                // onClick={() => toggleStatusModal(item.Id)}
+                                key={`${index}-edit`}
+                                onClick={() => handleEdit(item)}
                               >
                                 Edit
-                              </DropdownItem>
-                              <DropdownItem
-                                key={index}
-                                // onClick={() => toggleStatusModal(item.Id)}
-                              >
-                                Delete
                               </DropdownItem>
                             </DropdownMenu>
                           </UncontrolledDropdown>
@@ -192,7 +172,7 @@ const CourseMaster = () => {
                         </DropdownToggle>
 
                         <DropdownMenu
-                          right
+                          // right
                           style={{
                             minWidth: "120px",
                             border: "1px solid #ddd",
@@ -201,16 +181,10 @@ const CourseMaster = () => {
                           }}
                         >
                           <DropdownItem
-                            key={index}
+                            key={`${index}-edit`}
                             // onClick={() => toggleStatusModal(item.Id)}
                           >
                             Edit
-                          </DropdownItem>
-                          <DropdownItem
-                            key={index}
-                            // onClick={() => toggleStatusModal(item.Id)}
-                          >
-                            Delete
                           </DropdownItem>
                         </DropdownMenu>
                       </UncontrolledDropdown>
@@ -277,6 +251,7 @@ const CourseMaster = () => {
           modal={showMaster}
           toggle={toggleMaster}
           refreshList={getCourses}
+          course={course}
         />
       </Container>
       <ToastContainer />

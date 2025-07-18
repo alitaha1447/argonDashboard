@@ -138,7 +138,17 @@ const BatchModal = ({
   const [feeStructures, setFeeStructures] = useState([
     { selectedFees: null, feesAmount: "" },
   ]);
+  // console.log("------------------");
 
+  // const allValid = feeStructures.every(
+  //   (item) => item.selectedFees && item.feesAmount
+  // );
+  // console.log(allValid);
+  // if (!allValid) {
+  //   console.log("❌ At least one fee item is incomplete");
+  // } else {
+  //   console.log("true");
+  // }
   const [courseFeesOptions, setCourseFeesOptions] = useState([]);
   // Installment Modal
   const [installmentModalOpen, setinstallmentModalOpen] = useState(false);
@@ -326,6 +336,7 @@ const BatchModal = ({
   };
 
   const handleSubmit = async (e) => {
+    console.log("first");
     e.preventDefault();
     setLoading(true);
 
@@ -337,6 +348,7 @@ const BatchModal = ({
       selectedBranch,
       durationCount,
       selectedDurations,
+      feeStructures, // Now included in validation
     });
 
     if (Object.keys(errors).length > 0) {
@@ -349,11 +361,12 @@ const BatchModal = ({
     const isOrganization = selectPayment?.label === "Paid Organization";
 
     const formattedStartDate = startDate?.toISOString(); // 💡 move it here
-
+    console.log(durationCount);
     const duration = parseInt(durationCount);
     const durationType = selectedDurations?.value;
 
     const endDate = new Date(startDate);
+
     switch (durationType) {
       case 1:
         endDate.setDate(endDate.getDate() + duration);
@@ -370,7 +383,7 @@ const BatchModal = ({
       default:
         break;
     }
-
+    console.log(endDate);
     const formattedEndDate = endDate.toISOString();
 
     const batchFormData = {
@@ -400,27 +413,27 @@ const BatchModal = ({
       batch_students: stdId,
       installments_details: installmentsDetails,
     };
-    // console.log(batchFormData);
+    console.log(batchFormData);
 
-    try {
-      const res = await axios.post(`${API_PATH}/api/Batch`, batchFormData, {
-        params: {
-          APIKEY: API_KEY,
-        },
-      });
-      // console.log("✅ Batch created successfully:", res?.data);
-      toast.success("Batch created successfully");
-      // refreshList(1);
-    } catch (error) {
-      console.error("❌ Failed to create batch:", error);
-      toast.error(error?.name);
-    } finally {
-      toggle(); // ⬅️ close modal
-      refreshList(); // ⬅️ refresh list after modal closes
-      resetForm();
-      resetSelected();
-      setLoading(false);
-    }
+    // try {
+    //   const res = await axios.post(`${API_PATH}/api/Batch`, batchFormData, {
+    //     params: {
+    //       APIKEY: API_KEY,
+    //     },
+    //   });
+    //   // console.log("✅ Batch created successfully:", res?.data);
+    //   toast.success("Batch created successfully");
+    //   // refreshList(1);
+    // } catch (error) {
+    //   console.error("❌ Failed to create batch:", error);
+    //   toast.error(error?.name);
+    // } finally {
+    //   toggle(); // ⬅️ close modal
+    //   refreshList(); // ⬅️ refresh list after modal closes
+    //   resetForm();
+    //   resetSelected();
+    //   setLoading(false);
+    // }
     resetForm();
   };
 
@@ -548,8 +561,7 @@ const BatchModal = ({
                       <Select
                         // isMulti
                         // closeMenuOnSelect={false}
-                        closeMenuOnSelect={true}
-                        hideSelectedOptions={false}
+                        // hideSelectedOptions={true}
                         components={{ Option: CheckboxOption }}
                         options={courseOptions}
                         value={selectedCoursesOptions}
@@ -612,9 +624,13 @@ const BatchModal = ({
                               options={durationOptions}
                               // placeholder={selectedDurations}
                               value={selectedDurations}
-                              onChange={(selected) =>
-                                setSelectedDurations(selected)
-                              }
+                              onChange={(selected) => {
+                                setSelectedDurations(selected);
+                                setFormErrors((prev) => ({
+                                  ...prev,
+                                  selectedDurations: "",
+                                }));
+                              }}
                               isClearable
                               menuPortalTarget={document.body}
                               menuPosition="fixed"
@@ -698,8 +714,8 @@ const BatchModal = ({
                       <Select
                         isMulti
                         // closeMenuOnSelect={false}
-                        closeMenuOnSelect={true}
-                        hideSelectedOptions={false}
+                        // closeMenuOnSelect={true}
+                        // hideSelectedOptions={false}
                         components={{ Option: CheckboxOption }}
                         options={facultyOptions}
                         value={selectedFaculty}
@@ -737,6 +753,12 @@ const BatchModal = ({
                         placeholder="Select Batch Level"
                         isClearable
                         onMenuOpen={handleBatchLevel}
+                        menuPortalTarget={document.body}
+                        menuPosition="fixed"
+                        styles={{
+                          menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+                        }}
+                        menuShouldScrollIntoView={false}
                       />
                       {formErrors.selectedBatch && (
                         <div className="text-danger mt-1">
@@ -884,6 +906,11 @@ const BatchModal = ({
                           <FaPlus size={12} />
                         </div>
                       </div>
+                      {formErrors.feeStructures && (
+                        <div className="text-danger mb-2">
+                          {formErrors.feeStructures}
+                        </div>
+                      )}
                       {showFeeFields &&
                         feeStructures.map((fee, index) => (
                           <Row className="mt-2" key={index}>
@@ -891,13 +918,13 @@ const BatchModal = ({
                               <Select
                                 options={courseFeesOptions}
                                 value={fee.selectedFees}
-                                onChange={(selected) =>
+                                onChange={(selected) => {
                                   handleFeeChange(
                                     index,
                                     "selectedFees",
                                     selected
-                                  )
-                                }
+                                  );
+                                }}
                                 onMenuOpen={handleCourseFees}
                                 isClearable
                                 menuPortalTarget={document.body}

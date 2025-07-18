@@ -24,6 +24,8 @@ import BrachModal from "components/CustomModals/branchModal/BrachModal";
 import { useLoginMutation } from "reducer/auth/authApiSlice";
 import { GoogleLogin } from "@react-oauth/google";
 import { jwtDecode } from "jwt-decode";
+import { IoIosEye } from "react-icons/io";
+import { IoIosEyeOff } from "react-icons/io";
 
 const API_PATH = process.env.REACT_APP_API_PATH;
 const API_KEY = process.env.REACT_APP_API_KEY;
@@ -39,6 +41,12 @@ const Login = () => {
   const navigate = useNavigate();
 
   const dispatch = useDispatch();
+
+  const [showPassword, setShowPassword] = useState(false);
+
+  const toggleVisibility = () => setShowPassword((prev) => !prev);
+
+  // const isPassword = type === "password";
 
   const handleLogin = async () => {
     if (!username.trim() || !password.trim()) {
@@ -142,10 +150,16 @@ const Login = () => {
                   </InputGroupAddon>
                   <Input
                     placeholder="Password"
-                    type="password"
+                    type={showPassword ? "text" : "password"}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                   />
+                  <InputGroupText
+                    style={{ cursor: "pointer", fontSize: "20px" }}
+                    onClick={toggleVisibility}
+                  >
+                    {showPassword ? <IoIosEyeOff /> : <IoIosEye />}
+                  </InputGroupText>
                 </InputGroup>
               </FormGroup>
               <div className="text-center">

@@ -109,9 +109,11 @@ const EnquiryDashboard = (props) => {
 
   const [pageNumDropDown, setPageNumDropDown] = useState(pageNum[0]);
   const pageSize = pageNumDropDown?.value;
-
+  console.log(typeof pageSize);
   const [studentID, setStudentID] = useState([]);
   const [statusID, setStatusID] = useState(null);
+
+  const [allData, setAllData] = useState([]);
 
   // Enquiry
   // const [statusOptions, setstatusOptions] = useState([]);
@@ -452,6 +454,181 @@ const EnquiryDashboard = (props) => {
     color: "info",
   };
 
+  const printCustomTable1 = ({
+    title = "Print Table",
+    columns = [],
+    data = [],
+  }) => {
+    if (!Array.isArray(data) || data.length === 0) {
+      alert("No data available to print!");
+      return;
+    }
+
+    if (!Array.isArray(columns) || columns.length === 0) {
+      alert("No columns defined for print!");
+      return;
+    }
+
+    // Create headers
+    const tableHeaders = `<tr>${columns
+      .map((col) => `<th>${col.label}</th>`)
+      .join("")}</tr>`;
+
+    // Create rows
+    const tableRows = data
+      .map((item) => {
+        return `
+        <tr>
+          ${columns
+            .map(
+              (col) =>
+                `<td>${col.accessor ? item[col.accessor] ?? "" : ""}</td>`
+            )
+            .join("")}
+        </tr>
+      `;
+      })
+      .join("");
+
+    // Final table
+    const fullTableHTML = `
+    <table>
+      <thead>${tableHeaders}</thead>
+      <tbody>${tableRows}</tbody>
+    </table>
+  `;
+
+    const printWindow = window.open("", "", "height=800,width=1000");
+    printWindow.document.write(`
+    <html>
+      <head>
+        <title>${title}</title>
+        <style>
+          table {
+            width: 100%;
+            border-collapse: collapse;
+            font-family: Arial, sans-serif;
+          }
+          th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+          }
+          th {
+            background-color: #f2f2f2;
+          }
+        </style>
+      </head>
+      <body>
+        <h3>${title}</h3>
+        ${fullTableHTML}
+      </body>
+    </html>
+  `);
+    printWindow.document.close();
+    printWindow.focus();
+    printWindow.print();
+  };
+
+  const fetchAllData = async (pageno, pagesize) => {
+    const res = await axios.get(`${API_PATH}/api/Get_Enquiry_Dashboard_Data`, {
+      params: {
+        fromdate: "2025-04-01",
+        todate: "2026-03-01",
+        enquirytype: 1,
+        branch: 37,
+        pageno: pageno,
+        pagesize: pagesize,
+      },
+    });
+    setAllData(res.data.Data);
+  };
+
+  useEffect(() => {
+    fetchAllData(1, 11);
+  }, []);
+  console.log("-------------");
+  console.log(allData);
+  console.log("-------------");
+
+  const handlePrint = () => {
+    fetchAllData(1, 11);
+    const printCustomTable1 = ({
+      title = "Print Table",
+      columns = [],
+      data = [],
+    }) => {
+      if (!Array.isArray(data) || data.length === 0) {
+        alert("No data available to print!");
+        return;
+      }
+
+      if (!Array.isArray(columns) || columns.length === 0) {
+        alert("No columns defined for print!");
+        return;
+      }
+
+      // Create headers
+      const tableHeaders = `<tr>${columns
+        .map((col) => `<th>${col.label}</th>`)
+        .join("")}</tr>`;
+
+      // Create rows
+      const tableRows = data
+        .map((item) => {
+          return `
+        <tr>
+          ${columns
+            .map(
+              (col) =>
+                `<td>${col.accessor ? item[col.accessor] ?? "" : ""}</td>`
+            )
+            .join("")}
+        </tr>
+      `;
+        })
+        .join("");
+
+      // Final table
+      const fullTableHTML = `
+    <table>
+      <thead>${tableHeaders}</thead>
+      <tbody>${tableRows}</tbody>
+    </table>
+  `;
+
+      const printWindow = window.open("", "", "height=800,width=1000");
+      printWindow.document.write(`
+    <html>
+      <head>
+        <title>${title}</title>
+        <style>
+          table {
+            width: 100%;
+            border-collapse: collapse;
+            font-family: Arial, sans-serif;
+          }
+          th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+          }
+          th {
+            background-color: #f2f2f2;
+          }
+        </style>
+      </head>
+      <body>
+        <h3>${title}</h3>
+        ${fullTableHTML}
+      </body>
+    </html>
+  `);
+      printWindow.document.close();
+      printWindow.focus();
+      printWindow.print();
+    };
+  };
   return (
     <>
       <Header
@@ -619,14 +796,48 @@ const EnquiryDashboard = (props) => {
                       >
                         Add Enquiry
                       </Button>
+                      {/* <Button
+                        color="primary"
+                        block
+                        size="md"
+                        // onClick={() => printTableData("Student Enquiry Lists")}
+                        onClick={() =>
+                          printTableData1(
+                            "All Enquiries",
+                            allData
+                            // selectedEnquiryType
+                          )
+                        }
+                      >
+                        Print
+                      </Button> */}
                       <Button
                         color="primary"
                         block
                         size="md"
-                        onClick={() => printTableData("Student Enquiry Lists")}
+                        onClick={() =>
+                          printCustomTable1({
+                            title: "All Enquiries",
+                            columns: [
+                              { label: "ID", accessor: "Id" },
+                              { label: "Name", accessor: "Name" },
+                              { label: "Mobile", accessor: "Mobileno" },
+                              {
+                                label: "Qualification",
+                                accessor: "QualificationCode",
+                              },
+                              { label: "Course", accessor: "TopicTitle" },
+                              { label: "Branch", accessor: "BranchName" },
+                              { label: "Enquiry Date", accessor: "CreatedOn" },
+                              { label: "Status", accessor: "status_txt" },
+                            ],
+                            data: allData, // ⬅️ your full enquiry list
+                          })
+                        }
                       >
-                        Print
+                        Print All
                       </Button>
+
                       <Button
                         color="primary"
                         block

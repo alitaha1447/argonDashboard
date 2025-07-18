@@ -6,6 +6,7 @@ export const getValidationErrors = ({
   selectedBranch,
   durationCount,
   selectedDurations,
+  feeStructures, // ✅ Make sure this is passed
   duration,
   startDate,
   batchLevel,
@@ -41,6 +42,20 @@ export const getValidationErrors = ({
 
   if (!selectedDurations || selectedDurations.length === 0) {
     errors.selectedDurations = "Duration Select is required!";
+  }
+
+  // ✅ Fee structure validation
+  if (Array.isArray(feeStructures) && feeStructures.length > 0) {
+    const allValid = feeStructures.every(
+      (item) =>
+        item.selectedFees &&
+        item.feesAmount &&
+        !isNaN(parseFloat(item.feesAmount))
+    );
+
+    if (!allValid) {
+      errors.feeStructures = "Please complete all fee items with valid values";
+    }
   }
 
   return errors;
