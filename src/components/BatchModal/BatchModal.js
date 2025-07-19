@@ -89,7 +89,6 @@ const BatchModal = ({
   refreshList = () => {},
   resetSelected = () => {},
 }) => {
-  // console.log("   ss  ", studentID);
   const [loading, setLoading] = useState(false);
 
   const fileInputRef = useRef(null);
@@ -100,7 +99,6 @@ const BatchModal = ({
     enrollmentid: item.enrollmentid.toString(),
     // createdon: new Date().toISOString(), // or your preferred date format
   }));
-  // console.log(stdId);
   const [menuIsOpen, setMenuIsOpen] = useState(false);
 
   const [batchName, setBatchName] = useState("");
@@ -138,7 +136,6 @@ const BatchModal = ({
   const [feeStructures, setFeeStructures] = useState([
     { selectedFees: null, feesAmount: "" },
   ]);
-  // console.log("------------------");
 
   // const allValid = feeStructures.every(
   //   (item) => item.selectedFees && item.feesAmount
@@ -266,7 +263,6 @@ const BatchModal = ({
   const handleInstallmentSubmit = (receivedInstallments) => {
     setInstallmentsDetails(receivedInstallments);
   };
-  // console.log(installmentsDetails);
   const handleFileChange = async (event) => {
     const file = event.target.files[0];
     if (!file) return;
@@ -328,7 +324,7 @@ const BatchModal = ({
     setSelectedOrganization(null);
     setInstallmentsDetails([]);
     setSelectedDurations(null);
-    setDurationCount(null);
+    setDurationCount("");
     setSelectedDurations(null);
     setSelectedBranch([]);
     setSelectedBatch(null);
@@ -336,7 +332,6 @@ const BatchModal = ({
   };
 
   const handleSubmit = async (e) => {
-    console.log("first");
     e.preventDefault();
     setLoading(true);
 
@@ -361,7 +356,6 @@ const BatchModal = ({
     const isOrganization = selectPayment?.label === "Paid Organization";
 
     const formattedStartDate = startDate?.toISOString(); // 💡 move it here
-    console.log(durationCount);
     const duration = parseInt(durationCount);
     const durationType = selectedDurations?.value;
 
@@ -383,7 +377,6 @@ const BatchModal = ({
       default:
         break;
     }
-    console.log(endDate);
     const formattedEndDate = endDate.toISOString();
 
     const batchFormData = {
@@ -413,27 +406,26 @@ const BatchModal = ({
       batch_students: stdId,
       installments_details: installmentsDetails,
     };
-    console.log(batchFormData);
 
-    // try {
-    //   const res = await axios.post(`${API_PATH}/api/Batch`, batchFormData, {
-    //     params: {
-    //       APIKEY: API_KEY,
-    //     },
-    //   });
-    //   // console.log("✅ Batch created successfully:", res?.data);
-    //   toast.success("Batch created successfully");
-    //   // refreshList(1);
-    // } catch (error) {
-    //   console.error("❌ Failed to create batch:", error);
-    //   toast.error(error?.name);
-    // } finally {
-    //   toggle(); // ⬅️ close modal
-    //   refreshList(); // ⬅️ refresh list after modal closes
-    //   resetForm();
-    //   resetSelected();
-    //   setLoading(false);
-    // }
+    try {
+      const res = await axios.post(`${API_PATH}/api/Batch`, batchFormData, {
+        params: {
+          APIKEY: API_KEY,
+        },
+      });
+      // console.log("✅ Batch created successfully:", res?.data);
+      toast.success("Batch created successfully");
+      // refreshList(1);
+    } catch (error) {
+      console.error("❌ Failed to create batch:", error);
+      toast.error(error?.name);
+    } finally {
+      toggle(); // ⬅️ close modal
+      refreshList(); // ⬅️ refresh list after modal closes
+      resetForm();
+      resetSelected();
+      setLoading(false);
+    }
     resetForm();
   };
 

@@ -18,6 +18,7 @@ import Receipt from "layouts/receipt/Receipt";
 import PrivateRoute from "PrivateRoute";
 import PublicRoute from "PublicRoute";
 import App from "./App.js";
+import NoInternetConnection from "components/NoInternetConnecttion/NoInternetConnection";
 // import { StrictMode } from "react";
 const root = ReactDOM.createRoot(document.getElementById("root"));
 
@@ -29,32 +30,35 @@ root.render(
     <PersistGate loading={null} persistor={persistor}>
       {/* <GoogleOAuthProvider clientId={CLIENT_ID}> */}
       <BrowserRouter>
-        <Routes>
-          {/* <Route path="/admin/*" element={<AdminLayout />} /> */}
-          <Route
-            path="/admin/*"
-            element={
-              <PrivateRoute>
-                <AdminLayout />
-              </PrivateRoute>
-            }
-          />
-          {/* <Route path="/auth/*" element={<AuthLayout />} /> */}
-          <Route
-            path="/auth/*"
-            element={
-              <PublicRoute>
-                <AuthLayout />
-              </PublicRoute>
-            }
-          />
+        <NoInternetConnection>
+          {" "}
+          <Routes>
+            {/* <Route path="/admin/*" element={<AdminLayout />} /> */}
+            <Route
+              path="/admin/*"
+              element={
+                <PrivateRoute>
+                  <AdminLayout />
+                </PrivateRoute>
+              }
+            />
+            {/* <Route path="/auth/*" element={<AuthLayout />} /> */}
+            <Route
+              path="/auth/*"
+              element={
+                <PublicRoute>
+                  <AuthLayout />
+                </PublicRoute>
+              }
+            />
 
-          <Route path="/enquiryForm" element={<EnquiryForm />} />
-          <Route path="/receiptForm" element={<Receipt />} />
-          {/* <Route path="*" element={<Navigate to="/receiptForm" replace />} /> */}
-          {/* <Route path="*" element={<Navigate to="/admin/index" replace />} /> */}
-          <Route path="*" element={<Navigate to="/auth" replace />} />
-        </Routes>
+            <Route path="/enquiryForm" element={<EnquiryForm />} />
+            <Route path="/receiptForm" element={<Receipt />} />
+            {/* <Route path="*" element={<Navigate to="/receiptForm" replace />} /> */}
+            {/* <Route path="*" element={<Navigate to="/admin/index" replace />} /> */}
+            <Route path="*" element={<Navigate to="/auth" replace />} />
+          </Routes>
+        </NoInternetConnection>
       </BrowserRouter>
     </PersistGate>
     {/* </GoogleOAuthProvider> */}

@@ -1,4 +1,10 @@
-export const getValidationErrors = ({ fullName, email, pass, confirmPass }) => {
+export const getValidationErrors = ({
+  fullName,
+  email,
+  pass,
+  confirmPass,
+  gender,
+}) => {
   const errors = {};
 
   const trimmedName = fullName.trim();
@@ -24,6 +30,10 @@ export const getValidationErrors = ({ fullName, email, pass, confirmPass }) => {
     errors.confirmPass = "Confirm Password is required";
   } else if (pass !== confirmPass) {
     errors.confirmPass = "Passwords do not match";
+  }
+
+  if (!gender) {
+    errors.gender = "Gender is a mandatory field!";
   }
 
   return errors;

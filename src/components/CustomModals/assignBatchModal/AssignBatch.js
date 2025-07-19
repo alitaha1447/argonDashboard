@@ -28,6 +28,7 @@ const AssignBatch = ({
   refreshList = () => {},
   resetSelected = () => {},
 }) => {
+  const { id } = useSelector((state) => state.auth);
   // console.log(studentID);
   // const stdId = studentID.map((item) => ({
   //   enrollmentid: item.enrollmentid.toString(),
@@ -54,13 +55,17 @@ const AssignBatch = ({
     branchSearchText,
   } = useBranchList();
 
+  // useEffect(() => {
+  //   if (branchSearchText.length < 3) {
+  //     setBranchOptions([]);
+  //     return;
+  //   }
+  //   fetchBranch();
+  // }, [branchSearchText]);
+
   useEffect(() => {
-    if (branchSearchText.length < 3) {
-      setBranchOptions([]);
-      return;
-    }
-    fetchBranch();
-  }, [branchSearchText]);
+    fetchBranch("", "", id); // sends id to third param
+  }, []);
 
   const fetchFaculties = async () => {
     try {
@@ -131,23 +136,23 @@ const AssignBatch = ({
     }
   };
 
-  useEffect(() => {
-    if (!defaultBranch || selectedBranch) return;
+  // useEffect(() => {
+  //   if (!defaultBranch || selectedBranch) return;
 
-    const existsInOptions = branchOptions.some(
-      (opt) => opt.value === defaultBranch.value
-    );
-    if (!existsInOptions) {
-      setBranchOptions((prev) => [...prev, defaultBranch]);
-      setSelectedBranch(defaultBranch);
-    }
-    // else {
-    //   const matched = branchOptions.find(
-    //     (opt) => opt.value === defaultBranch.value
-    //   );
-    //   if (matched) setSelectedBranch(matched);
-    // }
-  }, [defaultBranch, branchOptions, selectedBranch]);
+  //   const existsInOptions = branchOptions.some(
+  //     (opt) => opt.value === defaultBranch.value
+  //   );
+  //   if (!existsInOptions) {
+  //     setBranchOptions((prev) => [...prev, defaultBranch]);
+  //     setSelectedBranch(defaultBranch);
+  //   }
+  //   // else {
+  //   //   const matched = branchOptions.find(
+  //   //     (opt) => opt.value === defaultBranch.value
+  //   //   );
+  //   //   if (matched) setSelectedBranch(matched);
+  //   // }
+  // }, [defaultBranch, branchOptions, selectedBranch]);
 
   return (
     <Modal

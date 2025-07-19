@@ -38,10 +38,8 @@ import AssignBatch from "components/CustomModals/assignBatchModal/AssignBatch";
 import PieChart from "components/Charts/PieChart";
 import BarChart from "components/Charts/BarChart";
 import CustomPagination from "components/CustomPagination/CustomPagination";
-import Loader from "components/CustomLoader/Loader";
 import "react-datepicker/dist/react-datepicker.css";
 import { fetchFinancialYearRangeByDate } from "utils/financialYearRange/FinancialYearRange";
-import useBranchList from "customHookApi/EnquiryDashboardApi/useBranchList";
 import axios from "axios";
 
 import { enquiry } from "DummyData";
@@ -50,7 +48,6 @@ import { BsThreeDotsVertical } from "react-icons/bs";
 import { MdFilterAlt } from "react-icons/md";
 import { MdFilterAltOff } from "react-icons/md";
 
-import useStatusEnquiry from "customHookApi/EnquiryDashboardApi/useStatusEnquiry";
 import { generateHexColors } from "utils/dynamicColorGenerator/generateHexColors ";
 import { exportToExcel } from "utils/printFile/exportToExcel";
 import { printTableData } from "utils/printFile/printFile";
@@ -69,18 +66,8 @@ const pageNum = [
 ];
 
 const EnquiryDashboard = (props) => {
-  // const Branch = useSelector((state) => state.auth.selectedBranch);
-  // console.log(Branch);
-  // const storedBranches = localStorage.getItem("branches");
   const storedBranches = useSelector((state) => state.auth.selectedBranch);
-  // console.log(storedBranches);
-  // const parsedBranches = storedBranches ? JSON.parse(storedBranches) : null;
-
-  const branchLabel = storedBranches?.label; // or parsedBranches?.[0]?.label if it's an array
   const branchValue = storedBranches?.value;
-
-  // const name = useSelector((state) => state.auth.name);
-  // console.log(name);
 
   const [activeFilters, setActiveFilters] = useState({});
 
@@ -109,17 +96,12 @@ const EnquiryDashboard = (props) => {
 
   const [pageNumDropDown, setPageNumDropDown] = useState(pageNum[0]);
   const pageSize = pageNumDropDown?.value;
-  console.log(typeof pageSize);
   const [studentID, setStudentID] = useState([]);
   const [statusID, setStatusID] = useState(null);
 
   const [allData, setAllData] = useState([]);
 
-  // Enquiry
-  // const [statusOptions, setstatusOptions] = useState([]);
   const [selectedStatus, setSelectedStatus] = useState(null);
-  // customHookAPI
-  const { setBranchOptions, fetchBranch, branchSearchText } = useBranchList();
   // PieChart
   const [pieData, setPieData] = useState({
     labels: [],
@@ -143,34 +125,34 @@ const EnquiryDashboard = (props) => {
     ],
   });
 
-  const fetchPaginatedData = async (page = 1, filters = {}) => {
+  const fetchPaginatedData = async (
+    page = 1,
+    size = pageSize,
+    filters = {}
+  ) => {
     const selectedBranch = filters?.branch || branchValue;
-    setIsTableLoading(true); // show loader
+    setIsTableLoading(true);
 
     try {
       const { startDate1, endDate1 } = fetchFinancialYearRangeByDate();
 
-      // Determine fromdate and todate from filters or fallback
       const fromDate = filters?.fromdate ? filters.fromdate : startDate1;
       const toDate = filters?.todate ? filters.todate : endDate1;
 
-      const params = {
-        fromdate: fromDate,
-        todate: toDate,
-
-        enquirytype: filters?.enquirytype || 1,
-        searchtext: filters?.searchText || "",
-        status: filters?.status || null,
-        // branch: filters.branch,
-        branch: selectedBranch,
-        pageno: page,
-        // pageno: 2,
-        pagesize: pageSize,
-      };
-
       const res = await axios.get(
         `${API_PATH}/api/Get_Enquiry_Dashboard_Data`,
-        { params }
+        {
+          params: {
+            fromdate: fromDate,
+            todate: toDate,
+            enquirytype: filters?.enquirytype || 1,
+            searchtext: filters?.searchText || "",
+            status: filters?.status || null,
+            branch: selectedBranch,
+            pageno: page,
+            pagesize: pageSize,
+          },
+        }
       );
 
       // if (!res.data) {
@@ -178,32 +160,27 @@ const EnquiryDashboard = (props) => {
       // }
 
       const result = res.data;
-      // console.log(result);
-      // ✅ Check if there's no data
       if (!result?.Data || result?.Data.length === 0) {
-        setListData([]); // Triggers the "No data found" UI
+        setListData([]);
         setTotalPages(1);
         setPageNumber(1);
-        return; // Exit early to avoid setting invalid data
+        return;
       }
 
-      // ✅ Set valid data if it exists
-      setListData(result?.Data);
-      setPageNumber(result?.PageNumber || page);
-      setTotalPages(result?.TotalPages || 1);
+      setListData(res?.data?.Data);
+      setPageNumber(res?.data?.PageNumber);
+      setTotalPages(res?.data?.TotalPages);
     } catch (error) {
       if (error.response && error.response.status === 404) {
-        // console.log(error);
         toast.warning("No Data" || error?.message);
         setListData([]);
         setPageNumber(1);
         setTotalPages(1);
       } else {
         toast.error(error?.message);
-        // console.error("Error fetching paginated data:", error);
       }
     } finally {
-      setIsTableLoading(false); // hide loader
+      setIsTableLoading(false);
     }
   };
 
@@ -213,14 +190,14 @@ const EnquiryDashboard = (props) => {
     fetchPaginatedData(1);
   }, [pageSize]);
 
-  useEffect(() => {
-    if (branchSearchText.length < 3) {
-      setBranchOptions([]);
-      return;
-    }
+  // useEffect(() => {
+  //   if (branchSearchText.length < 3) {
+  //     setBranchOptions([]);
+  //     return;
+  //   }
 
-    fetchBranch();
-  }, [branchSearchText]);
+  //   fetchBranch();
+  // }, [branchSearchText]);
 
   if (window.Chart) {
     parseOptions(Chart, chartOptions());
@@ -234,15 +211,11 @@ const EnquiryDashboard = (props) => {
     setBatchModalOpen((prev) => !prev);
   }, []);
 
-  // const toggleStatusModal = useCallback((id) => {
-  //   setStatusID(id);
-  //   setStatusModalOpen((prev) => !prev);
-  // }, []);
   const toggleStatusModal = useCallback((id) => {
     setStatusID(id);
     setStatusModalOpen((prev) => {
       if (!prev && id === null) {
-        setStatusID(null); // Reset statusID when explicitly closing
+        setStatusID(null);
       }
       return !prev;
     });
@@ -283,16 +256,16 @@ const EnquiryDashboard = (props) => {
     return `${year}-${month}-${day}`;
   };
 
-  const handleSearch = () => {
-    const filters = {
-      searchText: searchText.trim(),
-      enquirytype: selectedEnquiryType?.value || "",
-      status: selectedStatus?.value,
-      branch: selectedBranch?.value,
-      fromdate: startDate ? formatDate1(startDate) : null,
-      todate: endDate ? formatDate1(endDate) : null,
-    };
+  const filters = {
+    searchText: searchText.trim(),
+    enquirytype: selectedEnquiryType?.value || "",
+    status: selectedStatus?.value,
+    branch: selectedBranch?.value,
+    fromdate: startDate ? formatDate1(startDate) : null,
+    todate: endDate ? formatDate1(endDate) : null,
+  };
 
+  const handleSearch = () => {
     setActiveFilters(filters); // ⬅️ Store current filters
     fetchPaginatedData(1, filters); // ⬅️ Pass them for page 1
   };
@@ -383,7 +356,7 @@ const EnquiryDashboard = (props) => {
     }, 300); // Optional: debounce for better performance
 
     return () => clearTimeout(debounceTimer);
-  }, [selectedStatus, selectedEnquiryType]);
+  }, [selectedStatus, selectedEnquiryType, selectedBranch]);
 
   const handleCheckId = (id) => {
     const stringId = String(id); // Ensure id is a string
@@ -401,28 +374,29 @@ const EnquiryDashboard = (props) => {
       }
     });
   };
-  const handleExport = () => {
-    const exportData = listData.map((item) => {
-      const isCourseOrInternship =
-        selectedEnquiryType.label === "Course Enquiry" ||
-        selectedEnquiryType.label === "Internship Enquiry";
-      return {
-        Id: item.Id,
-        Name: item.Name,
-        "Contact Number": item.Mobileno,
-        ...(isCourseOrInternship && {
-          "Highest Qualification": item.QualificationCode,
-          Course: item.TopicTitle,
-        }),
-        ...(!isCourseOrInternship && {
-          Product: item.product_name,
-        }),
-        Branch: item.BranchName,
-        "Enquiry Date": formatDate(item.CreatedOn),
-        Status: item.status_txt,
-      };
-    });
-    exportToExcel(exportData, "EnquiryList", "Sheet1");
+  const handleExport = async () => {
+    // const data = await fetchPaginatedData(1, null, filters); // ⬅️ Pass them for page 1
+    // const exportData = listData.map((item) => {
+    //   const isCourseOrInternship =
+    //     selectedEnquiryType.label === "Course Enquiry" ||
+    //     selectedEnquiryType.label === "Internship Enquiry";
+    //   return {
+    //     Id: item.Id,
+    //     Name: item.Name,
+    //     "Contact Number": item.Mobileno,
+    //     ...(isCourseOrInternship && {
+    //       "Highest Qualification": item.QualificationCode,
+    //       Course: item.TopicTitle,
+    //     }),
+    //     ...(!isCourseOrInternship && {
+    //       Product: item.product_name,
+    //     }),
+    //     Branch: item.BranchName,
+    //     "Enquiry Date": formatDate(item.CreatedOn),
+    //     Status: item.status_txt,
+    //   };
+    // });
+    // exportToExcel(exportData, "EnquiryList", "Sheet1");
   };
 
   const statsCard1 = {
@@ -454,181 +428,6 @@ const EnquiryDashboard = (props) => {
     color: "info",
   };
 
-  const printCustomTable1 = ({
-    title = "Print Table",
-    columns = [],
-    data = [],
-  }) => {
-    if (!Array.isArray(data) || data.length === 0) {
-      alert("No data available to print!");
-      return;
-    }
-
-    if (!Array.isArray(columns) || columns.length === 0) {
-      alert("No columns defined for print!");
-      return;
-    }
-
-    // Create headers
-    const tableHeaders = `<tr>${columns
-      .map((col) => `<th>${col.label}</th>`)
-      .join("")}</tr>`;
-
-    // Create rows
-    const tableRows = data
-      .map((item) => {
-        return `
-        <tr>
-          ${columns
-            .map(
-              (col) =>
-                `<td>${col.accessor ? item[col.accessor] ?? "" : ""}</td>`
-            )
-            .join("")}
-        </tr>
-      `;
-      })
-      .join("");
-
-    // Final table
-    const fullTableHTML = `
-    <table>
-      <thead>${tableHeaders}</thead>
-      <tbody>${tableRows}</tbody>
-    </table>
-  `;
-
-    const printWindow = window.open("", "", "height=800,width=1000");
-    printWindow.document.write(`
-    <html>
-      <head>
-        <title>${title}</title>
-        <style>
-          table {
-            width: 100%;
-            border-collapse: collapse;
-            font-family: Arial, sans-serif;
-          }
-          th, td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: left;
-          }
-          th {
-            background-color: #f2f2f2;
-          }
-        </style>
-      </head>
-      <body>
-        <h3>${title}</h3>
-        ${fullTableHTML}
-      </body>
-    </html>
-  `);
-    printWindow.document.close();
-    printWindow.focus();
-    printWindow.print();
-  };
-
-  const fetchAllData = async (pageno, pagesize) => {
-    const res = await axios.get(`${API_PATH}/api/Get_Enquiry_Dashboard_Data`, {
-      params: {
-        fromdate: "2025-04-01",
-        todate: "2026-03-01",
-        enquirytype: 1,
-        branch: 37,
-        pageno: pageno,
-        pagesize: pagesize,
-      },
-    });
-    setAllData(res.data.Data);
-  };
-
-  useEffect(() => {
-    fetchAllData(1, 11);
-  }, []);
-  console.log("-------------");
-  console.log(allData);
-  console.log("-------------");
-
-  const handlePrint = () => {
-    fetchAllData(1, 11);
-    const printCustomTable1 = ({
-      title = "Print Table",
-      columns = [],
-      data = [],
-    }) => {
-      if (!Array.isArray(data) || data.length === 0) {
-        alert("No data available to print!");
-        return;
-      }
-
-      if (!Array.isArray(columns) || columns.length === 0) {
-        alert("No columns defined for print!");
-        return;
-      }
-
-      // Create headers
-      const tableHeaders = `<tr>${columns
-        .map((col) => `<th>${col.label}</th>`)
-        .join("")}</tr>`;
-
-      // Create rows
-      const tableRows = data
-        .map((item) => {
-          return `
-        <tr>
-          ${columns
-            .map(
-              (col) =>
-                `<td>${col.accessor ? item[col.accessor] ?? "" : ""}</td>`
-            )
-            .join("")}
-        </tr>
-      `;
-        })
-        .join("");
-
-      // Final table
-      const fullTableHTML = `
-    <table>
-      <thead>${tableHeaders}</thead>
-      <tbody>${tableRows}</tbody>
-    </table>
-  `;
-
-      const printWindow = window.open("", "", "height=800,width=1000");
-      printWindow.document.write(`
-    <html>
-      <head>
-        <title>${title}</title>
-        <style>
-          table {
-            width: 100%;
-            border-collapse: collapse;
-            font-family: Arial, sans-serif;
-          }
-          th, td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: left;
-          }
-          th {
-            background-color: #f2f2f2;
-          }
-        </style>
-      </head>
-      <body>
-        <h3>${title}</h3>
-        ${fullTableHTML}
-      </body>
-    </html>
-  `);
-      printWindow.document.close();
-      printWindow.focus();
-      printWindow.print();
-    };
-  };
   return (
     <>
       <Header
@@ -694,7 +493,7 @@ const EnquiryDashboard = (props) => {
                     enquiry={enquiry}
                     selectedEnquiryType={selectedEnquiryType}
                     handleEnquiryTypeChange={handleEnquiryTypeChange}
-                    branch={storedBranches}
+                    // branch={storedBranches}
                     selectedBranch={selectedBranch}
                     setSelectedBranch={setSelectedBranch}
                     startDate={startDate}
@@ -719,7 +518,7 @@ const EnquiryDashboard = (props) => {
               enquiry={enquiry}
               selectedEnquiryType={selectedEnquiryType}
               handleEnquiryTypeChange={handleEnquiryTypeChange}
-              branch={storedBranches}
+              // branch={storedBranches}
               selectedBranch={selectedBranch}
               setSelectedBranch={setSelectedBranch}
               startDate={startDate}
@@ -815,25 +614,25 @@ const EnquiryDashboard = (props) => {
                         color="primary"
                         block
                         size="md"
-                        onClick={() =>
-                          printCustomTable1({
-                            title: "All Enquiries",
-                            columns: [
-                              { label: "ID", accessor: "Id" },
-                              { label: "Name", accessor: "Name" },
-                              { label: "Mobile", accessor: "Mobileno" },
-                              {
-                                label: "Qualification",
-                                accessor: "QualificationCode",
-                              },
-                              { label: "Course", accessor: "TopicTitle" },
-                              { label: "Branch", accessor: "BranchName" },
-                              { label: "Enquiry Date", accessor: "CreatedOn" },
-                              { label: "Status", accessor: "status_txt" },
-                            ],
-                            data: allData, // ⬅️ your full enquiry list
-                          })
-                        }
+                        // onClick={() =>
+                        //   printCustomTable1({
+                        //     title: "All Enquiries",
+                        //     columns: [
+                        //       { label: "ID", accessor: "Id" },
+                        //       { label: "Name", accessor: "Name" },
+                        //       { label: "Mobile", accessor: "Mobileno" },
+                        //       {
+                        //         label: "Qualification",
+                        //         accessor: "QualificationCode",
+                        //       },
+                        //       { label: "Course", accessor: "TopicTitle" },
+                        //       { label: "Branch", accessor: "BranchName" },
+                        //       { label: "Enquiry Date", accessor: "CreatedOn" },
+                        //       { label: "Status", accessor: "status_txt" },
+                        //     ],
+                        //     data: allData, // ⬅️ your full enquiry list
+                        //   })
+                        // }
                       >
                         Print All
                       </Button>
@@ -842,7 +641,7 @@ const EnquiryDashboard = (props) => {
                         color="primary"
                         block
                         size="md"
-                        onClick={handleExport}
+                        onClick={() => handleExport()}
                       >
                         Save as Excel
                       </Button>
@@ -853,11 +652,6 @@ const EnquiryDashboard = (props) => {
 
               {/* ✅ Table View for Large Screens */}
               <div className="d-none d-lg-block">
-                {/* <List
-                  listData={listData}
-                  isTableLoading={isTableLoading}
-                  selectedEnquiryType={selectedEnquiryType}
-                /> */}
                 <Table
                   id="printable-table"
                   className="align-items-center table-flush"
@@ -912,18 +706,6 @@ const EnquiryDashboard = (props) => {
                                 onChange={() => handleCheckId(item.Id)}
                                 disabled={item.status_txt === "Admission Done"} // ✅ disable if condition matches
                               />
-
-                              {/* <Input
-                                type="checkbox"
-                                style={{ margin: 0 }}
-                                checked={
-                                  !!studentID.find(
-                                    (s) => s.enrollmentid === item.Id
-                                  )
-                                } // ✅ safer check
-                                onChange={() => handleCheckId(item.Id)} // ✅ use onChange not onClick
-                                disabled={item.status_txt === "Admission Done"}
-                              /> */}
                             </div>
                           </td>
                           <td>{item.Id}</td>
@@ -945,7 +727,6 @@ const EnquiryDashboard = (props) => {
                           <td>{item.status_txt}</td>
                           <td>{item.LatestRemark}</td>
                           <td>
-                            {" "}
                             <UncontrolledDropdown direction="left">
                               <DropdownToggle
                                 tag="span"
@@ -1018,10 +799,6 @@ const EnquiryDashboard = (props) => {
                               onChange={() => handleCheckId(item.Id)}
                               disabled={item.status_txt === "Admission Done"} // ✅ disable if condition matches
                             />
-                            {/* <Input
-                              type="checkbox"
-                              onClick={() => handleCheckId(item.Id)}
-                            /> */}
                           </div>
                           <div>
                             <p className="fs-6 fw-semibold mb-1">
@@ -1101,7 +878,6 @@ const EnquiryDashboard = (props) => {
                 {/* You can map more cards dynamically here */}
               </div>
               <CardFooter className="py-4">
-                {/* <nav aria-label="..."> */}
                 <CustomPagination
                   pageStart={pageStart}
                   setPageStart={setPageStart}
@@ -1112,10 +888,9 @@ const EnquiryDashboard = (props) => {
                   pageNumDropDown={pageNumDropDown}
                   setPageNumDropDown={setPageNumDropDown}
                   pageNum={pageNum}
-                  activeFilters={activeFilters} // ✅ pass it here
+                  // pageSize={pageSize}
+                  activeFilters={activeFilters}
                 />
-
-                {/* </nav> */}
               </CardFooter>
             </Card>
           </Col>
@@ -1132,7 +907,7 @@ const EnquiryDashboard = (props) => {
         studentID={studentID}
         // refreshList={fetchPaginatedData}
         refreshList={() => fetchPaginatedData(1, activeFilters)} // ✅ Pass filtered fetch        resetSelected={() => setStudentID([])} // ✅ Pass reset function
-        resetSelected={() => setStudentID([])} // ✅ Pass reset function
+        resetSelected={() => setStudentID([])}
       />
       <StatusUpdate
         modal={statusModalOpen}
@@ -1146,7 +921,7 @@ const EnquiryDashboard = (props) => {
         toggle={toggleAssignBatch}
         studentID={studentID}
         refreshList={fetchPaginatedData}
-        resetSelected={() => setStudentID([])} // ✅ Pass reset function
+        resetSelected={() => setStudentID([])}
       />
     </>
   );

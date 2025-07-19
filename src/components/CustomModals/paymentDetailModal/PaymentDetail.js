@@ -11,9 +11,13 @@ import {
   Table,
   Label,
   FormGroup,
+  Toast,
+  ToastBody,
 } from "reactstrap";
 import Select from "react-select";
 import InputField from "components/FormFields/InputField";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 import useBranchList from "customHookApi/EnquiryDashboardApi/useBranchList";
 import axios from "axios";
 import { paymentMode } from "DummyData";
@@ -34,6 +38,7 @@ const PaymentDetail = ({
   onPaymentSuccess = () => {},
   resetParentIds = () => {},
 }) => {
+  const { id } = useSelector((state) => state.auth);
   const defaultBranch = useSelector((state) => state.auth.selectedBranch);
 
   const [Loading, setLoading] = useState(false);
@@ -55,6 +60,7 @@ const PaymentDetail = ({
 
   const [receiptId, setReceiptId] = useState("");
   const [isTableLoading, setIsTableLoading] = useState(false);
+  const [startDate, setStartDate] = useState(new Date());
 
   const {
     branchOptions,
@@ -77,14 +83,18 @@ const PaymentDetail = ({
     setPaymentModeOptions(paymentMode[0]);
   };
 
-  useEffect(() => {
-    if (branchSearchText.length < 3) {
-      setBranchOptions([]);
-      return;
-    }
+  // useEffect(() => {
+  //   if (branchSearchText.length < 3) {
+  //     setBranchOptions([]);
+  //     return;
+  //   }
 
-    fetchBranch();
-  }, [branchSearchText]);
+  //   fetchBranch();
+  // }, [branchSearchText]);
+
+  useEffect(() => {
+    fetchBranch("", "", id); // sends id to third param
+  }, []);
 
   const fetchBatch = async () => {
     // setLoading(true);
@@ -236,7 +246,18 @@ const PaymentDetail = ({
       );
       return;
     }
+
     setLoading(true);
+    const formattedDate = (date) => {
+      const d = new Date(date);
+      const day = String(d.getDate()).padStart(2, "0");
+      const month = String(d.getMonth() + 1).padStart(2, "0");
+      const year = String(d.getFullYear());
+
+      return `${year}-${month}-${day}`;
+    };
+
+    const createdOn = formattedDate(startDate);
     try {
       const res = await axios.post(`${API_PATH}/api/CollectFees`, payment, {
         params: {
@@ -244,6 +265,7 @@ const PaymentDetail = ({
           batchid: selectedBatch?.value || batchId,
           batch_studentid: selectedStudent?.value || studId,
           paymentmode: paymentModeOptions?.value,
+          CreatedOn: createdOn,
         },
       });
 
@@ -265,6 +287,7 @@ const PaymentDetail = ({
       // }, 500); // optional small delay for smoother UI
     } catch (error) {
       console.log(error);
+      toast.error(error?.message);
     } finally {
       resetForm();
       resetParentIds(); // ✅ reset parent state
@@ -273,18 +296,18 @@ const PaymentDetail = ({
     }
   };
 
-  useEffect(() => {
-    if (!defaultBranch || selectedBranch) return;
+  // useEffect(() => {
+  //   if (!defaultBranch || selectedBranch) return;
 
-    const existsInOptions = branchOptions.some(
-      (opt) => opt.value === defaultBranch.value
-    );
-    if (!existsInOptions) {
-      setBranchOptions((prev) => [...prev, defaultBranch]);
-      setSelectedBranch(defaultBranch);
-    }
-  }, [defaultBranch, branchOptions, selectedBranch]);
-  console.log(selectedBranch);
+  //   const existsInOptions = branchOptions.some(
+  //     (opt) => opt.value === defaultBranch.value
+  //   );
+  //   if (!existsInOptions) {
+  //     setBranchOptions((prev) => [...prev, defaultBranch]);
+  //     setSelectedBranch(defaultBranch);
+  //   }
+  // }, [defaultBranch, branchOptions, selectedBranch]);
+
   return (
     <Modal
       isOpen={modal}
@@ -333,7 +356,6 @@ const PaymentDetail = ({
               <FormGroup>
                 <Label>Batch</Label>
                 <Select
-                  // isDisabled={!selectedBranch}
                   options={batches}
                   value={selectedBatch}
                   onChange={(selected) => {
@@ -341,14 +363,7 @@ const PaymentDetail = ({
                     setSelectedStudent(null); // ✅ Reset student
                   }}
                   placeholder="Select Batch"
-                  // placeholder={
-                  //   selectedBranch ? "Select Batch" : "Select Branch First"
-                  // }
                   onMenuOpen={fetchBatch}
-                  // onMenuOpen={() => {
-                  //   if (selectedBranch) fetchBatch();
-                  // }}
-                  // isLoading={Loading}
                 />
               </FormGroup>
             </Col>
@@ -391,10 +406,30 @@ const PaymentDetail = ({
                   label="Transition Number"
                   id="transitionNumber"
                   type="text"
-                  // Add your value and onChange handlers here if needed
                 />
               </Col>
             )}
+            <Col md={4} className={``}>
+              <FormGroup>
+                <Label for="startDate">Start Date</Label>
+                <div style={{ width: "100%" }}>
+                  <DatePicker
+                    selected={startDate}
+                    onChange={(date) => setStartDate(date)}
+                    dateFormat="dd-MM-yyyy"
+                    placeholderText="Select start date"
+                    isClearable
+                    scrollableYearDropdown
+                    yearDropdownItemNumber={50}
+                    minDate={new Date(1900, 0, 1)}
+                    maxDate={new Date(2025, 11, 31)}
+                    popperPlacement="bottom-start"
+                    className="form-control w-100"
+                    id="startDate"
+                  />
+                </div>
+              </FormGroup>
+            </Col>
           </Row>
         </div>
         {/* Separator */}

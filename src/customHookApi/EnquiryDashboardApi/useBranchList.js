@@ -1,15 +1,22 @@
 import React, { useState } from "react";
 import axios from "axios";
+import { useSelector } from "react-redux";
 
 const API_PATH = process.env.REACT_APP_API_PATH;
 const API_KEY = process.env.REACT_APP_API_KEY;
 
 const useBranchList = () => {
+  const { id } = useSelector((state) => state.auth);
+
   const [branchOptions, setBranchOptions] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [branchSearchText, setBranchSearchText] = useState("");
 
-  const fetchBranch = async (branchtype = "", parent_branch_id = "") => {
+  const fetchBranch = async (
+    branchtype = "",
+    parent_branch_id = "",
+    id = null
+  ) => {
     try {
       const res = await axios.get(`${API_PATH}/api/Branches`, {
         params: {
@@ -17,6 +24,7 @@ const useBranchList = () => {
           branchtype: branchtype,
           parent_branch_id: parent_branch_id,
           searchtext: branchSearchText,
+          userid: id,
         },
       });
 

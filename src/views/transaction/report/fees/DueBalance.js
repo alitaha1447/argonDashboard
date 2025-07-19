@@ -72,14 +72,14 @@ const DueBalance = () => {
   const pagesize = pageNumDropDown?.value;
 
   // customHookAPI
-  const {
-    branchOptions,
-    setBranchOptions,
-    isLoading,
-    fetchBranch,
-    setBranchSearchText,
-    branchSearchText,
-  } = useBranchList();
+  // const {
+  //   branchOptions,
+  //   setBranchOptions,
+  //   isLoading,
+  //   fetchBranch,
+  //   setBranchSearchText,
+  //   branchSearchText,
+  // } = useBranchList();
   const { statusOptions, fetchEnquiry } = useStatusEnquiry();
 
   const fetchDueCollection = async (page = 1) => {
@@ -119,7 +119,6 @@ const DueBalance = () => {
 
     return `${day}-${month}-${year}`;
   };
-
   return (
     <>
       <Header />

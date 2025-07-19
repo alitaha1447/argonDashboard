@@ -1,4 +1,4 @@
-// import { useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -31,7 +31,7 @@ import InstallModal from "components/CustomModals/installmentModal/InstallModal"
 import { exportToExcel } from "utils/printFile/exportToExcel";
 import { printTableData } from "utils/printFile/printFile";
 // import Select from "react-select";
-import useBranchList from "customHookApi/EnquiryDashboardApi/useBranchList";
+// import useBranchList from "customHookApi/EnquiryDashboardApi/useBranchList";
 // import useStatusEnquiry from "customHookApi/EnquiryDashboardApi/useStatusEnquiry";
 
 import axios from "axios";
@@ -42,8 +42,9 @@ const API_PATH = process.env.REACT_APP_API_PATH;
 const API_KEY = process.env.REACT_APP_API_KEY;
 
 const BatchStudent = () => {
+  const navigate = useNavigate();
   const Branch = useSelector((state) => state.auth.selectedBranch);
-  console.log(Branch);
+  // console.log(Branch);/
 
   const [isTableLoading, setisTableLoading] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
@@ -59,26 +60,28 @@ const BatchStudent = () => {
   const [installModal, setInstallModal] = useState(false);
   // const [installmentStdId, setInstallmentStdId] = useState("");
   // customHookAPI
-  const {
-    branchOptions,
-    setBranchOptions,
-    isLoading,
-    fetchBranch,
-    setBranchSearchText,
-    branchSearchText,
-  } = useBranchList();
+  // const {
+  //   branchOptions,
+  //   setBranchOptions,
+  //   isLoading,
+  //   fetchBranch,
+  //   setBranchSearchText,
+  //   branchSearchText,
+  // } = useBranchList();
 
-  useEffect(() => {
-    if (branchSearchText.length < 3) {
-      setBranchOptions([]);
-      return;
-    }
+  // useEffect(() => {
+  //   if (branchSearchText.length < 3) {
+  //     setBranchOptions([]);
+  //     return;
+  //   }
 
-    fetchBranch();
-  }, [branchSearchText]);
-
+  //   fetchBranch();
+  // }, [branchSearchText]);
+  // console.log(selectedBranch);
+  // console.log(selectedBatch);
   const fetchBatch = async () => {
-    const branchIDToUse = selectedBranch?.value || Branch?.value;
+    const branchIDToUse = selectedBranch?.value;
+    // || Branch?.value;
 
     if (!branchIDToUse) return; // ✅ exit if nothing to use
     // if (!selectedBranch?.value) return; // 🚫 Don't proceed if no branch is selected
@@ -190,7 +193,7 @@ const BatchStudent = () => {
                   className="pb-4 d-sm-none d-md-none"
                 >
                   <FilterBar
-                    branch={Branch} // 👈 pass it here
+                    // branch={Branch} // 👈 pass it here
                     selectedBranch={selectedBranch}
                     setSelectedBranch={setSelectedBranch}
                     fetchBatch={fetchBatch}
@@ -209,7 +212,7 @@ const BatchStudent = () => {
           </Col>
           <Col className="pb-4 d-none d-sm-block ">
             <FilterBar
-              branch={Branch} // 👈 pass it here
+              // branch={Branch} // 👈 pass it here
               selectedBranch={selectedBranch}
               setSelectedBranch={setSelectedBranch}
               fetchBatch={fetchBatch}
@@ -285,7 +288,7 @@ const BatchStudent = () => {
                         color="primary"
                         block
                         size="md"
-                        // onClick={() => printAndExportExcel(data)}
+                        onClick={() => navigate("/admin/userCreation")}
                       >
                         Add Student
                       </Button>

@@ -5,6 +5,8 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import useBranchList from "customHookApi/EnquiryDashboardApi/useBranchList";
 import useStatusEnquiry from "customHookApi/EnquiryDashboardApi/useStatusEnquiry";
+import { useSelector } from "react-redux";
+
 const FilterBar = ({
   selectedStatus,
   setSelectedStatus,
@@ -35,6 +37,7 @@ const FilterBar = ({
   selectedFacultyName,
   setSelectedFacultyName,
 }) => {
+  const { id } = useSelector((state) => state.auth);
   const {
     branchOptions,
     setBranchOptions,
@@ -46,13 +49,16 @@ const FilterBar = ({
 
   const { statusOptions, fetchEnquiry } = useStatusEnquiry();
 
+  // useEffect(() => {
+  //   if (branchSearchText.length < 3) {
+  //     setBranchOptions([]);
+  //     return;
+  //   }
+  //   fetchBranch();
+  // }, [branchSearchText]);
   useEffect(() => {
-    if (branchSearchText.length < 3) {
-      setBranchOptions([]);
-      return;
-    }
-    fetchBranch();
-  }, [branchSearchText]);
+    fetchBranch("", "", id); // sends id to third param
+  }, []);
 
   useEffect(() => {
     if (!branch || selectedBranch) return;

@@ -34,7 +34,6 @@ import { FaPlus } from "react-icons/fa";
 
 import useBranchList from "customHookApi/EnquiryDashboardApi/useBranchList";
 import axios from "axios";
-import { studentFeeData } from "DummyData";
 import { fetchFinancialYearRangeByDate } from "utils/financialYearRange/FinancialYearRange";
 import { generateHexColors } from "utils/dynamicColorGenerator/generateHexColors ";
 import { exportToExcel } from "utils/printFile/exportToExcel";
@@ -159,8 +158,8 @@ const FeesDashboard = () => {
     }
   };
 
-  const fetchPaginatedData = async (page = 1, filter = {}) => {
-    setIsTableLoading(true); // show loader
+  const fetchPaginatedData = async (page = 1, size = pageSize, filter = {}) => {
+    setIsTableLoading(true);
     try {
       const params = {
         APIKEY: API_KEY,
@@ -168,15 +167,19 @@ const FeesDashboard = () => {
         todate: endDate1,
         searchtext: filter?.searchtext || "",
         pageno: page,
-        pagesize: pageSize,
+        pagesize: size,
       };
       const res = await axios(`${API_PATH}/api/Collect_List`, {
         params,
       });
 
-      setFeeList(res?.data?.Data);
-      setPageNumber(res?.data?.PageNumber || page);
-      setTotalPages(res?.data?.TotalPages || 1);
+      if (size == null) {
+        return res?.data?.Data;
+      } else {
+        setFeeList(res?.data?.Data);
+        setPageNumber(res?.data?.PageNumber || page);
+        setTotalPages(res?.data?.TotalPages || 1);
+      }
     } catch (error) {
       if (error.response && error.response.status === 404) {
         setFeeList([]);
@@ -287,8 +290,9 @@ const FeesDashboard = () => {
     fetchPaginatedData(pageNumber, activeFilters);
   }, [pageNumber, activeFilters]);
 
-  const handleExport = () => {
-    const exportData = feeList.map((item, index) => {
+  const handleExport = async () => {
+    const data = await fetchPaginatedData(1, null);
+    const exportData = data.map((item, index) => {
       return {
         Id: index,
         "Student Name": item.name,
@@ -304,6 +308,20 @@ const FeesDashboard = () => {
       };
     });
     exportToExcel(exportData, "EnquiryList", "Sheet1");
+  };
+
+  const handlePrint = async () => {
+    const data = await fetchPaginatedData(1, null);
+    const columns = [
+      { label: "Student Name", accessor: "name" },
+      { label: "Contact Number", accessor: "mobileno" },
+      { label: "Total Fee Amount", accessor: "totalamount" },
+      { label: "Fee Recieved", accessor: "fees_received" },
+      { label: "Due Fees", accessor: "due_amount" },
+      { label: "Branch", accessor: "branch" },
+      { label: "Batch", accessor: "batch" },
+    ];
+    printTableData("Student Fee List", columns, data);
   };
 
   const statsCard1 = {
@@ -339,7 +357,17 @@ const FeesDashboard = () => {
 
     setShowPaymentDetail((prev) => !prev);
   };
-  // console.log(feeList);
+
+  const columns = [
+    { label: "Student Name", accessor: "student_name" },
+    { label: "Contact Number", accessor: "contact_number" },
+    { label: "Total Fee Amount", accessor: "total_fee" },
+    { label: "Fee Recieved", accessor: "fee_received" },
+    { label: "Due Fees", accessor: "due_fee" },
+    { label: "Branch", accessor: "branch_name" },
+    { label: "Batch", accessor: "batch_name" },
+  ];
+
   return (
     <>
       <Header
@@ -498,7 +526,8 @@ const FeesDashboard = () => {
                           color="primary"
                           block
                           size="md"
-                          onClick={() => printTableData("Student Fee Lists")}
+                          // onClick={() => printTableData("Student Fee Lists")}
+                          onClick={handlePrint}
                         >
                           Print
                         </Button>
@@ -739,6 +768,7 @@ const FeesDashboard = () => {
                 pageNumDropDown={pageNumDropDown}
                 setPageNumDropDown={setPageNumDropDown}
                 pageNum={pageNum}
+                pageSize={pageSize}
                 activeFilters={activeFilters} // ✅ pass it here
               />
 

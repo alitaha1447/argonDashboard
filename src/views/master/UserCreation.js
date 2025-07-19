@@ -20,6 +20,8 @@ import { getValidationErrors } from "utils/validations/userFormvalidation";
 import Header from "components/Headers/Header";
 import InputField from "components/FormFields/InputField";
 import RadioGroupField from "components/FormFields/RadioGroup";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
 import useBranchList from "customHookApi/EnquiryDashboardApi/useBranchList";
 import axios from "axios";
@@ -45,6 +47,7 @@ const UserCreation = () => {
   const [formErrors, setFormErrors] = useState({});
   const [roleOptions, setRoleOptions] = useState([]);
   const [selectedRole, setSelectedRole] = useState(null);
+  const [startDate, setStartDate] = useState(new Date());
   const [isAll, setIsAll] = useState(false); // 0 = unchecked, 1 = checked
   // const [isAllBranches, setIsAllBranches] = useState(false);
   const [isBranchActive, setIsBranchActive] = useState(false);
@@ -114,17 +117,35 @@ const UserCreation = () => {
     setIsActive(true);
     setIsAll(false);
     setIsBranchActive(false);
+    setStartDate(new Date());
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const errors = getValidationErrors({ fullName, email, pass, confirmPass });
+    const errors = getValidationErrors({
+      fullName,
+      email,
+      pass,
+      confirmPass,
+      gender,
+    });
 
     if (Object.keys(errors).length > 0) {
       setFormErrors(errors);
       return;
     }
+
+    const formattedDate = (date) => {
+      const d = new Date(date);
+      const day = String(d.getDate()).padStart(2, "0");
+      const month = String(d.getMonth() + 1).padStart(2, "0");
+      const year = String(d.getFullYear());
+
+      return `${year}-${month}-${day}`;
+    };
+
+    const createdOn = formattedDate(startDate);
 
     const userFormData = {
       isorganisational: isOrganisational ? 1 : 0,
@@ -139,9 +160,10 @@ const UserCreation = () => {
       isallbranches: isAll ? 1 : 0,
       userbranches: branches,
       userroles: userroles,
+      CreatedOn: createdOn,
     };
 
-    console.log(userFormData);
+    // console.log(userFormData);
 
     try {
       const res = await axios.post(`${API_PATH}/api/Save_Users`, userFormData, {
@@ -150,14 +172,16 @@ const UserCreation = () => {
           createdby: "Admin",
         },
       });
-      console.log(res);
+      // console.log(res);
       toast.success("User created Successfully!");
       resetForm();
     } catch (error) {
-      console.log(error);
+      // console.log(error);
+      toast.error(error?.message);
     }
     resetForm();
   };
+
   return (
     <>
       <Header />
@@ -168,6 +192,25 @@ const UserCreation = () => {
               <CardHeader className="bg-white">
                 <div className="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center w-100 pb-2 gap-2">
                   <h1 className="mb-2 mb-md-0">User Creation Form</h1>
+                  <FormGroup>
+                    <Label for="startDate">Start Date</Label>
+                    <div style={{ width: "100%" }}>
+                      <DatePicker
+                        selected={startDate}
+                        onChange={(date) => setStartDate(date)}
+                        dateFormat="dd-MM-yyyy"
+                        placeholderText="Select start date"
+                        isClearable
+                        scrollableYearDropdown
+                        yearDropdownItemNumber={50}
+                        minDate={new Date(1900, 0, 1)}
+                        maxDate={new Date(2025, 11, 31)}
+                        popperPlacement="bottom-start"
+                        className="form-control w-100"
+                        id="startDate"
+                      />
+                    </div>
+                  </FormGroup>
                 </div>
               </CardHeader>
               <CardBody>
@@ -270,7 +313,9 @@ const UserCreation = () => {
                         options={genderOptions}
                         selected={gender}
                         onChange={setGender}
-                        // required
+                        error={formErrors.gender}
+                        setFormErrors={setFormErrors} // ✅ only this is passed
+                        required
                       />
                     </Col>
                     <Col md={6}>
@@ -329,6 +374,7 @@ const UserCreation = () => {
                         />
                       </FormGroup>
                     </Col>
+                    <Col md={6}></Col>
                   </Row>
                   <Row></Row>
                   <Row>

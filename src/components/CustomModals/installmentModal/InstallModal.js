@@ -55,6 +55,7 @@ const InstallModal = ({
         amount: parseFloat(item.part_amount ?? 0),
         date: new Date(item.due_date), // Convert from "7/10/2025 12:00:00 AM"
       }));
+      setInstallmentStructure([]); // ✅ Clear existing data before setting new one
       setInstallmentStructure(transformed); // ✅ Update the structure
     } catch (error) {
       console.log(error);
@@ -62,6 +63,7 @@ const InstallModal = ({
   };
   useEffect(() => {
     if (modal && batchId && studId) {
+      setInstallmentStructure([]);
       fetchBatchinstallment(batchId, studId);
     }
   }, [modal && batchId && studId]);

@@ -75,14 +75,14 @@ const DailyCollection = () => {
   const [pageNumDropDown, setPageNumDropDown] = useState(pageNum[0]);
   const pageSize = pageNumDropDown?.value;
   // customHookAPI
-  const {
-    branchOptions,
-    setBranchOptions,
-    isLoading,
-    fetchBranch,
-    setBranchSearchText,
-    branchSearchText,
-  } = useBranchList();
+  // const {
+  //   branchOptions,
+  //   setBranchOptions,
+  //   isLoading,
+  //   fetchBranch,
+  //   setBranchSearchText,
+  //   branchSearchText,
+  // } = useBranchList();
   const { statusOptions, fetchEnquiry } = useStatusEnquiry();
 
   const fetchBatch = async () => {
@@ -119,7 +119,7 @@ const DailyCollection = () => {
     }
   };
 
-  const fetchDailyCollection = async (page = 1) => {
+  const fetchDailyCollection = async (page = 1, size = pageSize) => {
     setIsTableLoading(true);
     try {
       const res = await axios.get(`${API_PATH}/api/Get_Daily_Fee_Collection`, {
@@ -127,12 +127,17 @@ const DailyCollection = () => {
           fromdate: "2025-02-02",
           todate: "2026-01-01",
           pageno: page,
-          pagesize: pageSize,
+          pagesize: size,
         },
       });
-      setDailyLists(res?.data?.Data);
-      setPageNumber(res.data.PageNumber);
-      setTotalPages(res.data.TotalPages);
+
+      if (size === null) {
+        return res.data.Data;
+      } else {
+        setDailyLists(res?.data?.Data);
+        setPageNumber(res.data.PageNumber);
+        setTotalPages(res.data.TotalPages);
+      }
     } catch (error) {
       console.log(error);
     } finally {
@@ -144,8 +149,9 @@ const DailyCollection = () => {
     fetchDailyCollection(1);
   }, [pageSize]);
 
-  const handleExport = () => {
-    const exportData = dailyLists.map((item, index) => {
+  const handleExport = async () => {
+    const data = await fetchDailyCollection(1, null);
+    const exportData = data.map((item, index) => {
       const getDateOnly = (datetimeString) => {
         if (!datetimeString) return "";
         const datePart = datetimeString.split(" ")[0]; // "10/07/2025"

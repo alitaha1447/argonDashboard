@@ -7,6 +7,7 @@ import { paymentMode } from "DummyData";
 import { numberToWordsIndian } from "utils/numToWords";
 import axios from "axios";
 import { useLocation } from "react-router-dom";
+import RenderReceipt from "components/CustomReceipt/RenderReceipt";
 
 const API_PATH = process.env.REACT_APP_API_PATH;
 const API_KEY = process.env.REACT_APP_API_KEY;
@@ -65,7 +66,9 @@ const Receipt = () => {
     <div>
       <AuthNavbar />
       <Container style={{}}>
-        <div className="receipt-table w-100">
+        {/* {RenderReceipt("Student")}
+        {RenderReceipt("Staff")} */}
+        <div className="receipt-table w-100" style={{ marginBottom: "40px" }}>
           <Table
             responsive
             className="table fs-6 w-100"
@@ -85,7 +88,7 @@ const Receipt = () => {
                 >
                   <img
                     alt="Miracle Logo"
-                    src={require("../../assets/img/brand/miracleLogo.png")}
+                    src={require("../../assets/img/brand/MiracleInfoserv.png")}
                     style={{ height: "auto", maxWidth: "100%" }}
                   />
                   <p style={{ margin: 0, fontSize: "14px" }}>
@@ -112,7 +115,7 @@ const Receipt = () => {
                     verticalAlign: "top",
                   }}
                 >
-                  <p className="mb-0">Head Office Copy</p>
+                  <p className="mb-0">{"Head"}</p>
                   <p className="mb-0">Receipt No. : {data?.receipt_no}</p>
                   <p className="mb-0">Center Name : {data.branch_name}</p>
                 </td>
@@ -143,25 +146,25 @@ const Receipt = () => {
                   Roll No : {data?.admission_no}
                 </td>
                 {/* <td
-                  colSpan={1}
-                  style={{
-                    borderTop: "2px solid black",
-                    borderBottom: "2px solid black",
-                    padding: "8px",
-                  }}
-                >
-                  Roll No : MP-
-                </td> */}
+                          colSpan={1}
+                          style={{
+                            borderTop: "2px solid black",
+                            borderBottom: "2px solid black",
+                            padding: "8px",
+                          }}
+                        >
+                          Roll No : MP-
+                        </td> */}
                 {/* <td
-                  colSpan={1}
-                  style={{
-                    borderTop: "2px solid black",
-                    borderBottom: "2px solid black",
-                    padding: "8px",
-                  }}
-                >
-                  Roll No : MP-
-                </td> */}
+                          colSpan={1}
+                          style={{
+                            borderTop: "2px solid black",
+                            borderBottom: "2px solid black",
+                            padding: "8px",
+                          }}
+                        >
+                          Roll No : MP-
+                        </td> */}
               </tr>
               <tr>
                 {/* First column spans 2 cells */}
@@ -205,45 +208,45 @@ const Receipt = () => {
                     >
                       {item?.installment_title}
                       {/* <label
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        margin: 0,
-                      }}
-                    >
-                      Booking&nbsp;
-                      <input type="checkbox" />
-                    </label> */}
+                              style={{
+                                display: "flex",
+                                alignItems: "center",
+                                margin: 0,
+                              }}
+                            >
+                              Booking&nbsp;
+                              <input type="checkbox" />
+                            </label> */}
                       {/* <label
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        margin: 0,
-                      }}
-                    >
-                      Registration&nbsp;
-                      <input type="checkbox" />
-                    </label> */}
+                              style={{
+                                display: "flex",
+                                alignItems: "center",
+                                margin: 0,
+                              }}
+                            >
+                              Registration&nbsp;
+                              <input type="checkbox" />
+                            </label> */}
                       {/* <label
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        margin: 0,
-                      }}
-                    >
-                      Admission&nbsp;
-                      <input type="checkbox" />
-                    </label> */}
+                              style={{
+                                display: "flex",
+                                alignItems: "center",
+                                margin: 0,
+                              }}
+                            >
+                              Admission&nbsp;
+                              <input type="checkbox" />
+                            </label> */}
                       {/* <label
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        margin: 0,
-                      }}
-                    >
-                      Installment&nbsp;
-                      <input type="checkbox" />
-                    </label> */}
+                              style={{
+                                display: "flex",
+                                alignItems: "center",
+                                margin: 0,
+                              }}
+                            >
+                              Installment&nbsp;
+                              <input type="checkbox" />
+                            </label> */}
                     </div>
                   </td>
                   <td
@@ -260,94 +263,94 @@ const Receipt = () => {
                 </tr>
               ))}
               {/* <tr>
-                <td
-                  colSpan={2}
-                  style={{
-                    border: "2px solid black",
-                    padding: "8px",
-                  }}
-                >
-                  <div
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "8px",
-                    }}
-                  >
-                    Course Fees:
-                    <label
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        margin: 0,
-                      }}
-                    >
-                      Booking&nbsp;
-                      <input type="checkbox" />
-                    </label>
-                    <label
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        margin: 0,
-                      }}
-                    >
-                      Registration&nbsp;
-                      <input type="checkbox" />
-                    </label>
-                    <label
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        margin: 0,
-                      }}
-                    >
-                      Admission&nbsp;
-                      <input type="checkbox" />
-                    </label>
-                    <label
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        margin: 0,
-                      }}
-                    >
-                      Installment&nbsp;
-                      <input type="checkbox" />
-                    </label>
-                  </div>
-                </td>
-                <td
-                  rowSpan={1}
-                  style={{
-                    border: "2px solid black",
-                    padding: "8px",
-                    // textAlign: "right",
-                    verticalAlign: "top", // optional: aligns to top of the merged cell
-                  }}
-                >
-                  465897
-                </td>
-              </tr> */}
+                        <td
+                          colSpan={2}
+                          style={{
+                            border: "2px solid black",
+                            padding: "8px",
+                          }}
+                        >
+                          <div
+                            style={{
+                              display: "flex",
+                              alignItems: "center",
+                              gap: "8px",
+                            }}
+                          >
+                            Course Fees:
+                            <label
+                              style={{
+                                display: "flex",
+                                alignItems: "center",
+                                margin: 0,
+                              }}
+                            >
+                              Booking&nbsp;
+                              <input type="checkbox" />
+                            </label>
+                            <label
+                              style={{
+                                display: "flex",
+                                alignItems: "center",
+                                margin: 0,
+                              }}
+                            >
+                              Registration&nbsp;
+                              <input type="checkbox" />
+                            </label>
+                            <label
+                              style={{
+                                display: "flex",
+                                alignItems: "center",
+                                margin: 0,
+                              }}
+                            >
+                              Admission&nbsp;
+                              <input type="checkbox" />
+                            </label>
+                            <label
+                              style={{
+                                display: "flex",
+                                alignItems: "center",
+                                margin: 0,
+                              }}
+                            >
+                              Installment&nbsp;
+                              <input type="checkbox" />
+                            </label>
+                          </div>
+                        </td>
+                        <td
+                          rowSpan={1}
+                          style={{
+                            border: "2px solid black",
+                            padding: "8px",
+                            // textAlign: "right",
+                            verticalAlign: "top", // optional: aligns to top of the merged cell
+                          }}
+                        >
+                          465897
+                        </td>
+                      </tr> */}
 
               {/* Row 2 - Second Particular */}
               {/* <tr>
-                <td
-                  colSpan={2}
-                  style={{ border: "2px solid black", padding: "8px" }}
-                >
-                  Admission Fee
-                </td>
-                <td
-                  rowSpan={1}
-                  style={{
-                    border: "2px solid black",
-                    padding: "8px",
-                    textAlign: "right",
-                    verticalAlign: "top", // optional: aligns to top of the merged cell
-                  }}
-                ></td>
-              </tr> */}
+                        <td
+                          colSpan={2}
+                          style={{ border: "2px solid black", padding: "8px" }}
+                        >
+                          Admission Fee
+                        </td>
+                        <td
+                          rowSpan={1}
+                          style={{
+                            border: "2px solid black",
+                            padding: "8px",
+                            textAlign: "right",
+                            verticalAlign: "top", // optional: aligns to top of the merged cell
+                          }}
+                        ></td>
+                      </tr> */}
 
               {/* Row 3 - Third Particular */}
               <tr>
@@ -386,18 +389,18 @@ const Receipt = () => {
                 </td>
               </tr>
               {/* <tr>
-                <td
-                  colSpan={2}
-                  style={{ border: "2px solid black", padding: "8px" }}
-                ></td>
-                <td
-                  style={{
-                    border: "2px solid black",
-                    padding: "8px",
-                    textAlign: "right",
-                  }}
-                ></td>
-              </tr> */}
+                        <td
+                          colSpan={2}
+                          style={{ border: "2px solid black", padding: "8px" }}
+                        ></td>
+                        <td
+                          style={{
+                            border: "2px solid black",
+                            padding: "8px",
+                            textAlign: "right",
+                          }}
+                        ></td>
+                      </tr> */}
               <tr>
                 <td
                   colSpan={2}
@@ -482,10 +485,17 @@ const Receipt = () => {
                     }}
                   >
                     <li>
-                      Any disputes are subject to Bhopal jurisdiction only.
+                      Any issues/legal matters are subject to Bhopal
+                      jurisdiction.
                     </li>
                     <li>
-                      Certified that the above information is true and correct.
+                      Cheque / D.D. in Favour of Miracle Information Service
+                      (OPC) Pvt. Ltd.
+                    </li>
+                    <li>
+                      Certified that the particular given in the invoice are
+                      true and correct according to best of our belief and
+                      knowledge.
                     </li>
                   </ol>
                 </td>
