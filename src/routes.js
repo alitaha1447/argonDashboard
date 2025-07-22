@@ -666,6 +666,8 @@ import DueBalance from "views/transaction/report/fees/DueBalance";
 import FacultyCourses from "views/reports/course/FacultyCourses";
 import BatchStudent from "views/transaction/course/BatchStudent";
 import ReceiptList from "views/reports/fees/ReceiptList";
+import BatchUserCreation from "views/examples/BatchUserCreation";
+import UserList from "views/master/user/UserList";
 
 var routes = [
   {
@@ -723,6 +725,24 @@ var routes = [
         icon: "ni ni-single-copy-04 text-red",
         component: <UserCreation />,
         layout: "/admin",
+      },
+      {
+        // id: 5,
+        path: "/batchUserCreation",
+        name: "Batch User Creation",
+        icon: "ni ni-single-copy-04 text-red",
+        component: <BatchUserCreation />,
+        layout: "/admin",
+        showInSidebar: false, // ❌ hide from sidebar
+      },
+      {
+        // id: 5,
+        path: "/userList",
+        name: "User List",
+        icon: "ni ni-single-copy-04 text-red",
+        component: <UserList />,
+        layout: "/admin",
+        // showInSidebar: false, // ❌ hide from sidebar
       },
     ],
   },

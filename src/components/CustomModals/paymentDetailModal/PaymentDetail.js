@@ -21,7 +21,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import useBranchList from "customHookApi/EnquiryDashboardApi/useBranchList";
 import axios from "axios";
 import { paymentMode } from "DummyData";
-import { ToastContainer, toast } from "react-toastify";
+import { toast } from "react-toastify";
 import { useSelector } from "react-redux";
 
 // import { useLocation } from "react-router-dom";
@@ -268,7 +268,8 @@ const PaymentDetail = ({
           CreatedOn: createdOn,
         },
       });
-
+      console.log(res?.data);
+      console.log(res?.data?.receiptid);
       setReceiptId(res?.data?.receiptid);
 
       toast.success("Payment Success !!");
@@ -547,7 +548,6 @@ const PaymentDetail = ({
           Cancel
         </Button>
       </ModalFooter>
-      <ToastContainer />
     </Modal>
   );
 };

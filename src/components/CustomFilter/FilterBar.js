@@ -60,25 +60,24 @@ const FilterBar = ({
     fetchBranch("", "", id); // sends id to third param
   }, []);
 
-  useEffect(() => {
-    if (!branch || selectedBranch) return;
+  // useEffect(() => {
+  //   if (!branch || selectedBranch) return;
 
-    const existsInOptions = branchOptions.some(
-      (opt) => opt.value === branch.value
-    );
-    if (!existsInOptions) {
-      setBranchOptions((prev) => [...prev, branch]);
-      setSelectedBranch(branch);
-    }
+  //   const existsInOptions = branchOptions.some(
+  //     (opt) => opt.value === branch.value
+  //   );
+  //   if (!existsInOptions) {
+  //     setBranchOptions((prev) => [...prev, branch]);
+  //     setSelectedBranch(branch);
+  //   }
 
-    // else {
-    //   const matched = branchOptions.find(
-    //     (opt) => opt.value === defaultBranch.value
-    //   );
-    //   if (matched) setSelectedBranch(matched);
-    // }
-  }, [branch, branchOptions, selectedBranch]);
-
+  //   // else {
+  //   //   const matched = branchOptions.find(
+  //   //     (opt) => opt.value === defaultBranch.value
+  //   //   );
+  //   //   if (matched) setSelectedBranch(matched);
+  //   // }
+  // }, [branch, branchOptions, selectedBranch]);
   return (
     <div
       className="d-flex flex-column flex-lg-row align-items-center justify-content-between p-2 w-100"
@@ -162,6 +161,7 @@ const FilterBar = ({
             onChange={setSelectedFacultyName}
             onMenuOpen={fetchFaculties}
             placeholder="faculty name"
+            isClearable
           />
         )}
         {showDatePicker && (

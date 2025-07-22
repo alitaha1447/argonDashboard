@@ -20,17 +20,18 @@ import { getValidationErrors } from "utils/validations/userFormvalidation";
 import Header from "components/Headers/Header";
 import InputField from "components/FormFields/InputField";
 import RadioGroupField from "components/FormFields/RadioGroup";
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
 
 import useBranchList from "customHookApi/EnquiryDashboardApi/useBranchList";
 import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
+import { useSelector } from "react-redux";
 
 const API_PATH = process.env.REACT_APP_API_PATH;
 const API_KEY = process.env.REACT_APP_API_KEY;
 
 const UserCreation = () => {
+  const userId = useSelector((state) => state.auth.id);
+
   const [loading, setLoading] = useState(false);
 
   const [fullName, setFullName] = useState("");
@@ -42,14 +43,12 @@ const UserCreation = () => {
   const [gender, setGender] = useState(null);
   const [isOrganisational, setIsOrganisational] = useState(false);
   const [isActive, setIsActive] = useState(true);
-  // branches
-  const [selectedBranches, setSelectedBranches] = useState([]); // Changed from selectedBranch
+  const [selectedBranches, setSelectedBranches] = useState([]);
   const [formErrors, setFormErrors] = useState({});
   const [roleOptions, setRoleOptions] = useState([]);
   const [selectedRole, setSelectedRole] = useState(null);
   const [startDate, setStartDate] = useState(new Date());
-  const [isAll, setIsAll] = useState(false); // 0 = unchecked, 1 = checked
-  // const [isAllBranches, setIsAllBranches] = useState(false);
+  const [isAll, setIsAll] = useState(false);
   const [isBranchActive, setIsBranchActive] = useState(false);
 
   const {
@@ -122,6 +121,7 @@ const UserCreation = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
 
     const errors = getValidationErrors({
       fullName,
@@ -131,21 +131,10 @@ const UserCreation = () => {
       gender,
     });
 
-    if (Object.keys(errors).length > 0) {
-      setFormErrors(errors);
-      return;
-    }
-
-    const formattedDate = (date) => {
-      const d = new Date(date);
-      const day = String(d.getDate()).padStart(2, "0");
-      const month = String(d.getMonth() + 1).padStart(2, "0");
-      const year = String(d.getFullYear());
-
-      return `${year}-${month}-${day}`;
-    };
-
-    const createdOn = formattedDate(startDate);
+    // if (Object.keys(errors).length > 0) {
+    //   setFormErrors(errors);
+    //   return;
+    // }
 
     const userFormData = {
       isorganisational: isOrganisational ? 1 : 0,
@@ -160,24 +149,22 @@ const UserCreation = () => {
       isallbranches: isAll ? 1 : 0,
       userbranches: branches,
       userroles: userroles,
-      CreatedOn: createdOn,
     };
-
-    // console.log(userFormData);
 
     try {
       const res = await axios.post(`${API_PATH}/api/Save_Users`, userFormData, {
         params: {
           APIKEY: API_KEY,
-          createdby: "Admin",
+          createdby: userId.toString(),
         },
       });
-      // console.log(res);
       toast.success("User created Successfully!");
       resetForm();
     } catch (error) {
       // console.log(error);
       toast.error(error?.message);
+    } finally {
+      setLoading(false);
     }
     resetForm();
   };
@@ -192,25 +179,6 @@ const UserCreation = () => {
               <CardHeader className="bg-white">
                 <div className="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center w-100 pb-2 gap-2">
                   <h1 className="mb-2 mb-md-0">User Creation Form</h1>
-                  <FormGroup>
-                    <Label for="startDate">Start Date</Label>
-                    <div style={{ width: "100%" }}>
-                      <DatePicker
-                        selected={startDate}
-                        onChange={(date) => setStartDate(date)}
-                        dateFormat="dd-MM-yyyy"
-                        placeholderText="Select start date"
-                        isClearable
-                        scrollableYearDropdown
-                        yearDropdownItemNumber={50}
-                        minDate={new Date(1900, 0, 1)}
-                        maxDate={new Date(2025, 11, 31)}
-                        popperPlacement="bottom-start"
-                        className="form-control w-100"
-                        id="startDate"
-                      />
-                    </div>
-                  </FormGroup>
                 </div>
               </CardHeader>
               <CardBody>
@@ -416,6 +384,7 @@ const UserCreation = () => {
                       type="submit"
                       color="primary"
                       onClick={handleSubmit}
+                      disabled={loading}
                     >
                       {loading ? (
                         <>

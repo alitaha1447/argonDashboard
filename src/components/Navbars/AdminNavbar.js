@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 // reactstrap components
 import {
@@ -20,15 +21,21 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "reducer/auth/authSlice";
 import { persistor } from "app/store";
+import ChangePass from "components/CustomModals/changePassModal/ChangePass";
 // import { googleLogout } from "@react-oauth/google";
 
 const AdminNavbar = (props) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-
+  const [changePassModal, setChangePassModal] = useState(false);
   // const userName = useSelector((state) => state?.auth?.name); // Assuming 'user' is your slice name
   // const user = JSON.parse(localStorage.getItem("user"));
   const user = useSelector((state) => state?.auth);
+
+  const handleChangePassword = (e) => {
+    e.preventDefault();
+    setChangePassModal((prev) => !prev);
+  };
 
   const handleLogout = () => {
     // googleLogout(); // revoke Google session
@@ -93,9 +100,13 @@ const AdminNavbar = (props) => {
                   <i className="ni ni-settings-gear-65" />
                   <span>Settings</span>
                 </DropdownItem>
-                <DropdownItem to="/admin/user-profile" tag={Link}>
+                <DropdownItem
+                  to="/admin/user-profile"
+                  tag={Link}
+                  onClick={handleChangePassword}
+                >
                   <i className="ni ni-calendar-grid-58" />
-                  <span>Activity</span>
+                  <span>Change Password</span>
                 </DropdownItem>
                 <DropdownItem to="/admin/user-profile" tag={Link}>
                   <i className="ni ni-support-16" />
@@ -111,6 +122,7 @@ const AdminNavbar = (props) => {
           </Nav>
         </Container>
       </Navbar>
+      <ChangePass modal={changePassModal} toggle={handleChangePassword} />
     </>
   );
 };

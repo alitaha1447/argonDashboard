@@ -107,3 +107,39 @@ export const Type = [
   { label: "Create Manually", value: "CreateManually" },
   { label: "Bulk Upload", value: "BulkUpload" },
 ];
+
+export const pageNum = [
+  { value: 10, label: "10" },
+  { value: 25, label: " 25" },
+  { value: 50, label: "50" },
+  { value: 100, label: "100" },
+  { value: 5, label: "5" },
+];
+
+export const typeModeClass = [
+  { value: "online", label: "Online" },
+  { value: "offline", label: "Offline" },
+];
+export const paymentOptions = [
+  { value: 1, label: "Individual" },
+  { value: 2, label: "Paid Organization" },
+];
+
+export const organizationOptions = [
+  { value: 1, label: "Truba" },
+  { value: 2, label: "LNCT" },
+  { value: 3, label: "NGO" },
+];
+export const modeOptions = [
+  { value: 0, label: "Offline" },
+  { value: 1, label: "Online" },
+  { value: 2, label: "Hybrid" },
+];
+
+export const durationOptions = [
+  // { value: 0, label: "Hours" },
+  { value: 1, label: "Day" },
+  { value: 2, label: "Week" },
+  { value: 3, label: "Month" },
+  { value: 4, label: "Year" },
+];

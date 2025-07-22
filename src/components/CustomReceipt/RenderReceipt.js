@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { Container, Row, Col, Card, Table } from "reactstrap";
 // import "../receipt/receipt.css";
 
@@ -9,29 +9,32 @@ import { useLocation } from "react-router-dom";
 
 const API_PATH = process.env.REACT_APP_API_PATH;
 const API_KEY = process.env.REACT_APP_API_KEY;
-const RenderReceipt = (copyType = "Student") => {
+
+const RenderReceipt = ({ copyType }) => {
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const receiptId = queryParams.get("receiptId");
   const [data, setData] = useState({});
   const [paidInstallment, setpaidInstallment] = useState([]);
+  const [ready, setReady] = useState(false); // ✅ ensures both receipts rendered
 
   useEffect(() => {
     const receiptData = async () => {
+      // if (!receiptId || printedRef.current) return;
       try {
         const res = await axios.get(`${API_PATH}/api/Get_Receipt_Data`, {
           params: {
             APIKEY: API_KEY,
             receipt_id: receiptId,
-            // receipt_id: "EA3E44DC-D2A2-4FE0-B9E7-E022D7C068F5",
           },
         });
         setData(res?.data);
         setpaidInstallment(res?.data?.paid_installment);
-        // Trigger print after slight delay to ensure DOM is updated
-        setTimeout(() => {
-          window.print();
-        }, 500);
+        setReady(true); // ✅ now it's safe to print
+
+        // setTimeout(() => {
+        //   window.print();
+        // }, 500);
       } catch (error) {
         console.log(`Rciept --> ${error}`);
       }
@@ -39,7 +42,7 @@ const RenderReceipt = (copyType = "Student") => {
     if (receiptId) {
       receiptData();
     }
-  }, []);
+  }, [receiptId]);
 
   const totalPaid = paidInstallment.reduce(
     (acc, item) => acc + parseFloat(item.total_paid_amount || 0),
@@ -59,6 +62,26 @@ const RenderReceipt = (copyType = "Student") => {
 
   const paymentModeLabel =
     paymentMode.find((mode) => mode.value === data.payment_mode)?.label || "-";
+
+  const formattedDate = (date) => {
+    const d = new Date(date);
+    const day = String(d.getDate()).padStart(2, "0");
+    const month = String(d.getMonth() + 1).padStart(2, "0");
+    const year = String(d.getFullYear());
+
+    return `${day}-${month}-${year}`;
+  };
+
+  useEffect(() => {
+    if (ready && !sessionStorage.getItem("receipt_printed")) {
+      sessionStorage.setItem("receipt_printed", "true");
+      setTimeout(() => {
+        console.log("Calling print...");
+        window.focus();
+        window.print();
+      }, 500);
+    }
+  }, [ready]);
 
   return (
     <div>
@@ -82,7 +105,7 @@ const RenderReceipt = (copyType = "Student") => {
               >
                 <img
                   alt="Miracle Logo"
-                  src={require("../../assets/img/brand/miracleLogo.png")}
+                  src={require("../../assets/img/brand/MiracleInfoserv.png")}
                   style={{ height: "auto", maxWidth: "100%" }}
                 />
                 <p style={{ margin: 0, fontSize: "14px" }}>
@@ -118,7 +141,7 @@ const RenderReceipt = (copyType = "Student") => {
           <tbody>
             <tr>
               <td
-                colSpan={3}
+                colSpan={1}
                 style={{
                   borderTop: "2px solid black",
                   borderBottom: "2px solid black",
@@ -126,6 +149,27 @@ const RenderReceipt = (copyType = "Student") => {
                 }}
               >
                 Student Name : {data?.name}
+              </td>
+              <td
+                colSpan={1}
+                style={{
+                  borderTop: "2px solid black",
+                  borderBottom: "2px solid black",
+                  padding: "8px",
+                  textAlign: "center",
+                }}
+              >
+                Course : {data?.topic_title}
+              </td>
+              <td
+                colSpan={1}
+                style={{
+                  borderTop: "2px solid black",
+                  borderBottom: "2px solid black",
+                  padding: "8px",
+                }}
+              >
+                Payment Date : {formattedDate(data?.payment_date)}
               </td>
             </tr>
             <tr>

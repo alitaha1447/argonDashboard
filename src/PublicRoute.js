@@ -19,8 +19,8 @@ const PublicRoute = ({ children }) => {
   const isLoggedIn = auth?.isLoggedIn;
   const isBranchSelected = auth?.branchSelected;
 
-  console.log("isLoggedIn --> PublicRoute", isLoggedIn);
-  console.log("isBranchSelected --> PublicRoute", isBranchSelected);
+  // console.log("isLoggedIn --> PublicRoute", isLoggedIn);
+  // console.log("isBranchSelected --> PublicRoute", isBranchSelected);
 
   // Only redirect if branch is selected (i.e., everything is done)
   if (isLoggedIn && isBranchSelected) {

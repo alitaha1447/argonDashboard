@@ -24,6 +24,11 @@ import Select, { components } from "react-select";
 import InputField from "components/FormFields/InputField";
 import TextAreaField from "components/FormFields/TextAreaField";
 import InstallModal from "components/CustomModals/installmentModal/InstallModal";
+import { typeModeClass } from "DummyData";
+import { paymentOptions } from "DummyData";
+import { organizationOptions } from "DummyData";
+import { modeOptions } from "DummyData";
+import { durationOptions } from "DummyData";
 
 import useQualificationList from "customHookApi/EnquiryDashboardApi/useQualificationList";
 import useBranchList from "customHookApi/EnquiryDashboardApi/useBranchList";
@@ -33,42 +38,10 @@ import axios from "axios";
 import { getValidationErrors } from "utils/validations/createBatchValidation";
 import { FaPlus, FaMinus } from "react-icons/fa";
 import { ToastContainer, toast } from "react-toastify";
+import { useSelector } from "react-redux";
 
 const API_PATH = process.env.REACT_APP_API_PATH;
 const API_KEY = process.env.REACT_APP_API_KEY;
-
-const typeModeClass = [
-  { value: "online", label: "Online" },
-  { value: "offline", label: "Offline" },
-];
-const facultyOptions = [
-  { value: "test", label: "Test" },
-  { value: "abc", label: "ABC" },
-  { value: "xyz", label: "XYZ" },
-];
-const paymentOptions = [
-  { value: 1, label: "Individual" },
-  { value: 2, label: "Paid Organization" },
-];
-
-const organizationOptions = [
-  { value: 1, label: "Truba" },
-  { value: 2, label: "LNCT" },
-  { value: 3, label: "NGO" },
-];
-
-const modeOptions = [
-  { value: 0, label: "Offline" },
-  { value: 1, label: "Online" },
-  { value: 2, label: "Hybrid" },
-];
-const durationOptions = [
-  // { value: 0, label: "Hours" },
-  { value: 1, label: "Day" },
-  { value: 2, label: "Week" },
-  { value: 3, label: "Month" },
-  { value: 4, label: "Year" },
-];
 
 const CheckboxOption = (props) => (
   <components.Option {...props}>
@@ -89,6 +62,7 @@ const BatchModal = ({
   refreshList = () => {},
   resetSelected = () => {},
 }) => {
+  const userId = useSelector((state) => state?.auth?.id);
   const [loading, setLoading] = useState(false);
 
   const fileInputRef = useRef(null);
@@ -99,7 +73,6 @@ const BatchModal = ({
     enrollmentid: item.enrollmentid.toString(),
     // createdon: new Date().toISOString(), // or your preferred date format
   }));
-  const [menuIsOpen, setMenuIsOpen] = useState(false);
 
   const [batchName, setBatchName] = useState("");
   const [description, setDescription] = useState("");
@@ -137,19 +110,11 @@ const BatchModal = ({
     { selectedFees: null, feesAmount: "" },
   ]);
 
-  // const allValid = feeStructures.every(
-  //   (item) => item.selectedFees && item.feesAmount
-  // );
-  // console.log(allValid);
-  // if (!allValid) {
-  //   console.log("❌ At least one fee item is incomplete");
-  // } else {
-  //   console.log("true");
-  // }
   const [courseFeesOptions, setCourseFeesOptions] = useState([]);
   // Installment Modal
   const [installmentModalOpen, setinstallmentModalOpen] = useState(false);
   const [installmentsDetails, setInstallmentsDetails] = useState([]);
+  const [installmentError, setInstallmentError] = useState("");
   const [selectedFile, setSelectedFile] = useState("");
   const [totalFess, setTotalFess] = useState(0); // Initialize as 0 (number)
 
@@ -178,17 +143,11 @@ const BatchModal = ({
 
   const handleFaculty = async () => {
     try {
-      const res = await axios.get(
-        "https://hotelapi.shriyanshnath.com/api/Get_Faculties",
-        {
-          params: {
-            APIKEY: API_KEY,
-          },
-          // headers: {
-          //   APIKEY: "12345678@",
-          // },
-        }
-      );
+      const res = await axios.get(`${API_PATH}/api/Get_Faculties`, {
+        params: {
+          APIKEY: API_KEY,
+        },
+      });
       const formattedFaculty = res.data.map((item) => ({
         value: item.Id,
         label: item.Name,
@@ -201,17 +160,11 @@ const BatchModal = ({
 
   const handleBatchLevel = async () => {
     try {
-      const res = await axios.get(
-        "https://hotelapi.shriyanshnath.com/api/Get_Batch_Level",
-        {
-          params: {
-            APIKEY: API_KEY,
-          },
-          // headers: {
-          //   APIKEY: "12345678@", // Passing API key in headers as well
-          // },
-        }
-      );
+      const res = await axios.get(`${API_PATH}/api/Get_Batch_Level`, {
+        params: {
+          APIKEY: API_KEY,
+        },
+      });
       const formattedBatch = res.data.map((item) => ({
         value: item.id,
         label: item.level_name,
@@ -223,14 +176,11 @@ const BatchModal = ({
   };
 
   const handleCourseFees = async () => {
-    const res = await axios.get(
-      "https://hotelapi.shriyanshnath.com/api/Get_Ledger_Heads",
-      {
-        params: {
-          APIKEY: API_KEY,
-        },
-      }
-    );
+    const res = await axios.get(`${API_PATH}/api/Get_Ledger_Heads`, {
+      params: {
+        APIKEY: API_KEY,
+      },
+    });
     const formattedBatch = res?.data?.map((item) => ({
       value: item.HeadID,
       label: item.HeadName,
@@ -262,6 +212,7 @@ const BatchModal = ({
 
   const handleInstallmentSubmit = (receivedInstallments) => {
     setInstallmentsDetails(receivedInstallments);
+    setInstallmentError("");
   };
   const handleFileChange = async (event) => {
     const file = event.target.files[0];
@@ -285,11 +236,6 @@ const BatchModal = ({
     const formData = new FormData();
     formData.append("file", file, newFileName);
 
-    // for (let pair of formData.entries()) {
-    //   console.log(`${pair[0]}:`, pair[1]);
-    // }
-
-    // 🔁 Uncomment when ready to upload
     try {
       const response = await axios.post(
         `${API_PATH}/api/FileAPI/UploadFiles`,
@@ -343,12 +289,18 @@ const BatchModal = ({
       selectedBranch,
       durationCount,
       selectedDurations,
-      feeStructures, // Now included in validation
+      feeStructures,
     });
 
+    if (installmentsDetails.length === 0) {
+      setInstallmentError("Please create installment details.");
+      setLoading(false);
+      return;
+    }
+
     if (Object.keys(errors).length > 0) {
-      setFormErrors(errors); // show error messages under fields
-      setLoading(false); // 🔁 This is essential
+      setFormErrors(errors);
+      setLoading(false);
 
       return;
     }
@@ -390,14 +342,13 @@ const BatchModal = ({
       StartDate: formattedStartDate,
       EndDate: formattedEndDate,
       BatchCapacity: parseInt(batchCapacity),
-      // BatchStatus,
       ModeOfStudy: selectMode?.value,
       FacultyID: selectedFaculty?.map((item) => item.value),
       batch_level: selectedBatch?.value,
       Payment_type: selectPayment?.value,
       sponsorid: isOrganization ? selectedOrganization?.value : null,
       min_qualification: selectedQualification?.value,
-      CreatedBy: "Developer",
+      CreatedBy: userId.toString(),
       batch_locations: selectedBranch.map((item) => ({
         branchid: item.value,
         venue: item.label,
@@ -418,7 +369,7 @@ const BatchModal = ({
       // refreshList(1);
     } catch (error) {
       console.error("❌ Failed to create batch:", error);
-      toast.error(error?.name);
+      toast.error(error?.message);
     } finally {
       toggle(); // ⬅️ close modal
       refreshList(); // ⬅️ refresh list after modal closes
@@ -433,7 +384,6 @@ const BatchModal = ({
     setinstallmentModalOpen((prev) => !prev);
   };
 
-  // Inside the component
   const totalFees = useMemo(() => {
     return feeStructures.reduce((sum, item) => {
       const amount = parseFloat(item.feesAmount);
@@ -466,7 +416,6 @@ const BatchModal = ({
             style={{ overflowY: "auto", maxHeight: "calc(100vh - 210px)" }}
           >
             <CardBody>
-              {/* <EnquiryFormCardBody /> */}
               <Form>
                 <Row>
                   <Col md={6}>
@@ -599,7 +548,7 @@ const BatchModal = ({
                               }));
                             }}
                             style={{
-                              height: "38px", // match react-select default height
+                              height: "38px",
                               borderRadius: "4px",
                             }}
                           />
@@ -898,9 +847,17 @@ const BatchModal = ({
                           <FaPlus size={12} />
                         </div>
                       </div>
-                      {formErrors.feeStructures && (
+                      {/* {formErrors.feeStructures && (
                         <div className="text-danger mb-2">
                           {formErrors.feeStructures}
+                        </div>
+                      )} */}
+                      {installmentError && (
+                        <div
+                          className="text-danger mt-2"
+                          style={{ fontSize: "13px" }}
+                        >
+                          {installmentError}
                         </div>
                       )}
                       {showFeeFields &&
@@ -1039,7 +996,7 @@ const BatchModal = ({
         modal={installmentModalOpen}
         toggle={toggleInstallment}
         onSubmitInstallment={handleInstallmentSubmit}
-        totalFees={totalFees} // Add this line
+        totalFees={totalFees}
       />
       <ToastContainer />
     </div>

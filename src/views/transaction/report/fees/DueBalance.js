@@ -21,7 +21,7 @@ import Header from "components/Headers/Header";
 import { FaPlus } from "react-icons/fa";
 import { BsThreeDotsVertical } from "react-icons/bs";
 import axios from "axios";
-import { ToastContainer } from "react-toastify";
+import { ToastContainer, toast } from "react-toastify";
 import useBranchList from "customHookApi/EnquiryDashboardApi/useBranchList";
 import useStatusEnquiry from "customHookApi/EnquiryDashboardApi/useStatusEnquiry";
 import FilterBar from "components/CustomFilter/FilterBar";
@@ -36,6 +36,8 @@ import { useSelector } from "react-redux";
 import { MdFilterAlt } from "react-icons/md";
 import { MdFilterAltOff } from "react-icons/md";
 import Loader from "components/CustomLoader/Loader";
+import { printTableData } from "utils/printFile/printFile";
+import { exportToExcel } from "utils/printFile/exportToExcel";
 
 const API_PATH = process.env.REACT_APP_API_PATH;
 const API_KEY = process.env.REACT_APP_API_KEY;
@@ -57,6 +59,8 @@ const DueBalance = () => {
   const [searchText, setSearchText] = useState("");
   // Branch
   const [selectedBranch, setSelectedBranch] = useState(null);
+  const [selectedBatch, setSelectedBatch] = useState(null);
+  const [batches, setBatches] = useState([]);
 
   // Enquiry
   // const [statusOptions, setstatusOptions] = useState([]);
@@ -71,6 +75,8 @@ const DueBalance = () => {
   const [pageNumDropDown, setPageNumDropDown] = useState(pageNum[0]);
   const pagesize = pageNumDropDown?.value;
 
+  const [activeFilters, setActiveFilters] = useState({});
+
   // customHookAPI
   // const {
   //   branchOptions,
@@ -82,7 +88,45 @@ const DueBalance = () => {
   // } = useBranchList();
   const { statusOptions, fetchEnquiry } = useStatusEnquiry();
 
-  const fetchDueCollection = async (page = 1) => {
+  const fetchBatch = async () => {
+    const branchIDToUse = selectedBranch?.value || defaultBranch?.value;
+
+    if (!branchIDToUse) return; // ✅ exit if nothing to use
+    // setLoadingBatches(true); // Start loader
+    try {
+      const res = await axios.get(`${API_PATH}/api/GetBatch`, {
+        params: {
+          APIKEY: API_KEY,
+          branchid: branchIDToUse,
+          // branchid: selectedBranch?.value,
+        },
+      });
+
+      const formattedBatch = res?.data.map((item) => ({
+        value: item.BatchID,
+        label: item.BatchName,
+      }));
+      // const formattedBatch = res?.data?.length
+      //   ? res.data.map((item) => ({
+      //       value: item.BatchID,
+      //       label: item.BatchName,
+      //     }))
+      //   : [];
+
+      setBatches(formattedBatch);
+    } catch (error) {
+      console.log(error);
+      // setBatches([]);
+    } finally {
+      // setLoadingBatches(false); // Stop loader
+    }
+  };
+
+  const fetchDueCollection = async (
+    page = 1,
+    size = pagesize,
+    filters = {}
+  ) => {
     setIsTableLoading(true);
     try {
       const res = await axios.get(`${API_PATH}/api/Get_due_balance_report`, {
@@ -90,26 +134,69 @@ const DueBalance = () => {
           APIKEY: API_KEY,
           fromdate: startDate1,
           todate: endDate1,
-          branchid: null,
-          batchid: null,
+          branchid: filters?.branch,
+          batchid: filters?.batch,
           searchtext: "",
           pageno: page,
-          pagesize: pagesize,
+          pagesize: size,
         },
       });
+
+      if (size === null) {
+        return res?.data?.Data;
+      }
       setDueLists(res?.data?.Data);
       setPageNumber(res?.data?.PageNumber);
       setTotalPages(res?.data?.TotalPages);
     } catch (error) {
-      console.log(error);
+      if (error.response && error.response.status === 404) {
+        toast.warning("No Data" || error?.message);
+        setDueLists([]);
+        setPageNumber(1);
+        setTotalPages(1);
+      } else {
+        toast.error(error?.message);
+      }
     } finally {
       setIsTableLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchDueCollection(1);
+    fetchDueCollection(1, pagesize);
   }, [pagesize]);
+
+  const formatDate1 = (date) => {
+    const d = new Date(date);
+    const day = String(d.getDate()).padStart(2, "0");
+    const month = String(d.getMonth() + 1).padStart(2, "0"); // months are 0-based
+    const year = d.getFullYear();
+    return `${year}-${month}-${day}`;
+  };
+
+  const handleUnifiedSearchChange = (e) => {
+    const { value } = e.target;
+    setSearchText(value);
+  };
+
+  const filters = {
+    // fromdate: startDate ? formatDate1(startDate) : null,
+    // todate: endDate ? formatDate1(endDate) : null,
+    searchText: searchText.trim(),
+    branch: selectedBranch?.value,
+    batch: selectedBatch?.value,
+    // facultyid: selectedFacultyName?.value,
+  };
+
+  const handleSearch = () => {
+    setActiveFilters(filters); // ⬅️ Store current filters
+    fetchDueCollection(1, pagesize, filters); // ⬅️ Pass them for page 1
+  };
+
+  const handleSearchClick = (e) => {
+    e.preventDefault();
+    handleSearch(); // ✅ Reuse search logic
+  };
 
   const formattedDate = (date) => {
     const d = new Date(date);
@@ -118,6 +205,42 @@ const DueBalance = () => {
     const year = String(d.getFullYear());
 
     return `${day}-${month}-${year}`;
+  };
+
+  const handlePrint = async () => {
+    const data = await fetchDueCollection(1, null, filters); // ⬅️ Pass them for page 1
+    const columns = [
+      //   { label: "ID", accessor: "Id" },
+      { label: "Student Name", accessor: "name" },
+      { label: "Due Detail	", accessor: "installment_title" },
+      { label: "Due Amount	", accessor: "part_amount" },
+      { label: "Due Date", accessor: "due_date" },
+      { label: "Late Fees", accessor: "late_fees" },
+
+      // { label: "Total Amount", accessor: `${part_amount + late_fees}` },
+    ];
+    printTableData("Due List", columns, data);
+  };
+
+  const handleExport = async () => {
+    const data = await fetchDueCollection(1, null, filters); // ⬅️ Pass them for page 1
+    const exportData = data.map((item, index) => {
+      const getDateOnly = (datetimeString) => {
+        if (!datetimeString) return "";
+        const datePart = datetimeString.split(" ")[0]; // "10/07/2025"
+        return datePart.replace(/\//g, "-"); // "10-07-2025"
+      };
+
+      return {
+        "S.No	": index + 1,
+        "Student Name	": item.name,
+        "Due Detail": item.installment_title,
+        "Due Amount": item.part_amount,
+        "Due Date": item.totalAmount,
+        "Late Fees": getDateOnly(item.due_date),
+      };
+    });
+    exportToExcel(exportData, "Due Collection", "Sheet1");
   };
   return (
     <>
@@ -157,19 +280,22 @@ const DueBalance = () => {
                     setSelectedStatus={setSelectedStatus}
                     fetchEnquiry={fetchEnquiry}
                     searchText={searchText}
-                    // handleUnifiedSearchChange={handleUnifiedSearchChange}
+                    handleUnifiedSearchChange={handleUnifiedSearchChange}
                     enquiry={enquiry}
-                    // selectedEnquiryType={selectedEnquiryType}
-                    // handleEnquiryTypeChange={handleEnquiryTypeChange}
+                    fetchBatch={fetchBatch}
+                    batches={batches}
                     branch={defaultBranch}
+                    selectedBatch={selectedBatch}
+                    setSelectedBatch={setSelectedBatch}
                     selectedBranch={selectedBranch}
                     setSelectedBranch={setSelectedBranch}
                     startDate={startDate}
                     endDate={endDate}
                     setDateRange={setDateRange}
                     showDatePicker={false}
-                    // handleSearchClick={handleSearchClick}
-                    showStatus={true}
+                    handleSearchClick={handleSearchClick}
+                    showBatch={true}
+                    showStatus={false}
                   />
                 </motion.div>
               )}
@@ -181,19 +307,22 @@ const DueBalance = () => {
               setSelectedStatus={setSelectedStatus}
               fetchEnquiry={fetchEnquiry}
               searchText={searchText}
-              // handleUnifiedSearchChange={handleUnifiedSearchChange}
+              handleUnifiedSearchChange={handleUnifiedSearchChange}
               enquiry={enquiry}
-              // selectedEnquiryType={selectedEnquiryType}
-              // handleEnquiryTypeChange={handleEnquiryTypeChange}
+              fetchBatch={fetchBatch}
+              batches={batches}
               branch={defaultBranch}
+              selectedBatch={selectedBatch}
+              setSelectedBatch={setSelectedBatch}
               selectedBranch={selectedBranch}
               setSelectedBranch={setSelectedBranch}
               startDate={startDate}
               endDate={endDate}
               setDateRange={setDateRange}
               showDatePicker={false}
-              // handleSearchClick={handleSearchClick}
-              showStatus={true}
+              handleSearchClick={handleSearchClick}
+              showBatch={true}
+              showStatus={false}
             />
           </Col>
         </Row>
@@ -238,14 +367,19 @@ const DueBalance = () => {
                         minWidth: "160px",
                       }}
                     >
-                      <Button color="primary" block size="md">
+                      <Button
+                        color="primary"
+                        block
+                        size="md"
+                        onClick={handlePrint}
+                      >
                         Print
                       </Button>
                       <Button
                         color="primary"
                         block
                         size="md"
-                        // onClick={handleExport}
+                        onClick={handleExport}
                       >
                         Save as Excel
                       </Button>
@@ -361,6 +495,7 @@ const DueBalance = () => {
                   pageNumDropDown={pageNumDropDown}
                   setPageNumDropDown={setPageNumDropDown}
                   pageNum={pageNum}
+                  activeFilters={activeFilters}
                 />
               </CardFooter>
             </Card>

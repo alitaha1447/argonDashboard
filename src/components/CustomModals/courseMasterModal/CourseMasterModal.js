@@ -25,6 +25,7 @@ const CourseMasterModal = ({ modal, toggle, refreshList, course }) => {
   const [courseDescription, setCourseDescription] = useState("");
   const [courseSequence, setCourseSequence] = useState("");
   const [isActive, setIsActive] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const isEdit = course && course.Id;
 
@@ -44,6 +45,8 @@ const CourseMasterModal = ({ modal, toggle, refreshList, course }) => {
   }, [modal, course]);
 
   const handleSubmit = async () => {
+    setLoading(true);
+
     const courseData = {
       TopicTitle: courseName,
       TopicDescription: courseDescription,
@@ -85,6 +88,8 @@ const CourseMasterModal = ({ modal, toggle, refreshList, course }) => {
     } catch (error) {
       console.log("Error creating course:", error);
       toast.error(error?.name);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -163,8 +168,20 @@ const CourseMasterModal = ({ modal, toggle, refreshList, course }) => {
         className="bg-white border-top"
         style={{ position: "sticky", bottom: 0, zIndex: 10 }}
       >
-        <Button color="primary" onClick={handleSubmit}>
-          {isEdit ? "Update" : "Submit"}
+        <Button color="primary" onClick={handleSubmit} disabled={loading}>
+          {loading ? (
+            <>
+              <span
+                className="spinner-border spinner-border-sm me-2"
+                role="status"
+              />
+              {isEdit ? "Updating..." : "Submitting..."}
+            </>
+          ) : isEdit ? (
+            "Update"
+          ) : (
+            "Submit"
+          )}
         </Button>
         <Button color="secondary" onClick={toggle}>
           Cancel

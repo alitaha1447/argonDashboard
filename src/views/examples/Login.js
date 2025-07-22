@@ -67,7 +67,7 @@ const Login = () => {
       //   username: username,
       //   pwd: password,
       // }).unwrap();
-      console.log(loginResponse);
+      // console.log(loginResponse);
       const userData = loginResponse?.data;
 
       // Dispatch Redux action

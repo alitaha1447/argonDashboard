@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 import Chart from "chart.js";
@@ -35,6 +35,8 @@ import EnquiryModal from "components/EnquiryModal/EnquiryModal";
 import BatchModal from "components/BatchModal/BatchModal";
 import StatusUpdate from "components/CustomModals/statusUpdateModal/StatusUpdate";
 import AssignBatch from "components/CustomModals/assignBatchModal/AssignBatch";
+import { formatDateToDMY } from "utils/formattedDate/formatDateToDMY";
+import { pageNum } from "DummyData";
 import PieChart from "components/Charts/PieChart";
 import BarChart from "components/Charts/BarChart";
 import CustomPagination from "components/CustomPagination/CustomPagination";
@@ -56,14 +58,6 @@ import { toast } from "react-toastify";
 
 const API_PATH = process.env.REACT_APP_API_PATH;
 const API_KEY = process.env.REACT_APP_API_KEY;
-
-const pageNum = [
-  { value: 10, label: "10" },
-  { value: 25, label: " 25" },
-  { value: 50, label: "50" },
-  { value: 100, label: "100" },
-  { value: 5, label: "5" },
-];
 
 const EnquiryDashboard = (props) => {
   const storedBranches = useSelector((state) => state.auth.selectedBranch);
@@ -99,9 +93,8 @@ const EnquiryDashboard = (props) => {
   const [studentID, setStudentID] = useState([]);
   const [statusID, setStatusID] = useState(null);
 
-  const [allData, setAllData] = useState([]);
-
   const [selectedStatus, setSelectedStatus] = useState(null);
+  const firstRenderRef = useRef(true);
   // PieChart
   const [pieData, setPieData] = useState({
     labels: [],
@@ -132,7 +125,6 @@ const EnquiryDashboard = (props) => {
   ) => {
     const selectedBranch = filters?.branch || branchValue;
     setIsTableLoading(true);
-
     try {
       const { startDate1, endDate1 } = fetchFinancialYearRangeByDate();
 
@@ -150,34 +142,28 @@ const EnquiryDashboard = (props) => {
             status: filters?.status || null,
             branch: selectedBranch,
             pageno: page,
-            pagesize: pageSize,
+            pagesize: size,
           },
         }
       );
 
-      // if (!res.data) {
-      //   throw new Error("No data received from API");
-      // }
-
-      const result = res.data;
-      if (!result?.Data || result?.Data.length === 0) {
-        setListData([]);
-        setTotalPages(1);
-        setPageNumber(1);
-        return;
-      }
-
-      setListData(res?.data?.Data);
-      setPageNumber(res?.data?.PageNumber);
-      setTotalPages(res?.data?.TotalPages);
-    } catch (error) {
-      if (error.response && error.response.status === 404) {
-        toast.warning("No Data" || error?.message);
-        setListData([]);
-        setPageNumber(1);
-        setTotalPages(1);
+      if (size === null) {
+        return res?.data?.Data;
       } else {
-        toast.error(error?.message);
+        setListData(res?.data?.Data);
+        setPageNumber(res?.data?.PageNumber);
+        setTotalPages(res?.data?.TotalPages);
+      }
+    } catch (error) {
+      if (error.response?.status === 404) {
+        if (size !== null) {
+          toast.warning("No data found.");
+          setListData([]);
+          setPageNumber(1);
+          setTotalPages(1);
+        }
+      } else {
+        toast.error(error?.message || "Something went wrong.");
       }
     } finally {
       setIsTableLoading(false);
@@ -187,7 +173,7 @@ const EnquiryDashboard = (props) => {
   useEffect(() => {
     setPageStart(1);
     setPageNumber(1);
-    fetchPaginatedData(1);
+    fetchPaginatedData(1, pageSize);
   }, [pageSize]);
 
   // useEffect(() => {
@@ -241,13 +227,13 @@ const EnquiryDashboard = (props) => {
     setSelectedEnquiryType(selectedOption); // only update state
   };
 
-  const formatDate = (date) => {
-    const d = new Date(date);
-    const day = String(d.getDate()).padStart(2, "0");
-    const month = String(d.getMonth() + 1).padStart(2, "0"); // months are 0-based
-    const year = d.getFullYear();
-    return `${day}-${month}-${year}`;
-  };
+  // const formatDate = (date) => {
+  //   const d = new Date(date);
+  //   const day = String(d.getDate()).padStart(2, "0");
+  //   const month = String(d.getMonth() + 1).padStart(2, "0"); // months are 0-based
+  //   const year = d.getFullYear();
+  //   return `${day}-${month}-${year}`;
+  // };
   const formatDate1 = (date) => {
     const d = new Date(date);
     const day = String(d.getDate()).padStart(2, "0");
@@ -267,7 +253,7 @@ const EnquiryDashboard = (props) => {
 
   const handleSearch = () => {
     setActiveFilters(filters); // ⬅️ Store current filters
-    fetchPaginatedData(1, filters); // ⬅️ Pass them for page 1
+    fetchPaginatedData(1, pageSize, filters); // ⬅️ Pass them for page 1
   };
 
   const handleSearchClick = (e) => {
@@ -275,18 +261,29 @@ const EnquiryDashboard = (props) => {
     handleSearch(); // ✅ Reuse search logic
   };
 
+  useEffect(() => {
+    if (firstRenderRef.current) {
+      firstRenderRef.current = false;
+      return;
+    }
+    const debounceTimer = setTimeout(() => {
+      handleSearch();
+    }, 300);
+
+    return () => clearTimeout(debounceTimer);
+  }, [selectedStatus, selectedEnquiryType, selectedBranch]);
+
   const fetchAllDashboardData = async () => {
     const { startDate1, endDate1 } = fetchFinancialYearRangeByDate();
     try {
       // 1. Enquiry Analytics (for header stats)
       const analyticsRes = await axios.get(
-        "https://hotelapi.shriyanshnath.com/api/Get_Enquiry_Analytics",
+        `${API_PATH}/api/Get_Enquiry_Analytics`,
         {
-          // headers: { APIKEY: "12345678@" },
           params: {
             APIKEY: "12345678@",
-            fromdate: "2025-04-01",
-            todate: "2026-03-01",
+            fromdate: startDate1,
+            todate: endDate1,
           },
         }
       );
@@ -350,17 +347,7 @@ const EnquiryDashboard = (props) => {
     fetchAllDashboardData();
   }, []);
 
-  useEffect(() => {
-    const debounceTimer = setTimeout(() => {
-      handleSearch();
-    }, 300); // Optional: debounce for better performance
-
-    return () => clearTimeout(debounceTimer);
-  }, [selectedStatus, selectedEnquiryType, selectedBranch]);
-
   const handleCheckId = (id) => {
-    const stringId = String(id); // Ensure id is a string
-
     setStudentID((prev) => {
       // Check if ID already exists
       const exists = prev.some((item) => item.enrollmentid === id);
@@ -374,29 +361,47 @@ const EnquiryDashboard = (props) => {
       }
     });
   };
+
+  const handlePrint = async () => {
+    const data = await fetchPaginatedData(1, null, filters); // ⬅️ Pass them for page 1
+    const columns = [
+      { label: "ID", accessor: "Id" },
+      { label: "Name", accessor: "Name" },
+      { label: "Mobile", accessor: "Mobileno" },
+      {
+        label: "Qualification",
+        accessor: "QualificationCode",
+      },
+      { label: "Course", accessor: "TopicTitle" },
+      { label: "Branch", accessor: "BranchName" },
+      { label: "Enquiry Date", accessor: "CreatedOn" },
+      { label: "Status", accessor: "status_txt" },
+    ];
+    printTableData("Enquiry List", columns, data);
+  };
   const handleExport = async () => {
-    // const data = await fetchPaginatedData(1, null, filters); // ⬅️ Pass them for page 1
-    // const exportData = listData.map((item) => {
-    //   const isCourseOrInternship =
-    //     selectedEnquiryType.label === "Course Enquiry" ||
-    //     selectedEnquiryType.label === "Internship Enquiry";
-    //   return {
-    //     Id: item.Id,
-    //     Name: item.Name,
-    //     "Contact Number": item.Mobileno,
-    //     ...(isCourseOrInternship && {
-    //       "Highest Qualification": item.QualificationCode,
-    //       Course: item.TopicTitle,
-    //     }),
-    //     ...(!isCourseOrInternship && {
-    //       Product: item.product_name,
-    //     }),
-    //     Branch: item.BranchName,
-    //     "Enquiry Date": formatDate(item.CreatedOn),
-    //     Status: item.status_txt,
-    //   };
-    // });
-    // exportToExcel(exportData, "EnquiryList", "Sheet1");
+    const data = await fetchPaginatedData(1, null, filters); // ⬅️ Pass them for page 1
+    const exportData = listData.map((item) => {
+      const isCourseOrInternship =
+        selectedEnquiryType.label === "Course Enquiry" ||
+        selectedEnquiryType.label === "Internship Enquiry";
+      return {
+        Id: item.Id,
+        Name: item.Name,
+        "Contact Number": item.Mobileno,
+        ...(isCourseOrInternship && {
+          "Highest Qualification": item.QualificationCode,
+          Course: item.TopicTitle,
+        }),
+        ...(!isCourseOrInternship && {
+          Product: item.product_name,
+        }),
+        Branch: item.BranchName,
+        "Enquiry Date": formatDateToDMY(item.CreatedOn),
+        Status: item.status_txt,
+      };
+    });
+    exportToExcel(exportData, "EnquiryList", "Sheet1");
   };
 
   const statsCard1 = {
@@ -595,44 +600,12 @@ const EnquiryDashboard = (props) => {
                       >
                         Add Enquiry
                       </Button>
-                      {/* <Button
-                        color="primary"
-                        block
-                        size="md"
-                        // onClick={() => printTableData("Student Enquiry Lists")}
-                        onClick={() =>
-                          printTableData1(
-                            "All Enquiries",
-                            allData
-                            // selectedEnquiryType
-                          )
-                        }
-                      >
-                        Print
-                      </Button> */}
+
                       <Button
                         color="primary"
                         block
                         size="md"
-                        // onClick={() =>
-                        //   printCustomTable1({
-                        //     title: "All Enquiries",
-                        //     columns: [
-                        //       { label: "ID", accessor: "Id" },
-                        //       { label: "Name", accessor: "Name" },
-                        //       { label: "Mobile", accessor: "Mobileno" },
-                        //       {
-                        //         label: "Qualification",
-                        //         accessor: "QualificationCode",
-                        //       },
-                        //       { label: "Course", accessor: "TopicTitle" },
-                        //       { label: "Branch", accessor: "BranchName" },
-                        //       { label: "Enquiry Date", accessor: "CreatedOn" },
-                        //       { label: "Status", accessor: "status_txt" },
-                        //     ],
-                        //     data: allData, // ⬅️ your full enquiry list
-                        //   })
-                        // }
+                        onClick={handlePrint}
                       >
                         Print All
                       </Button>
@@ -641,7 +614,7 @@ const EnquiryDashboard = (props) => {
                         color="primary"
                         block
                         size="md"
-                        onClick={() => handleExport()}
+                        onClick={handleExport}
                       >
                         Save as Excel
                       </Button>
@@ -723,7 +696,7 @@ const EnquiryDashboard = (props) => {
                             <td>{item.product_name}</td>
                           )}
                           <td>{item.BranchName}</td>
-                          <td>{formatDate(item.CreatedOn)}</td>
+                          <td>{formatDateToDMY(item.CreatedOn)}</td>
                           <td>{item.status_txt}</td>
                           <td>{item.LatestRemark}</td>
                           <td>
@@ -832,7 +805,7 @@ const EnquiryDashboard = (props) => {
                             </p>
                             <p className="fs-6 fw-semibold mb-1">
                               <strong>Enquiry Date:</strong>{" "}
-                              {formatDate(item.CreatedOn)}
+                              {formatDateToDMY(item.CreatedOn)}
                             </p>
                             <p className="fs-6 fw-semibold mb-1">
                               <strong>Status:</strong> {item.status_txt}
@@ -900,6 +873,7 @@ const EnquiryDashboard = (props) => {
         modal={modalOpen}
         toggle={toggleModal}
         refreshList={fetchPaginatedData}
+        refreshStats={fetchAllDashboardData}
       />
       <BatchModal
         modal={batchModalOpen}

@@ -39,6 +39,7 @@ import { generateHexColors } from "utils/dynamicColorGenerator/generateHexColors
 import { exportToExcel } from "utils/printFile/exportToExcel";
 import { printTableData } from "utils/printFile/printFile";
 import { useSelector } from "react-redux";
+import { ToastContainer, toast } from "react-toastify";
 
 const API_PATH = process.env.REACT_APP_API_PATH;
 const API_KEY = process.env.REACT_APP_API_KEY;
@@ -158,14 +159,26 @@ const FeesDashboard = () => {
     }
   };
 
-  const fetchPaginatedData = async (page = 1, size = pageSize, filter = {}) => {
+  const fetchPaginatedData = async (
+    page = 1,
+    size = pageSize,
+    filters = {}
+  ) => {
     setIsTableLoading(true);
+
     try {
+      const { startDate1, endDate1 } = fetchFinancialYearRangeByDate();
+
+      const fromDate = filters?.fromdate ? filters.fromdate : startDate1;
+      const toDate = filters?.todate ? filters.todate : endDate1;
+
       const params = {
         APIKEY: API_KEY,
-        fromdate: startDate1,
-        todate: endDate1,
-        searchtext: filter?.searchtext || "",
+        fromdate: fromDate,
+        todate: toDate,
+        searchtext: filters?.searchText,
+        branch: filters?.branch,
+        batchid: filters?.batchid,
         pageno: page,
         pagesize: size,
       };
@@ -182,6 +195,7 @@ const FeesDashboard = () => {
       }
     } catch (error) {
       if (error.response && error.response.status === 404) {
+        toast.warning("No Data" || error?.message);
         setFeeList([]);
         setPageNumber(1);
         setTotalPages(1);
@@ -193,15 +207,25 @@ const FeesDashboard = () => {
     }
   };
 
+  const formatDate1 = (date) => {
+    const d = new Date(date);
+    const day = String(d.getDate()).padStart(2, "0");
+    const month = String(d.getMonth() + 1).padStart(2, "0"); // months are 0-based
+    const year = d.getFullYear();
+    return `${year}-${month}-${day}`;
+  };
+
+  const filters = {
+    searchText: searchText.trim(),
+    branch: selectedBranch?.value,
+    batchid: selectedBatch?.value,
+    fromdate: startDate ? formatDate1(startDate) : null,
+    todate: endDate ? formatDate1(endDate) : null,
+  };
+
   const handleSearch = () => {
-    const filters = {
-      searchText: searchText.trim(),
-      status: selectedEnquiryType?.value || "",
-      branch: selectedBranch?.value,
-      batchid: selectedBatch?.value,
-    };
     setActiveFilters(filters); // ⬅️ Store current filters
-    fetchPaginatedData(1, filters); // ⬅️ Pass them for page 1
+    fetchPaginatedData(1, pageSize, filters); // ⬅️ Pass them for page 1
   };
 
   const handleSearchClick = (e) => {
@@ -311,7 +335,7 @@ const FeesDashboard = () => {
   };
 
   const handlePrint = async () => {
-    const data = await fetchPaginatedData(1, null);
+    const data = await fetchPaginatedData(1, null, filters);
     const columns = [
       { label: "Student Name", accessor: "name" },
       { label: "Contact Number", accessor: "mobileno" },
@@ -371,12 +395,12 @@ const FeesDashboard = () => {
   return (
     <>
       <Header
-        cardTitle1={statsCard1}
-        cardTitle2={statsCard2}
-        cardTitle3={statsCard3}
+      // cardTitle1={statsCard1}
+      // cardTitle2={statsCard2}
+      // cardTitle3={statsCard3}
       />
       <Container className="mt--8" fluid>
-        <div className={`d-flex justify-content-end px-2 mb-2 mt-2`}>
+        {/* <div className={`d-flex justify-content-end px-2 mb-2 mt-2`}>
           <Button
             color="primary"
             size="sm"
@@ -385,11 +409,11 @@ const FeesDashboard = () => {
           >
             {showGraph ? "Hide Chart" : "Show Chart"}
           </Button>
-        </div>
-        <Row className={`pb-5 ${showGraph ? "d-flex" : "d-none"}`}>
+        </div> */}
+        {/* <Row className={`pb-5 ${showGraph ? "d-flex" : "d-none"}`}>
           <BarChart data={barData} options={chartExample1.options} />
           <PieChart data={pieData} options={chartExample3.options} />
-        </Row>
+        </Row> */}
 
         <Row className="d-flex flex-column">
           <Col>
@@ -425,7 +449,7 @@ const FeesDashboard = () => {
                     enquiry={enquiry}
                     selectedEnquiryType={selectedEnquiryType}
                     handleEnquiryTypeChange={handleEnquiryTypeChange}
-                    branch={Branch}
+                    // branch={Branch}
                     selectedBranch={selectedBranch}
                     setSelectedBranch={setSelectedBranch}
                     startDate={startDate}
@@ -453,7 +477,7 @@ const FeesDashboard = () => {
               enquiry={enquiry}
               selectedEnquiryType={selectedEnquiryType}
               handleEnquiryTypeChange={handleEnquiryTypeChange}
-              branch={Branch}
+              // branch={Branch}
               selectedBranch={selectedBranch}
               setSelectedBranch={setSelectedBranch}
               startDate={startDate}
@@ -620,8 +644,8 @@ const FeesDashboard = () => {
                                   boxShadow: "0px 2px 6px rgba(0,0,0,0.2)",
                                 }}
                               >
-                                <DropdownItem>Mail</DropdownItem>
-                                <DropdownItem>Refund</DropdownItem>
+                                {/* <DropdownItem>Mail</DropdownItem> */}
+                                {/* <DropdownItem>Refund</DropdownItem> */}
                                 <DropdownItem
                                   onClick={() =>
                                     toggleRecievePayment(
@@ -797,6 +821,7 @@ const FeesDashboard = () => {
           batchstudentid={selectedFeeDetail?.batchstudentid}
         />
       </Container>
+      <ToastContainer />
     </>
   );
 };

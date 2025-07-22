@@ -32,7 +32,7 @@ const BrachModal = ({ show, toggle, onConfirm }) => {
         userid: userID,
       },
     });
-    console.log(res?.data);
+    // console.log(res?.data);
     const formattedData = res?.data.map((branch) => ({
       value: branch?.branchid,
       label: branch?.branchname,
@@ -65,8 +65,8 @@ const BrachModal = ({ show, toggle, onConfirm }) => {
         className="bg-white border-bottom"
         // style={{ position: "sticky", top: 0, zIndex: 10 }}
       >
-        <h1>Select Branch</h1>
-      </ModalHeader>{" "}
+        <div className="h1 mb-0">Assign Batch</div>
+      </ModalHeader>
       <ModalBody>
         <div className="d-flex flex-column gap-3 mb-3" style={{ gap: "1rem" }}>
           <Row>

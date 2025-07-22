@@ -15,6 +15,7 @@ import Select from "react-select";
 import TextAreaField from "components/FormFields/TextAreaField";
 import useStatusEnquiry from "customHookApi/EnquiryDashboardApi/useStatusEnquiry";
 import axios from "axios";
+import { useSelector } from "react-redux";
 
 const API_PATH = process.env.REACT_APP_API_PATH;
 const API_KEY = process.env.REACT_APP_API_KEY;
@@ -26,6 +27,8 @@ const StatusUpdate = ({
   refreshList,
   refreshStats = () => {},
 }) => {
+  const userId = useSelector((state) => state?.auth?.id);
+
   const [selectedStatus, setSelectedStatus] = useState(null);
   const { statusOptions, fetchEnquiry } = useStatusEnquiry();
   const [description, setDescription] = useState("");
@@ -46,7 +49,7 @@ const StatusUpdate = ({
             id: `${selectedId}`,
             status: selectedStatus?.value,
             remark: description,
-            createdby: "Developer",
+            CreatedBy: userId.toString(),
           },
         }
       );
@@ -97,6 +100,11 @@ const StatusUpdate = ({
                   placeholder="Select Batch Level"
                   onMenuOpen={fetchEnquiry}
                   isClearable
+                  menuPortalTarget={document.body} // ✅ renders dropdown outside modal
+                  menuPosition="fixed" // ✅ fixes position to avoid overflow
+                  styles={{
+                    menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+                  }}
                 />
               </FormGroup>
             </Col>

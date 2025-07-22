@@ -58,6 +58,8 @@ const Sidebar = (props) => {
   const [openDropdowns, setOpenDropdowns] = useState({});
   const [permissionsId, setPermissionsId] = useState([]);
 
+  const alwaysVisibleRoutes = ["User List"];
+
   // verifies if routeName is the one active (in browser input)
   // const activeRoute = (routeName) => {
   //   return props.location.pathname.indexOf(routeName) > -1 ? "active" : "";
@@ -222,8 +224,16 @@ const Sidebar = (props) => {
       // console.log("renderRoutes");
       // console.log(routesList);
       return routesList
-        .filter((route) => route.name !== "Login" && route.name !== "Register") // 👈 Exclude these
-        .filter((route) => hasPermission(route))
+        .filter(
+          (route) =>
+            route.name !== "Login" &&
+            route.name !== "Register" &&
+            route.showInSidebar !== false
+        ) // 👈 Exclude these
+        .filter(
+          (route) =>
+            alwaysVisibleRoutes.includes(route.name) || hasPermission?.(route)
+        )
         .map((route, index) => {
           // Label
           if (route.isLabel) {

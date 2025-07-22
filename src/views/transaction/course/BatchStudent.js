@@ -44,7 +44,6 @@ const API_KEY = process.env.REACT_APP_API_KEY;
 const BatchStudent = () => {
   const navigate = useNavigate();
   const Branch = useSelector((state) => state.auth.selectedBranch);
-  // console.log(Branch);/
 
   const [isTableLoading, setisTableLoading] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
@@ -79,13 +78,15 @@ const BatchStudent = () => {
   // }, [branchSearchText]);
   // console.log(selectedBranch);
   // console.log(selectedBatch);
+
   const fetchBatch = async () => {
     const branchIDToUse = selectedBranch?.value;
     // || Branch?.value;
 
     if (!branchIDToUse) return; // ✅ exit if nothing to use
     // if (!selectedBranch?.value) return; // 🚫 Don't proceed if no branch is selected
-    setLoadingBatches(true); // Start loader
+
+    setLoadingBatches(true);
     try {
       const res = await axios.get(`${API_PATH}/api/GetBatch`, {
         params: {
@@ -104,32 +105,33 @@ const BatchStudent = () => {
       console.log(error);
       // setBatches([]);
     } finally {
-      setLoadingBatches(false); // Stop loader
+      setLoadingBatches(false);
+    }
+  };
+
+  const fetchBatchStudent = async () => {
+    setisTableLoading(true);
+    if (!selectedBatch?.value) {
+      setBatchStudent([]);
+      setisTableLoading(false);
+      return;
+    }
+    try {
+      const res = await axios.get(`${API_PATH}/api/Get_Batch_student`, {
+        params: {
+          APIKEY: API_KEY,
+          batchid: selectedBatch?.value,
+        },
+      });
+      setBatchStudent(res?.data);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setisTableLoading(false);
     }
   };
 
   useEffect(() => {
-    const fetchBatchStudent = async () => {
-      setisTableLoading(true);
-      if (!selectedBatch?.value) {
-        setBatchStudent([]); // ✅ Clear student list if no batch selected
-        setisTableLoading(false);
-        return;
-      }
-      try {
-        const res = await axios.get(`${API_PATH}/api/Get_Batch_student`, {
-          params: {
-            APIKEY: API_KEY,
-            batchid: selectedBatch?.value,
-          },
-        });
-        setBatchStudent(res?.data);
-      } catch (error) {
-        console.log(error);
-      } finally {
-        setisTableLoading(false);
-      }
-    };
     fetchBatchStudent();
   }, [selectedBatch?.value]);
 
@@ -144,7 +146,7 @@ const BatchStudent = () => {
   };
 
   const resetBatchAndStudent = () => {
-    setSelectedBatch(null);
+    // setSelectedBatch(null);
     setStudid("");
   };
 
@@ -158,6 +160,16 @@ const BatchStudent = () => {
       };
     });
     exportToExcel(exportData, "BatchStudent", "Sheet1");
+  };
+
+  const handlePrint = async () => {
+    const columns = [
+      { label: "S.No	", accessor: "id" },
+      { label: "Enrollment No.", accessor: "admission_no" },
+      { label: "Name", accessor: "name" },
+      { label: "Mobile", accessor: "mobileno" },
+    ];
+    printTableData("Student Fee List", columns, batchStudent);
   };
 
   return (
@@ -272,7 +284,7 @@ const BatchStudent = () => {
                         color="primary"
                         block
                         size="md"
-                        onClick={() => printTableData("Student Batch Lists")}
+                        onClick={handlePrint}
                       >
                         Print
                       </Button>
@@ -288,7 +300,14 @@ const BatchStudent = () => {
                         color="primary"
                         block
                         size="md"
-                        onClick={() => navigate("/admin/userCreation")}
+                        onClick={() =>
+                          navigate("/admin/batchUserCreation", {
+                            state: {
+                              selectedBranch,
+                              selectedBatch,
+                            },
+                          })
+                        }
                       >
                         Add Student
                       </Button>

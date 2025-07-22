@@ -18,6 +18,7 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
 import axios from "axios";
+import { useSelector } from "react-redux";
 
 const API_PATH = process.env.REACT_APP_API_PATH;
 const API_KEY = process.env.REACT_APP_API_KEY;
@@ -31,6 +32,7 @@ const InstallModal = ({
   studId = null,
   resetParentIds = () => {}, // ✅ Default fallback
 }) => {
+  const userId = useSelector((state) => state?.auth?.id);
   const location = useLocation();
   const [initialAmount, setInitialAmount] = useState(0);
   const remainingAmount = totalFees - parseFloat(initialAmount || 0);
@@ -160,7 +162,7 @@ const InstallModal = ({
 
     const payload = {
       batch_installments: formatted,
-      CreatedBy: "Developer", // or logged-in user
+      CreatedBy: userId.toString(),
     };
 
     try {

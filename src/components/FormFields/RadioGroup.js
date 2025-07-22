@@ -9,7 +9,7 @@ const RadioGroupField = ({
   onChange,
   required = false,
   error,
-  setFormErrors, // ✅ just need this
+  setFormErrors = () => {}, // ✅ just need this
 }) => {
   return (
     <FormGroup tag="fieldset" className="mb-3">
@@ -30,10 +30,12 @@ const RadioGroupField = ({
                 checked={selected?.value === option.value}
                 onChange={() => {
                   onChange(option);
+                  // if (typeof setFormErrors === "function") {
                   setFormErrors((prev) => ({
                     ...prev,
-                    [name]: "", // Use the name prop as the key
+                    [name]: "",
                   }));
+                  // }
                 }}
                 className="me-2"
               />

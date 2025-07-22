@@ -37,6 +37,7 @@ import axios from "axios";
 import { useSelector } from "react-redux";
 import { MdFilterAlt } from "react-icons/md";
 import { MdFilterAltOff } from "react-icons/md";
+import { toast, ToastContainer } from "react-toastify";
 
 const API_PATH = process.env.REACT_APP_API_PATH;
 const API_KEY = process.env.REACT_APP_API_KEY;
@@ -103,7 +104,7 @@ const FacultyCourses = () => {
           branchid: null,
         },
       });
-      console.log(res.data);
+      // console.log(res.data);
       const formatted = res?.data.map((item, index) => ({
         value: item?.Id,
         label: item?.Name,
@@ -126,44 +127,70 @@ const FacultyCourses = () => {
     fetchCourse();
   }, []);
 
-  const fetchFacultyBatch = async (page = 1, filters = {}) => {
+  const fetchFacultyBatch = async (page = 1, size = pageSize, filters = {}) => {
     setIsTableLoading(true);
+    // console.log(filters);
     try {
+      const { startDate1, endDate1 } = fetchFinancialYearRangeByDate();
+
+      const fromDate = filters?.fromdate ? filters.fromdate : startDate1;
+      const toDate = filters?.todate ? filters.todate : endDate1;
+
       const res = await axios.get(`${API_PATH}/api/Get_Faculty_Batch_Report`, {
         params: {
           APIKEY: API_KEY,
-          fromdate: startDate1,
-          todate: endDate1,
+          fromdate: fromDate,
+          todate: toDate,
           branch: filters?.branch,
           facultyid: filters?.facultyid,
           pageno: page,
-          pagesize: pageSize,
+          pagesize: size,
         },
       });
+
+      if (size === null) {
+        return res?.data?.Data;
+      }
+
       setFacultyBatch(res.data.Data);
       setPageNumber(res.data.PageNumber);
       setTotalPages(res.data.TotalPages);
     } catch (error) {
-      console.log(error);
+      if (error.response && error.response.status === 404) {
+        toast.warning("No Data" || error?.message);
+        setFacultyBatch([]);
+        setPageNumber(1);
+        setTotalPages(1);
+      } else {
+        toast.error(error?.message);
+      }
     } finally {
       setIsTableLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchFacultyBatch(1);
+    fetchFacultyBatch(1, pageSize);
   }, [pageSize]);
 
-  const handleSearch = () => {
-    const filters = {
-      // fromdate: startDate ? formatDate1(startDate) : null,
-      // todate: endDate ? formatDate1(endDate) : null,
-      branch: null,
-      facultyid: null,
-    };
+  const formatDate1 = (date) => {
+    const d = new Date(date);
+    const day = String(d.getDate()).padStart(2, "0");
+    const month = String(d.getMonth() + 1).padStart(2, "0"); // months are 0-based
+    const year = d.getFullYear();
+    return `${year}-${month}-${day}`;
+  };
 
+  const filters = {
+    fromdate: startDate ? formatDate1(startDate) : null,
+    todate: endDate ? formatDate1(endDate) : null,
+    branch: selectedBranch?.value,
+    facultyid: selectedFacultyName?.value,
+  };
+
+  const handleSearch = () => {
     setActiveFilters(filters); // ⬅️ Store current filters
-    fetchFacultyBatch(1, filters); // ⬅️ Pass them for page 1
+    fetchFacultyBatch(1, pageSize, filters); // ⬅️ Pass them for page 1
   };
 
   const handleSearchClick = (e) => {
@@ -184,13 +211,35 @@ const FacultyCourses = () => {
     return course ? course.TopicTitle : "-";
   };
 
-  const handleExport = () => {
-    const exportData = facultyBatch.map((item, index) => {
+  const handlePrint = async () => {
+    const data = await fetchFacultyBatch(1, null, filters); // ⬅️ Pass them for page 1
+    const columns = [
+      { label: "Faculty Name", accessor: "facultyname" },
+      { label: "Batch Title", accessor: "batchname" },
+      { label: "Course", accessor: "courseid" }, // ✅ Corrected accessor,
+      { label: "Start date", accessor: "startdate" },
+      { label: "End date", accessor: "enddate" },
+      { label: "Capacity", accessor: "batchcapacity" },
+    ];
+    // Map course name before printing
+    const transformedData = data.map((item) => ({
+      ...item,
+      courseid: getCourseNameById(item.courseid),
+    }));
+    printTableData("Enquiry List", columns, transformedData);
+  };
+
+  const handleExport = async () => {
+    const data = await fetchFacultyBatch(1, null, filters); // ⬅️ Pass them for page 1
+    const exportData = data.map((item, index) => {
       return {
         "S.No	": index + 1,
-        "Enrollment No.": item.admission_no,
-        Name: item.name,
-        Mobile: item.mobileno,
+        "Faculty Name": item.facultyname,
+        "Batch Title": item.batchname,
+        Course: getCourseNameById(item.courseid),
+        "Start date": formatDate(item.startdate),
+        "End date": formatDate(item.enddate),
+        Capacity: item.batchcapacity,
       };
     });
     exportToExcel(exportData, "FacultyBatch", "Sheet1");
@@ -235,6 +284,9 @@ const FacultyCourses = () => {
                     fetchFaculties={fetchFaculties}
                     facultyNameOptions={facultyNameOptions}
                     selectedFacultyName={selectedFacultyName}
+                    startDate={startDate}
+                    endDate={endDate}
+                    setDateRange={setDateRange}
                     setSelectedFacultyName={setSelectedFacultyName}
                     handleSearchClick={handleSearchClick}
                     showSearchByFacultyName={true}
@@ -256,6 +308,9 @@ const FacultyCourses = () => {
               facultyNameOptions={facultyNameOptions}
               selectedFacultyName={selectedFacultyName}
               setSelectedFacultyName={setSelectedFacultyName}
+              startDate={startDate}
+              endDate={endDate}
+              setDateRange={setDateRange}
               handleSearchClick={handleSearchClick}
               showSearchByFacultyName={true}
               showSearchByName={false}
@@ -309,7 +364,7 @@ const FacultyCourses = () => {
                         color="primary"
                         block
                         size="md"
-                        onClick={() => printTableData("Faculty Batch Lists")}
+                        onClick={handlePrint}
                       >
                         Print
                       </Button>
@@ -320,14 +375,6 @@ const FacultyCourses = () => {
                         onClick={handleExport}
                       >
                         Save as Excel
-                      </Button>
-                      <Button
-                        color="primary"
-                        block
-                        size="md"
-                        // onClick={() => printAndExportExcel(data)}
-                      >
-                        Add Student
                       </Button>
                     </DropdownMenu>
                   </UncontrolledDropdown>
@@ -511,11 +558,13 @@ const FacultyCourses = () => {
                   pageNumDropDown={pageNumDropDown}
                   setPageNumDropDown={setPageNumDropDown}
                   pageNum={pageNum}
+                  activeFilters={activeFilters}
                 />
               </CardFooter>
             </Card>
           </div>
         </Row>
+        <ToastContainer />
       </Container>
     </>
   );

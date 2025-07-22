@@ -29,7 +29,6 @@ const AssignBatch = ({
   resetSelected = () => {},
 }) => {
   const { id } = useSelector((state) => state.auth);
-  // console.log(studentID);
   // const stdId = studentID.map((item) => ({
   //   enrollmentid: item.enrollmentid.toString(),
   // }));
@@ -64,7 +63,7 @@ const AssignBatch = ({
   // }, [branchSearchText]);
 
   useEffect(() => {
-    fetchBranch("", "", id); // sends id to third param
+    fetchBranch("", "", id);
   }, []);
 
   const fetchFaculties = async () => {
@@ -72,10 +71,9 @@ const AssignBatch = ({
       const res = await axios.get(`${API_PATH}/api/Get_Faculties`, {
         params: {
           APIKEY: API_KEY,
-          branchid: null,
+          // branchid: null,
         },
       });
-      // console.log(res.data);
       const formatted = res?.data.map((item, index) => ({
         value: item?.Id,
         label: item?.Name,
@@ -90,9 +88,9 @@ const AssignBatch = ({
     const res = await axios.get(`${API_PATH}/api/GetBatch`, {
       params: {
         APIKEY: API_KEY,
+        facultyid: selectedFacultyName?.value,
       },
     });
-    // console.log(res);
     const formattedEnquiry = res.data.map((item) => ({
       value: item.BatchID,
       label: item.BatchName,
@@ -102,6 +100,7 @@ const AssignBatch = ({
 
   const handleAssignBatch = async () => {
     setLoading(true);
+
     const assignBatchData = {
       batchid: selectedBatch?.value.toString(),
       batch_student: studentID.map((item) => ({
@@ -109,7 +108,6 @@ const AssignBatch = ({
         enrollmentid: item?.enrollmentid.toString(),
       })),
     };
-    // console.log(assignBatchData);
     try {
       const assignBatch = await axios.post(
         `${API_PATH}/api/Assign_Batch`,
@@ -120,7 +118,6 @@ const AssignBatch = ({
           },
         }
       );
-      // console.log(assignBatch);
       toast.success("Batch Assigned Successfully!!");
       refreshList(1);
       // toggle();
@@ -136,24 +133,6 @@ const AssignBatch = ({
     }
   };
 
-  // useEffect(() => {
-  //   if (!defaultBranch || selectedBranch) return;
-
-  //   const existsInOptions = branchOptions.some(
-  //     (opt) => opt.value === defaultBranch.value
-  //   );
-  //   if (!existsInOptions) {
-  //     setBranchOptions((prev) => [...prev, defaultBranch]);
-  //     setSelectedBranch(defaultBranch);
-  //   }
-  //   // else {
-  //   //   const matched = branchOptions.find(
-  //   //     (opt) => opt.value === defaultBranch.value
-  //   //   );
-  //   //   if (matched) setSelectedBranch(matched);
-  //   // }
-  // }, [defaultBranch, branchOptions, selectedBranch]);
-
   return (
     <Modal
       isOpen={modal}
@@ -168,7 +147,7 @@ const AssignBatch = ({
         className="bg-white border-bottom"
         style={{ position: "sticky", top: 0, zIndex: 10 }}
       >
-        <h1>Assign Batch</h1>
+        <div className="h1 mb-0">Assign Batch</div>{" "}
       </ModalHeader>
       <ModalBody>
         <div className="d-flex flex-column gap-3 mb-3" style={{ gap: "1rem" }}>

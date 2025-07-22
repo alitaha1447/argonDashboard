@@ -32,6 +32,8 @@ import CustomPagination from "components/CustomPagination/CustomPagination";
 import { paymentMode } from "DummyData";
 import { exportToExcel } from "utils/printFile/exportToExcel";
 import { printTableData } from "utils/printFile/printFile";
+import { fetchFinancialYearRangeByDate } from "utils/financialYearRange/FinancialYearRange";
+import { ToastContainer, toast } from "react-toastify";
 
 const API_PATH = process.env.REACT_APP_API_PATH;
 const API_KEY = process.env.REACT_APP_API_KEY;
@@ -53,6 +55,9 @@ const ReceiptList = () => {
   const [selectedBranch, setSelectedBranch] = useState(null);
   const [selectedBatch, setSelectedBatch] = useState(null);
   const [searchText, setSearchText] = useState("");
+  const [dateRange, setDateRange] = useState([null, null]);
+  const [startDate, endDate] = dateRange;
+  const [activeFilters, setActiveFilters] = useState({});
 
   const [receiptLists, setReceiptLists] = useState([]);
   const [isTableLoading, setIsTableLoading] = useState(false);
@@ -66,7 +71,6 @@ const ReceiptList = () => {
   const [receiptId, setReceiptId] = useState("");
 
   const fetchBatch = async () => {
-    console.log(1);
     // setLoadingBatches(true); // Start loader
     try {
       const res = await axios.get(`${API_PATH}/api/GetBatch`, {
@@ -105,34 +109,104 @@ const ReceiptList = () => {
     // }
   };
 
-  const fetchReceiptList = async (page = 1) => {
+  const fetchReceiptList = async (page = 1, size = pageSize, filters = {}) => {
     setIsTableLoading(true);
+
     try {
+      const { startDate1, endDate1 } = fetchFinancialYearRangeByDate();
+
+      const fromDate = filters?.fromdate ? filters.fromdate : startDate1;
+      const toDate = filters?.todate ? filters.todate : endDate1;
+
       const res = await axios.get(`${API_PATH}/api/Get_Receipt_list`, {
         params: {
-          fromdate: "2025-02-02",
-          todate: "2026-01-01",
+          fromdate: fromDate,
+          todate: toDate,
+          branchid: filters.branch,
+          batchid: filters.batch,
           pageno: page,
-          pagesize: pageSize,
+          pagesize: size,
         },
       });
-      // console.log(res.data.Data);
+      if (size === null) {
+        return res?.data?.Data;
+      }
+      // console.log(res.data);
       setReceiptLists(res?.data?.Data);
       setPageNumber(res.data.PageNumber);
       setTotalPages(res.data.TotalPages);
     } catch (error) {
-      console.log(error);
+      if (error.response && error.response.status === 404) {
+        toast.warning("No Data" || error?.message);
+        setReceiptLists([]);
+        setPageNumber(1);
+        setTotalPages(1);
+      } else {
+        toast.error(error?.message);
+      }
     } finally {
       setIsTableLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchReceiptList(1);
+    fetchReceiptList(1, pageSize);
   }, [pageSize]);
+
+  const formatDate1 = (date) => {
+    const d = new Date(date);
+    const day = String(d.getDate()).padStart(2, "0");
+    const month = String(d.getMonth() + 1).padStart(2, "0"); // months are 0-based
+    const year = d.getFullYear();
+    return `${year}-${month}-${day}`;
+  };
+
+  const filters = {
+    searchText: searchText.trim(),
+    // enquirytype: selectedEnquiryType?.value || "",
+    // status: selectedStatus?.value,
+    branch: selectedBranch?.value,
+    batch: selectedBatch?.value,
+    fromdate: startDate ? formatDate1(startDate) : null,
+    todate: endDate ? formatDate1(endDate) : null,
+  };
+
+  const handleSearch = () => {
+    setActiveFilters(filters); // ⬅️ Store current filters
+    fetchReceiptList(1, pageSize, filters); // ⬅️ Pass them for page 1
+  };
+
+  const handleSearchClick = (e) => {
+    e.preventDefault();
+    handleSearch(); // ✅ Reuse search logic
+  };
 
   const handleReceiptId = (id) => {
     window.open(`/receiptForm?receiptId=${id}`, "_blank");
+  };
+
+  const handlePrint = async () => {
+    const data = await fetchReceiptList(1, null, filters);
+
+    const columns = [
+      { label: "Receipt.No", accessor: "receipt_no" },
+      { label: "Receipt Date", accessor: "receipt_date" },
+      { label: "Student Name", accessor: "name" },
+      { label: "Receipt Amount", accessor: "receipt_amt" },
+      { label: "Payment Mode", accessor: "payment_mode" },
+    ];
+
+    const transformedData = data.map((item) => {
+      const paymentModeLabel =
+        paymentMode.find((mode) => mode.value === item.payment_mode)?.label ||
+        "="; // 👈 fallback to 'Cash' instead of 0
+      return {
+        ...item,
+        payment_mode: paymentModeLabel,
+      };
+    });
+
+    printTableData("Receipt List", columns, transformedData);
   };
 
   const handleExport = () => {
@@ -198,11 +272,15 @@ const ReceiptList = () => {
                     branch={defaultBranch}
                     selectedBranch={selectedBranch}
                     setSelectedBranch={setSelectedBranch}
+                    handleSearchClick={handleSearchClick}
                     showSearchByName={true}
                     showBatch={true}
-                    showDatePicker={false}
+                    showDatePicker={true}
                     showStatus={false}
                     showSearchByFacultyName={false}
+                    startDate={startDate}
+                    endDate={endDate}
+                    setDateRange={setDateRange}
                   />
                 </motion.div>
               )}
@@ -219,11 +297,15 @@ const ReceiptList = () => {
               branch={defaultBranch}
               selectedBranch={selectedBranch}
               setSelectedBranch={setSelectedBranch}
+              handleSearchClick={handleSearchClick}
               showSearchByName={true}
               showBatch={true}
-              showDatePicker={false}
+              showDatePicker={true}
               showStatus={false}
               showSearchByFacultyName={false}
+              startDate={startDate}
+              endDate={endDate}
+              setDateRange={setDateRange}
             />
           </Col>
         </Row>
@@ -272,7 +354,7 @@ const ReceiptList = () => {
                         color="primary"
                         block
                         size="md"
-                        onClick={() => printTableData("Receipt Lists")}
+                        onClick={handlePrint}
                       >
                         Print
                       </Button>
@@ -322,18 +404,20 @@ const ReceiptList = () => {
                           return datePart.replace(/\//g, "-"); // "10-07-2025"
                         };
 
-                        const paymentModeLabel =
-                          paymentMode.find(
-                            (mode) => mode.value === item.payment_mode
-                          )?.label || "-";
-
+                        const paymentModeLabel = paymentMode.find(
+                          (mode) => mode.value === item.payment_mode
+                        );
+                        console.log(item);
+                        const label = paymentModeLabel
+                          ? paymentModeLabel.label
+                          : "Cash";
                         return (
                           <tr key={index}>
                             <td>{item.receipt_no}</td>
                             <td>{getDateOnly(item.receipt_date)}</td>
                             <td>{item.name}</td>
                             <td>{item.receipt_amt}</td>
-                            <td>{paymentModeLabel}</td>
+                            <td>{label}</td>
                             <td>
                               <UncontrolledDropdown direction="left">
                                 <DropdownToggle
@@ -462,11 +546,13 @@ const ReceiptList = () => {
                   pageNumDropDown={pageNumDropDown}
                   setPageNumDropDown={setPageNumDropDown}
                   pageNum={pageNum}
+                  activeFilters={activeFilters}
                 />
               </CardFooter>
             </Card>
           </div>
         </Row>
+        <ToastContainer />
       </Container>
     </>
   );

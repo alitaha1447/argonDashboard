@@ -21,7 +21,7 @@ import Header from "components/Headers/Header";
 import { FaPlus } from "react-icons/fa";
 import { BsThreeDotsVertical } from "react-icons/bs";
 import axios from "axios";
-import { ToastContainer } from "react-toastify";
+import { ToastContainer, toast } from "react-toastify";
 import useBranchList from "customHookApi/EnquiryDashboardApi/useBranchList";
 import useStatusEnquiry from "customHookApi/EnquiryDashboardApi/useStatusEnquiry";
 import FilterBar from "components/CustomFilter/FilterBar";
@@ -37,6 +37,7 @@ import CustomPagination from "components/CustomPagination/CustomPagination";
 import { exportToExcel } from "utils/printFile/exportToExcel";
 import { printTableData } from "utils/printFile/printFile";
 import { useSelector } from "react-redux";
+import { fetchFinancialYearRangeByDate } from "utils/financialYearRange/FinancialYearRange";
 
 const API_PATH = process.env.REACT_APP_API_PATH;
 const API_KEY = process.env.REACT_APP_API_KEY;
@@ -74,6 +75,9 @@ const DailyCollection = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [pageNumDropDown, setPageNumDropDown] = useState(pageNum[0]);
   const pageSize = pageNumDropDown?.value;
+
+  const [activeFilters, setActiveFilters] = useState({});
+
   // customHookAPI
   // const {
   //   branchOptions,
@@ -119,13 +123,26 @@ const DailyCollection = () => {
     }
   };
 
-  const fetchDailyCollection = async (page = 1, size = pageSize) => {
+  const fetchDailyCollection = async (
+    page = 1,
+    size = pageSize,
+    filters = {}
+  ) => {
     setIsTableLoading(true);
+
     try {
+      const { startDate1, endDate1 } = fetchFinancialYearRangeByDate();
+
+      const fromDate = filters?.fromdate ? filters.fromdate : startDate1;
+      const toDate = filters?.todate ? filters.todate : endDate1;
+
       const res = await axios.get(`${API_PATH}/api/Get_Daily_Fee_Collection`, {
         params: {
-          fromdate: "2025-02-02",
-          todate: "2026-01-01",
+          fromdate: fromDate,
+          todate: toDate,
+          branchid: filters?.branch,
+          batchid: filters?.batch,
+          // searchtext,
           pageno: page,
           pagesize: size,
         },
@@ -139,15 +156,63 @@ const DailyCollection = () => {
         setTotalPages(res.data.TotalPages);
       }
     } catch (error) {
-      console.log(error);
+      if (error.response && error.response.status === 404) {
+        toast.warning("No Data" || error?.message);
+        setDailyLists([]);
+        setPageNumber(1);
+        setTotalPages(1);
+      } else {
+        toast.error(error?.message);
+      }
     } finally {
       setIsTableLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchDailyCollection(1);
+    fetchDailyCollection(1, pageSize);
   }, [pageSize]);
+
+  const formatDate1 = (date) => {
+    const d = new Date(date);
+    const day = String(d.getDate()).padStart(2, "0");
+    const month = String(d.getMonth() + 1).padStart(2, "0"); // months are 0-based
+    const year = d.getFullYear();
+    return `${year}-${month}-${day}`;
+  };
+
+  const filters = {
+    fromdate: startDate ? formatDate1(startDate) : null,
+    todate: endDate ? formatDate1(endDate) : null,
+    branch: selectedBranch?.value,
+    batch: selectedBatch?.value,
+    // facultyid: selectedFacultyName?.value,
+  };
+
+  const handleSearch = () => {
+    setActiveFilters(filters); // ⬅️ Store current filters
+    fetchDailyCollection(1, pageSize, filters); // ⬅️ Pass them for page 1
+  };
+
+  const handleSearchClick = (e) => {
+    e.preventDefault();
+    handleSearch(); // ✅ Reuse search logic
+  };
+
+  const handlePrint = async () => {
+    const data = await fetchDailyCollection(1, null); // ⬅️ Pass them for page 1
+    // console.log(data);
+    const columns = [
+      //   { label: "ID", accessor: "Id" },
+      { label: "Student Name", accessor: "name" },
+      { label: "Batch", accessor: "batchname" },
+      { label: "Branch", accessor: "branch_name" },
+      { label: "Total Amount", accessor: "totalAmount" },
+      { label: "Amount Recieved	", accessor: "amount_received" },
+      { label: "Date", accessor: "received_date" },
+    ];
+    printTableData("Enquiry List", columns, data);
+  };
 
   const handleExport = async () => {
     const data = await fetchDailyCollection(1, null);
@@ -223,7 +288,7 @@ const DailyCollection = () => {
                     startDate={startDate}
                     endDate={endDate}
                     setDateRange={setDateRange}
-                    // handleSearchClick={handleSearchClick}
+                    handleSearchClick={handleSearchClick}
                     showDatePicker={true}
                     showBatch={true}
                     showStatus={false}
@@ -253,7 +318,7 @@ const DailyCollection = () => {
               startDate={startDate}
               endDate={endDate}
               setDateRange={setDateRange}
-              // handleSearchClick={handleSearchClick}
+              handleSearchClick={handleSearchClick}
               showDatePicker={true}
               showBatch={true}
               showStatus={false}
@@ -306,9 +371,7 @@ const DailyCollection = () => {
                         color="primary"
                         block
                         size="md"
-                        onClick={() =>
-                          printTableData("Daily Fee Collection Lists")
-                        }
+                        onClick={handlePrint}
                       >
                         Print
                       </Button>
@@ -440,6 +503,7 @@ const DailyCollection = () => {
                   pageNumDropDown={pageNumDropDown}
                   setPageNumDropDown={setPageNumDropDown}
                   pageNum={pageNum}
+                  activeFilters={activeFilters}
                 />
               </CardFooter>
             </Card>

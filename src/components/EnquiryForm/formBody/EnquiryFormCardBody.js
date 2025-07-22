@@ -5,6 +5,8 @@ import Select, { components } from "react-select";
 import InputField from "components/FormFields/InputField";
 import TextAreaField from "components/FormFields/TextAreaField";
 import RadioGroupField from "components/FormFields/RadioGroup";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 import { refOptions, genderOptions } from "DummyData";
 import { getValidationErrors } from "utils/validations/enquiryValidation";
 import axios from "axios";
@@ -13,6 +15,7 @@ import { ToastContainer, toast } from "react-toastify";
 import useQualificationList from "customHookApi/EnquiryDashboardApi/useQualificationList";
 import usePreferredCourse from "customHookApi/EnquiryDashboardApi/usePreferredCourse";
 import useBranchList from "customHookApi/EnquiryDashboardApi/useBranchList";
+import { useSelector } from "react-redux";
 
 const API_PATH = process.env.REACT_APP_API_PATH;
 const API_KEY = process.env.REACT_APP_API_KEY;
@@ -35,7 +38,8 @@ const EnquiryFormCardBody = ({
   refreshList = () => {},
   refreshStats = () => {},
 }) => {
-  // console.log("first");
+  const userId = useSelector((state) => state?.auth?.id);
+
   const isCourseEnquiry =
     selectedEnquiry?.label === "Course Enquiry" ||
     selectedEnquiry?.label === "Internship Enquiry";
@@ -50,26 +54,20 @@ const EnquiryFormCardBody = ({
   const [referedBy, setReferedBy] = useState(null);
   const [whatsappNumber, setWhatsappNumber] = useState("");
   const [additionalQuery, setAdditionalQuery] = useState("");
-  // Qualifications
   const [selectedQualification, setSelectedOptionsQualification] =
     useState(null);
-  // Prefered Courses
 
   const [selectedCoursesOptions, setSelectedCoursesOptions] = useState(null);
-  // Branch
   const [selectedBranch, setSelectedBranch] = useState(null);
-  // console.log("B --> ", selectedBranch);
-  //  Products
   const [productOptions, setProductOptions] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [selectedFile, setSelectedFile] = useState(null);
   const [formErrors, setFormErrors] = useState({});
-  // Qualifications
   const { qualificationOptions, fetchQualificationLists } =
     useQualificationList();
   const { courseOptions, fetchCourseDetails } = usePreferredCourse();
+  const [startDate, setStartDate] = useState(new Date());
 
-  // branches
   const {
     branchOptions,
     setBranchOptions,
@@ -133,8 +131,6 @@ const EnquiryFormCardBody = ({
           },
         }
       );
-      // console.log("fileUpload --> ", response);
-      // console.log("Upload success:", response.data);
     } catch (error) {
       console.error("Upload error:", error);
     }
@@ -179,6 +175,14 @@ const EnquiryFormCardBody = ({
 
       return;
     }
+    const formattedDate = (date) => {
+      const d = new Date(date);
+      const day = String(d.getDate()).padStart(2, "0");
+      const month = String(d.getMonth() + 1).padStart(2, "0");
+      const year = String(d.getFullYear());
+
+      return `${year}-${month}-${day}`;
+    };
     const enquiryFormdata = {
       EnquiryType: selectedEnquiry?.value,
       Name: fullName,
@@ -197,9 +201,9 @@ const EnquiryFormCardBody = ({
       WhatsappNo: whatsappNumber,
       AdditionalQuery: additionalQuery,
       ResumePath: selectedFile,
-      CreatedBy: "Developer",
+      CreatedBy: userId.toString(),
+      CreatedOn: formattedDate(startDate),
     };
-    // console.log(enquiryFormdata);
     try {
       const res = await axios.post(
         `${API_PATH}/api/SaveEnquiry`,
@@ -211,7 +215,6 @@ const EnquiryFormCardBody = ({
         }
       );
       toast.success("Enquiry submitted successfully!");
-      // console.log("DATA --> ", enquiryFormdata);
       console.log("✅ Enquiry submitted successfully:", res);
       refreshList(1);
       refreshStats();
@@ -224,7 +227,6 @@ const EnquiryFormCardBody = ({
       toggle();
     }
   };
-  console.log(gender);
   return (
     <Form>
       <Row>
@@ -428,6 +430,27 @@ const EnquiryFormCardBody = ({
             </FormGroup>
           </Col>
         )}
+        <Col md={6}>
+          <FormGroup>
+            <Label for="startDate">Enquiry Date</Label>
+            <div style={{ width: "100%" }}>
+              <DatePicker
+                selected={startDate}
+                onChange={(date) => setStartDate(date)}
+                dateFormat="dd-MM-yyyy"
+                placeholderText="Select start date"
+                isClearable
+                scrollableYearDropdown
+                yearDropdownItemNumber={50}
+                minDate={new Date(1900, 0, 1)}
+                maxDate={new Date(2025, 11, 31)}
+                popperPlacement="bottom-start"
+                className="form-control w-100"
+                id="startDate"
+              />
+            </div>
+          </FormGroup>
+        </Col>
       </Row>
 
       <RadioGroupField
