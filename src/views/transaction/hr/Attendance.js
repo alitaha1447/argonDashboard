@@ -1,0 +1,327 @@
+import React, { useState, useRef } from "react";
+import Webcam from "react-webcam";
+import EXIF from "exif-js";
+import {
+  Card,
+  CardBody,
+  CardTitle,
+  CardText,
+  Col,
+  Container,
+  Row,
+  Button,
+} from "reactstrap";
+
+// Campus location (latitude, longitude)
+const campusLocation = {
+  latitude: 23.23295911764229,
+  longitude: 77.43292637116465,
+};
+// 23.231465316719643, 77.43552865061508;
+// 23.23295911764229, 77.43292637116465;
+// Function to calculate distance between two geographical points using Haversine formula
+const calculateDistance = (lat1, lon1, lat2, lon2) => {
+  console.log(`Current --> ${lat1}`);
+  console.log(`Current --> ${lon1}`);
+  console.log(`Campus --> ${lat2}`);
+  console.log(`Campus --> ${lon2}`);
+  const R = 6371; // Radius of the Earth in km
+  const dLat = ((lat2 - lat1) * Math.PI) / 180; // Convert degrees to radians
+  const dLon = ((lon2 - lon1) * Math.PI) / 180; // Convert degrees to radians
+
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos((lat1 * Math.PI) / 180) *
+      Math.cos((lat2 * Math.PI) / 180) *
+      Math.sin(dLon / 2) *
+      Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  const distance = R * c * 1000; // Distance in meters
+  return distance; // Distance in meters
+};
+
+const Attendance = () => {
+  const webcamRef = useRef(null);
+  const [image, setImage] = useState(null);
+  const [isCameraOpen, setIsCameraOpen] = useState(false);
+  const [location, setLocation] = useState(null);
+  const [attendanceStatus, setAttendanceStatus] = useState(null);
+  const [isLoading, setIsLoading] = useState(false); // State for loading spinner
+  const [isImageBlurred, setIsImageBlurred] = useState(false); // State to control image blur
+
+  // Function to get the current location of the user
+  const getCurrentLocation = () => {
+    return new Promise((resolve, reject) => {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            const { latitude, longitude } = position.coords;
+            resolve({ latitude, longitude });
+          },
+          (err) => {
+            reject(err);
+          }
+        );
+      } else {
+        reject("Geolocation is not supported by this browser.");
+      }
+    });
+  };
+
+  // Function to handle image capture
+  const handleImageCapture = async () => {
+    if (webcamRef.current) {
+      const imageSrc = webcamRef.current.getScreenshot();
+      console.log(imageSrc);
+      setImage(imageSrc);
+      setIsCameraOpen(false);
+
+      // Show loader and blur the image while processing
+      setIsLoading(true);
+      setIsImageBlurred(true); // Apply the blur effect
+
+      try {
+        // Get the current location (latitude and longitude)
+        const currentLocation = await getCurrentLocation();
+        // setLocation(currentLocation); // Set the location in state
+        console.log("Current Location:", currentLocation);
+
+        // Calculate the distance between current location and campus location
+        const distance = calculateDistance(
+          currentLocation.latitude,
+          currentLocation.longitude,
+          campusLocation.latitude,
+          campusLocation.longitude
+        );
+        console.log("Distance from campus:", distance, "meters");
+
+        // Check if the distance is within a certain threshold (e.g., 50 meters)
+        if (distance <= 50) {
+          setAttendanceStatus("Attendance Done"); // If within threshold, mark attendance as done
+        } else {
+          setAttendanceStatus("Out of Campus Range"); // If outside, mark attendance as not done
+        }
+      } catch (error) {
+        console.error("Error getting location:", error);
+        setAttendanceStatus("Error retrieving location");
+      }
+
+      // Hide the loader and remove blur after processing
+      setIsLoading(false);
+      setIsImageBlurred(false); // Remove the blur effect
+      //   setTimeout(() => {
+      //     setImage(false);
+      //   }, [9000]);
+    }
+  };
+
+  // Function to cancel the camera and reset the state
+  const handleCancel = () => {
+    setIsCameraOpen(false);
+    setImage(null);
+    // setLocation(null);
+    setAttendanceStatus(null);
+    setIsLoading(false); // Hide the loader on cancel
+    setIsImageBlurred(false); // Remove the blur effect
+  };
+
+  // Function to capture image
+  //   const captureImage = () => {
+  //     const photo = webcamRef.current.getScreenshot();
+  //     setImage(photo);
+  //     stopCamera(); // Stop the camera after capturing the image
+  //   };
+
+  // Function to get location coordinates
+  //   const getLocation = () => {
+  //     if (navigator.geolocation) {
+  //       navigator.geolocation.getCurrentPosition((position) => {
+  //         setLocation({
+  //           latitude: position.coords.latitude,
+  //           longitude: position.coords.longitude,
+  //         });
+  //       });
+  //     } else {
+  //       alert("Geolocation is not supported by this browser.");
+  //     }
+  //   };
+
+  // Function to embed geotagging in the image
+  //   const embedGeoTag = (imgData) => {
+  //     console.log("first");
+  //     console.log(imgData);
+  //     if (location) {
+  //       const { latitude, longitude } = location;
+
+  //       // Convert base64 image to a blob
+  //       const byteString = atob(imgData.split(",")[1]);
+  //       const arrayBuffer = new ArrayBuffer(byteString.length);
+  //       const uint8Array = new Uint8Array(arrayBuffer);
+  //       for (let i = 0; i < byteString.length; i++) {
+  //         uint8Array[i] = byteString.charCodeAt(i);
+  //       }
+
+  //       const blob = new Blob([uint8Array], { type: "image/jpeg" });
+  //       const reader = new FileReader();
+
+  //       reader.onloadend = () => {
+  //         const exifData = {
+  //           GPSLatitude: latitude,
+  //           GPSLongitude: longitude,
+  //         };
+
+  //         EXIF.getData(reader.result, function () {
+  //           console.log("seconday");
+  //           EXIF.setTag(this, "GPSLatitude", exifData.GPSLatitude);
+  //           EXIF.setTag(this, "GPSLongitude", exifData.GPSLongitude);
+
+  //           // To get the EXIF data and possibly display it
+  //           console.log(EXIF.getAllTags(this));
+  //         });
+  //       };
+
+  //       reader.readAsDataURL(blob);
+  //     }
+  //   };
+
+  // Function to stop the webcam
+  //   const stopCamera = () => {
+  //     const stream = webcamRef.current?.video?.srcObject;
+  //     if (stream) {
+  //       const tracks = stream.getTracks();
+  //       tracks.forEach((track) => track.stop()); // Stops each track (video/audio)
+  //     }
+  //   };
+
+  //   console.log(location);
+  return (
+    <div className="header bg-gradient-info pb-8 pt-5 pt-md-8">
+      <Container fluid>
+        <div className="header-body">
+          <Row>
+            <Col lg={4}>
+              <Card className="card-stats md-4 mb-xl-0">
+                {/* <div>
+                  <Webcam
+                    audio={false}
+                    ref={webcamRef}
+                    screenshotFormat="image/jpeg"
+                    width="100%"
+                  />
+                  <button onClick={captureImage}>Capture</button>
+                  <button onClick={getLocation}>Get Location</button>
+                  {image && <img src={image} alt="Captured" />}
+                  {image && location && embedGeoTag(image)}{" "}
+                </div> */}
+                <CardBody>
+                  <CardTitle tag="h2" className="text-primary">
+                    Batch 1
+                  </CardTitle>
+
+                  <CardText className="mb-xl-0">
+                    <strong>Name:</strong> Taha
+                  </CardText>
+                  <CardText className="">
+                    <strong>Age:</strong> 25
+                  </CardText>
+
+                  {isCameraOpen ? (
+                    <>
+                      <div
+                        style={{
+                          position: "relative",
+                          filter: isImageBlurred ? "blur(8px)" : "none", // Apply blur when processing
+                        }}
+                      >
+                        <Webcam
+                          audio={false}
+                          ref={webcamRef}
+                          screenshotFormat="image/jpeg"
+                          width="100%"
+                          videoConstraints={{
+                            facingMode: "environment", // Use back camera
+                          }}
+                        />
+                      </div>
+                      <Button
+                        color="primary"
+                        block
+                        onClick={handleImageCapture}
+                      >
+                        Capture Image
+                      </Button>
+                      <Button
+                        color="danger"
+                        block
+                        onClick={handleCancel}
+                        style={{ marginTop: "10px" }}
+                      >
+                        Cancel
+                      </Button>
+                    </>
+                  ) : (
+                    <Button
+                      className="mb-2"
+                      color="primary"
+                      block
+                      onClick={() => setIsCameraOpen(true)}
+                    >
+                      Attendance
+                    </Button>
+                  )}
+
+                  {image && (
+                    <div style={{ position: "relative" }}>
+                      <img
+                        src={image}
+                        alt="Captured"
+                        style={{
+                          width: "100%",
+                          filter: isImageBlurred ? "blur(8px)" : "none",
+                          opacity: isImageBlurred ? 0.4 : 1,
+                          pointerEvents: isImageBlurred ? "none" : "auto", // disables interaction
+                        }}
+                      />
+
+                      {isLoading && (
+                        <div
+                          style={{
+                            position: "absolute",
+                            top: "50%",
+                            left: "50%",
+                            transform: "translate(-50%, -50%)",
+                            textAlign: "center",
+                            zIndex: 10,
+                          }}
+                        >
+                          <div
+                            className="spinner-border text-primary"
+                            role="status"
+                          >
+                            <span className="sr-only">Loading...</span>
+                          </div>
+                          <p style={{ color: "white", marginTop: "10px" }}>
+                            Processing...
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {attendanceStatus && (
+                    <div>
+                      <h5>Attendance Status:</h5>
+                      <p>{attendanceStatus}</p>
+                    </div>
+                  )}
+                </CardBody>
+              </Card>
+            </Col>
+          </Row>
+        </div>
+      </Container>
+    </div>
+  );
+};
+
+export default Attendance;

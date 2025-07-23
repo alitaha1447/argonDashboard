@@ -630,14 +630,15 @@ import List from "views/examples/List";
 // import Icons from "views/examples/Icons.js";
 // import Test from "views/examples/Test";
 import ContentMaster from "views/master/ContentMaster";
-import CourseMaster from "views/master/CourseMaster";
+
+import CourseMaster from "views/master/course/CourseMaster";
 import ContentType from "views/master/ContentType";
 import EnquiryType from "views/master/EnquiryType";
 import FeesMaster from "views/master/FeesMaster";
 import UserCreation from "views/master/UserCreation";
-import Attendance from "views/transaction/Attendance";
+import Attendance from "views/transaction/hr/Attendance";
 import Certificate from "views/transaction/Certificate";
-import CourseStructure from "views/transaction/CourseStructure";
+import CourseStructure from "views/master/course/CourseStructure";
 import HRPayment from "views/transaction/HRPayment";
 import Payable from "views/transaction/Payable";
 import Appointmentletter from "views/employee/Appointmentletter";
