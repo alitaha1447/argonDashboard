@@ -48,7 +48,7 @@ const pageNum = [
 
 const ReceiptList = () => {
   const defaultBranch = useSelector((state) => state?.auth?.selectedBranch);
-
+  const branchValue = defaultBranch?.value;
   const [showFilters, setShowFilters] = useState(false);
 
   const [batches, setBatches] = useState([]);
@@ -110,6 +110,7 @@ const ReceiptList = () => {
   };
 
   const fetchReceiptList = async (page = 1, size = pageSize, filters = {}) => {
+    const selectedBranch = filters?.branch || branchValue;
     setIsTableLoading(true);
 
     try {
@@ -122,7 +123,7 @@ const ReceiptList = () => {
         params: {
           fromdate: fromDate,
           todate: toDate,
-          branchid: filters.branch,
+          branchid: selectedBranch,
           batchid: filters.batch,
           pageno: page,
           pagesize: size,
@@ -407,7 +408,6 @@ const ReceiptList = () => {
                         const paymentModeLabel = paymentMode.find(
                           (mode) => mode.value === item.payment_mode
                         );
-                        console.log(item);
                         const label = paymentModeLabel
                           ? paymentModeLabel.label
                           : "Cash";

@@ -52,6 +52,7 @@ const pageNum = [
 
 const DailyCollection = () => {
   const defaultBranch = useSelector((state) => state.auth.selectedBranch);
+  const branchValue = defaultBranch?.value;
 
   const [showFilters, setShowFilters] = useState(false);
   // const [selectedEnquiryType, setSelectedEnquiryType] = useState(enquiry[0]);
@@ -128,6 +129,8 @@ const DailyCollection = () => {
     size = pageSize,
     filters = {}
   ) => {
+    const selectedBranch = filters?.branch || branchValue;
+
     setIsTableLoading(true);
 
     try {
@@ -141,7 +144,7 @@ const DailyCollection = () => {
           fromdate: fromDate,
           todate: toDate,
           branchid: filters?.branch,
-          batchid: filters?.batch,
+          batchid: selectedBranch,
           // searchtext,
           pageno: page,
           pagesize: size,
