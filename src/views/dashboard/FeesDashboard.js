@@ -53,7 +53,8 @@ const pageNum = [
 ];
 
 const FeesDashboard = () => {
-  const Branch = useSelector((state) => state.auth.selectedBranch);
+  const storedBranches = useSelector((state) => state.auth.selectedBranch);
+  const branchValue = storedBranches?.value;
 
   const { startDate1, endDate1 } = fetchFinancialYearRangeByDate();
 
@@ -164,6 +165,8 @@ const FeesDashboard = () => {
     size = pageSize,
     filters = {}
   ) => {
+    const selectedBranch = filters?.branch || branchValue;
+
     setIsTableLoading(true);
 
     try {
@@ -177,7 +180,7 @@ const FeesDashboard = () => {
         fromdate: fromDate,
         todate: toDate,
         searchtext: filters?.searchText,
-        branch: filters?.branch,
+        branch: selectedBranch,
         batchid: filters?.batchid,
         pageno: page,
         pagesize: size,

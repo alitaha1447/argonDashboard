@@ -52,7 +52,7 @@ const pageNum = [
 
 const FacultyCourses = () => {
   const defaultBranch = useSelector((state) => state?.auth?.selectedBranch);
-
+  const branchValue = defaultBranch?.value;
   const [showFilters, setShowFilters] = useState(false);
 
   const [courses, setCourses] = useState([]);
@@ -128,6 +128,8 @@ const FacultyCourses = () => {
   }, []);
 
   const fetchFacultyBatch = async (page = 1, size = pageSize, filters = {}) => {
+    const selectedBranch = filters?.branch || branchValue;
+
     setIsTableLoading(true);
     // console.log(filters);
     try {
@@ -141,7 +143,7 @@ const FacultyCourses = () => {
           APIKEY: API_KEY,
           fromdate: fromDate,
           todate: toDate,
-          branch: filters?.branch,
+          branch: selectedBranch,
           facultyid: filters?.facultyid,
           pageno: page,
           pagesize: size,
