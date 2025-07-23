@@ -14,11 +14,10 @@ import {
 
 // Campus location (latitude, longitude)
 const campusLocation = {
-  latitude: 23.23295911764229,
-  longitude: 77.43292637116465,
+  latitude: 23.231465316719643,
+  longitude: 77.43552865061508,
 };
 // 23.231465316719643, 77.43552865061508;
-// 23.23295911764229, 77.43292637116465;
 // Function to calculate distance between two geographical points using Haversine formula
 const calculateDistance = (lat1, lon1, lat2, lon2) => {
   console.log(`Current --> ${lat1}`);
@@ -239,7 +238,7 @@ const Attendance = () => {
                           screenshotFormat="image/jpeg"
                           width="100%"
                           videoConstraints={{
-                            facingMode: "environment", // Use back camera
+                            facingMode: "user", // Use front camera
                           }}
                         />
                       </div>
