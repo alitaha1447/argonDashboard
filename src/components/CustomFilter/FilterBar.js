@@ -16,6 +16,7 @@ const FilterBar = ({
   selectedEnquiryType,
   handleEnquiryTypeChange,
   branch,
+  showBranch = true,
   selectedBranch,
   setSelectedBranch,
   startDate,
@@ -36,6 +37,8 @@ const FilterBar = ({
   facultyNameOptions,
   selectedFacultyName,
   setSelectedFacultyName,
+  showLeaveType = false,
+  leaveTypeOptions,
 }) => {
   const { id } = useSelector((state) => state.auth);
   const {
@@ -103,6 +106,16 @@ const FilterBar = ({
             />
           </div>
         )}
+        {showLeaveType && (
+          <Select
+            options={leaveTypeOptions}
+            // value={selectedFacultyName}
+            // onChange={setSelectedFacultyName}
+            // onMenuOpen={fetchFaculties}
+            placeholder="Leave Type"
+            isClearable
+          />
+        )}
         {showSearchByName && (
           <div style={{ width: "170px" }}>
             <Input
@@ -123,24 +136,26 @@ const FilterBar = ({
             />
           </div>
         )}
+        {showBranch && (
+          <div style={{ width: "170px" }}>
+            <Select
+              id="branch-select"
+              options={branchOptions}
+              value={selectedBranch}
+              onChange={(selected) => setSelectedBranch(selected)}
+              onInputChange={(text) => setBranchSearchText(text)}
+              placeholder="branch"
+              isClearable
+              isLoading={isLoading}
+              noOptionsMessage={({ inputValue }) =>
+                inputValue.length < 3
+                  ? "Type at least 3 characters to search"
+                  : "No branches found"
+              }
+            />
+          </div>
+        )}
 
-        <div style={{ width: "170px" }}>
-          <Select
-            id="branch-select"
-            options={branchOptions}
-            value={selectedBranch}
-            onChange={(selected) => setSelectedBranch(selected)}
-            onInputChange={(text) => setBranchSearchText(text)}
-            placeholder="branch"
-            isClearable
-            isLoading={isLoading}
-            noOptionsMessage={({ inputValue }) =>
-              inputValue.length < 3
-                ? "Type at least 3 characters to search"
-                : "No branches found"
-            }
-          />
-        </div>
         {showBatch && (
           <div style={{ width: "170px" }}>
             <Select

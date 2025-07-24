@@ -669,6 +669,8 @@ import BatchStudent from "views/transaction/course/BatchStudent";
 import ReceiptList from "views/reports/fees/ReceiptList";
 import BatchUserCreation from "views/examples/BatchUserCreation";
 import UserList from "views/master/user/UserList";
+import LeaveRequest from "views/transaction/hr/LeaveRequest";
+import LeaveDashboard from "views/transaction/hr/LeaveDashboard";
 
 var routes = [
   {
@@ -944,6 +946,22 @@ var routes = [
         name: "Attendance",
         icon: "ni ni-ungroup text-red",
         component: <Attendance />,
+        layout: "/admin",
+      },
+      {
+        // id: 30,
+        path: "/leaveRequest",
+        name: "Leave Request",
+        icon: "ni ni-ungroup text-red",
+        component: <LeaveRequest />,
+        layout: "/admin",
+      },
+      {
+        // id: 30,
+        path: "/leaveDashboard",
+        name: "Leave Dashboard",
+        icon: "ni ni-ungroup text-red",
+        component: <LeaveDashboard />,
         layout: "/admin",
       },
       {

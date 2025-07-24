@@ -11,6 +11,7 @@ import {
   Row,
   Button,
 } from "reactstrap";
+import { useSelector } from "react-redux";
 
 // Campus location (latitude, longitude)
 const campusLocation = {
@@ -20,10 +21,10 @@ const campusLocation = {
 // 23.231465316719643, 77.43552865061508;
 // Function to calculate distance between two geographical points using Haversine formula
 const calculateDistance = (lat1, lon1, lat2, lon2) => {
-  console.log(`Current --> ${lat1}`);
-  console.log(`Current --> ${lon1}`);
-  console.log(`Campus --> ${lat2}`);
-  console.log(`Campus --> ${lon2}`);
+  // console.log(`Current --> ${lat1}`);
+  // console.log(`Current --> ${lon1}`);
+  // console.log(`Campus --> ${lat2}`);
+  // console.log(`Campus --> ${lon2}`);
   const R = 6371; // Radius of the Earth in km
   const dLat = ((lat2 - lat1) * Math.PI) / 180; // Convert degrees to radians
   const dLon = ((lon2 - lon1) * Math.PI) / 180; // Convert degrees to radians
@@ -36,10 +37,15 @@ const calculateDistance = (lat1, lon1, lat2, lon2) => {
       Math.sin(dLon / 2);
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   const distance = R * c * 1000; // Distance in meters
-  return distance; // Distance in meters
+  return distance;
 };
 
 const Attendance = () => {
+  const { name, email, mobileno, selectedBranch, isorganisational } =
+    useSelector((state) => state?.auth);
+  console.log(isorganisational);
+  const st = isorganisational ? "TAHA" : "Student";
+  console.log(st);
   const webcamRef = useRef(null);
   const [image, setImage] = useState(null);
   const [isCameraOpen, setIsCameraOpen] = useState(false);
@@ -71,7 +77,7 @@ const Attendance = () => {
   const handleImageCapture = async () => {
     if (webcamRef.current) {
       const imageSrc = webcamRef.current.getScreenshot();
-      console.log(imageSrc);
+      // console.log(imageSrc);
       setImage(imageSrc);
       setIsCameraOpen(false);
 
@@ -83,22 +89,21 @@ const Attendance = () => {
         // Get the current location (latitude and longitude)
         const currentLocation = await getCurrentLocation();
         // setLocation(currentLocation); // Set the location in state
-        console.log("Current Location:", currentLocation);
+        // console.log("Current Location:", currentLocation);
 
-        // Calculate the distance between current location and campus location
         const distance = calculateDistance(
           currentLocation.latitude,
           currentLocation.longitude,
           campusLocation.latitude,
           campusLocation.longitude
         );
-        console.log("Distance from campus:", distance, "meters");
+        // console.log("Distance from campus:", distance, "meters");
 
         // Check if the distance is within a certain threshold (e.g., 50 meters)
         if (distance <= 50) {
-          setAttendanceStatus("Attendance Done"); // If within threshold, mark attendance as done
+          setAttendanceStatus("Attendance Done");
         } else {
-          setAttendanceStatus("Out of Campus Range"); // If outside, mark attendance as not done
+          setAttendanceStatus("Out of Campus Range");
         }
       } catch (error) {
         console.error("Error getting location:", error);
@@ -107,7 +112,7 @@ const Attendance = () => {
 
       // Hide the loader and remove blur after processing
       setIsLoading(false);
-      setIsImageBlurred(false); // Remove the blur effect
+      setIsImageBlurred(false);
       //   setTimeout(() => {
       //     setImage(false);
       //   }, [9000]);
@@ -120,202 +125,239 @@ const Attendance = () => {
     setImage(null);
     // setLocation(null);
     setAttendanceStatus(null);
-    setIsLoading(false); // Hide the loader on cancel
-    setIsImageBlurred(false); // Remove the blur effect
+    setIsLoading(false);
+    setIsImageBlurred(false);
   };
 
-  // Function to capture image
-  //   const captureImage = () => {
-  //     const photo = webcamRef.current.getScreenshot();
-  //     setImage(photo);
-  //     stopCamera(); // Stop the camera after capturing the image
-  //   };
-
-  // Function to get location coordinates
-  //   const getLocation = () => {
-  //     if (navigator.geolocation) {
-  //       navigator.geolocation.getCurrentPosition((position) => {
-  //         setLocation({
-  //           latitude: position.coords.latitude,
-  //           longitude: position.coords.longitude,
-  //         });
-  //       });
-  //     } else {
-  //       alert("Geolocation is not supported by this browser.");
-  //     }
-  //   };
-
-  // Function to embed geotagging in the image
-  //   const embedGeoTag = (imgData) => {
-  //     console.log("first");
-  //     console.log(imgData);
-  //     if (location) {
-  //       const { latitude, longitude } = location;
-
-  //       // Convert base64 image to a blob
-  //       const byteString = atob(imgData.split(",")[1]);
-  //       const arrayBuffer = new ArrayBuffer(byteString.length);
-  //       const uint8Array = new Uint8Array(arrayBuffer);
-  //       for (let i = 0; i < byteString.length; i++) {
-  //         uint8Array[i] = byteString.charCodeAt(i);
-  //       }
-
-  //       const blob = new Blob([uint8Array], { type: "image/jpeg" });
-  //       const reader = new FileReader();
-
-  //       reader.onloadend = () => {
-  //         const exifData = {
-  //           GPSLatitude: latitude,
-  //           GPSLongitude: longitude,
-  //         };
-
-  //         EXIF.getData(reader.result, function () {
-  //           console.log("seconday");
-  //           EXIF.setTag(this, "GPSLatitude", exifData.GPSLatitude);
-  //           EXIF.setTag(this, "GPSLongitude", exifData.GPSLongitude);
-
-  //           // To get the EXIF data and possibly display it
-  //           console.log(EXIF.getAllTags(this));
-  //         });
-  //       };
-
-  //       reader.readAsDataURL(blob);
-  //     }
-  //   };
-
-  // Function to stop the webcam
-  //   const stopCamera = () => {
-  //     const stream = webcamRef.current?.video?.srcObject;
-  //     if (stream) {
-  //       const tracks = stream.getTracks();
-  //       tracks.forEach((track) => track.stop()); // Stops each track (video/audio)
-  //     }
-  //   };
-
-  //   console.log(location);
   return (
     <div className="header bg-gradient-info pb-8 pt-5 pt-md-8">
       <Container fluid>
         <div className="header-body">
           <Row>
-            <Col lg={4}>
-              <Card className="card-stats md-4 mb-xl-0">
-                {/* <div>
-                  <Webcam
-                    audio={false}
-                    ref={webcamRef}
-                    screenshotFormat="image/jpeg"
-                    width="100%"
-                  />
-                  <button onClick={captureImage}>Capture</button>
-                  <button onClick={getLocation}>Get Location</button>
-                  {image && <img src={image} alt="Captured" />}
-                  {image && location && embedGeoTag(image)}{" "}
-                </div> */}
-                <CardBody>
-                  <CardTitle tag="h2" className="text-primary">
-                    Batch 1
-                  </CardTitle>
+            {isorganisational === 1 ? (
+              <Col lg={4} md={6} className="mb-4">
+                <Card className="h-100">
+                  <CardBody>
+                    <CardTitle tag="h2" className="text-primary fs-4">
+                      Employee
+                    </CardTitle>
 
-                  <CardText className="mb-xl-0">
-                    <strong>Name:</strong> Taha
-                  </CardText>
-                  <CardText className="">
-                    <strong>Age:</strong> 25
-                  </CardText>
+                    <CardText className="mb-2">
+                      <strong>Name:</strong>{" "}
+                      <span className="text-break">{name}</span>
+                    </CardText>
+                    <CardText className="mb-2">
+                      <strong className="me-1">Email:</strong>
+                      <span className="text-break">{email}</span>
+                    </CardText>
 
-                  {isCameraOpen ? (
-                    <>
-                      <div
-                        style={{
-                          position: "relative",
-                          filter: isImageBlurred ? "blur(8px)" : "none", // Apply blur when processing
-                        }}
-                      >
-                        <Webcam
-                          audio={false}
-                          ref={webcamRef}
-                          screenshotFormat="image/jpeg"
-                          width="100%"
-                          videoConstraints={{
-                            facingMode: "user", // Use front camera
-                          }}
-                        />
-                      </div>
-                      <Button
-                        color="primary"
-                        block
-                        onClick={handleImageCapture}
-                      >
-                        Capture Image
-                      </Button>
-                      <Button
-                        color="danger"
-                        block
-                        onClick={handleCancel}
-                        style={{ marginTop: "10px" }}
-                      >
-                        Cancel
-                      </Button>
-                    </>
-                  ) : (
-                    <Button
-                      className="mb-2"
-                      color="primary"
-                      block
-                      onClick={() => setIsCameraOpen(true)}
-                    >
-                      Attendance
-                    </Button>
-                  )}
+                    <CardText className="mb-2">
+                      <strong>Contact No.:</strong>{" "}
+                      <span className="text-break">{mobileno}</span>
+                    </CardText>
+                    <CardText className="mb-3">
+                      <strong>Branch:</strong> {selectedBranch?.label}
+                    </CardText>
 
-                  {image && (
-                    <div style={{ position: "relative" }}>
-                      <img
-                        src={image}
-                        alt="Captured"
-                        style={{
-                          width: "100%",
-                          filter: isImageBlurred ? "blur(8px)" : "none",
-                          opacity: isImageBlurred ? 0.4 : 1,
-                          pointerEvents: isImageBlurred ? "none" : "auto", // disables interaction
-                        }}
-                      />
-
-                      {isLoading && (
+                    {isCameraOpen ? (
+                      <>
                         <div
                           style={{
-                            position: "absolute",
-                            top: "50%",
-                            left: "50%",
-                            transform: "translate(-50%, -50%)",
-                            textAlign: "center",
-                            zIndex: 10,
+                            position: "relative",
+                            filter: isImageBlurred ? "blur(8px)" : "none",
                           }}
                         >
-                          <div
-                            className="spinner-border text-primary"
-                            role="status"
-                          >
-                            <span className="sr-only">Loading...</span>
-                          </div>
-                          <p style={{ color: "white", marginTop: "10px" }}>
-                            Processing...
-                          </p>
+                          <Webcam
+                            audio={false}
+                            ref={webcamRef}
+                            screenshotFormat="image/jpeg"
+                            width="100%"
+                            videoConstraints={{ facingMode: "user" }}
+                            style={{ maxWidth: "100%" }}
+                          />
                         </div>
-                      )}
-                    </div>
-                  )}
+                        <Button
+                          color="primary"
+                          block
+                          onClick={handleImageCapture}
+                        >
+                          Capture Image
+                        </Button>
+                        <Button
+                          color="danger"
+                          block
+                          onClick={handleCancel}
+                          className="mt-2"
+                        >
+                          Cancel
+                        </Button>
+                      </>
+                    ) : (
+                      <Button
+                        className="mb-2"
+                        color="primary"
+                        block
+                        onClick={() => setIsCameraOpen(true)}
+                      >
+                        Attendance
+                      </Button>
+                    )}
 
-                  {attendanceStatus && (
-                    <div>
-                      <h5>Attendance Status:</h5>
-                      <p>{attendanceStatus}</p>
-                    </div>
-                  )}
-                </CardBody>
-              </Card>
-            </Col>
+                    {image && (
+                      <div style={{ position: "relative" }}>
+                        <img
+                          src={image}
+                          alt="Captured"
+                          style={{
+                            width: "100%",
+                            filter: isImageBlurred ? "blur(8px)" : "none",
+                            opacity: isImageBlurred ? 0.4 : 1,
+                            pointerEvents: isImageBlurred ? "none" : "auto",
+                          }}
+                        />
+
+                        {isLoading && (
+                          <div
+                            style={{
+                              position: "absolute",
+                              top: "50%",
+                              left: "50%",
+                              transform: "translate(-50%, -50%)",
+                              textAlign: "center",
+                              zIndex: 10,
+                            }}
+                          >
+                            <div
+                              className="spinner-border text-primary"
+                              role="status"
+                            >
+                              <span className="sr-only">Loading...</span>
+                            </div>
+                            <p style={{ color: "white", marginTop: "10px" }}>
+                              Processing...
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    {attendanceStatus && (
+                      <div className="mt-3">
+                        <h5 className="mb-1">Attendance Status:</h5>
+                        <p>{attendanceStatus}</p>
+                      </div>
+                    )}
+                  </CardBody>
+                </Card>
+              </Col>
+            ) : (
+              <Col lg={4}>
+                <Card className="card-stats md-4 mb-xl-0">
+                  <CardBody>
+                    <CardTitle tag="h2" className="text-primary">
+                      Batch 1
+                    </CardTitle>
+
+                    <CardText className="mb-xl-0">
+                      <strong>Name:</strong> Taha
+                    </CardText>
+                    <CardText className="">
+                      <strong>Age:</strong> 25
+                    </CardText>
+
+                    {isCameraOpen ? (
+                      <>
+                        <div
+                          style={{
+                            position: "relative",
+                            filter: isImageBlurred ? "blur(8px)" : "none",
+                          }}
+                        >
+                          <Webcam
+                            audio={false}
+                            ref={webcamRef}
+                            screenshotFormat="image/jpeg"
+                            width="100%"
+                            videoConstraints={{
+                              facingMode: "user",
+                            }}
+                          />
+                        </div>
+                        <Button
+                          color="primary"
+                          block
+                          onClick={handleImageCapture}
+                        >
+                          Capture Image
+                        </Button>
+                        <Button
+                          color="danger"
+                          block
+                          onClick={handleCancel}
+                          style={{ marginTop: "10px" }}
+                        >
+                          Cancel
+                        </Button>
+                      </>
+                    ) : (
+                      <Button
+                        className="mb-2"
+                        color="primary"
+                        block
+                        onClick={() => setIsCameraOpen(true)}
+                      >
+                        Attendance
+                      </Button>
+                    )}
+
+                    {image && (
+                      <div style={{ position: "relative" }}>
+                        <img
+                          src={image}
+                          alt="Captured"
+                          style={{
+                            width: "100%",
+                            filter: isImageBlurred ? "blur(8px)" : "none",
+                            opacity: isImageBlurred ? 0.4 : 1,
+                            pointerEvents: isImageBlurred ? "none" : "auto", // disables interaction
+                          }}
+                        />
+
+                        {isLoading && (
+                          <div
+                            style={{
+                              position: "absolute",
+                              top: "50%",
+                              left: "50%",
+                              transform: "translate(-50%, -50%)",
+                              textAlign: "center",
+                              zIndex: 10,
+                            }}
+                          >
+                            <div
+                              className="spinner-border text-primary"
+                              role="status"
+                            >
+                              <span className="sr-only">Loading...</span>
+                            </div>
+                            <p style={{ color: "white", marginTop: "10px" }}>
+                              Processing...
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    {attendanceStatus && (
+                      <div>
+                        <h5>Attendance Status:</h5>
+                        <p>{attendanceStatus}</p>
+                      </div>
+                    )}
+                  </CardBody>
+                </Card>
+              </Col>
+            )}
           </Row>
         </div>
       </Container>

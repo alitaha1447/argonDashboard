@@ -58,7 +58,7 @@ const Sidebar = (props) => {
   const [openDropdowns, setOpenDropdowns] = useState({});
   const [permissionsId, setPermissionsId] = useState([]);
 
-  const alwaysVisibleRoutes = ["User List"];
+  const alwaysVisibleRoutes = ["User List", "Leave Request", "Leave Dashboard"];
 
   // verifies if routeName is the one active (in browser input)
   // const activeRoute = (routeName) => {

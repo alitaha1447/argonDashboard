@@ -1,5 +1,5 @@
 export const getValidationErrors = ({
-  batchName,
+  batchName = "",
   selectedQualification,
   selectedCoursesOptions,
   selectedBatch,
@@ -7,15 +7,15 @@ export const getValidationErrors = ({
   durationCount,
   selectedDurations,
   feeStructures, // ✅ Make sure this is passed
+  installmentsDetails,
+  // description = "",
   duration,
   startDate,
   batchLevel,
   location,
 }) => {
   const errors = {};
-
-  const trimmedbatchTitle = batchName.trim();
-  //   console.log("-------------", !trimmedbatchTitle);
+  const trimmedbatchTitle = batchName?.trim();
   if (!trimmedbatchTitle) {
     errors.batchName = "Batch Title is a mandatory field!";
   }
@@ -58,5 +58,15 @@ export const getValidationErrors = ({
     }
   }
 
-  return errors;
+  if (!installmentsDetails || installmentsDetails.length === 0) {
+    errors.installmentsDetails = "Please create installment details.";
+  }
+
+  // if (!description.trim()) {
+  //   errors.description = "Description is required.";
+  // } else if (description.length > 1000) {
+  //   errors.description = "Description must not exceed 1000 characters.";
+  // }
+
+  return { errors };
 };

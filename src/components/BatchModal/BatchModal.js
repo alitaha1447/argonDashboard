@@ -275,13 +275,15 @@ const BatchModal = ({
     setSelectedBranch([]);
     setSelectedBatch(null);
     setLoading(false); // ✅ Reset loading state here
+    setInstallmentError("");
+    // setFormErrors({});
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
 
-    const errors = getValidationErrors({
+    const { errors } = getValidationErrors({
       batchName,
       selectedQualification,
       selectedCoursesOptions,
@@ -290,18 +292,12 @@ const BatchModal = ({
       durationCount,
       selectedDurations,
       feeStructures,
+      installmentsDetails,
     });
-
-    if (installmentsDetails.length === 0) {
-      setInstallmentError("Please create installment details.");
-      setLoading(false);
-      return;
-    }
-
     if (Object.keys(errors).length > 0) {
       setFormErrors(errors);
+      setInstallmentError(errors.installmentsDetails);
       setLoading(false);
-
       return;
     }
 
@@ -853,10 +849,7 @@ const BatchModal = ({
                         </div>
                       )} */}
                       {installmentError && (
-                        <div
-                          className="text-danger mt-2"
-                          style={{ fontSize: "13px" }}
-                        >
+                        <div className="text-danger mt-2">
                           {installmentError}
                         </div>
                       )}
