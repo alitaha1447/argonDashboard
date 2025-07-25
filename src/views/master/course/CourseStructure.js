@@ -62,6 +62,14 @@ const CourseStructure = () => {
     ]);
   };
 
+  const removeModule = (moduleIdx) => {
+    const updatedModules = [...modules];
+    updatedModules.splice(moduleIdx, 1);
+    setModules(updatedModules);
+    setSelectedItem(null);
+    setExpandedModules(expandedModules.filter((idx) => idx !== moduleIdx));
+  };
+
   const toggleModuleExpansion = (moduleIdx) => {
     if (expandedModules.includes(moduleIdx)) {
       setExpandedModules(expandedModules.filter((idx) => idx !== moduleIdx));
@@ -72,13 +80,17 @@ const CourseStructure = () => {
 
   const addContentToModule = (moduleIndex) => {
     const updatedModules = [...modules];
-    const contentNumber = updatedModules[moduleIndex].contents.length + 1;
     updatedModules[moduleIndex].contents.push({
-      title: `Content ${contentNumber}`,
+      title: "",
       file: null,
       submitted: false,
     });
     setModules(updatedModules);
+
+    // ✅ Auto-expand module if not already
+    if (!expandedModules.includes(moduleIndex)) {
+      setExpandedModules([...expandedModules, moduleIndex]);
+    }
   };
 
   const removeContentFromModule = (moduleIndex, contentIndex) => {
@@ -140,7 +152,7 @@ const CourseStructure = () => {
             </div>
           </CardHeader>
 
-          <CardBody className="bg-white">
+          <CardBody className="bg-white rounded">
             <Row>
               {/* Left Side */}
               <Col
@@ -150,80 +162,72 @@ const CourseStructure = () => {
               >
                 <div className="p-2">
                   {selectedCourse && (
-                    <Button
-                      color="primary"
-                      size="sm"
-                      onClick={addModule}
-                      className="mb-3 w-100"
-                      style={{ color: "white" }}
-                    >
-                      + Add Module
-                    </Button>
+                    <div className="d-flex justify-content-between bg-primary rounded align-items-center mb-3">
+                      <span className="fw-bold text-white px-2">▼ Modules</span>
+                      <span
+                        onClick={addModule}
+                        style={{ cursor: "pointer" }}
+                        className="text-white fw-bold cursor-pointer  text-lg ml-6 mr-2"
+                      >
+                        +
+                      </span>
+                    </div>
                   )}
+
                   {modules.length === 0 && (
                     <div className="text-muted">No modules added yet.</div>
                   )}
+
                   {modules.map((mod, moduleIdx) => (
                     <div key={moduleIdx} className="mb-3">
                       <div
-                        className="d-flex justify-content-between align-items-center rounded bg-primary border px-2 py-1 text-white"
+                        className="d-flex justify-content-between bg-white rounded border border-primary bg-white border pl-2 align-items-center mb-3 text-white"
                         onClick={() => toggleModuleExpansion(moduleIdx)}
                         style={{ cursor: "pointer" }}
                       >
-                        <strong>{mod.name}</strong>
-                        <Button
-                          size="sm"
-                          color="primary"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            const updatedModules = [...modules];
-                            updatedModules.splice(moduleIdx, 1);
-                            setModules(updatedModules);
-                            setExpandedModules((prev) =>
-                              prev.filter((i) => i !== moduleIdx)
-                            );
-                            if (
-                              selectedItem &&
-                              selectedItem.moduleIdx === moduleIdx
-                            ) {
-                              setSelectedItem(null);
-                            }
-                          }}
-                          style={{ color: "white" }}
-                        >
-                          ×
-                        </Button>
+                        <strong className="text-primary">
+                          ▼ {mod.name}{" "}
+                          <span
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              addContentToModule(moduleIdx);
+                            }}
+                            className="text-primary  text-lg ml-7 mr-2"
+                          >
+                            +
+                          </span>
+                          <span
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              removeModule(moduleIdx);
+                            }}
+                            className="text-primary text-lg pl-2 pb-1"
+                          >
+                            ×
+                          </span>
+                        </strong>
+                        <div className="d-flex align-items-center"></div>
                       </div>
+
                       {expandedModules.includes(moduleIdx) && (
                         <div className="ms-3 mt-2">
-                          <Button
-                            size="sm"
-                            color="primary"
-                            onClick={() => addContentToModule(moduleIdx)}
-                            className="mb-2 w-100"
-                            style={{ color: "white" }}
-                          >
-                            + Add Content
-                          </Button>
-                          {mod.contents.map((content, contentIdx) => (
+                          {mod.contents.map((_, contentIdx) => (
                             <div
                               key={contentIdx}
                               onClick={() =>
                                 handleSelectContent(moduleIdx, contentIdx)
                               }
-                              className={`ml-2 mb-1 border rounded d-flex justify-content-between align-items-center px-2 py-1 ${
+                              className={`mb-2 d-flex justify-content-between border border-primary align-items-center px-2 rounded ${
                                 selectedItem &&
                                 selectedItem.moduleIdx === moduleIdx &&
                                 selectedItem.contentIdx === contentIdx
-                                  ? "bg-primary text-white"
-                                  : "bg-primary text-white"
+                                  ? "bg-white text-primary"
+                                  : "bg-white text-primary"
                               }`}
-                              style={{ cursor: "pointer" }}
+                              style={{ cursor: "pointer", fontSize: "0.9rem" }}
                             >
-                              <span>{content.title}</span>
-                              <Button
-                                size="sm"
-                                color="primary"
+                              <span>Content {contentIdx + 1}</span>
+                              <span
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   removeContentFromModule(
@@ -231,10 +235,10 @@ const CourseStructure = () => {
                                     contentIdx
                                   );
                                 }}
-                                style={{ color: "white" }}
+                                className="text-primary text-lg pl-2"
                               >
                                 ×
-                              </Button>
+                              </span>
                             </div>
                           ))}
                         </div>
@@ -249,7 +253,10 @@ const CourseStructure = () => {
                 {selectedItem ? (
                   <Card>
                     <CardHeader className="bg-white">
-                      <h5 className="text-primary mb-0">Edit Content</h5>
+                      <h5 className="text-primary mb-0">
+                        Editing - Module {selectedItem.moduleIdx + 1}, Content{" "}
+                        {selectedItem.contentIdx + 1}
+                      </h5>
                     </CardHeader>
                     <CardBody>
                       <div className="mb-3">
@@ -274,18 +281,21 @@ const CourseStructure = () => {
                       </div>
                       <div className="mb-3">
                         <Label>Upload File</Label>
-                        <Input
-                          bsSize="sm"
-                          type="file"
-                          onChange={(e) =>
-                            handleFieldChange("file", e.target.files[0])
-                          }
-                          disabled={
-                            modules[selectedItem.moduleIdx].contents[
-                              selectedItem.contentIdx
-                            ].submitted
-                          }
-                        />
+                        <div className="border rounded p-1">
+                          <Input
+                            bsSize="sm"
+                            type="file"
+                            onChange={(e) =>
+                              handleFieldChange("file", e.target.files[0])
+                            }
+                            disabled={
+                              modules[selectedItem.moduleIdx].contents[
+                                selectedItem.contentIdx
+                              ].submitted
+                            }
+                            className="form-control border-0"
+                          />
+                        </div>
                         {modules[selectedItem.moduleIdx].contents[
                           selectedItem.contentIdx
                         ].file && (
