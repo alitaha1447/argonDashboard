@@ -76,6 +76,7 @@ const Attendance = () => {
   // Function to handle image capture
   const handleImageCapture = async () => {
     if (webcamRef.current) {
+      console.log(webcamRef.current);
       const imageSrc = webcamRef.current.getScreenshot();
       // console.log(imageSrc);
       setImage(imageSrc);

@@ -40,7 +40,6 @@ const EnquiryFormCardBody = ({
 }) => {
   const userId = useSelector((state) => state?.auth?.id);
   const storedBranches = useSelector((state) => state.auth.selectedBranch);
-  const branchValue = storedBranches?.value;
 
   const isCourseEnquiry =
     selectedEnquiry?.label === "Course Enquiry" ||
@@ -79,17 +78,23 @@ const EnquiryFormCardBody = ({
     branchSearchText,
   } = useBranchList();
 
+  useEffect(() => {
+    if (storedBranches) {
+      setSelectedBranch(storedBranches);
+    }
+  }, [storedBranches]);
+
   // useEffect(() => {
   //   if (branchSearchText.length < 3) {
   //     setBranchOptions([]);
   //     return;
   //   }
-
   //   fetchBranch();
   // }, [branchSearchText]);
   useEffect(() => {
     fetchBranch("", "", userId);
   }, []);
+
   // ProductLists
   const fetchProductLists = async () => {
     try {
@@ -157,7 +162,7 @@ const EnquiryFormCardBody = ({
   };
   // Submit Form
   const handleSubmit = async (e) => {
-    // setLoading(true);
+    setLoading(true);
     e.preventDefault();
 
     const isCourseEnquiry =
