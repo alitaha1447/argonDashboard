@@ -594,7 +594,7 @@ const BatchModal = ({
                   <Col md={6}>
                     <FormGroup>
                       <Label for="startDate">Start Date</Label>
-                      <div style={{ width: "100%" }}>
+                      <div style={{}}>
                         <DatePicker
                           selected={startDate}
                           onChange={(date) => setStartDate(date)}
@@ -606,7 +606,7 @@ const BatchModal = ({
                           minDate={new Date(1900, 0, 1)}
                           maxDate={new Date(2025, 11, 31)}
                           popperPlacement="bottom-start"
-                          className="form-control w-100"
+                          className="form-control w-100 react-datepicker-wrapper1"
                           id="startDate"
                         />
                       </div>

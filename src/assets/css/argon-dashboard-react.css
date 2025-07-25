@@ -21559,3 +21559,6 @@ button:focus,
 /* .border-bottom .close {
   display: none;          
 } */
+.react-datepicker-wrapper{
+  width: 100%;
+}

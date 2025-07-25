@@ -6,6 +6,7 @@ export const getValidationErrors = ({
   selectedQualification,
   selectedCoursesOptions,
   gender,
+  selectedBranch,
 }) => {
   const errors = {};
 
@@ -41,6 +42,10 @@ export const getValidationErrors = ({
     if (!selectedCoursesOptions || selectedCoursesOptions.length === 0) {
       errors.selectedCoursesOptions = "At least one course must be selected!";
     }
+  }
+
+  if (!selectedBranch) {
+    errors.selectedBranch = "Branch is a mandatory field!";
   }
 
   return errors;

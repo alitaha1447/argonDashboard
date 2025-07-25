@@ -35,6 +35,7 @@ import EnquiryModal from "components/EnquiryModal/EnquiryModal";
 import BatchModal from "components/BatchModal/BatchModal";
 import StatusUpdate from "components/CustomModals/statusUpdateModal/StatusUpdate";
 import AssignBatch from "components/CustomModals/assignBatchModal/AssignBatch";
+import EnquiryForm from "components/Organisms/EnquiryForm";
 import { formatDateToDMY } from "utils/formattedDate/formatDateToDMY";
 import { pageNum } from "DummyData";
 import PieChart from "components/Charts/PieChart";
@@ -70,6 +71,7 @@ const EnquiryDashboard = (props) => {
   const [batchModalOpen, setBatchModalOpen] = useState(false);
   const [statusModalOpen, setStatusModalOpen] = useState(false);
   const [assignBatchModal, setAssignBatchModal] = useState(false);
+  const [enquiryFormModal, setEnquiryFormModal] = useState(false);
 
   const [selectedEnquiryType, setSelectedEnquiryType] = useState(enquiry[0]);
   const [dateRange, setDateRange] = useState([null, null]);
@@ -211,6 +213,11 @@ const EnquiryDashboard = (props) => {
     setAssignBatchModal((prev) => !prev);
   };
 
+  const toggleEnquiryForm = () => {
+    console.log("toggleEnquiryForm");
+    setEnquiryFormModal((prev) => !prev);
+  };
+
   // const handleEnquiry = (selected) => {
   //   setSelectedEnquiry(selected);
   // };
@@ -284,6 +291,7 @@ const EnquiryDashboard = (props) => {
             APIKEY: "12345678@",
             fromdate: startDate1,
             todate: endDate1,
+            branchid: branchValue,
           },
         }
       );
@@ -720,8 +728,14 @@ const EnquiryDashboard = (props) => {
                                 }}
                               >
                                 <DropdownItem
-                                  key={index}
+                                  key={`${index}--status`}
                                   onClick={() => toggleStatusModal(item.Id)}
+                                >
+                                  Change Status
+                                </DropdownItem>
+                                <DropdownItem
+                                  key={`${index}--update`}
+                                  onClick={toggleModal}
                                 >
                                   Update
                                 </DropdownItem>
@@ -839,7 +853,7 @@ const EnquiryDashboard = (props) => {
                               key={index}
                               onClick={() => toggleStatusModal(item.Id)}
                             >
-                              Update
+                              Change Status
                             </DropdownItem>
                           </DropdownMenu>
                         </UncontrolledDropdown>
@@ -897,6 +911,7 @@ const EnquiryDashboard = (props) => {
         refreshList={fetchPaginatedData}
         resetSelected={() => setStudentID([])}
       />
+      {/* <EnquiryForm modal={enquiryFormModal} toggle={toggleEnquiryForm} /> */}
     </>
   );
 };

@@ -39,6 +39,8 @@ const EnquiryFormCardBody = ({
   refreshStats = () => {},
 }) => {
   const userId = useSelector((state) => state?.auth?.id);
+  const storedBranches = useSelector((state) => state.auth.selectedBranch);
+  const branchValue = storedBranches?.value;
 
   const isCourseEnquiry =
     selectedEnquiry?.label === "Course Enquiry" ||
@@ -77,14 +79,17 @@ const EnquiryFormCardBody = ({
     branchSearchText,
   } = useBranchList();
 
-  useEffect(() => {
-    if (branchSearchText.length < 3) {
-      setBranchOptions([]);
-      return;
-    }
+  // useEffect(() => {
+  //   if (branchSearchText.length < 3) {
+  //     setBranchOptions([]);
+  //     return;
+  //   }
 
-    fetchBranch();
-  }, [branchSearchText]);
+  //   fetchBranch();
+  // }, [branchSearchText]);
+  useEffect(() => {
+    fetchBranch("", "", userId);
+  }, []);
   // ProductLists
   const fetchProductLists = async () => {
     try {
@@ -152,7 +157,7 @@ const EnquiryFormCardBody = ({
   };
   // Submit Form
   const handleSubmit = async (e) => {
-    setLoading(true);
+    // setLoading(true);
     e.preventDefault();
 
     const isCourseEnquiry =
@@ -167,8 +172,8 @@ const EnquiryFormCardBody = ({
       selectedQualification,
       selectedCoursesOptions,
       gender,
+      selectedBranch,
     });
-
     if (Object.keys(errors).length > 0) {
       setFormErrors(errors); // show error messages under fields
       setLoading(false); // 🔁 This is essential
@@ -308,17 +313,49 @@ const EnquiryFormCardBody = ({
           />
         </Col>
       </Row>
-
-      <RadioGroupField
-        label="Gender"
-        name="gender"
-        options={genderOptions}
-        selected={gender}
-        onChange={setGender}
-        error={formErrors.gender}
-        setFormErrors={setFormErrors} // ✅ only this is passed
-        required
-      />
+      <Row>
+        {isCourseEnquiry && (
+          <Col md={6}>
+            <FormGroup>
+              <Label>
+                Branch<span className="text-danger">*</span>
+              </Label>
+              <Select
+                options={branchOptions}
+                value={selectedBranch}
+                onChange={setSelectedBranch}
+                onInputChange={setBranchSearchText}
+                // placeholder="Type at least 3 letters..."
+                isClearable
+                isLoading={isLoading}
+                menuPortalTarget={document.body}
+                menuPosition="fixed"
+                styles={{
+                  menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+                }}
+                menuShouldScrollIntoView={false}
+              />
+              {formErrors.selectedBranch && (
+                <div className="text-danger mt-1">
+                  {formErrors.selectedBranch}
+                </div>
+              )}
+            </FormGroup>
+          </Col>
+        )}
+        <Col md={6}>
+          <RadioGroupField
+            label="Gender"
+            name="gender"
+            options={genderOptions}
+            selected={gender}
+            onChange={setGender}
+            error={formErrors.gender}
+            setFormErrors={setFormErrors} // ✅ only this is passed
+            required
+          />
+        </Col>
+      </Row>
 
       <Row>
         {isCourseEnquiry && (
@@ -408,16 +445,18 @@ const EnquiryFormCardBody = ({
           )}
         </Col>
 
-        {isCourseEnquiry && (
+        {/* {isCourseEnquiry && (
           <Col md={6}>
             <FormGroup>
-              <Label>Branch</Label>
+              <Label>
+                Branch<span className="text-danger">*</span>
+              </Label>
               <Select
                 options={branchOptions}
                 value={selectedBranch}
                 onChange={setSelectedBranch}
                 onInputChange={setBranchSearchText}
-                placeholder="Type at least 3 letters..."
+                // placeholder="Type at least 3 letters..."
                 isClearable
                 isLoading={isLoading}
                 menuPortalTarget={document.body}
@@ -427,13 +466,18 @@ const EnquiryFormCardBody = ({
                 }}
                 menuShouldScrollIntoView={false}
               />
+              {formErrors.selectedBranch && (
+                <div className="text-danger mt-1">
+                  {formErrors.selectedBranch}
+                </div>
+              )}
             </FormGroup>
           </Col>
-        )}
+        )} */}
         <Col md={6}>
           <FormGroup>
             <Label for="startDate">Enquiry Date</Label>
-            <div style={{ width: "100%" }}>
+            <div>
               <DatePicker
                 selected={startDate}
                 onChange={(date) => setStartDate(date)}
@@ -499,7 +543,12 @@ const EnquiryFormCardBody = ({
       )}
 
       <div className="text-end">
-        <Button type="submit" color="primary" onClick={handleSubmit}>
+        <Button
+          type="submit"
+          color="primary"
+          onClick={handleSubmit}
+          disabled={loading}
+        >
           {loading ? (
             <>
               <span
