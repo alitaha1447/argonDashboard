@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 // reactstrap components
 import axios from "axios";
 
@@ -26,6 +26,7 @@ import { GoogleLogin } from "@react-oauth/google";
 import { jwtDecode } from "jwt-decode";
 import { IoIosEye } from "react-icons/io";
 import { IoIosEyeOff } from "react-icons/io";
+import { FaCamera } from "react-icons/fa6";
 
 const API_PATH = process.env.REACT_APP_API_PATH;
 const API_KEY = process.env.REACT_APP_API_KEY;
@@ -35,14 +36,10 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
-
-  // const [login, { isLoading }] = useLoginMutation();
-
-  const navigate = useNavigate();
-
-  const dispatch = useDispatch();
-
   const [showPassword, setShowPassword] = useState(false);
+  // const [login, { isLoading }] = useLoginMutation();
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const toggleVisibility = () => setShowPassword((prev) => !prev);
 
@@ -97,6 +94,7 @@ const Login = () => {
   const toggleBranchModal = () => {
     setShowConfirmModal((prev) => !prev);
   };
+
   return (
     <>
       <Col lg="5" md="7">
@@ -213,7 +211,7 @@ const Login = () => {
                 className="btn-neutral btn-icon"
                 color="default"
                 href="#pablo"
-                // onClick={(e) => e.preventDefault()}
+                onClick={(e) => e.preventDefault()}
               >
                 <span className="btn-inner--icon">
                   <img

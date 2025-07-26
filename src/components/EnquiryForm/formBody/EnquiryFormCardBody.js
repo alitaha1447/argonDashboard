@@ -15,7 +15,9 @@ import { ToastContainer, toast } from "react-toastify";
 import useQualificationList from "customHookApi/EnquiryDashboardApi/useQualificationList";
 import usePreferredCourse from "customHookApi/EnquiryDashboardApi/usePreferredCourse";
 import useBranchList from "customHookApi/EnquiryDashboardApi/useBranchList";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import { clearSelectedEnquiryId } from "reducer/admin/enquiry/selectedEnquirySlice";
+import { formatDateToDMY } from "utils/formattedDate/formatDateToDMY";
 
 const API_PATH = process.env.REACT_APP_API_PATH;
 const API_KEY = process.env.REACT_APP_API_KEY;
@@ -34,6 +36,7 @@ const CheckboxOption = (props) => (
 
 const EnquiryFormCardBody = ({
   selectedEnquiry,
+  selectedEnquiryId,
   toggle = () => {},
   refreshList = () => {},
   refreshStats = () => {},
@@ -62,7 +65,9 @@ const EnquiryFormCardBody = ({
   const [selectedBranch, setSelectedBranch] = useState(null);
   const [productOptions, setProductOptions] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
-  const [selectedFile, setSelectedFile] = useState(null);
+  const [resumeFile, setResumeFile] = useState(null);
+  const [imageFile, setImageFile] = useState(null);
+
   const [formErrors, setFormErrors] = useState({});
   const { qualificationOptions, fetchQualificationLists } =
     useQualificationList();
@@ -84,16 +89,71 @@ const EnquiryFormCardBody = ({
     }
   }, [storedBranches]);
 
-  // useEffect(() => {
-  //   if (branchSearchText.length < 3) {
-  //     setBranchOptions([]);
-  //     return;
-  //   }
-  //   fetchBranch();
-  // }, [branchSearchText]);
   useEffect(() => {
     fetchBranch("", "", userId);
   }, []);
+
+  useEffect(() => {
+    const fetchEnquiryDetails = async () => {
+      if (!selectedEnquiryId) return;
+
+      try {
+        const [qualificationData, courseData, productData] = await Promise.all([
+          fetchQualificationLists(),
+          fetchCourseDetails(),
+        ]);
+
+        const res = await axios.get(`${API_PATH}/api/Get_Enquiry_Detail`, {
+          params: {
+            APIKEY: API_KEY,
+            enquiryid: selectedEnquiryId,
+          },
+        });
+
+        setFullName(res.data.Name || "");
+        setEmail(res.data.Email || "");
+        setContactNumber(res.data.Mobileno || "");
+        setAddress(res?.data?.Address || "");
+        setWhatsappNumber(res?.data?.WhatsappNo || "");
+        setAdditionalQuery(res?.data?.AdditionalQuery || "");
+
+        const genderObj = genderOptions.find(
+          (g) => g.value === res?.data?.Gender
+        );
+        setGender(genderObj || null);
+
+        const referObj = refOptions.find(
+          (r) => r.value === res?.data?.ReferedBy
+        );
+        setReferedBy(referObj || null);
+        setSelectedOptionsQualification(
+          qualificationData.find((q) => q.value === res?.data?.Qualification) ||
+            null
+        );
+        setSelectedCoursesOptions(
+          courseData.find((q) => q.value === res?.data?.Course) || null
+        );
+
+        if (res.data.Product && productOptions.length > 0) {
+          const productObj = productOptions.find(
+            (p) => p.value === res?.data?.Product
+          );
+          setSelectedProduct(productObj || null);
+        }
+
+        if (res.data.Branch && branchOptions.length > 0) {
+          const branchObj = branchOptions.find(
+            (b) => b.value === res?.data?.Branch
+          );
+          setSelectedBranch(branchObj || null);
+        }
+      } catch (error) {
+        console.error("❌ Failed to fetch enquiry details:", error);
+      }
+    };
+
+    fetchEnquiryDetails();
+  }, [selectedEnquiryId]);
 
   // ProductLists
   const fetchProductLists = async () => {
@@ -101,7 +161,6 @@ const EnquiryFormCardBody = ({
       const res = await axios.get(`${API_PATH}/api/GetProduct`, {
         params: {
           APIKEY: API_KEY,
-          // searchtext: branchSearchText,
         },
       });
 
@@ -117,19 +176,22 @@ const EnquiryFormCardBody = ({
   // FileUpload
   const handleFileChange = async (event) => {
     const file = event.target.files[0];
+    const inputId = event.target.id; // 'resume' or 'image
+
+    if (!file) return;
+
     const fileName = file.name;
     let parts = fileName.split(".");
     let name = parts[0];
-    setSelectedFile(fileName);
 
-    if (!file) return;
     const uuid = uuidv4();
     const newFileName = `${uuid}-${name}`;
 
     const formData = new FormData();
     formData.append("file", file, newFileName);
+
     try {
-      const response = await axios.post(
+      const res = await axios.post(
         `${API_PATH}/api/FileAPI/UploadFiles`,
         formData,
         {
@@ -141,6 +203,11 @@ const EnquiryFormCardBody = ({
           },
         }
       );
+      if (inputId === "resume") {
+        setResumeFile(newFileName);
+      } else if (inputId === "image") {
+        setImageFile(newFileName);
+      }
     } catch (error) {
       console.error("Upload error:", error);
     }
@@ -158,9 +225,9 @@ const EnquiryFormCardBody = ({
     setSelectedCoursesOptions("");
     setSelectedProduct(null);
     setSelectedBranch(null);
-    setSelectedFile(null);
+    setResumeFile(null);
+    setImageFile(null);
   };
-  // Submit Form
   const handleSubmit = async (e) => {
     setLoading(true);
     e.preventDefault();
@@ -180,8 +247,8 @@ const EnquiryFormCardBody = ({
       selectedBranch,
     });
     if (Object.keys(errors).length > 0) {
-      setFormErrors(errors); // show error messages under fields
-      setLoading(false); // 🔁 This is essential
+      setFormErrors(errors);
+      setLoading(false);
 
       return;
     }
@@ -194,6 +261,7 @@ const EnquiryFormCardBody = ({
       return `${year}-${month}-${day}`;
     };
     const enquiryFormdata = {
+      ...(selectedEnquiryId && { Id: selectedEnquiryId }),
       EnquiryType: selectedEnquiry?.value,
       Name: fullName,
       Email: email,
@@ -210,10 +278,12 @@ const EnquiryFormCardBody = ({
       ReferedBy: referedBy?.value,
       WhatsappNo: whatsappNumber,
       AdditionalQuery: additionalQuery,
-      ResumePath: selectedFile,
+      ResumePath: resumeFile,
+      Img_path: imageFile,
       CreatedBy: userId.toString(),
       CreatedOn: formattedDate(startDate),
     };
+
     try {
       const res = await axios.post(
         `${API_PATH}/api/SaveEnquiry`,
@@ -224,7 +294,11 @@ const EnquiryFormCardBody = ({
           },
         }
       );
-      toast.success("Enquiry submitted successfully!");
+      toast.success(
+        selectedEnquiryId
+          ? "Enquiry updated successfully!"
+          : "Enquiry submitted successfully!"
+      );
       console.log("✅ Enquiry submitted successfully:", res);
       refreshList(1);
       refreshStats();
@@ -262,7 +336,6 @@ const EnquiryFormCardBody = ({
             value={email}
             onChange={(e) => {
               setEmail(e.target.value);
-              // Validate email on every change
               let errorMessage = "";
               if (!e.target.value.trim()) {
                 errorMessage = "Email is a mandatory field!";
@@ -281,13 +354,12 @@ const EnquiryFormCardBody = ({
           <InputField
             label="Contact Number"
             id="contact"
-            type="text" // Use text instead of number
-            inputMode="numeric" // Shows numeric keyboard on mobile
+            type="text"
+            inputMode="numeric"
             value={contactNumber}
             onChange={(e) => {
               const value = e.target.value;
 
-              // Allow only digits
               if (/^\d*$/.test(value)) {
                 setContactNumber(value);
 
@@ -330,7 +402,6 @@ const EnquiryFormCardBody = ({
                 value={selectedBranch}
                 onChange={setSelectedBranch}
                 onInputChange={setBranchSearchText}
-                // placeholder="Type at least 3 letters..."
                 isClearable
                 isLoading={isLoading}
                 menuPortalTarget={document.body}
@@ -356,7 +427,7 @@ const EnquiryFormCardBody = ({
             selected={gender}
             onChange={setGender}
             error={formErrors.gender}
-            setFormErrors={setFormErrors} // ✅ only this is passed
+            setFormErrors={setFormErrors}
             required
           />
         </Col>
@@ -403,8 +474,6 @@ const EnquiryFormCardBody = ({
                 Courses<span className="text-danger">*</span>
               </Label>
               <Select
-                // isMulti
-                // closeMenuOnSelect={false}
                 closeMenuOnSelect={true}
                 hideSelectedOptions={false}
                 components={{ Option: CheckboxOption }}
@@ -450,35 +519,6 @@ const EnquiryFormCardBody = ({
           )}
         </Col>
 
-        {/* {isCourseEnquiry && (
-          <Col md={6}>
-            <FormGroup>
-              <Label>
-                Branch<span className="text-danger">*</span>
-              </Label>
-              <Select
-                options={branchOptions}
-                value={selectedBranch}
-                onChange={setSelectedBranch}
-                onInputChange={setBranchSearchText}
-                // placeholder="Type at least 3 letters..."
-                isClearable
-                isLoading={isLoading}
-                menuPortalTarget={document.body}
-                menuPosition="fixed"
-                styles={{
-                  menuPortal: (base) => ({ ...base, zIndex: 9999 }),
-                }}
-                menuShouldScrollIntoView={false}
-              />
-              {formErrors.selectedBranch && (
-                <div className="text-danger mt-1">
-                  {formErrors.selectedBranch}
-                </div>
-              )}
-            </FormGroup>
-          </Col>
-        )} */}
         <Col md={6}>
           <FormGroup>
             <Label for="startDate">Enquiry Date</Label>
@@ -500,6 +540,15 @@ const EnquiryFormCardBody = ({
             </div>
           </FormGroup>
         </Col>
+        <Col md={6}>
+          <InputField
+            label="WhatsApp Number for Updates"
+            id="whatsapp"
+            type="tel"
+            value={whatsappNumber}
+            onChange={(e) => setWhatsappNumber(e.target.value)}
+          />
+        </Col>
       </Row>
 
       <RadioGroupField
@@ -511,16 +560,7 @@ const EnquiryFormCardBody = ({
       />
 
       <Row>
-        <Col md={6}>
-          <InputField
-            label="WhatsApp Number for Updates"
-            id="whatsapp"
-            type="tel"
-            value={whatsappNumber}
-            onChange={(e) => setWhatsappNumber(e.target.value)}
-          />
-        </Col>
-        <Col md={6}>
+        <Col md={12}>
           <TextAreaField
             label="Any Additional Query"
             id="additionalQuery"
@@ -532,19 +572,38 @@ const EnquiryFormCardBody = ({
 
       {(selectedEnquiry.label === "Course Enquiry" ||
         selectedEnquiry.label === "Internship Enquiry") && (
-        <FormGroup>
-          <Label>Upload Resume</Label>
-          <Input
-            type="file"
-            name="resume"
-            id="resume"
-            accept=".pdf,.doc,.docx"
-            onChange={handleFileChange}
-          />
-          <p style={{ fontSize: "0.875rem", color: "#6c757d" }}>
-            Supported files: PDF/DOC. Max 10 MB.
-          </p>
-        </FormGroup>
+        <Row>
+          <Col md={5}>
+            <FormGroup>
+              <Label>Upload Resume</Label>
+              <Input
+                type="file"
+                name="resume"
+                id="resume"
+                accept=".pdf,.doc,.docx"
+                onChange={handleFileChange}
+              />
+              <p style={{ fontSize: "0.875rem", color: "#6c757d" }}>
+                Supported files: PDF/DOC. Max 10 MB.
+              </p>
+            </FormGroup>
+          </Col>
+          <Col md={6}>
+            <FormGroup>
+              <Label>Upload Image</Label>
+              <Input
+                type="file"
+                name="image"
+                id="image"
+                accept=".jpg,.jpeg,.png"
+                onChange={handleFileChange}
+              />
+              <p style={{ fontSize: "0.875rem", color: "#6c757d" }}>
+                Supported files: JPEG (or JPG) / PNG. Max 10 MB.
+              </p>
+            </FormGroup>
+          </Col>
+        </Row>
       )}
 
       <div className="text-end">
@@ -561,8 +620,10 @@ const EnquiryFormCardBody = ({
                 role="status"
                 aria-hidden="true"
               ></span>
-              Submitting ...
+              {selectedEnquiryId ? "Updating ..." : "Submitting ..."}
             </>
+          ) : selectedEnquiryId ? (
+            "Update"
           ) : (
             "Submit"
           )}

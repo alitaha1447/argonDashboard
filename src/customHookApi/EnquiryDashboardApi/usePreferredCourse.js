@@ -22,6 +22,7 @@ const usePreferredCourse = () => {
         label: item.TopicTitle,
       }));
       setCourseOptions(formattedCourses);
+      return formattedCourses;
     } catch (error) {
       console.log(`course_Error ---> ${error}`);
     }

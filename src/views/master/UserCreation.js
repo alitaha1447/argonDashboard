@@ -1,3 +1,4 @@
+import { v4 as uuidv4 } from "uuid";
 import {
   Container,
   Row,
@@ -44,10 +45,10 @@ const UserCreation = () => {
   const [isOrganisational, setIsOrganisational] = useState(false);
   const [isActive, setIsActive] = useState(true);
   const [selectedBranches, setSelectedBranches] = useState([]);
+  const [selectedFile, setSelectedFile] = useState(null);
   const [formErrors, setFormErrors] = useState({});
   const [roleOptions, setRoleOptions] = useState([]);
   const [selectedRole, setSelectedRole] = useState(null);
-  const [startDate, setStartDate] = useState(new Date());
   const [isAll, setIsAll] = useState(false);
   const [isBranchActive, setIsBranchActive] = useState(false);
 
@@ -86,8 +87,7 @@ const UserCreation = () => {
   }, []);
 
   const branches = selectedBranches.map((branch) => ({
-    // userid: "string", // Replace with actual user ID if needed
-    branchid: branch.value.toString(), // ✅ convert to string safely (if needed)
+    branchid: branch.value.toString(),
     isactive: isBranchActive ? "1" : "0",
   }));
 
@@ -95,12 +95,46 @@ const UserCreation = () => {
     selectedRole && selectedRole.value
       ? [
           {
-            // userroleid: 0,
-            // userid: 0, // replace with actual user ID if available
             roleid: selectedRole.value.toString(),
           },
         ]
       : [];
+
+  const handleFileChange = async (event) => {
+    const file = event.target.files[0];
+    const inputId = event.target.id; // 'resume' or 'image
+
+    // if (!file) return;
+
+    const fileName = file.name;
+    let parts = fileName.split(".");
+    let name = parts[0];
+    setSelectedFile(fileName);
+
+    if (!file) return;
+    const uuid = uuidv4();
+    const newFileName = `${uuid}-${name}`;
+
+    const formData = new FormData();
+    formData.append("file", file, newFileName);
+
+    try {
+      const res = await axios.post(
+        `${API_PATH}/api/FileAPI/UploadFiles`,
+        formData,
+        {
+          params: {
+            APIKEY: API_KEY,
+          },
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+    } catch (error) {
+      console.error("Upload error:", error);
+    }
+  };
 
   const resetForm = () => {
     setFullName("");
@@ -116,7 +150,7 @@ const UserCreation = () => {
     setIsActive(true);
     setIsAll(false);
     setIsBranchActive(false);
-    setStartDate(new Date());
+    setSelectedFile(null);
   };
 
   const handleSubmit = async (e) => {
@@ -131,10 +165,10 @@ const UserCreation = () => {
       gender,
     });
 
-    // if (Object.keys(errors).length > 0) {
-    //   setFormErrors(errors);
-    //   return;
-    // }
+    if (Object.keys(errors).length > 0) {
+      setFormErrors(errors);
+      return;
+    }
 
     const userFormData = {
       isorganisational: isOrganisational ? 1 : 0,
@@ -149,6 +183,7 @@ const UserCreation = () => {
       isallbranches: isAll ? 1 : 0,
       userbranches: branches,
       userroles: userroles,
+      Img_path: selectedFile,
     };
 
     try {
@@ -161,7 +196,6 @@ const UserCreation = () => {
       toast.success("User created Successfully!");
       resetForm();
     } catch (error) {
-      // console.log(error);
       toast.error(error?.message);
     } finally {
       setLoading(false);
@@ -282,7 +316,7 @@ const UserCreation = () => {
                         selected={gender}
                         onChange={setGender}
                         error={formErrors.gender}
-                        setFormErrors={setFormErrors} // ✅ only this is passed
+                        setFormErrors={setFormErrors}
                         required
                       />
                     </Col>
@@ -321,7 +355,7 @@ const UserCreation = () => {
                               isClearable
                               isLoading={isLoading}
                               isMulti
-                              isDisabled={isAll} // ✅ disables dropdown if checkbox is selected
+                              isDisabled={isAll}
                             />
                           </div>
                         </div>
@@ -342,7 +376,21 @@ const UserCreation = () => {
                         />
                       </FormGroup>
                     </Col>
-                    <Col md={6}></Col>
+                    <Col md={6}>
+                      <FormGroup>
+                        <Label>Upload Image</Label>
+                        <Input
+                          type="file"
+                          name="image"
+                          id="image"
+                          accept=".jpg,.jpeg,.png"
+                          onChange={handleFileChange}
+                        />
+                        <p style={{ fontSize: "0.875rem", color: "#6c757d" }}>
+                          Supported files: JPEG (or JPG) / PNG. Max 10 MB.
+                        </p>
+                      </FormGroup>
+                    </Col>
                   </Row>
                   <Row></Row>
                   <Row>

@@ -17,8 +17,11 @@ import { enquiry } from "../../DummyData";
 const EnquiryModal = ({
   modal,
   toggle,
+  selectedEnquiryId = null,
   //  handleSubmit
-  refreshList,
+
+  refreshList = () => {},
+  refreshStats = () => {},
 }) => {
   const [selectedEnquiry, setSelectedEnquiry] = useState(enquiry[0]);
 
@@ -58,6 +61,8 @@ const EnquiryModal = ({
               selectedEnquiry={selectedEnquiry}
               toggle={toggle}
               refreshList={refreshList}
+              refreshStats={refreshStats}
+              selectedEnquiryId={selectedEnquiryId}
             />
           </ModalBody>
 

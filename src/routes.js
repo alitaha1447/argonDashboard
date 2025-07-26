@@ -671,6 +671,7 @@ import BatchUserCreation from "views/examples/BatchUserCreation";
 import UserList from "views/master/user/UserList";
 import LeaveRequest from "views/transaction/hr/LeaveRequest";
 import LeaveDashboard from "views/transaction/hr/LeaveDashboard";
+import ViewStructure from "views/master/course/ViewStructure";
 
 var routes = [
   {
@@ -769,6 +770,13 @@ var routes = [
         name: "CourseMaster",
         icon: "ni ni-ungroup text-red",
         component: <CourseMaster />,
+        layout: "/admin",
+      },
+      {
+        path: "/viewStructure",
+        name: "View Structure",
+        icon: "ni ni-ungroup text-red",
+        component: <ViewStructure />,
         layout: "/admin",
       },
     ],

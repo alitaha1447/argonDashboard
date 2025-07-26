@@ -1,8 +1,8 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-
+import { useDispatch } from "react-redux";
+// import { setSelectedEnquiryId } from "reducer/admin/enquiry/selectedEnquirySlice";
 import Chart from "chart.js";
-// reactstrap components
 import {
   Button,
   Card,
@@ -23,7 +23,6 @@ import {
 import Header from "components/Headers/Header.js";
 import FilterBar from "components/CustomFilter/FilterBar";
 
-// core components
 import {
   chartOptions,
   parseOptions,
@@ -35,7 +34,6 @@ import EnquiryModal from "components/EnquiryModal/EnquiryModal";
 import BatchModal from "components/BatchModal/BatchModal";
 import StatusUpdate from "components/CustomModals/statusUpdateModal/StatusUpdate";
 import AssignBatch from "components/CustomModals/assignBatchModal/AssignBatch";
-import EnquiryForm from "components/Organisms/EnquiryForm";
 import { formatDateToDMY } from "utils/formattedDate/formatDateToDMY";
 import { pageNum } from "DummyData";
 import PieChart from "components/Charts/PieChart";
@@ -61,6 +59,7 @@ const API_PATH = process.env.REACT_APP_API_PATH;
 const API_KEY = process.env.REACT_APP_API_KEY;
 
 const EnquiryDashboard = (props) => {
+  const dispatch = useDispatch();
   const storedBranches = useSelector((state) => state.auth.selectedBranch);
   const branchValue = storedBranches?.value;
 
@@ -71,7 +70,6 @@ const EnquiryDashboard = (props) => {
   const [batchModalOpen, setBatchModalOpen] = useState(false);
   const [statusModalOpen, setStatusModalOpen] = useState(false);
   const [assignBatchModal, setAssignBatchModal] = useState(false);
-  const [enquiryFormModal, setEnquiryFormModal] = useState(false);
 
   const [selectedEnquiryType, setSelectedEnquiryType] = useState(enquiry[0]);
   const [dateRange, setDateRange] = useState([null, null]);
@@ -94,6 +92,7 @@ const EnquiryDashboard = (props) => {
   const pageSize = pageNumDropDown?.value;
   const [studentID, setStudentID] = useState([]);
   const [statusID, setStatusID] = useState(null);
+  const [selectedEnquiryId, setSelectedEnquiryId] = useState(null);
 
   const [selectedStatus, setSelectedStatus] = useState(null);
   const firstRenderRef = useRef(true);
@@ -183,7 +182,6 @@ const EnquiryDashboard = (props) => {
   //     setBranchOptions([]);
   //     return;
   //   }
-
   //   fetchBranch();
   // }, [branchSearchText]);
 
@@ -191,7 +189,9 @@ const EnquiryDashboard = (props) => {
     parseOptions(Chart, chartOptions());
   }
 
-  const toggleModal = useCallback(() => {
+  const toggleModal = useCallback((id = null) => {
+    setSelectedEnquiryId(id);
+    // dispatch(setSelectedEnquiryId(id));
     setModalOpen((prev) => !prev);
   }, []);
 
@@ -213,11 +213,6 @@ const EnquiryDashboard = (props) => {
     setAssignBatchModal((prev) => !prev);
   };
 
-  const toggleEnquiryForm = () => {
-    console.log("toggleEnquiryForm");
-    setEnquiryFormModal((prev) => !prev);
-  };
-
   // const handleEnquiry = (selected) => {
   //   setSelectedEnquiry(selected);
   // };
@@ -234,13 +229,6 @@ const EnquiryDashboard = (props) => {
     setSelectedEnquiryType(selectedOption); // only update state
   };
 
-  // const formatDate = (date) => {
-  //   const d = new Date(date);
-  //   const day = String(d.getDate()).padStart(2, "0");
-  //   const month = String(d.getMonth() + 1).padStart(2, "0"); // months are 0-based
-  //   const year = d.getFullYear();
-  //   return `${day}-${month}-${year}`;
-  // };
   const formatDate1 = (date) => {
     const d = new Date(date);
     const day = String(d.getDate()).padStart(2, "0");
@@ -604,7 +592,7 @@ const EnquiryDashboard = (props) => {
                         color="primary"
                         block
                         size="md"
-                        onClick={toggleModal}
+                        onClick={() => toggleModal(null)} // ✅ Explicitly passing `null`
                       >
                         Add Enquiry
                       </Button>
@@ -735,7 +723,7 @@ const EnquiryDashboard = (props) => {
                                 </DropdownItem>
                                 <DropdownItem
                                   key={`${index}--update`}
-                                  onClick={toggleModal}
+                                  onClick={() => toggleModal(item.Id)}
                                 >
                                   Update
                                 </DropdownItem>
@@ -855,6 +843,12 @@ const EnquiryDashboard = (props) => {
                             >
                               Change Status
                             </DropdownItem>
+                            <DropdownItem
+                              key={`${index}--update`}
+                              onClick={() => toggleModal(item.Id)}
+                            >
+                              Update
+                            </DropdownItem>
                           </DropdownMenu>
                         </UncontrolledDropdown>
                       </div>
@@ -875,7 +869,7 @@ const EnquiryDashboard = (props) => {
                   pageNumDropDown={pageNumDropDown}
                   setPageNumDropDown={setPageNumDropDown}
                   pageNum={pageNum}
-                  // pageSize={pageSize}
+                  pageSize={pageSize}
                   activeFilters={activeFilters}
                 />
               </CardFooter>
@@ -885,7 +879,9 @@ const EnquiryDashboard = (props) => {
       </Container>
       <EnquiryModal
         modal={modalOpen}
-        toggle={toggleModal}
+        // toggle={toggleModal} // ✅ close modal safely
+        toggle={() => toggleModal(null)}
+        selectedEnquiryId={selectedEnquiryId}
         refreshList={fetchPaginatedData}
         refreshStats={fetchAllDashboardData}
       />
@@ -894,7 +890,7 @@ const EnquiryDashboard = (props) => {
         toggle={batchModal}
         studentID={studentID}
         // refreshList={fetchPaginatedData}
-        refreshList={() => fetchPaginatedData(1, activeFilters)} // ✅ Pass filtered fetch        resetSelected={() => setStudentID([])} // ✅ Pass reset function
+        refreshList={() => fetchPaginatedData(1, pageSize, activeFilters)}
         resetSelected={() => setStudentID([])}
       />
       <StatusUpdate
@@ -911,7 +907,6 @@ const EnquiryDashboard = (props) => {
         refreshList={fetchPaginatedData}
         resetSelected={() => setStudentID([])}
       />
-      {/* <EnquiryForm modal={enquiryFormModal} toggle={toggleEnquiryForm} /> */}
     </>
   );
 };

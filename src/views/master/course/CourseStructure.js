@@ -23,6 +23,8 @@ const CourseStructure = () => {
   const [modules, setModules] = useState([]);
   const [selectedItem, setSelectedItem] = useState(null);
   const [expandedModules, setExpandedModules] = useState([]);
+  const [newModuleName, setNewModuleName] = useState("");
+  const [isCreatingModule, setIsCreatingModule] = useState(false);
 
   useEffect(() => {
     getCourses();
@@ -48,18 +50,31 @@ const CourseStructure = () => {
     setModules([]);
     setSelectedItem(null);
     setExpandedModules([]);
+    setIsCreatingModule(false);
   };
 
   const addModule = () => {
-    const nextId = modules.length + 1;
-    setModules([
+    setIsCreatingModule((prev) => !prev);
+    setSelectedItem(null);
+  };
+
+  const handleCreateModule = () => {
+    if (!newModuleName.trim()) {
+      alert("Please enter a module name.");
+      return;
+    }
+    const newModules = [
       ...modules,
       {
-        id: nextId,
-        name: `Module ${nextId}`,
+        id: modules.length + 1,
+        name: newModuleName.trim(),
         contents: [],
       },
-    ]);
+    ];
+    setModules(newModules);
+    setExpandedModules([...expandedModules, newModules.length - 1]);
+    setNewModuleName("");
+    setIsCreatingModule(false);
   };
 
   const removeModule = (moduleIdx) => {
@@ -86,11 +101,14 @@ const CourseStructure = () => {
       submitted: false,
     });
     setModules(updatedModules);
-
-    // ✅ Auto-expand module if not already
     if (!expandedModules.includes(moduleIndex)) {
       setExpandedModules([...expandedModules, moduleIndex]);
     }
+    setSelectedItem({
+      moduleIdx: moduleIndex,
+      contentIdx: updatedModules[moduleIndex].contents.length - 1,
+    });
+    setIsCreatingModule(false);
   };
 
   const removeContentFromModule = (moduleIndex, contentIndex) => {
@@ -108,6 +126,7 @@ const CourseStructure = () => {
 
   const handleSelectContent = (moduleIdx, contentIdx) => {
     setSelectedItem({ moduleIdx, contentIdx });
+    setIsCreatingModule(false);
   };
 
   const handleFieldChange = (field, value) => {
@@ -138,39 +157,51 @@ const CourseStructure = () => {
       <Container fluid className="mt--8">
         <Card className="shadow mb-4 bg-white">
           <CardHeader className="bg-white border-0">
-            <div className="d-flex flex-column flex-md-row justify-content-between align-items-center">
-              <h2 className="mb-2 text-dark">Course Structure</h2>
-              <div style={{ width: "300px" }}>
-                <Select
-                  placeholder="Select Course"
-                  options={courses}
-                  value={selectedCourse}
-                  onChange={handleCourseChange}
-                  isClearable
-                />
-              </div>
-            </div>
+            <h2 className="mb-2 text-dark">Course Structure</h2>
           </CardHeader>
 
           <CardBody className="bg-white rounded">
             <Row>
               {/* Left Side */}
               <Col
-                md="3"
-                className="border-end"
-                style={{ borderRight: "1px solid #ccc", minHeight: "70vh" }}
+                xs="12"
+                md="4"
+                lg="3"
+                className="mb-3 border-end"
+                style={{ minHeight: "70vh" }}
               >
                 <div className="p-2">
+                  <div className="mb-3">
+                    <Select
+                      placeholder="Select Course"
+                      options={courses}
+                      value={selectedCourse}
+                      onChange={handleCourseChange}
+                      isClearable
+                    />
+                  </div>
+
                   {selectedCourse && (
-                    <div className="d-flex justify-content-between bg-primary rounded align-items-center mb-3">
-                      <span className="fw-bold text-white px-2">▼ Modules</span>
-                      <span
-                        onClick={addModule}
-                        style={{ cursor: "pointer" }}
-                        className="text-white fw-bold cursor-pointer  text-lg ml-6 mr-2"
-                      >
-                        +
+                    <div
+                      onClick={addModule}
+                      className="d-flex justify-content-between align-items-center bg-primary rounded px-2 py-1 mb-3"
+                      style={{ cursor: "pointer" }}
+                    >
+                      <span className="fw-bold text-white">
+                        {isCreatingModule ? (
+                          <>
+                            <i className="fa-solid fa-caret-down me-2"></i>
+                            Add Modules
+                          </>
+                        ) : (
+                          <>
+                            <i className="fa-solid fa-caret-right me-2"></i>
+                            Add Modules
+                          </>
+                        )}
                       </span>
+
+                      <span className="text-white fw-bold">+</span>
                     </div>
                   )}
 
@@ -179,34 +210,54 @@ const CourseStructure = () => {
                   )}
 
                   {modules.map((mod, moduleIdx) => (
-                    <div key={moduleIdx} className="mb-3">
+                    <div
+                      key={moduleIdx}
+                      className="mb-3 p-2 rounded"
+                      style={{
+                        backgroundColor: "#f5f9ff",
+                        border: "1px solid #cce0ff",
+                      }}
+                    >
                       <div
-                        className="d-flex justify-content-between bg-white rounded border border-primary bg-white border pl-2 align-items-center mb-3 text-white"
+                        className="d-flex justify-content-between align-items-center bg-white rounded border border-primary px-2 py-1 mb-2"
                         onClick={() => toggleModuleExpansion(moduleIdx)}
                         style={{ cursor: "pointer" }}
                       >
-                        <strong className="text-primary">
-                          ▼ {mod.name}{" "}
-                          <span
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              addContentToModule(moduleIdx);
-                            }}
-                            className="text-primary  text-lg ml-7 mr-2"
-                          >
-                            +
+                        <div className="d-flex justify-content-between align-items-center w-100">
+                          <span className="text-primary fw-bold">
+                            <i
+                              className={`fa-solid ${
+                                expandedModules.includes(moduleIdx)
+                                  ? "fa-caret-down"
+                                  : "fa-caret-right"
+                              } me-2`}
+                            ></i>
+                            {mod.name}
                           </span>
-                          <span
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              removeModule(moduleIdx);
-                            }}
-                            className="text-primary text-lg pl-2 pb-1"
-                          >
-                            ×
-                          </span>
-                        </strong>
-                        <div className="d-flex align-items-center"></div>
+
+                          <div className="d-flex align-items-center">
+                            <span
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                addContentToModule(moduleIdx);
+                              }}
+                              className="text-primary fw-bold mx-2"
+                              style={{ cursor: "pointer", fontSize: "1.2rem" }}
+                            >
+                              +
+                            </span>
+                            <span
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                removeModule(moduleIdx);
+                              }}
+                              className="text-primary fw-bold"
+                              style={{ cursor: "pointer", fontSize: "1.2rem" }}
+                            >
+                              ×
+                            </span>
+                          </div>
+                        </div>
                       </div>
 
                       {expandedModules.includes(moduleIdx) && (
@@ -217,13 +268,7 @@ const CourseStructure = () => {
                               onClick={() =>
                                 handleSelectContent(moduleIdx, contentIdx)
                               }
-                              className={`mb-2 d-flex justify-content-between border border-primary align-items-center px-2 rounded ${
-                                selectedItem &&
-                                selectedItem.moduleIdx === moduleIdx &&
-                                selectedItem.contentIdx === contentIdx
-                                  ? "bg-white text-primary"
-                                  : "bg-white text-primary"
-                              }`}
+                              className={`mb-2 d-flex justify-content-between border border-primary align-items-center px-2 py-1 rounded bg-white text-primary`}
                               style={{ cursor: "pointer", fontSize: "0.9rem" }}
                             >
                               <span>Content {contentIdx + 1}</span>
@@ -235,7 +280,7 @@ const CourseStructure = () => {
                                     contentIdx
                                   );
                                 }}
-                                className="text-primary text-lg pl-2"
+                                className="text-primary fw-bold"
                               >
                                 ×
                               </span>
@@ -249,14 +294,46 @@ const CourseStructure = () => {
               </Col>
 
               {/* Right Side */}
-              <Col md="9" className="p-3 bg-white">
-                {selectedItem ? (
+              <Col xs="12" md="8" lg="9" className="p-3 bg-white">
+                {isCreatingModule ? (
                   <Card>
-                    <CardHeader className="bg-white">
+                    <CardHeader className="bg-white d-flex justify-content-between align-items-center">
+                      <h5 className="text-primary mb-0">Create New Module</h5>
+                      <Button
+                        close
+                        onClick={() => setIsCreatingModule(false)}
+                      />
+                    </CardHeader>
+                    <CardBody>
+                      <div className="mb-3">
+                        <Label>Module Name</Label>
+                        <Input
+                          bsSize="sm"
+                          value={newModuleName}
+                          onChange={(e) => setNewModuleName(e.target.value)}
+                          placeholder="Enter module name"
+                        />
+                      </div>
+                      <div className="text-end">
+                        <Button
+                          size="sm"
+                          color="primary"
+                          onClick={handleCreateModule}
+                        >
+                          Create Module
+                        </Button>
+                      </div>
+                    </CardBody>
+                  </Card>
+                ) : selectedItem ? (
+                  <Card>
+                    <CardHeader className="bg-white d-flex justify-content-between align-items-center">
                       <h5 className="text-primary mb-0">
-                        Editing - Module {selectedItem.moduleIdx + 1}, Content{" "}
-                        {selectedItem.contentIdx + 1}
+                        Editing - {modules[selectedItem.moduleIdx].name},
+                        Content {selectedItem.contentIdx + 1}
                       </h5>
+
+                      <Button close onClick={() => setSelectedItem(null)} />
                     </CardHeader>
                     <CardBody>
                       <div className="mb-3">
@@ -318,7 +395,6 @@ const CourseStructure = () => {
                               selectedItem.contentIdx
                             ].submitted
                           }
-                          style={{ color: "white" }}
                         >
                           {modules[selectedItem.moduleIdx].contents[
                             selectedItem.contentIdx
@@ -331,7 +407,10 @@ const CourseStructure = () => {
                   </Card>
                 ) : (
                   <Card body className="text-center">
-                    <p>Select a content item from the left to edit details.</p>
+                    <p>
+                      Select a content item from the left or add a module to
+                      begin.
+                    </p>
                   </Card>
                 )}
               </Col>
