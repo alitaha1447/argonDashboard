@@ -38,12 +38,15 @@ import { useDispatch, useSelector } from "react-redux";
 import { logout } from "reducer/auth/authSlice";
 import { persistor } from "app/store";
 import axios from "axios";
+import Select from "react-select";
 
 const API_PATH = process.env.REACT_APP_API_PATH;
 const API_KEY = process.env.REACT_APP_API_KEY;
 // var ps;
 
 const Sidebar = (props) => {
+  const [financialYearOptions, setFinancialYearOptions] = useState([]);
+  const [selectedFY, setSelectedFY] = useState(null);
   // console.log(props.routes);
   const { routes, logo } = props;
   const dispatch = useDispatch();
@@ -77,6 +80,29 @@ const Sidebar = (props) => {
   const closeCollapse = () => {
     setCollapseOpen(false);
   };
+
+  useEffect(() => {
+    const generateFinancialYearOptions = () => {
+      const currentDate = new Date();
+      const currentMonth = currentDate.getMonth(); // April is 3 (0-indexed)
+      const currentYear = currentDate.getFullYear();
+
+      const fyStart = currentMonth >= 3 ? currentYear : currentYear - 1;
+      const years = [];
+
+      for (let i = 0; i < 5; i++) {
+        const from = fyStart - i;
+        const to = from + 1;
+        const label = `${from}-${to}`;
+        years.push({ label, value: label });
+        // years.push({ label });
+      }
+
+      setFinancialYearOptions(years);
+    };
+
+    generateFinancialYearOptions();
+  }, []);
 
   useEffect(() => {
     const fetchPermissions = async () => {
@@ -352,6 +378,15 @@ const Sidebar = (props) => {
             />
           </NavbarBrand>
         ) : null}
+        <div className="d-flex d-md-none">
+          <Select
+            options={financialYearOptions}
+            value={selectedFY}
+            onChange={setSelectedFY}
+            placeholder="Select Financial Year"
+            isClearable
+          />
+        </div>
         {/* User */}
         <Nav className="align-items-center d-md-none">
           <UncontrolledDropdown nav>

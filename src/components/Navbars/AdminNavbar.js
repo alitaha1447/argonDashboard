@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 // reactstrap components
 import {
@@ -22,9 +22,13 @@ import { useDispatch, useSelector } from "react-redux";
 import { logout } from "reducer/auth/authSlice";
 import { persistor } from "app/store";
 import ChangePass from "components/CustomModals/changePassModal/ChangePass";
+import Select from "react-select";
+
 // import { googleLogout } from "@react-oauth/google";
 
 const AdminNavbar = (props) => {
+  const [financialYearOptions, setFinancialYearOptions] = useState([]);
+  const [selectedFY, setSelectedFY] = useState(null);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [changePassModal, setChangePassModal] = useState(false);
@@ -32,6 +36,29 @@ const AdminNavbar = (props) => {
   // const user = JSON.parse(localStorage.getItem("user"));
   const user = useSelector((state) => state?.auth);
 
+  useEffect(() => {
+    const generateFinancialYearOptions = () => {
+      const currentDate = new Date();
+      const currentMonth = currentDate.getMonth(); // April is 3 (0-indexed)
+      const currentYear = currentDate.getFullYear();
+
+      const fyStart = currentMonth >= 3 ? currentYear : currentYear - 1;
+      const years = [];
+
+      for (let i = 0; i < 5; i++) {
+        const from = fyStart - i;
+        const to = from + 1;
+        const label = `${from}-${to}`;
+        years.push({ label, value: label });
+        // years.push({ label });
+      }
+
+      setFinancialYearOptions(years);
+    };
+
+    generateFinancialYearOptions();
+  }, []);
+  console.log(selectedFY);
   const handleChangePassword = (e) => {
     e.preventDefault();
     setChangePassModal((prev) => !prev);
@@ -59,7 +86,16 @@ const AdminNavbar = (props) => {
               style={{ height: "3rem" }}
             />
           </Link>
-          <Form className="navbar-search navbar-search-dark form-inline mr-3 d-none d-md-flex ml-lg-auto">
+          <div className="d-none d-md-flex ml-lg-auto">
+            <Select
+              options={financialYearOptions}
+              value={selectedFY}
+              onChange={setSelectedFY}
+              placeholder="Select Financial Year"
+              isClearable
+            />
+          </div>
+          {/* <Form className="navbar-search navbar-search-dark form-inline mr-3 d-none d-md-flex ml-lg-auto">
             <FormGroup className="mb-0">
               <InputGroup className="input-group-alternative">
                 <InputGroupAddon addonType="prepend">
@@ -70,7 +106,7 @@ const AdminNavbar = (props) => {
                 <Input placeholder="Search" type="text" />
               </InputGroup>
             </FormGroup>
-          </Form>
+          </Form> */}
           <Nav className="align-items-center d-none d-md-flex" navbar>
             <UncontrolledDropdown nav>
               <DropdownToggle className="pr-0" nav>
@@ -81,7 +117,7 @@ const AdminNavbar = (props) => {
                       src={require("../../assets/img/brand/profilePic.png")}
                     />
                   </span>
-                  <Media className="ml-2 d-none d-lg-block">
+                  <Media className="ml-2 d-none d-md-block">
                     <span className="mb-0 text-sm font-weight-bold">
                       {user.name}
                     </span>

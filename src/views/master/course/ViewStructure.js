@@ -13,33 +13,7 @@ import {
 import Header from "components/Headers/Header";
 import Select from "react-select";
 
-// 🔹 Sub-component: Date Input
-const DateInput = ({ value, onChange }) => (
-  <FormGroup>
-    <Label for="date">Select Date</Label>
-    <Input
-      id="date"
-      type="date"
-      value={value}
-      onChange={(e) => onChange(e.target.value)}
-    />
-  </FormGroup>
-);
-
-// 🔹 Sub-component: Time Input
-const TimeInput = ({ value, onChange }) => (
-  <FormGroup>
-    <Label for="time">Select Time</Label>
-    <Input
-      id="time"
-      type="time"
-      value={value}
-      onChange={(e) => onChange(e.target.value)}
-    />
-  </FormGroup>
-);
-
-// 🔹 Sub-component: Faculty Dropdown
+// 🔹 Faculty Dropdown Component
 const FacultySelect = ({ value, onChange }) => {
   const facultyOptions = [
     { label: "Prof. A.K. Sharma", value: "sharma" },
@@ -64,7 +38,6 @@ const FacultySelect = ({ value, onChange }) => {
 
 const ViewStructure = () => {
   const [selectedDate, setSelectedDate] = useState("");
-  const [selectedTime, setSelectedTime] = useState("");
   const [selectedFaculty, setSelectedFaculty] = useState(null);
   const [expandModule, setExpandModule] = useState(true);
   const [expandContent, setExpandContent] = useState(true);
@@ -79,25 +52,7 @@ const ViewStructure = () => {
           </CardHeader>
 
           <CardBody>
-            {/* 🔹 Date, Time, and Faculty Inputs */}
-            <Row>
-              <Col md="6">
-                <DateInput value={selectedDate} onChange={setSelectedDate} />
-              </Col>
-              <Col md="6">
-                <TimeInput value={selectedTime} onChange={setSelectedTime} />
-              </Col>
-            </Row>
-            <Row>
-              <Col md="12">
-                <FacultySelect
-                  value={selectedFaculty}
-                  onChange={setSelectedFaculty}
-                />
-              </Col>
-            </Row>
-
-            {/* 🔹 Module Section */}
+            {/* 🔹 Module + Content Section Combined */}
             <Row>
               <Col xs="12">
                 <Card className="mb-4 border">
@@ -115,39 +70,67 @@ const ViewStructure = () => {
                       Module
                     </h5>
                   </CardHeader>
+
                   {expandModule && (
                     <CardBody>
-                      <p>This is where module data will be displayed.</p>
-                    </CardBody>
-                  )}
-                </Card>
-              </Col>
-            </Row>
+                      {/* 🔹 Content Section inside Module */}
+                      <Card className="border mt-1">
+                        <CardHeader
+                          className="bg-light d-flex justify-content-between align-items-center"
+                          style={{ cursor: "pointer" }}
+                          onClick={() => setExpandContent(!expandContent)}
+                        >
+                          <h5 className="mb-0 text-primary">
+                            <i
+                              className={`fa me-2 ${
+                                expandContent
+                                  ? "fa-caret-right"
+                                  : "fa-caret-down"
+                              }`}
+                            ></i>
+                            Content
+                          </h5>
+                        </CardHeader>
 
-            {/* 🔹 Content Section */}
-            <Row>
-              <Col xs="12">
-                <Card className="mb-4 border">
-                  <CardHeader
-                    className="bg-light d-flex justify-content-between align-items-center"
-                    style={{ cursor: "pointer" }}
-                    onClick={() => setExpandContent(!expandContent)}
-                  >
-                    <h5 className="mb-0 text-primary">
-                      <i
-                        className={`fa me-2 ${
-                          expandContent ? "fa-caret-down" : "fa-caret-right"
-                        }`}
-                      ></i>
-                      Content
-                    </h5>
-                  </CardHeader>
-                  {expandContent && (
-                    <CardBody>
-                      <p>
-                        This is where content details (titles, videos, etc.)
-                        will be shown.
-                      </p>
+                        {!expandContent && (
+                          <CardBody>
+                            {/* 🔹 Date & Time Input */}
+                            <Row>
+                              <Col md="12">
+                                <FormGroup>
+                                  <Label for="datetime">
+                                    Select Date & Time
+                                  </Label>
+                                  <Input
+                                    id="datetime"
+                                    type="datetime-local"
+                                    value={selectedDate}
+                                    onChange={(e) =>
+                                      setSelectedDate(e.target.value)
+                                    }
+                                  />
+                                </FormGroup>
+                              </Col>
+                            </Row>
+
+                            {/* 🔹 Faculty Dropdown */}
+                            <Row>
+                              <Col md="12">
+                                <FacultySelect
+                                  value={selectedFaculty}
+                                  onChange={setSelectedFaculty}
+                                />
+                              </Col>
+                            </Row>
+
+                            {/* 🔹 Additional content info */}
+                            <p>
+                              This is where content details (titles, videos,
+                              etc.) will be shown.
+                            </p>
+                          </CardBody>
+                        )}
+                      </Card>
                     </CardBody>
                   )}
                 </Card>
