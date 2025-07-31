@@ -15,7 +15,7 @@ import AdminLayout from "layouts/Admin.js";
 import AuthLayout from "layouts/Auth.js";
 import EnquiryForm from "layouts/EnquiryForm";
 // import FaceDetection from "layouts/FaceDetection";
-// import HumanFaceDetection from "layouts/HumanFaceDetection";
+import HumanFaceDetection from "layouts/HumanFaceDetection";
 import Receipt from "layouts/receipt/Receipt";
 import PrivateRoute from "PrivateRoute";
 import PublicRoute from "PublicRoute";
@@ -52,7 +52,7 @@ root.render(
 
           <Route path="/enquiryForm" element={<EnquiryForm />} />
           {/* <Route path="/faceDetection" element={<FaceDetection />} /> */}
-          {/* <Route path="/humanFaceDetection" element={<HumanFaceDetection />} /> */}
+          <Route path="/humanFaceDetection" element={<HumanFaceDetection />} />
           <Route path="/receiptForm" element={<Receipt />} />
           {/* <Route path="*" element={<Navigate to="/receiptForm" replace />} /> */}
           {/* <Route path="*" element={<Navigate to="/admin/index" replace />} /> */}

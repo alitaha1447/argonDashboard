@@ -1,116 +1,186 @@
 import React, { useEffect, useRef, useState } from "react";
 import Human from "@vladmandic/human";
-import Webcam from "react-webcam";
-
-const human = new Human({
-  modelBasePath: "https://vladmandic.github.io/human/models",
-  face: { enabled: true },
-});
 
 const HumanFaceDetection = () => {
-  const webcamRef = useRef(null);
-  const [webcamOn, setWebcamOn] = useState(true);
-  const [image1, setImage1] = useState(null);
-  const [image2, setImage2] = useState(null);
-  const [result, setResult] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const videoRef = useRef(null);
+  const canvasRef = useRef(null);
+  const mediaStreamRef = useRef(null);
+  const animationRef = useRef(null);
+  const isDetectingRef = useRef(false);
+  const [isCameraOn, setIsCameraOn] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [faceStatus, setFaceStatus] = useState(null); // 'real', 'fake', or null
+
+  // Initialize Human once
+  const humanRef = useRef(
+    new Human({
+      modelBasePath: "https://vladmandic.github.io/human/models",
+      face: { enabled: true },
+      backend: "webgl",
+      webgl: {
+        context: "webgl",
+        extensions: ["OES_texture_float", "OES_standard_derivatives"],
+      },
+      debug: true,
+    })
+  );
+
+  const openCamera = async () => {
+    if (isCameraOn || isLoading) return;
+
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      // Load models if not already loaded
+      if (!humanRef.current.initialized) {
+        await humanRef.current.load();
+      }
+
+      // Get video stream
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      mediaStreamRef.current = stream;
+
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+        await new Promise((resolve) => {
+          videoRef.current.onloadedmetadata = () => {
+            videoRef.current.play().then(resolve);
+          };
+        });
+      }
+
+      setIsCameraOn(true);
+      isDetectingRef.current = true;
+      detectVideo();
+    } catch (err) {
+      console.error("Error accessing webcam: ", err);
+      setError(`Error: ${err.message}`);
+      stopCamera();
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const stopCamera = () => {
+    if (mediaStreamRef.current) {
+      mediaStreamRef.current.getTracks().forEach((track) => track.stop());
+      mediaStreamRef.current = null;
+    }
+
+    if (animationRef.current) {
+      cancelAnimationFrame(animationRef.current);
+      animationRef.current = null;
+    }
+
+    if (videoRef.current) {
+      videoRef.current.srcObject = null;
+    }
+
+    setIsCameraOn(false);
+    isDetectingRef.current = false;
+  };
+
+  const detectVideo = async () => {
+    if (!isDetectingRef.current || !videoRef.current || !canvasRef.current)
+      return;
+
+    try {
+      const result = await humanRef.current.detect(videoRef.current);
+      console.log(result);
+      // Update canvas dimensions to match video
+      canvasRef.current.width = videoRef.current.videoWidth;
+      canvasRef.current.height = videoRef.current.videoHeight;
+
+      // Draw detections
+      await humanRef.current.draw.all(canvasRef.current, result);
+
+      // Continue detection loop
+      animationRef.current = requestAnimationFrame(detectVideo);
+    } catch (err) {
+      console.error("Detection error:", err);
+      setError("Detection error - check console");
+      stopCamera();
+    }
+  };
 
   useEffect(() => {
-    const loadModels = async () => {
-      await human.load();
-      await human.warmup();
+    return () => {
+      stopCamera();
+      // if (humanRef.current) {
+      //   humanRef.current.dispose();
+      // }
     };
-    loadModels();
   }, []);
-
-  const captureImage = (setImage) => {
-    if (webcamRef.current) {
-      const screenshot = webcamRef.current.getScreenshot();
-      const image = new Image();
-      image.src = screenshot;
-
-      image.onload = () => {
-        const canvas = document.createElement("canvas");
-        canvas.width = image.width;
-        canvas.height = image.height;
-        const ctx = canvas.getContext("2d");
-        ctx.drawImage(image, 0, 0);
-        setImage(canvas);
-        setWebcamOn(false); // stop webcam after capture
-      };
-    }
-  };
-
-  const calculateCosineSimilarity = (vec1, vec2) => {
-    const dotProduct = vec1.reduce((acc, val, i) => acc + val * vec2[i], 0);
-    const mag1 = Math.sqrt(vec1.reduce((acc, val) => acc + val * val, 0));
-    const mag2 = Math.sqrt(vec2.reduce((acc, val) => acc + val * val, 0));
-    return dotProduct / (mag1 * mag2);
-  };
-
-  const compareFaces = async () => {
-    if (!image1 || !image2) {
-      setResult("❌ Please capture both images first.");
-      return;
-    }
-
-    setLoading(true);
-    setResult(null);
-
-    const face1 = await human.detect(image1);
-    const face2 = await human.detect(image2);
-
-    if (face1.face.length === 0 || face2.face.length === 0) {
-      setResult("❌ Face not detected in one or both images.");
-      setLoading(false);
-      return;
-    }
-
-    const descriptor1 = face1.face[0].embedding;
-    const descriptor2 = face2.face[0].embedding;
-    const similarity = calculateCosineSimilarity(descriptor1, descriptor2);
-
-    setResult(
-      similarity > 0.6
-        ? `✅ Same person (Similarity: ${similarity.toFixed(2)})`
-        : `❌ Different person (Similarity: ${similarity.toFixed(2)})`
-    );
-    setLoading(false);
-  };
 
   return (
     <div>
-      {webcamOn && (
-        <Webcam
-          audio={false}
-          ref={webcamRef}
-          screenshotFormat="image/jpeg"
-          width={640}
-          height={480}
-        />
-      )}
-
-      <div style={{ marginTop: "10px" }}>
-        <button onClick={() => captureImage(setImage1)}>Capture Image 1</button>
-        <button
-          onClick={() => {
-            setWebcamOn(true); // reopen webcam for 2nd capture
-            setTimeout(() => captureImage(setImage2), 300); // wait for webcam to initialize
+      <div
+        style={{
+          position: "relative",
+          width: "576px",
+          height: "420px",
+          overflow: "hidden",
+          border: "2px solid #ccc",
+          borderRadius: "8px",
+          backgroundColor: "#f0f0f0",
+        }}
+      >
+        <video
+          ref={videoRef}
+          autoPlay
+          muted
+          playsInline
+          style={{
+            width: "100%",
+            height: "100%",
+            objectFit: "cover",
+            display: isCameraOn ? "block" : "none",
           }}
-        >
-          Capture Image 2
-        </button>
-        <button onClick={compareFaces} disabled={loading}>
-          {loading ? "Comparing..." : "Compare"}
-        </button>
+        />
+        <canvas
+          ref={canvasRef}
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "100%",
+          }}
+        />
+        {!isCameraOn && (
+          <div
+            style={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              width: "100%",
+              height: "100%",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              color: "#666",
+            }}
+          >
+            Camera is off
+          </div>
+        )}
       </div>
 
-      {loading && <p>🔄 Processing...</p>}
-      {result && <p>{result}</p>}
+      {error && <div style={{ color: "red", margin: "10px 0" }}>{error}</div>}
 
-      <div style={{ display: "flex", gap: "10px", marginTop: "10px" }}>
-        {image1 && <img src={image1.toDataURL()} alt="Image 1" width="200" />}
-        {image2 && <img src={image2.toDataURL()} alt="Image 2" width="200" />}
+      <div style={{ marginTop: 10 }}>
+        <button onClick={openCamera} disabled={isCameraOn || isLoading}>
+          {isLoading ? "Loading..." : "Open Camera"}
+        </button>
+        <button
+          onClick={stopCamera}
+          style={{ marginLeft: 10, backgroundColor: "red", color: "white" }}
+          disabled={!isCameraOn}
+        >
+          Stop Camera
+        </button>
       </div>
     </div>
   );
