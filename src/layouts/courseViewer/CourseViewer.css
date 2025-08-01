@@ -1,5 +1,24 @@
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+.course-viewer-wrapper {
+  min-height: 100vh;
+  /* background: #eec0c0; */
+}
+
+.lesson-item:hover {
+  background-color: #e6f0ff !important;
+}
+
+.lesson-item.active {
+  border-left: 4px solid #007bff;
+}
+.video-wrapper {
+  aspect-ratio: 15 / 8;
+  width: 100%;
+
+  /* background: #000; */
+}
+
+@media (max-width: 768px) {
+  .video-wrapper {
+    aspect-ratio: 4 / 3;
+  }
 }
