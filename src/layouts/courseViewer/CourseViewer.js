@@ -1,43 +1,68 @@
 import React, { useState, useRef } from "react";
-import { Container, Row, Col, Card, CardBody } from "reactstrap";
-import { FaPlay, FaLock, FaCheckCircle } from "react-icons/fa";
-import "layouts/courseViewer/CourseViewer.css";
-import ReactPlayer from "react-player";
-const lessons = [
-  {
-    id: 0,
-    title: "Intro Video (YouTube)",
-    completed: true,
-    locked: false,
-    type: "youtube",
-    mediaUrl: "https://www.youtube.com/watch?v=LXb3EKWsInQ",
-  },
-  {
-    id: 1,
-    title: "Sample Image Slide",
-    completed: false,
-    locked: false,
-    type: "image",
-    mediaUrl: require("assets/img/ship-7643503_1280.png"),
-  },
-  {
-    id: 2,
-    title: "Local Video (MP4)",
-    completed: false,
-    locked: false,
-    type: "video",
-    mediaUrl:
-      "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
-  },
-];
-const CourseViewer = () => {
-  const [currentLesson, setCurrentLesson] = useState(0);
-  const lesson = lessons[currentLesson];
+import { Container, Row, Col, Card, CardBody, Button } from "reactstrap";
+import { MdInsertComment, MdOutlineTimer } from "react-icons/md";
 
+import { CiTextAlignLeft } from "react-icons/ci";
+import "layouts/courseViewer/CourseViewer.css";
+import { useResizeDetector } from "react-resize-detector";
+import ReactPlayer from "react-player";
+import { pdfjs, Document, Page } from "react-pdf";
+import "react-pdf/dist/Page/AnnotationLayer.css";
+import "react-pdf/dist/Page/TextLayer.css";
+pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
+
+const CourseViewer = () => {
+  const { width, height, ref } = useResizeDetector();
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [expandedCommentIndex, setExpandedCommentIndex] = useState([]);
+  const [lessons, setLessons] = useState([
+    {
+      id: 0,
+      title: "Intro Video (YouTube)",
+      completed: true,
+      locked: false,
+      type: "youtube",
+      mediaUrl: "https://www.youtube.com/watch?v=LXb3EKWsInQ",
+    },
+    {
+      id: 1,
+      title: "Sample Image Slide",
+      completed: false,
+      locked: false,
+      type: "image",
+      mediaUrl: require("assets/img/ship-7643503_1280.png"),
+    },
+    {
+      id: 2,
+      title: "Local Video (MP4)",
+      completed: false,
+      locked: false,
+      type: "video",
+      mediaUrl:
+        "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+    },
+    {
+      id: 3,
+      title: "Sample PDF File",
+      type: "pdf",
+    },
+  ]);
+  const [comments, setComments] = useState([]); // [{ [index]: ["comment1", "comment2"] }]
+  const [inputComment, setInputComment] = useState(""); // for current input
+  const [numPages, setNumPages] = useState();
+  // const [pageNumber, setPageNumber] = useState(1);
+
+  function onDocumentLoadSuccess({ numPages }) {
+    setNumPages(numPages);
+  }
+
+  const lesson = currentIndex !== null ? lessons[currentIndex] : null;
+  console.log(lesson);
   const renderMedia = () => {
     switch (lesson.type) {
       case "youtube":
         return (
+          // <div className="react-player-wrapper">
           <ReactPlayer
             src={lesson.mediaUrl}
             controls
@@ -46,6 +71,7 @@ const CourseViewer = () => {
             className="react-player"
             style={{ borderRadius: "12px" }}
           />
+          // </div>
         );
 
       case "video":
@@ -77,10 +103,58 @@ const CourseViewer = () => {
             }}
           />
         );
+      case "pdf":
+        return (
+          <div
+            ref={ref}
+            style={{ width: "100%", height: "100%", overflowY: "scroll" }}
+          >
+            <Document
+              file={`${process.env.PUBLIC_URL}/bill.pdf`}
+              onLoadSuccess={onDocumentLoadSuccess}
+            >
+              <Page pageNumber={1} width={width} height={height} />
+            </Document>
+          </div>
+        );
 
       default:
         return <p>Unsupported media type</p>;
     }
+  };
+
+  const toggleCommentExpansion = (idx) => {
+    console.log(idx);
+    if (expandedCommentIndex.includes(idx)) {
+      setExpandedCommentIndex(
+        expandedCommentIndex.filter((index) => index !== idx)
+      );
+    } else {
+      setExpandedCommentIndex([...expandedCommentIndex, idx]);
+    }
+  };
+
+  const handleCommentSubmit = (lessonIdx) => {
+    if (!inputComment.trim()) return;
+
+    setLessons((prevLessons) => {
+      const updatedLessons = [...prevLessons];
+      const lesson = updatedLessons[lessonIdx];
+
+      // Dynamically create comments array if not present
+      if (!lesson.comments) {
+        lesson.comments = [];
+      }
+
+      lesson.comments.push({
+        commentId: Date.now(),
+        comment: inputComment.trim(),
+      });
+
+      return updatedLessons;
+    });
+
+    setInputComment("");
   };
 
   return (
@@ -94,8 +168,12 @@ const CourseViewer = () => {
               style={{ background: "#eee9dbff" }}
             >
               <h2 className="mb-4 fw-bold text-dark">Now Playing</h2>
-              <div className="video-wrapper rounded-3 mb-3">
-                {renderMedia()}
+              <div className="video-wrapper rounded-3 mb-3 h-100">
+                {currentIndex !== null ? (
+                  renderMedia()
+                ) : (
+                  <p>Please select a lesson to begin.</p>
+                )}
               </div>
             </div>
           </Col>
@@ -107,27 +185,102 @@ const CourseViewer = () => {
               style={{ background: "#eee9dbff" }}
             >
               <h2 className="mb-3 fw-bold text-dark">Course Content</h2>
+
               <div className="overflow-auto" style={{ maxHeight: "75vh" }}>
-                {lessons.map((lesson, index) => (
-                  <Card
-                    key={lesson.id}
-                    className={`mb-2 ${
-                      index === currentLesson ? "border-primary" : ""
-                    }`}
-                    style={{
-                      cursor: "pointer",
-                      opacity: lesson.locked ? 0.6 : 1,
-                      borderWidth: index === currentLesson ? "2px" : "1px",
-                    }}
-                    onClick={() => setCurrentLesson(index)}
-                  >
-                    <CardBody className="d-flex justify-content-between align-items-center p-3">
-                      <div>
-                        <strong>{lesson.title}</strong>
+                {lessons.map((lesson, lessonIdx) => {
+                  // const isActive = index === currentIndex;
+                  // const isExpanded = index === expandedCommentIndex;
+                  // console.log(lessonIdx);
+                  return (
+                    <div
+                      key={lesson.id}
+                      style={{
+                        opacity: lesson.locked ? 0.6 : 1,
+                        border:
+                          expandedCommentIndex.includes(lessonIdx) ||
+                          lessonIdx === currentIndex
+                            ? "2px solid #0d6efd"
+                            : "1px solid #dee2e6",
+                        borderRadius: "0.5rem",
+                        marginBottom: "0.5rem",
+                        transition: "border-color 0.3s",
+                        backgroundColor: "#fff",
+                        height:
+                          expandedCommentIndex.includes(lessonIdx) ||
+                          lessonIdx === currentIndex
+                            ? "2px solid #0d6efd"
+                            : "1px solid #dee2e6",
+                        overflow: "hidden",
+                        transition: "all 0.3s ease",
+                      }}
+                    >
+                      <div
+                        style={{
+                          padding: "1rem",
+                          display: "flex",
+                          justifyContent: "space-between",
+                          alignItems: "center",
+                        }}
+                      >
+                        <div
+                          style={{ cursor: "pointer" }}
+                          onClick={() =>
+                            setCurrentIndex(
+                              lessonIdx === currentIndex ? null : lessonIdx
+                            )
+                          }
+                        >
+                          <strong>{lesson.title}</strong>
+                          <div className="d-flex align-items-center gap-1 text-muted small">
+                            <MdOutlineTimer size={14} />
+                            <span>2:30</span>
+                          </div>
+                        </div>
+                        <div className="d-flex align-items-center gap-2">
+                          <MdInsertComment
+                            style={{ cursor: "pointer" }}
+                            onClick={() => toggleCommentExpansion(lessonIdx)}
+                          />
+                          <CiTextAlignLeft />
+                        </div>
                       </div>
-                    </CardBody>
-                  </Card>
-                ))}
+                      {expandedCommentIndex.includes(lessonIdx) && (
+                        <div
+                          style={{
+                            padding: "0 1rem 1rem",
+                          }}
+                        >
+                          <textarea
+                            className="form-control"
+                            placeholder="Add your comment here..."
+                            rows={3}
+                            value={inputComment}
+                            onChange={(e) => setInputComment(e.target.value)}
+                          />
+                          <button
+                            className="btn btn-sm btn-primary mt-2 mb-2"
+                            onClick={() => handleCommentSubmit(lessonIdx)}
+                          >
+                            Submit
+                          </button>
+                          {/* ✅ PLACE THIS HERE */}
+                          {lessons[lessonIdx].comments?.length > 0 && (
+                            <ul className="list-group list-group-flush mt-2">
+                              {lessons[lessonIdx].comments.map((cmt) => (
+                                <li
+                                  key={cmt.commentId}
+                                  className="list-group-item py-1 px-2 small"
+                                >
+                                  {cmt.comment}
+                                </li>
+                              ))}
+                            </ul>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
             </div>
           </Col>

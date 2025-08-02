@@ -22,3 +22,8 @@
     aspect-ratio: 4 / 3;
   }
 }
+@media (max-width: 768px) {
+  .responsive-now-playing {
+    height: 1000px !important; /* or whatever height works well on small screens */
+  }
+}
