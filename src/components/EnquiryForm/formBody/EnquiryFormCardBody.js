@@ -280,9 +280,10 @@ const EnquiryFormCardBody = ({
       AdditionalQuery: additionalQuery,
       ResumePath: resumeFile,
       Img_path: imageFile,
-      CreatedBy: userId.toString(),
+      CreatedBy: userId ? userId.toString() : "",
       CreatedOn: formattedDate(startDate),
     };
+    console.log(enquiryFormdata);
 
     try {
       const res = await axios.post(
