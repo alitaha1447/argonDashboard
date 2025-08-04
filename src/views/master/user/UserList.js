@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 import {
@@ -24,12 +24,16 @@ import Header from "components/Headers/Header";
 import InputField from "components/FormFields/InputField";
 import RadioGroupField from "components/FormFields/RadioGroup";
 import FilterBar from "components/CustomFilter/FilterBar";
+import CustomPagination from "components/CustomPagination/CustomPagination";
 import { ToastContainer, toast } from "react-toastify";
 import axios from "axios";
 import { useSelector } from "react-redux";
 import { MdFilterAlt } from "react-icons/md";
 import { MdFilterAltOff } from "react-icons/md";
 import { FaPlus } from "react-icons/fa";
+
+const API_PATH = process.env.REACT_APP_API_PATH;
+const API_KEY = process.env.REACT_APP_API_KEY;
 
 const facultyBatch = [
   {
@@ -40,10 +44,48 @@ const facultyBatch = [
   },
 ];
 
+const pageNum = [
+  { value: 10, label: "10" },
+  { value: 25, label: " 25" },
+  { value: 50, label: "50" },
+  { value: 100, label: "100" },
+];
+
 const UserList = () => {
   const [isTableLoading, setIsTableLoading] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
   const [selectedBranch, setSelectedBranch] = useState(null);
+  const [pageNumber, setPageNumber] = useState(1);
+  const [pageStart, setPageStart] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [pageNumDropDown, setPageNumDropDown] = useState(pageNum[0]);
+  const pageSize = pageNumDropDown?.value;
+  const [userLists, setuserLists] = useState([]);
+
+  const fetchUserList = async (page = 1, size = pageSize, filters = {}) => {
+    setIsTableLoading(true);
+    try {
+      const res = await axios.get(`${API_PATH}/api/Get_User_List`, {
+        params: {
+          APIKEY: API_KEY,
+          userid: null,
+          pageno: page,
+          pagesize: size,
+        },
+      });
+      setuserLists(res?.data?.Data);
+      setPageNumber(res.data.PageNumber);
+      setTotalPages(res.data.TotalPages);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsTableLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchUserList(1, pageSize);
+  }, [pageSize]);
 
   return (
     <div>
@@ -187,18 +229,19 @@ const UserList = () => {
                                                 <p className="mt-2 mb-0">Loading data...</p> */}
                         </td>
                       </tr>
-                    ) : facultyBatch.length > 0 ? (
-                      facultyBatch.map((item, index) => (
-                        <tr key={index}>
-                          <td>{item.userId}</td>
-                          <td>{item.userName}</td>
-                          <td>{item.email}</td>
-                          <td>{item.mobile}</td>
+                    ) : userLists.length > 0 ? (
+                      userLists.map((item, index) => (
+                        <tr key={item.Id}>
+                          <td>{item.Id}</td>
+                          <td>{item.Name}</td>
+                          <td>{item.Email}</td>
+                          <td>{item.MobileNo}</td>
                           <td>
                             <div className="d-flex justify-content-center align-items-center">
                               <Input
                                 type="checkbox"
                                 style={{ margin: 0 }}
+                                checked={item.IsActive === 1} // ✅ Checked only if IsActive is 1
                                 // checked={studentID.some(
                                 //   (s) => s.enrollmentid === item.Id
                                 // )} // ✅ controlled state
@@ -227,26 +270,26 @@ const UserList = () => {
               <div className="d-block d-lg-none p-3">
                 {isTableLoading ? (
                   <Spinner color="primary">Loading...</Spinner>
-                ) : facultyBatch.length > 0 ? (
-                  facultyBatch.map((item, index) => (
+                ) : userLists.length > 0 ? (
+                  userLists.map((item, index) => (
                     <Card className="mb-3 shadow-sm">
                       <div className="d-flex p-4 justify-content-between">
                         <div className="d-flex">
                           <div>
                             <p className="fs-6 fw-semibold mb-1">
-                              <strong>User Id. :</strong> {item.userId}
+                              <strong>User Id. :</strong> {item.Id}
                             </p>
                             <p className="fs-6 fw-semibold mb-1">
-                              <strong>User Name:</strong> {item.userName}
+                              <strong>User Name:</strong> {item.Name}
                             </p>
                             <p className="fs-6 fw-semibold mb-1">
                               <strong>Email:</strong>
-                              {item.email}
+                              {item.Email}
                             </p>
 
                             <p className="fs-6 fw-semibold mb-1">
                               <strong>Mobile :</strong>
-                              {item.mobile}
+                              {item.MobileNo}
                             </p>
                             <p className="fs-6 fw-semibold mb-1">
                               <div className="d-flex align-items-center">
@@ -254,6 +297,7 @@ const UserList = () => {
                                 <Input
                                   type="checkbox"
                                   style={{ margin: 0 }}
+                                  checked={item.IsActive === 1} // ✅ Checked only if IsActive is 1
                                   // checked={studentID.some(
                                   //   (s) => s.enrollmentid === item.Id
                                   // )} // ✅ controlled state
@@ -277,18 +321,18 @@ const UserList = () => {
                 )}
               </div>
               <CardFooter className="py-4">
-                {/* <CustomPagination
+                <CustomPagination
                   pageStart={pageStart}
                   setPageStart={setPageStart}
                   totalPages={totalPages}
                   setPageNumber={setPageNumber}
-                  fetchPaginatedData={fetchFacultyBatch}
+                  fetchPaginatedData={fetchUserList}
                   pageNumber={pageNumber}
                   pageNumDropDown={pageNumDropDown}
                   setPageNumDropDown={setPageNumDropDown}
                   pageNum={pageNum}
-                  activeFilters={activeFilters}
-                /> */}
+                  // activeFilters={activeFilters}
+                />
               </CardFooter>
             </Card>
           </div>

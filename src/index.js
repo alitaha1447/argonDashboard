@@ -18,9 +18,11 @@ import EnquiryForm from "layouts/EnquiryForm";
 import HumanFaceDetection from "layouts/HumanFaceDetection";
 import Receipt from "layouts/receipt/Receipt";
 import CourseViewer from "layouts/courseViewer/CourseViewer";
+import CourseViewer2 from "layouts/courseViewer2/CourseViewer2";
 import PrivateRoute from "PrivateRoute";
 import PublicRoute from "PublicRoute";
 import App from "./App.js";
+
 const root = ReactDOM.createRoot(document.getElementById("root"));
 
 const CLIENT_ID =
@@ -55,6 +57,7 @@ root.render(
           {/* <Route path="/faceDetection" element={<FaceDetection />} /> */}
           <Route path="/humanFaceDetection" element={<HumanFaceDetection />} />
           <Route path="/courseViewer" element={<CourseViewer />} />
+          <Route path="/courseViewer2" element={<CourseViewer2 />} />
           <Route path="/receiptForm" element={<Receipt />} />
           {/* <Route path="*" element={<Navigate to="/receiptForm" replace />} /> */}
           {/* <Route path="*" element={<Navigate to="/admin/index" replace />} /> */}

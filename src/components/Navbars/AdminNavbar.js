@@ -58,9 +58,8 @@ const AdminNavbar = (props) => {
 
     generateFinancialYearOptions();
   }, []);
-  console.log(selectedFY);
-  const handleChangePassword = (e) => {
-    e.preventDefault();
+
+  const handleChangePassword = () => {
     setChangePassModal((prev) => !prev);
   };
 

@@ -39,6 +39,7 @@ import { logout } from "reducer/auth/authSlice";
 import { persistor } from "app/store";
 import axios from "axios";
 import Select from "react-select";
+import ChangePass from "components/CustomModals/changePassModal/ChangePass";
 
 const API_PATH = process.env.REACT_APP_API_PATH;
 const API_KEY = process.env.REACT_APP_API_KEY;
@@ -51,6 +52,7 @@ const Sidebar = (props) => {
   const { routes, logo } = props;
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const [changePassModal, setChangePassModal] = useState(false);
 
   // const user = JSON.parse(localStorage.getItem("user"));
   const user = useSelector((state) => state.auth);
@@ -342,6 +344,10 @@ const Sidebar = (props) => {
     };
   }
 
+  const handleChangePassword = () => {
+    setChangePassModal((prev) => !prev);
+  };
+
   const handleLogout = () => {
     // localStorage.clear(); // 🔥 Clears everything in localStorage
     dispatch(logout());
@@ -433,9 +439,13 @@ const Sidebar = (props) => {
                 <i className="ni ni-settings-gear-65" />
                 <span>Settings</span>
               </DropdownItem>
-              <DropdownItem to="/admin/user-profile" tag={Link}>
+              <DropdownItem
+                to="/admin/user-profile"
+                tag={Link}
+                onClick={handleChangePassword}
+              >
                 <i className="ni ni-calendar-grid-58" />
-                <span>Activity</span>
+                <span>Change Password</span>
               </DropdownItem>
               <DropdownItem to="/admin/user-profile" tag={Link}>
                 <i className="ni ni-support-16" />
@@ -584,6 +594,7 @@ const Sidebar = (props) => {
           </Nav> */}
         </Collapse>
       </Container>
+      <ChangePass modal={changePassModal} toggle={handleChangePassword} />
     </Navbar>
   );
 };
