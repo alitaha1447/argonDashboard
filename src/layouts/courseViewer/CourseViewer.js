@@ -6,10 +6,19 @@ import { CiTextAlignLeft } from "react-icons/ci";
 import "layouts/courseViewer/CourseViewer.css";
 import { useResizeDetector } from "react-resize-detector";
 import ReactPlayer from "react-player";
+import DocViewer, { DocViewerRenderers } from "react-doc-viewer";
 import { pdfjs, Document, Page } from "react-pdf";
 import "react-pdf/dist/Page/AnnotationLayer.css";
 import "react-pdf/dist/Page/TextLayer.css";
 pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
+
+const docs = [
+  {
+    uri: `${process.env.PUBLIC_URL}/SamplePPTFile_500kb.ppt`, // must be a direct link or base64
+    fileType: "pptx",
+    fileName: "Presentation.pptx",
+  },
+];
 
 const CourseViewer = () => {
   const { width, height, ref } = useResizeDetector();
@@ -51,13 +60,14 @@ const CourseViewer = () => {
   const [inputComment, setInputComment] = useState(""); // for current input
   const [numPages, setNumPages] = useState();
   // const [pageNumber, setPageNumber] = useState(1);
+  // const [docs, setDocs] = useState([]);
 
   function onDocumentLoadSuccess({ numPages }) {
     setNumPages(numPages);
   }
 
   const lesson = currentIndex !== null ? lessons[currentIndex] : null;
-  console.log(lesson);
+
   const renderMedia = () => {
     switch (lesson.type) {
       case "youtube":
@@ -110,7 +120,7 @@ const CourseViewer = () => {
             style={{ width: "100%", height: "100%", overflowY: "scroll" }}
           >
             <Document
-              file={`${process.env.PUBLIC_URL}/bill.pdf`}
+              file={`${process.env.PUBLIC_URL}/Miracle Infoserv.pdf`}
               onLoadSuccess={onDocumentLoadSuccess}
             >
               <Page pageNumber={1} width={width} height={height} />
@@ -124,7 +134,6 @@ const CourseViewer = () => {
   };
 
   const toggleCommentExpansion = (idx) => {
-    console.log(idx);
     if (expandedCommentIndex.includes(idx)) {
       setExpandedCommentIndex(
         expandedCommentIndex.filter((index) => index !== idx)
@@ -139,6 +148,7 @@ const CourseViewer = () => {
 
     setLessons((prevLessons) => {
       const updatedLessons = [...prevLessons];
+
       const lesson = updatedLessons[lessonIdx];
 
       // Dynamically create comments array if not present
@@ -157,6 +167,22 @@ const CourseViewer = () => {
     setInputComment("");
   };
 
+  // const handleFileChange = (e) => {
+  //   const file = e.target.files[0];
+
+  //   if (file && file.name.endsWith(".ppt")) {
+  //     const newDoc = {
+  //       file: file, // File object
+  //       fileType: "ppt",
+  //       fileName: file.name,
+  //     };
+
+  //     setDocs([newDoc]);
+  //   } else {
+  //     alert("Please select a valid PPTX file");
+  //   }
+  // };
+
   return (
     <div className="course-viewer-wrapper py-3">
       <Container fluid>
@@ -174,6 +200,18 @@ const CourseViewer = () => {
                 ) : (
                   <p>Please select a lesson to begin.</p>
                 )}
+                <DocViewer
+                  documents={docs}
+                  pluginRenderers={DocViewerRenderers}
+                />
+                {/* <div>
+                  <input
+                    type="file"
+                    accept=".ppt"
+                    onChange={handleFileChange}
+                  />
+                  {docs.length > 0 && <div style={{ height: "80vh" }}></div>}
+                </div> */}
               </div>
             </div>
           </Col>
@@ -225,8 +263,8 @@ const CourseViewer = () => {
                         <div
                           style={{ cursor: "pointer" }}
                           onClick={() =>
-                            setCurrentIndex(
-                              lessonIdx === currentIndex ? null : lessonIdx
+                            setCurrentIndex((prevIndex) =>
+                              prevIndex === lessonIdx ? null : lessonIdx
                             )
                           }
                         >
