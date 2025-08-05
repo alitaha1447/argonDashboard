@@ -1,13 +1,5 @@
 import React, { useState, useRef } from "react";
-import {
-  Container,
-  Row,
-  Col,
-  Card,
-  CardBody,
-  Button,
-  Progress,
-} from "reactstrap";
+import { Container, Row, Col, Button, Progress } from "reactstrap";
 import { course } from "DummyData";
 import { MdInsertComment, MdOutlineTimer } from "react-icons/md";
 import { IoIosArrowDown } from "react-icons/io";
@@ -21,39 +13,22 @@ import "react-pdf/dist/Page/AnnotationLayer.css";
 import "react-pdf/dist/Page/TextLayer.css";
 pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
 
-const docs = [
-  {
-    uri: `${process.env.PUBLIC_URL}/SamplePPTFile_500kb.ppt`, // must be a direct link or base64
-    fileType: "pptx",
-    fileName: "Presentation.pptx",
-  },
-];
-
 const CourseViewer = () => {
+  const mediaRef = useRef(null);
   const { width, height, ref } = useResizeDetector();
-  const [currentIndex, setCurrentIndex] = useState(0);
   const [expandedCommentIndex, setExpandedCommentIndex] = useState(null);
-  // const [expandedSections, setExpandedSections] = useState({});
-  // const [expandedSections, setExpandedSections] = useState({
-  //   index: null,
-  //   type: null,
-  // });
+
   const [expandedCourseIndex, setExpandedCourseIndex] = useState(null);
 
-  // const [comments, setComments] = useState({}); // [{ [index]: ["comment1", "comment2"] }]
-  const [inputComment, setInputComment] = useState(""); // for current input
+  const [inputComment, setInputComment] = useState("");
   const [numPages, setNumPages] = useState();
   const [selectedTopic, setSelectedTopic] = useState(null);
 
   const [courses, setCourses] = useState(course);
 
-  // const [expandedCommentIndex, setExpandedCommentIndex] = useState(null);
-
   function onDocumentLoadSuccess({ numPages }) {
     setNumPages(numPages);
   }
-
-  // const lesson = currentIndex !== null ? lessons[currentIndex] : null;
 
   const renderMedia = () => {
     if (!selectedTopic) return <p>Select a topic to view its content.</p>;
@@ -135,17 +110,6 @@ const CourseViewer = () => {
   };
 
   const toggleExpansion = (index, sectionType) => {
-    // console.log(index);
-    // setExpandedSections(
-    //   (prev) =>
-    //     prev.index === index && prev.type === sectionType
-    //       ? { index: null, type: null } // toggle off
-    //       : { index, type: sectionType } // open new
-    // );
-    // setExpandedSections((prev) => ({
-    //   ...prev,
-    //   [index]: prev[index] === sectionType ? null : sectionType,
-    // }));
     setExpandedCourseIndex((prevIndex) => (prevIndex === index ? null : index));
   };
   const toggleCommentExpansion = (courseIndex) => {
@@ -154,23 +118,8 @@ const CourseViewer = () => {
     );
   };
   const handleCommentSubmit = (courseIndex) => {
-    // if (!inputComment.trim()) return;
-    // setComments((prev) => {
-    //   const updatedComments = { ...prev };
+    if (!inputComment.trim()) return;
 
-    //   // If no comment array exists for this course, initialize it
-    //   if (!updatedComments[courseIndex]) {
-    //     updatedComments[courseIndex] = [];
-    //   }
-
-    //   // Push the new comment
-    //   updatedComments[courseIndex].push({
-    //     commentId: Date.now(),
-    //     comment: inputComment.trim(),
-    //   });
-
-    //   return updatedComments;
-    // });
     setCourses((prev) => {
       const updated = [...prev];
       console.log(updated);
@@ -189,54 +138,6 @@ const CourseViewer = () => {
     setInputComment("");
   };
 
-  // const handleCommentSubmit = (lessonIdx) => {
-  //   if (!inputComment.trim()) return;
-
-  //   setLessons((prevLessons) => {
-  //     const updatedLessons = [...prevLessons];
-
-  //     const lesson = updatedLessons[lessonIdx];
-
-  //     // Dynamically create comments array if not present
-  //     if (!lesson.comments) {
-  //       lesson.comments = [];
-  //     }
-
-  //     lesson.comments.push({
-  //       commentId: Date.now(),
-  //       comment: inputComment.trim(),
-  //     });
-
-  //     return updatedLessons;
-  //   });
-
-  //   setInputComment("");
-  // };
-
-  // const handleFileChange = (e) => {
-  //   const file = e.target.files[0];
-
-  //   if (file && file.name.endsWith(".ppt")) {
-  //     const newDoc = {
-  //       file: file, // File object
-  //       fileType: "ppt",
-  //       fileName: file.name,
-  //     };
-
-  //     setDocs([newDoc]);
-  //   } else {
-  //     alert("Please select a valid PPTX file");
-  //   }
-  // };
-  // const docs = [
-  //   {
-  //     // uri: `${process.env.PUBLIC_URL}/bill.pdf`,
-  //     uri: {require('../')},
-  //     fileType: "ppt",
-  //     fileName: "demo",
-  //   },
-  // ];
-
   return (
     <div className="course-viewer-wrapper py-3">
       <Container fluid>
@@ -247,9 +148,18 @@ const CourseViewer = () => {
               className="rounded-3 shadow-sm p-3"
               style={{ background: "#eee9dbff" }}
             >
-              <div className="mb-3 d-flex flex-wrap justify-content-between align-items-center">
-                <h2 className="fw-bold text-dark">Now Playing</h2>
+              <div
+                ref={mediaRef}
+                className="mb-3 d-flex flex-sm-row justify-content-between align-items-center align-items-sm-start gap-2"
+              >
+                {/* Heading with responsive class */}
+                <h2 className="fw-bold text-dark mb-0 now-playing-heading">
+                  Now Playing
+                </h2>
+
+                {/* Button with responsive class */}
                 <Button
+                  className="now-playing-button"
                   style={{
                     background: "#5E72E4",
                     color: "white",
@@ -260,11 +170,7 @@ const CourseViewer = () => {
                 </Button>
               </div>
               <div className="video-wrapper rounded-3 mb-3 h-100">
-                {/* {currentIndex !== null ? ( */}
                 {renderMedia()}
-                {/* ) : (
-                  <p>Please select a lesson to begin.</p>
-                )} */}
               </div>
             </div>
           </Col>
@@ -299,9 +205,6 @@ const CourseViewer = () => {
               >
                 {courses.map((course, courseIndex) => {
                   const isExpanded = expandedCourseIndex === courseIndex;
-                  // const isActive = index === currentIndex;
-                  // const isExpanded = index === expandedCommentIndex;
-                  console.log(course);
 
                   return (
                     <div
@@ -313,24 +216,6 @@ const CourseViewer = () => {
                           ? "2px solid #0d6efd"
                           : "1px solid #dee2e6",
                         transition: "border-color 0.3s",
-                        // opacity: lesson.locked ? 0.6 : 1,
-                        // height: "auto",
-                        // border:
-                        //   expandedCommentIndex.includes(lessonIdx) ||
-                        //   lessonIdx === currentIndex
-                        //     ? "2px solid #0d6efd"
-                        //     : "1px solid #dee2e6",
-                        // borderRadius: "0.5rem",
-                        // marginBottom: "0.5rem",
-                        // transition: "border-color 0.3s",
-                        // backgroundColor: "#fff",
-                        // height:
-                        //   expandedCommentIndex.includes(lessonIdx) ||
-                        //   lessonIdx === currentIndex
-                        //     ? "2px solid #0d6efd"
-                        //     : "1px solid #dee2e6",
-                        // overflow: "hidden",
-                        // transition: "all 0.3s ease",
                       }}
                     >
                       <div
@@ -341,14 +226,7 @@ const CourseViewer = () => {
                           alignItems: "center",
                         }}
                       >
-                        <div
-                          style={{ cursor: "pointer" }}
-                          // onClick={() =>
-                          //   setCurrentIndex((prevIndex) =>
-                          //     prevIndex === lessonIdx ? null : lessonIdx
-                          //   )
-                          // }
-                        >
+                        <div style={{ cursor: "pointer" }}>
                           <strong>{course.title}</strong>
                           <div className="d-flex align-items-center gap-1 text-muted small">
                             <MdOutlineTimer size={14} />
@@ -375,20 +253,17 @@ const CourseViewer = () => {
                           <div
                             key={topicIndex}
                             className="topic-item"
-                            onClick={() => setSelectedTopic(topic)}
+                            onClick={() => {
+                              setSelectedTopic(topic);
+                              mediaRef.current?.scrollIntoView({
+                                behavior: "smooth",
+                                block: "start",
+                              });
+                            }}
                             style={{
                               cursor: "pointer",
                               padding: "0.5rem",
                               marginLeft: "1rem",
-                              // border: "1px solid red",
-                              // backgroundColor:
-                              //   selectedTopic?.label === topic.label
-                              //     ? "#e6f0ff"
-                              //     : "transparent",
-                              // borderLeft:
-                              //   selectedTopic?.label === topic.label
-                              //     ? "3px solid #0d6efd"
-                              //     : "none",
                             }}
                           >
                             <strong>{topic.label}</strong>

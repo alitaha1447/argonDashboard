@@ -17,6 +17,25 @@
   /* background: #000; */
 }
 
+@media (max-width: 425px) {
+  .now-playing-heading {
+    font-size: 1.15rem; /* Smaller heading */
+  }
+  .now-playing-button {
+    padding: 0.3rem 0.8rem; /* Tighter button padding */
+    font-size: 12px; /* Smaller button text */
+  }
+}
+@media (max-width: 375px) {
+  .now-playing-heading {
+    font-size: 1rem; /* Smaller heading */
+  }
+  .now-playing-button {
+    padding: 0.25rem 0.5rem; /* Tighter button padding */
+    font-size: 12px; /* Smaller button text */
+  }
+}
+
 @media (max-width: 768px) {
   .video-wrapper {
     aspect-ratio: 4 / 3;
