@@ -1,7 +1,16 @@
 import React, { useState, useRef } from "react";
-import { Container, Row, Col, Card, CardBody, Button } from "reactstrap";
+import {
+  Container,
+  Row,
+  Col,
+  Card,
+  CardBody,
+  Button,
+  Progress,
+} from "reactstrap";
+import { course } from "DummyData";
 import { MdInsertComment, MdOutlineTimer } from "react-icons/md";
-
+import { IoIosArrowDown } from "react-icons/io";
 import { CiTextAlignLeft } from "react-icons/ci";
 import "layouts/courseViewer/CourseViewer.css";
 import { useResizeDetector } from "react-resize-detector";
@@ -23,58 +32,37 @@ const docs = [
 const CourseViewer = () => {
   const { width, height, ref } = useResizeDetector();
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [expandedCommentIndex, setExpandedCommentIndex] = useState([]);
-  const [lessons, setLessons] = useState([
-    {
-      id: 0,
-      title: "Intro Video (YouTube)",
-      completed: true,
-      locked: false,
-      type: "youtube",
-      mediaUrl: "https://www.youtube.com/watch?v=LXb3EKWsInQ",
-    },
-    {
-      id: 1,
-      title: "Sample Image Slide",
-      completed: false,
-      locked: false,
-      type: "image",
-      mediaUrl: require("assets/img/ship-7643503_1280.png"),
-    },
-    {
-      id: 2,
-      title: "Local Video (MP4)",
-      completed: false,
-      locked: false,
-      type: "video",
-      mediaUrl:
-        "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
-    },
-    {
-      id: 3,
-      title: "Sample PDF File",
-      type: "pdf",
-    },
-  ]);
-  const [comments, setComments] = useState([]); // [{ [index]: ["comment1", "comment2"] }]
+  const [expandedCommentIndex, setExpandedCommentIndex] = useState(null);
+  // const [expandedSections, setExpandedSections] = useState({});
+  // const [expandedSections, setExpandedSections] = useState({
+  //   index: null,
+  //   type: null,
+  // });
+  const [expandedCourseIndex, setExpandedCourseIndex] = useState(null);
+
+  // const [comments, setComments] = useState({}); // [{ [index]: ["comment1", "comment2"] }]
   const [inputComment, setInputComment] = useState(""); // for current input
   const [numPages, setNumPages] = useState();
-  // const [pageNumber, setPageNumber] = useState(1);
-  // const [docs, setDocs] = useState([]);
+  const [selectedTopic, setSelectedTopic] = useState(null);
+
+  const [courses, setCourses] = useState(course);
+
+  // const [expandedCommentIndex, setExpandedCommentIndex] = useState(null);
 
   function onDocumentLoadSuccess({ numPages }) {
     setNumPages(numPages);
   }
 
-  const lesson = currentIndex !== null ? lessons[currentIndex] : null;
+  // const lesson = currentIndex !== null ? lessons[currentIndex] : null;
 
   const renderMedia = () => {
-    switch (lesson.type) {
+    if (!selectedTopic) return <p>Select a topic to view its content.</p>;
+    switch (selectedTopic.type) {
       case "youtube":
         return (
           // <div className="react-player-wrapper">
           <ReactPlayer
-            src={lesson.mediaUrl}
+            src={selectedTopic.mediaUrl}
             controls
             width="100%"
             height="100%"
@@ -95,7 +83,7 @@ const CourseViewer = () => {
             style={{ borderRadius: "12px" }}
             onContextMenu={(e) => e.preventDefault()}
           >
-            <source src={lesson.mediaUrl} type="video/mp4" />
+            <source src={selectedTopic.mediaUrl} type="video/mp4" />
             Your browser does not support the video tag.
           </video>
         );
@@ -103,7 +91,7 @@ const CourseViewer = () => {
       case "image":
         return (
           <img
-            src={lesson.mediaUrl}
+            src={selectedTopic.mediaUrl}
             alt="Lesson Visual"
             style={{
               width: "100%",
@@ -128,44 +116,102 @@ const CourseViewer = () => {
           </div>
         );
 
+      case "ppt":
+        return (
+          <iframe
+            src={`https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(
+              `${window.location.origin}/assets/files/SamplePPTFile_500kb.ppt`
+            )}`}
+            width="100%"
+            height="100%"
+            frameBorder="0"
+            title="PowerPoint Viewer"
+          />
+        );
+
       default:
         return <p>Unsupported media type</p>;
     }
   };
 
-  const toggleCommentExpansion = (idx) => {
-    if (expandedCommentIndex.includes(idx)) {
-      setExpandedCommentIndex(
-        expandedCommentIndex.filter((index) => index !== idx)
-      );
-    } else {
-      setExpandedCommentIndex([...expandedCommentIndex, idx]);
-    }
+  const toggleExpansion = (index, sectionType) => {
+    // console.log(index);
+    // setExpandedSections(
+    //   (prev) =>
+    //     prev.index === index && prev.type === sectionType
+    //       ? { index: null, type: null } // toggle off
+    //       : { index, type: sectionType } // open new
+    // );
+    // setExpandedSections((prev) => ({
+    //   ...prev,
+    //   [index]: prev[index] === sectionType ? null : sectionType,
+    // }));
+    setExpandedCourseIndex((prevIndex) => (prevIndex === index ? null : index));
   };
+  const toggleCommentExpansion = (courseIndex) => {
+    setExpandedCommentIndex((prevIndex) =>
+      prevIndex === courseIndex ? null : courseIndex
+    );
+  };
+  const handleCommentSubmit = (courseIndex) => {
+    // if (!inputComment.trim()) return;
+    // setComments((prev) => {
+    //   const updatedComments = { ...prev };
 
-  const handleCommentSubmit = (lessonIdx) => {
-    if (!inputComment.trim()) return;
+    //   // If no comment array exists for this course, initialize it
+    //   if (!updatedComments[courseIndex]) {
+    //     updatedComments[courseIndex] = [];
+    //   }
 
-    setLessons((prevLessons) => {
-      const updatedLessons = [...prevLessons];
+    //   // Push the new comment
+    //   updatedComments[courseIndex].push({
+    //     commentId: Date.now(),
+    //     comment: inputComment.trim(),
+    //   });
 
-      const lesson = updatedLessons[lessonIdx];
+    //   return updatedComments;
+    // });
+    setCourses((prev) => {
+      const updated = [...prev];
+      console.log(updated);
+      const course = updated[courseIndex];
 
-      // Dynamically create comments array if not present
-      if (!lesson.comments) {
-        lesson.comments = [];
+      if (!course.comment) {
+        course.comment = [];
       }
-
-      lesson.comments.push({
+      course.comment.push({
         commentId: Date.now(),
         comment: inputComment.trim(),
       });
-
-      return updatedLessons;
+      return updated;
     });
 
     setInputComment("");
   };
+
+  // const handleCommentSubmit = (lessonIdx) => {
+  //   if (!inputComment.trim()) return;
+
+  //   setLessons((prevLessons) => {
+  //     const updatedLessons = [...prevLessons];
+
+  //     const lesson = updatedLessons[lessonIdx];
+
+  //     // Dynamically create comments array if not present
+  //     if (!lesson.comments) {
+  //       lesson.comments = [];
+  //     }
+
+  //     lesson.comments.push({
+  //       commentId: Date.now(),
+  //       comment: inputComment.trim(),
+  //     });
+
+  //     return updatedLessons;
+  //   });
+
+  //   setInputComment("");
+  // };
 
   // const handleFileChange = (e) => {
   //   const file = e.target.files[0];
@@ -182,6 +228,14 @@ const CourseViewer = () => {
   //     alert("Please select a valid PPTX file");
   //   }
   // };
+  // const docs = [
+  //   {
+  //     // uri: `${process.env.PUBLIC_URL}/bill.pdf`,
+  //     uri: {require('../')},
+  //     fileType: "ppt",
+  //     fileName: "demo",
+  //   },
+  // ];
 
   return (
     <div className="course-viewer-wrapper py-3">
@@ -193,25 +247,24 @@ const CourseViewer = () => {
               className="rounded-3 shadow-sm p-3"
               style={{ background: "#eee9dbff" }}
             >
-              <h2 className="mb-4 fw-bold text-dark">Now Playing</h2>
+              <div className="mb-3 d-flex flex-wrap justify-content-between align-items-center">
+                <h2 className="fw-bold text-dark">Now Playing</h2>
+                <Button
+                  style={{
+                    background: "#5E72E4",
+                    color: "white",
+                    border: "none",
+                  }}
+                >
+                  Complete & Continue
+                </Button>
+              </div>
               <div className="video-wrapper rounded-3 mb-3 h-100">
-                {currentIndex !== null ? (
-                  renderMedia()
-                ) : (
+                {/* {currentIndex !== null ? ( */}
+                {renderMedia()}
+                {/* ) : (
                   <p>Please select a lesson to begin.</p>
-                )}
-                <DocViewer
-                  documents={docs}
-                  pluginRenderers={DocViewerRenderers}
-                />
-                {/* <div>
-                  <input
-                    type="file"
-                    accept=".ppt"
-                    onChange={handleFileChange}
-                  />
-                  {docs.length > 0 && <div style={{ height: "80vh" }}></div>}
-                </div> */}
+                )} */}
               </div>
             </div>
           </Col>
@@ -222,34 +275,62 @@ const CourseViewer = () => {
               className="rounded-3 shadow-sm p-3 h-100"
               style={{ background: "#eee9dbff" }}
             >
-              <h2 className="mb-3 fw-bold text-dark">Course Content</h2>
+              <div className="mb-4">
+                <h2 className="fw-bold text-dark mb-1">Courses</h2>
+                <small className="text-muted">Section : 2025-26</small>
 
-              <div className="overflow-auto" style={{ maxHeight: "75vh" }}>
-                {lessons.map((lesson, lessonIdx) => {
+                <div className="d-flex justify-content-end mb-1">
+                  <span
+                    style={{
+                      fontWeight: "bold",
+                      fontSize: "0.95rem",
+                      color: "#333",
+                    }}
+                  >
+                    20% Completed
+                  </span>
+                </div>
+
+                <Progress value={20} />
+              </div>
+              <div
+                className="overflow-auto hide-scrollbar"
+                style={{ maxHeight: "75vh" }}
+              >
+                {courses.map((course, courseIndex) => {
+                  const isExpanded = expandedCourseIndex === courseIndex;
                   // const isActive = index === currentIndex;
                   // const isExpanded = index === expandedCommentIndex;
-                  // console.log(lessonIdx);
+                  console.log(course);
+
                   return (
                     <div
-                      key={lesson.id}
+                      key={course.id}
+                      className="mb-3 rounded-3"
                       style={{
-                        opacity: lesson.locked ? 0.6 : 1,
-                        border:
-                          expandedCommentIndex.includes(lessonIdx) ||
-                          lessonIdx === currentIndex
-                            ? "2px solid #0d6efd"
-                            : "1px solid #dee2e6",
-                        borderRadius: "0.5rem",
-                        marginBottom: "0.5rem",
-                        transition: "border-color 0.3s",
                         backgroundColor: "#fff",
-                        height:
-                          expandedCommentIndex.includes(lessonIdx) ||
-                          lessonIdx === currentIndex
-                            ? "2px solid #0d6efd"
-                            : "1px solid #dee2e6",
-                        overflow: "hidden",
-                        transition: "all 0.3s ease",
+                        border: isExpanded
+                          ? "2px solid #0d6efd"
+                          : "1px solid #dee2e6",
+                        transition: "border-color 0.3s",
+                        // opacity: lesson.locked ? 0.6 : 1,
+                        // height: "auto",
+                        // border:
+                        //   expandedCommentIndex.includes(lessonIdx) ||
+                        //   lessonIdx === currentIndex
+                        //     ? "2px solid #0d6efd"
+                        //     : "1px solid #dee2e6",
+                        // borderRadius: "0.5rem",
+                        // marginBottom: "0.5rem",
+                        // transition: "border-color 0.3s",
+                        // backgroundColor: "#fff",
+                        // height:
+                        //   expandedCommentIndex.includes(lessonIdx) ||
+                        //   lessonIdx === currentIndex
+                        //     ? "2px solid #0d6efd"
+                        //     : "1px solid #dee2e6",
+                        // overflow: "hidden",
+                        // transition: "all 0.3s ease",
                       }}
                     >
                       <div
@@ -262,13 +343,13 @@ const CourseViewer = () => {
                       >
                         <div
                           style={{ cursor: "pointer" }}
-                          onClick={() =>
-                            setCurrentIndex((prevIndex) =>
-                              prevIndex === lessonIdx ? null : lessonIdx
-                            )
-                          }
+                          // onClick={() =>
+                          //   setCurrentIndex((prevIndex) =>
+                          //     prevIndex === lessonIdx ? null : lessonIdx
+                          //   )
+                          // }
                         >
-                          <strong>{lesson.title}</strong>
+                          <strong>{course.title}</strong>
                           <div className="d-flex align-items-center gap-1 text-muted small">
                             <MdOutlineTimer size={14} />
                             <span>2:30</span>
@@ -277,17 +358,61 @@ const CourseViewer = () => {
                         <div className="d-flex align-items-center gap-2">
                           <MdInsertComment
                             style={{ cursor: "pointer" }}
-                            onClick={() => toggleCommentExpansion(lessonIdx)}
+                            onClick={() => toggleCommentExpansion(courseIndex)}
                           />
-                          <CiTextAlignLeft />
+                          <CiTextAlignLeft style={{ cursor: "pointer" }} />
+                          <IoIosArrowDown
+                            style={{ cursor: "pointer" }}
+                            onClick={() => toggleExpansion(courseIndex)}
+                          />
                         </div>
                       </div>
-                      {expandedCommentIndex.includes(lessonIdx) && (
-                        <div
-                          style={{
-                            padding: "0 1rem 1rem",
-                          }}
-                        >
+                      {/* Expandable Topics */}
+                      <div
+                        className={`expand-wrapper ${isExpanded ? "open" : ""}`}
+                      >
+                        {course?.topics?.map((topic, topicIndex) => (
+                          <div
+                            key={topicIndex}
+                            className="topic-item"
+                            onClick={() => setSelectedTopic(topic)}
+                            style={{
+                              cursor: "pointer",
+                              padding: "0.5rem",
+                              marginLeft: "1rem",
+                              // border: "1px solid red",
+                              // backgroundColor:
+                              //   selectedTopic?.label === topic.label
+                              //     ? "#e6f0ff"
+                              //     : "transparent",
+                              // borderLeft:
+                              //   selectedTopic?.label === topic.label
+                              //     ? "3px solid #0d6efd"
+                              //     : "none",
+                            }}
+                          >
+                            <strong>{topic.label}</strong>
+                            <div className="d-flex align-items-center gap-1 text-muted small">
+                              {topic?.time && (
+                                <>
+                                  <MdOutlineTimer size={14} />
+                                  <span>{topic.time.trim()}</span>
+                                </>
+                              )}
+                            </div>
+                            {/* {topic.label} */}
+                          </div>
+                        ))}
+                        {!course.topics && (
+                          <div className="p-2">
+                            <p className="text-muted">
+                              No topics available for this course.
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                      {expandedCommentIndex === courseIndex && (
+                        <div style={{ padding: "0 1rem 1rem" }}>
                           <textarea
                             className="form-control"
                             placeholder="Add your comment here..."
@@ -297,14 +422,14 @@ const CourseViewer = () => {
                           />
                           <button
                             className="btn btn-sm btn-primary mt-2 mb-2"
-                            onClick={() => handleCommentSubmit(lessonIdx)}
+                            onClick={() => handleCommentSubmit(courseIndex)}
                           >
                             Submit
                           </button>
-                          {/* ✅ PLACE THIS HERE */}
-                          {lessons[lessonIdx].comments?.length > 0 && (
+
+                          {courses[courseIndex]?.comment?.length > 0 && (
                             <ul className="list-group list-group-flush mt-2">
-                              {lessons[lessonIdx].comments.map((cmt) => (
+                              {courses[courseIndex].comment.map((cmt) => (
                                 <li
                                   key={cmt.commentId}
                                   className="list-group-item py-1 px-2 small"

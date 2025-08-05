@@ -27,3 +27,30 @@
     height: 1000px !important; /* or whatever height works well on small screens */
   }
 }
+
+/* Hide vertical scrollbar while allowing scroll */
+.hide-scrollbar {
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none; /* Chrome, Safari */
+}
+
+.expand-wrapper {
+  overflow: hidden;
+  max-height: 0;
+  transition: max-height 0.4s ease-in-out;
+}
+
+.expand-wrapper.open {
+  max-height: 300px; /* adjust based on how tall your content is */
+}
+
+.comment-box {
+  margin-top: 0.5rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 1rem;
+}
