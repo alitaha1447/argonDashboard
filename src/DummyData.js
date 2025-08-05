@@ -262,4 +262,62 @@ export const course = [
       },
     ],
   },
+  {
+    id: 4,
+    title: "Data Analytics",
+    topics: [
+      {
+        label: "Topic 1 - You Tude Video",
+        type: "youtube",
+        mediaUrl: "https://www.youtube.com/watch?v=yZvFH7B6gKI",
+        time: "8:30",
+      },
+      {
+        label: "Topic 2 - MP 4 Video",
+        type: "video",
+        mediaUrl:
+          "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+        time: "8:30",
+      },
+      { label: "Topic 3 - PDF", type: "pdf" },
+      {
+        label: "Topic 4 - Image",
+        type: "image",
+        mediaUrl: require("assets/img/ship-7643503_1280.png"),
+      },
+      {
+        label: "Topic 5 - Ppt",
+        type: "ppt",
+      },
+    ],
+  },
+  {
+    id: 5,
+    title: "Data Science",
+    topics: [
+      {
+        label: "Topic 1 - You Tude Video",
+        type: "youtube",
+        mediaUrl: "https://www.youtube.com/watch?v=uIUvpJdYgSA",
+        time: "8:30",
+      },
+      {
+        label: "Topic 2 - MP 4 Video",
+        type: "video",
+        mediaUrl:
+          "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+        time: "8:30",
+      },
+      { label: "Topic 3 - PDF", type: "pdf" },
+      {
+        label: "Topic 4 - Image",
+        type: "image",
+        mediaUrl: require("assets/img/ship-7643503_1280.png"),
+      },
+      {
+        label: "Topic 5 - Ppt",
+        type: "ppt",
+      },
+    ],
+  },
 ];

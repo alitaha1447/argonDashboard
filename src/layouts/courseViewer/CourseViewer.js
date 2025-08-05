@@ -4,6 +4,7 @@ import { course } from "DummyData";
 import { MdInsertComment, MdOutlineTimer } from "react-icons/md";
 import { IoIosArrowDown } from "react-icons/io";
 import { CiTextAlignLeft } from "react-icons/ci";
+import { MdZoomOutMap } from "react-icons/md";
 import "layouts/courseViewer/CourseViewer.css";
 import { useResizeDetector } from "react-resize-detector";
 import ReactPlayer from "react-player";
@@ -25,6 +26,8 @@ const CourseViewer = () => {
   const [selectedTopic, setSelectedTopic] = useState(null);
 
   const [courses, setCourses] = useState(course);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [selectedPdf, setSelectedPdf] = useState(null); // e.g. for file path
 
   function onDocumentLoadSuccess({ numPages }) {
     setNumPages(numPages);
@@ -80,8 +83,35 @@ const CourseViewer = () => {
         return (
           <div
             ref={ref}
-            style={{ width: "100%", height: "100%", overflowY: "scroll" }}
+            style={{
+              width: "100%",
+              height: "100%",
+              overflowY: "scroll",
+              position: "relative",
+            }}
           >
+            <button
+              onClick={() => {
+                setIsFullscreen(true);
+                setSelectedPdf(
+                  `${process.env.PUBLIC_URL}/Miracle Infoserv.pdf`
+                );
+              }}
+              style={{
+                position: "absolute",
+                top: 10,
+                right: 10,
+                zIndex: 10,
+                background: "#000",
+                color: "#fff",
+                border: "none",
+                borderRadius: "4px",
+                padding: "4px 8px",
+                cursor: "pointer",
+              }}
+            >
+              <MdZoomOutMap />
+            </button>
             <Document
               file={`${process.env.PUBLIC_URL}/Miracle Infoserv.pdf`}
               onLoadSuccess={onDocumentLoadSuccess}
@@ -141,7 +171,7 @@ const CourseViewer = () => {
   return (
     <div className="course-viewer-wrapper py-3">
       <Container fluid>
-        <Row className="gx-3 gy-3">
+        <Row className="gx-3 gy-3" style={{}}>
           {/* Main Content Area */}
           <Col lg={8} md={12}>
             <div
@@ -150,7 +180,7 @@ const CourseViewer = () => {
             >
               <div
                 ref={mediaRef}
-                className="mb-3 d-flex flex-sm-row justify-content-between align-items-center align-items-sm-start gap-2"
+                className="mb-3 d-flex flex-sm-row justify-content-between align-items-center align-items-sm-start gap-2 sticky-xs"
               >
                 {/* Heading with responsive class */}
                 <h2 className="fw-bold text-dark mb-0 now-playing-heading">
@@ -201,7 +231,7 @@ const CourseViewer = () => {
               </div>
               <div
                 className="overflow-auto hide-scrollbar"
-                style={{ maxHeight: "75vh" }}
+                style={{ maxHeight: "65vh" }}
               >
                 {courses.map((course, courseIndex) => {
                   const isExpanded = expandedCourseIndex === courseIndex;
@@ -324,6 +354,54 @@ const CourseViewer = () => {
           </Col>
         </Row>
       </Container>
+      {isFullscreen && selectedPdf && (
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: "#fff",
+            zIndex: 9999,
+            overflowY: "auto",
+            padding: 20,
+          }}
+        >
+          {/* Close Fullscreen Button */}
+          <button
+            onClick={() => {
+              setIsFullscreen(false);
+              setSelectedPdf(null);
+            }}
+            style={{
+              position: "fixed",
+              top: 20,
+              right: 20,
+              zIndex: 10000,
+              backgroundColor: "#000",
+              color: "#fff",
+              border: "none",
+              borderRadius: 4,
+              padding: "8px 12px",
+              fontSize: 14,
+              cursor: "pointer",
+            }}
+          >
+            ❌ Close
+          </button>
+
+          <Document file={selectedPdf} onLoadSuccess={onDocumentLoadSuccess}>
+            {Array.from(new Array(numPages), (_, index) => (
+              <Page
+                key={`page_${index + 1}`}
+                pageNumber={index + 1}
+                width={window.innerWidth - 40}
+              />
+            ))}
+          </Document>
+        </div>
+      )}
     </div>
   );
 };
