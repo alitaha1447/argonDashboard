@@ -173,6 +173,14 @@ export const course = [
         label: "Topic 5 - Ppt",
         type: "ppt",
       },
+      {
+        label: "Topic 6 - Text",
+        type: "text",
+      },
+      {
+        label: "Topic 7 - Link",
+        type: "link",
+      },
     ],
   },
   {
@@ -201,6 +209,14 @@ export const course = [
       {
         label: "Topic 5 - Ppt",
         type: "ppt",
+      },
+      {
+        label: "Topic 6 - Text",
+        type: "text",
+      },
+      {
+        label: "Topic 7 - Link",
+        type: "link",
       },
     ],
   },
@@ -231,6 +247,14 @@ export const course = [
         label: "Topic 5 - Ppt",
         type: "ppt",
       },
+      {
+        label: "Topic 6 - Text",
+        type: "text",
+      },
+      {
+        label: "Topic 7 - Link",
+        type: "link",
+      },
     ],
   },
   {
@@ -259,6 +283,14 @@ export const course = [
       {
         label: "Topic 5 - Ppt",
         type: "ppt",
+      },
+      {
+        label: "Topic 6 - Text",
+        type: "text",
+      },
+      {
+        label: "Topic 7 - Link",
+        type: "link",
       },
     ],
   },
@@ -289,6 +321,14 @@ export const course = [
         label: "Topic 5 - Ppt",
         type: "ppt",
       },
+      {
+        label: "Topic 6 - Text",
+        type: "text",
+      },
+      {
+        label: "Topic 7 - Link",
+        type: "link",
+      },
     ],
   },
   {
@@ -317,6 +357,14 @@ export const course = [
       {
         label: "Topic 5 - Ppt",
         type: "ppt",
+      },
+      {
+        label: "Topic 6 - Text",
+        type: "text",
+      },
+      {
+        label: "Topic 7 - Link",
+        type: "link",
       },
     ],
   },

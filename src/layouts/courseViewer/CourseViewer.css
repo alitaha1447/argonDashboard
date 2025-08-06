@@ -64,7 +64,7 @@
 }
 
 .expand-wrapper.open {
-  max-height: 300px; /* adjust based on how tall your content is */
+  max-height: 1000px; /* adjust based on how tall your content is */
 }
 
 .comment-box {
@@ -72,4 +72,29 @@
   background: #f8f9fa;
   border-radius: 8px;
   padding: 1rem;
+}
+
+/* Fade and slide down animation */
+@keyframes fadeSlideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Modal container with transition */
+.user-modal {
+  animation: fadeSlideDown 0.5s ease forwards;
+  opacity: 0;
+  transform: translateY(-15px);
+}
+
+/* When visible */
+.user-modal.show {
+  opacity: 1;
+  transform: translateY(0);
 }

@@ -4,7 +4,7 @@ import { IoIosArrowDown } from "react-icons/io";
 import "layouts/courseViewer2/CourseViewer2.css";
 import { useResizeDetector } from "react-resize-detector";
 import ReactPlayer from "react-player";
-import DocViewer, { DocViewerRenderers } from "react-doc-viewer";
+// import DocViewer, { DocViewerRenderers } from "react-doc-viewer";
 import { pdfjs, Document, Page } from "react-pdf";
 import "react-pdf/dist/Page/AnnotationLayer.css";
 import "react-pdf/dist/Page/TextLayer.css";
