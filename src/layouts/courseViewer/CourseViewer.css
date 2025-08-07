@@ -57,22 +57,22 @@
   display: none; /* Chrome, Safari */
 }
 
-.expand-wrapper {
+/* .expand-wrapper {
   overflow: hidden;
   max-height: 0;
   transition: max-height 0.4s ease-in-out;
 }
 
 .expand-wrapper.open {
-  max-height: 1000px; /* adjust based on how tall your content is */
-}
+  max-height: 1000px;
+} */
 
-.comment-box {
+/* .comment-box {
   margin-top: 0.5rem;
   background: #f8f9fa;
   border-radius: 8px;
   padding: 1rem;
-}
+} */
 
 /* Fade and slide down animation */
 @keyframes fadeSlideDown {
@@ -93,8 +93,38 @@
   transform: translateY(-15px);
 }
 
-/* When visible */
 .user-modal.show {
   opacity: 1;
   transform: translateY(0);
 }
+
+/* Small screen tweaks */
+@media (max-width: 576px) {
+  .user-modal {
+    padding: 0.75rem !important;
+  }
+
+  .user-modal .rounded-circle {
+    width: 60px !important;
+    height: 60px !important;
+  }
+
+  .user-modal .user-name {
+    font-size: 1rem !important;
+  }
+
+  .user-modal .user-details span {
+    font-size: 0.75rem !important;
+  }
+
+  .user-modal .contact-btn {
+    font-size: 0.7rem !important;
+    padding: 2px 6px !important;
+  }
+
+  .user-modal .contact-number {
+    font-size: 0.75rem !important;
+  }
+}
+
+/*  */

@@ -63,9 +63,10 @@ const BatchModal = ({
   resetSelected = () => {},
 }) => {
   const userId = useSelector((state) => state?.auth?.id);
-  const [loading, setLoading] = useState(false);
+  const storedBranches = useSelector((state) => state.auth.selectedBranch);
 
   const fileInputRef = useRef(null);
+  const [loading, setLoading] = useState(false);
 
   const stdId = studentID.map((item) => ({
     // id: "", // or generate unique id if needed
@@ -132,14 +133,19 @@ const BatchModal = ({
   } = useBranchList();
   const { courseOptions, fetchCourseDetails } = usePreferredCourse();
 
-  // Custom Option component with checkbox
   useEffect(() => {
-    if (branchSearchText.length < 3) {
-      setBranchOptions([]);
-      return;
+    if (storedBranches) {
+      const formatted = Array.isArray(storedBranches)
+        ? storedBranches
+        : [storedBranches];
+
+      setSelectedBranch(formatted);
     }
-    fetchBranch();
-  }, [branchSearchText]);
+  }, [storedBranches]);
+
+  useEffect(() => {
+    fetchBranch("", "", userId);
+  }, []);
 
   const handleFaculty = async () => {
     try {
@@ -281,11 +287,11 @@ const BatchModal = ({
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
+    // setLoading(true);
 
     const { errors } = getValidationErrors({
       batchName,
-      selectedQualification,
+      // selectedQualification,
       selectedCoursesOptions,
       selectedBatch,
       selectedBranch,
@@ -343,7 +349,7 @@ const BatchModal = ({
       batch_level: selectedBatch?.value,
       Payment_type: selectPayment?.value,
       sponsorid: isOrganization ? selectedOrganization?.value : null,
-      min_qualification: selectedQualification?.value,
+      min_qualification: selectedQualification?.value ?? 0,
       CreatedBy: userId.toString(),
       batch_locations: selectedBranch.map((item) => ({
         branchid: item.value,
@@ -353,7 +359,6 @@ const BatchModal = ({
       batch_students: stdId,
       installments_details: installmentsDetails,
     };
-
     try {
       const res = await axios.post(`${API_PATH}/api/Batch`, batchFormData, {
         params: {
@@ -432,17 +437,18 @@ const BatchModal = ({
                     <FormGroup>
                       <Label>
                         Minimum Qualification
-                        <span className="text-danger">*</span>
+                        {/* <span className="text-danger">*</span> */}
                       </Label>
                       <Select
+                        isClearable
                         options={qualificationOptions}
                         value={selectedQualification}
                         onChange={(selected) => {
                           setSelectedOptionsQualification(selected);
-                          setFormErrors((prev) => ({
-                            ...prev,
-                            selectedQualification: "",
-                          }));
+                          // setFormErrors((prev) => ({
+                          //   ...prev,
+                          //   selectedQualification: "",
+                          // }));
                         }}
                         onMenuOpen={fetchQualificationLists}
                         menuPortalTarget={document.body}
@@ -452,11 +458,11 @@ const BatchModal = ({
                         }}
                         menuShouldScrollIntoView={false}
                       />
-                      {formErrors.selectedQualification && (
+                      {/* {formErrors.selectedQualification && (
                         <div className="text-danger mt-1">
                           {formErrors.selectedQualification}
                         </div>
-                      )}
+                      )} */}
                     </FormGroup>
                   </Col>
                 </Row>
@@ -760,8 +766,8 @@ const BatchModal = ({
                       </Label>
                       <Select
                         isMulti
-                        closeMenuOnSelect={false}
-                        hideSelectedOptions={false}
+                        // closeMenuOnSelect={false}
+                        // hideSelectedOptions={false}
                         components={{ Option: CheckboxOption }}
                         options={branchOptions}
                         value={selectedBranch}

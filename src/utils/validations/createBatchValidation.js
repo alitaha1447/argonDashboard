@@ -1,6 +1,6 @@
 export const getValidationErrors = ({
   batchName = "",
-  selectedQualification,
+  // selectedQualification,
   selectedCoursesOptions,
   selectedBatch,
   selectedBranch,
@@ -20,9 +20,9 @@ export const getValidationErrors = ({
     errors.batchName = "Batch Title is a mandatory field!";
   }
 
-  if (!selectedQualification || selectedQualification.length === 0) {
-    errors.selectedQualification = "Highest Qualification is required!";
-  }
+  // if (!selectedQualification || selectedQualification.length === 0) {
+  //   errors.selectedQualification = "Highest Qualification is required!";
+  // }
 
   if (!selectedCoursesOptions || selectedCoursesOptions.length === 0) {
     errors.selectedCoursesOptions = "At least one course must be selected!";

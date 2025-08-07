@@ -14,9 +14,13 @@ import {
 } from "reactstrap";
 import { course } from "DummyData";
 import { MdInsertComment, MdOutlineTimer } from "react-icons/md";
-import { IoIosArrowDown } from "react-icons/io";
+import { IoIosArrowDown, IoMdSend, IoIosArrowUp } from "react-icons/io";
 import { CiTextAlignLeft } from "react-icons/ci";
-import { MdZoomOutMap } from "react-icons/md";
+import {
+  MdZoomOutMap,
+  MdOutlineZoomOutMap,
+  MdOutlineZoomInMap,
+} from "react-icons/md";
 import { FaUserTie } from "react-icons/fa";
 import "layouts/courseViewer/CourseViewer.css";
 import { useResizeDetector } from "react-resize-detector";
@@ -142,15 +146,15 @@ const CourseViewer = () => {
                 top: 10,
                 right: 10,
                 zIndex: 10,
-                background: "#000",
-                color: "#fff",
+                // background: "#000",
+                // color: "#fff",
                 border: "none",
                 borderRadius: "4px",
-                padding: "4px 8px",
+                // padding: "4px 8px",
                 cursor: "pointer",
               }}
             >
-              <MdZoomOutMap />
+              <MdOutlineZoomOutMap />
             </button>
             <Document
               file={`${process.env.PUBLIC_URL}/Miracle Infoserv.pdf`}
@@ -162,15 +166,7 @@ const CourseViewer = () => {
         );
 
       case "ppt":
-        return (
-          <div style={{ height: "100%", border: "1px solid #ccc" }}>
-            <DocViewer
-              documents={docs}
-              pluginRenderers={DocViewerRenderers}
-              style={{ height: "100%", width: "100%" }}
-            />
-          </div>
-        );
+        return <DocViewer documents={docs} />;
       case "text":
         return (
           <div
@@ -272,19 +268,14 @@ const CourseViewer = () => {
           {/* Main Content Area */}
           <Col lg={8} md={12}>
             <div
+              ref={mediaRef}
               className="rounded-3 shadow-sm p-3"
               style={{ background: "#eee9dbff" }}
             >
-              <div
-                ref={mediaRef}
-                className="mb-3 d-flex flex-sm-row justify-content-between align-items-center align-items-sm-start gap-2 sticky-xs"
-              >
-                {/* Heading with responsive class */}
+              <div className="mb-3 d-flex flex-sm-row justify-content-between align-items-center align-items-sm-start gap-2 sticky-xs">
                 <h2 className="fw-bold text-dark mb-0 now-playing-heading">
                   Now Playing
                 </h2>
-
-                {/* Button with responsive class */}
                 <Button
                   className="now-playing-button"
                   style={{
@@ -305,8 +296,8 @@ const CourseViewer = () => {
           {/* Sidebar */}
           <Col lg={4} md={12}>
             <div
-              className="rounded-3 shadow-sm p-3 h-100"
-              style={{ background: "#eee9dbff" }}
+              className="rounded-3 shadow-sm p-3 "
+              style={{ background: "#eee9dbff", height: "100%" }}
             >
               <div className="mb-4">
                 <div className="d-flex justify-content-between align-items-center">
@@ -333,43 +324,45 @@ const CourseViewer = () => {
                     className={`user-modal my-3 p-3 rounded position-absolute top-5 start-10 ${
                       user ? "show" : ""
                     }`}
-                    // className="my-3 p-3 position-absolute top-5 start-10"
                     style={{
                       zIndex: 999,
                       backgroundColor: "#d4d3d0ff",
-                      // boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)",
-                      // cursor: "pointer",
                       width: "calc(100% - 60px)",
+                      maxWidth: "600px",
                       transition: "opacity 0.3s ease, transform 0.3s ease",
                     }}
                   >
                     <div className="border border-primary rounded mb-2 p-2">
                       <div className="d-flex align-items-center">
-                        {/* Rounded Image on Left */}
                         <div
-                          className="rounded-circle overflow-hidden me-3"
+                          className="rounded-circle me-3 flex-shrink-0"
                           style={{
                             width: "80px",
                             height: "80px",
+                            overflow: "hidden",
                             backgroundColor: "#f0f0f0",
                           }}
                         >
                           <img
                             src={require("assets/img/81kJPl8jmiL._SY741_.jpg")}
                             alt="User"
-                            className="w-100 h-100 object-fit-cover"
+                            style={{
+                              width: "100%",
+                              height: "100%",
+                              objectFit: "contain",
+                            }}
                           />
                         </div>
 
-                        {/* User Details on Right */}
                         <div className="flex-grow-1">
-                          <div className="fw-bold">Taha</div>
-                          <div className="d-flex flex-column text-muted small">
+                          <div className="fw-bold user-name">Taha</div>
+                          <div className="d-flex flex-column text-muted user-details">
                             <span>Age: 25</span>
                             <span>Email ID: test@gmail.com</span>
-                            <div>
+                            <div className="d-flex align-items-center gap-2 mt-1">
                               <Button
                                 size="sm"
+                                className="contact-btn"
                                 style={{
                                   background: "#5E72E4",
                                   color: "white",
@@ -378,7 +371,9 @@ const CourseViewer = () => {
                               >
                                 Contact No
                               </Button>
-                              +91-1236547890
+                              <span className="text-dark fw-semibold contact-number">
+                                +91-1236547890
+                              </span>
                             </div>
                           </div>
                         </div>
@@ -403,7 +398,7 @@ const CourseViewer = () => {
               </div>
               <div
                 className="overflow-auto hide-scrollbar"
-                style={{ maxHeight: "65vh" }}
+                style={{ height: "65vh" }}
               >
                 {courses.map((course, courseIndex) => {
                   const isExpanded = expandedCourseIndex === courseIndex;
@@ -417,7 +412,12 @@ const CourseViewer = () => {
                         border: isExpanded
                           ? "2px solid #0d6efd"
                           : "1px solid #dee2e6",
-                        transition: "border-color 0.3s",
+                        // height: isExpanded ? "auto" : "80px",
+                        maxHeight: isExpanded ? "450px" : "80px", // Estimate max height
+                        transition:
+                          "max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
+                        overflow: "hidden",
+                        // overflowY: "auto",
                       }}
                     >
                       <div
@@ -436,20 +436,44 @@ const CourseViewer = () => {
                           </div>
                         </div>
                         <div className="d-flex align-items-center gap-2">
-                          <MdInsertComment
-                            style={{ cursor: "pointer" }}
-                            onClick={() => toggleCommentExpansion(courseIndex)}
-                          />
+                          <div
+                            style={{
+                              backgroundColor:
+                                expandedCommentIndex === courseIndex
+                                  ? "#e9ecef"
+                                  : "transparent",
+                              borderRadius: "5px",
+                              padding: "5px",
+                              display: "inline-block",
+                            }}
+                          >
+                            <MdInsertComment
+                              size={20}
+                              style={{ cursor: "pointer" }}
+                              onClick={() =>
+                                toggleCommentExpansion(courseIndex)
+                              }
+                            />
+                          </div>
+
                           <CiTextAlignLeft style={{ cursor: "pointer" }} />
-                          <IoIosArrowDown
+                          <span
                             style={{ cursor: "pointer" }}
                             onClick={() => toggleExpansion(courseIndex)}
-                          />
+                          >
+                            {isExpanded ? <IoIosArrowUp /> : <IoIosArrowDown />}
+                          </span>
                         </div>
                       </div>
                       {/* Expandable Topics */}
                       <div
-                        className={`expand-wrapper ${isExpanded ? "open" : ""}`}
+                        style={{
+                          maxHeight: "350px", // or any height you prefer
+                          overflowY: "auto",
+                          paddingRight: "0.5rem",
+                          scrollbarWidth: "none" /* Firefox */,
+                        }}
+                        // className={`expand-wrapper ${isExpanded ? "open" : ""}`}
                       >
                         {course?.topics?.map((topic, topicIndex) => (
                           <div
@@ -497,7 +521,7 @@ const CourseViewer = () => {
                             <textarea
                               className="form-control"
                               placeholder="Add your comment here..."
-                              rows={3}
+                              rows={2}
                               value={inputComment}
                               onChange={(e) => setInputComment(e.target.value)}
                             />
@@ -518,6 +542,10 @@ const CourseViewer = () => {
                                       <li
                                         key={cmtIndx}
                                         className="list-group-item py-2 px-2 small"
+                                        style={{
+                                          border: "1px solid red",
+                                          marginBottom: "0.5rem",
+                                        }}
                                       >
                                         <div
                                           style={{
@@ -527,26 +555,6 @@ const CourseViewer = () => {
                                         >
                                           {cmt.comment}
                                         </div>
-
-                                        {/* Replies (if any) */}
-                                        {cmt?.reply?.length > 0 && (
-                                          <ul className="list-unstyled mt-2 ms-1">
-                                            {cmt.reply.map((rep, repIndex) => (
-                                              <li
-                                                key={rep.replyId}
-                                                className="mb-1 px-3"
-                                                style={{
-                                                  fontSize: "0.85rem", // slightly larger
-                                                  color: "#333", // darker text
-                                                }}
-                                              >
-                                                {rep.text}
-                                              </li>
-                                            ))}
-                                          </ul>
-                                        )}
-
-                                        {/* Reply button */}
                                         <span
                                           className="btn btn-link text-primary p-0"
                                           style={{
@@ -562,8 +570,6 @@ const CourseViewer = () => {
                                         >
                                           Reply
                                         </span>
-
-                                        {/* Reply Textarea */}
                                         {isReplying && (
                                           <>
                                             <textarea
@@ -591,6 +597,73 @@ const CourseViewer = () => {
                                             </div>
                                           </>
                                         )}
+                                        {/* Replies (if any) */}
+                                        {cmt?.reply?.length > 0 && (
+                                          <ul
+                                            className="list-unstyled mt-2 ms-1"
+                                            style={{
+                                              border: "1px solid blue",
+                                              marginBottom: "0.5rem",
+                                            }}
+                                          >
+                                            {cmt.reply.map((rep, repIndex) => (
+                                              <li
+                                                key={rep.replyId}
+                                                className="mb-1 px-3"
+                                                style={{
+                                                  fontSize: "0.85rem",
+                                                  color: "#333",
+                                                }}
+                                              >
+                                                {rep.text}
+                                              </li>
+                                            ))}
+                                          </ul>
+                                        )}
+                                        {/* Reply button */}
+                                        {/* <span
+                                          className="btn btn-link text-primary p-0"
+                                          style={{
+                                            fontSize: "0.75rem",
+                                            lineHeight: "1",
+                                            marginTop: "2px",
+                                          }}
+                                          onClick={() =>
+                                            setActiveReplyId((prev) =>
+                                              prev === cmtIndx ? null : cmtIndx
+                                            )
+                                          }
+                                        >
+                                          Reply
+                                        </span> */}
+                                        {/* Reply Textarea */}
+                                        {/* {isReplying && (
+                                          <>
+                                            <textarea
+                                              className="form-control form-control-sm mt-2"
+                                              rows={1}
+                                              placeholder="Write your reply..."
+                                              value={inputReply}
+                                              onChange={(e) =>
+                                                setInputReply(e.target.value)
+                                              }
+                                            />
+                                            <div className="d-flex justify-content-end mt-2">
+                                              <Button
+                                                size="sm"
+                                                color="success"
+                                                onClick={() =>
+                                                  handleReply(
+                                                    courseIndex,
+                                                    cmtIndx
+                                                  )
+                                                }
+                                              >
+                                                Replied
+                                              </Button>
+                                            </div>
+                                          </>
+                                        )} */}
                                       </li>
                                     );
                                   }
@@ -633,16 +706,16 @@ const CourseViewer = () => {
               top: 20,
               right: 20,
               zIndex: 10000,
-              backgroundColor: "#000",
-              color: "#fff",
+              // backgroundColor: "#000",
+              // color: "#fff",
               border: "none",
               borderRadius: 4,
-              padding: "8px 12px",
+              // padding: "8px 12px",
               fontSize: 14,
               cursor: "pointer",
             }}
           >
-            ❌ Close
+            <MdOutlineZoomInMap />
           </button>
 
           <Document file={selectedPdf} onLoadSuccess={onDocumentLoadSuccess}>

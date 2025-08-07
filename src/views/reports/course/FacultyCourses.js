@@ -409,7 +409,7 @@ const FacultyCourses = () => {
                     ) : facultyBatch.length > 0 ? (
                       facultyBatch.map((item, index) => (
                         <tr key={index}>
-                          <td>{item.batchid}</td>
+                          <td>{index + 1}</td>
                           <td>{item.facultyname}</td>
                           <td>{item.batchname}</td>
                           <td>{getCourseNameById(item.courseid)}</td>{" "}

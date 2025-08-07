@@ -347,7 +347,7 @@ const BatchStudent = () => {
                       batchStudent.map((item, index) => {
                         return (
                           <tr key={item.id}>
-                            <td>{item.id}</td>
+                            <td>{index + 1}</td>
                             <td>{item.admission_no}</td>
                             <td>{item.name}</td>
                             <td>{item.mobileno}</td>
