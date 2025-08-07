@@ -19,6 +19,22 @@
     </a>, sharing stories about traveling and cooking, as well as tips on how
     to run a successful blog.
   </p>
+  <p style="color: #4a4a4a; font-size: 16px; line-height: 1.8; margin-bottom: 1rem;">
+    It has been exactly 3 years since I wrote my first blog series entitled
+    “Flavorful Tuscany”, but starting it was definitely not easy. Back then, I
+    didn’t know much about blogging, let alone think that one day it could
+    become <strong style="color: #e74c3c;">my full-time job</strong>. Even though I had many recipes
+    and food-related stories to tell, it never crossed my mind that I could be
+    sharing them with the whole world.
+  </p>
+
+  <p style="color: #4a4a4a; font-size: 16px; line-height: 1.8; margin-bottom: 1rem;">
+    I am now a <strong style="color: #27ae60;">full-time blogger</strong> and the curator of the
+    <a href="https://ckeditor.com/ckeditor-4/#" style="color: #2980b9; text-decoration: none; font-weight: 600;">
+      Simply delicious newsletter
+    </a>, sharing stories about traveling and cooking, as well as tips on how
+    to run a successful blog.
+  </p>
 
   <p style="color: #4a4a4a; font-size: 16px; margin-bottom: 0.75rem;">
     If you are tempted by the idea of creating your own blog, please think about the following:

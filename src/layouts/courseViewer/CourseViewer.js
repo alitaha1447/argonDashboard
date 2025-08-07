@@ -3,13 +3,11 @@ import { Container, Row, Col, Button, Progress } from "reactstrap";
 import { course } from "DummyData";
 import { MdInsertComment, MdOutlineTimer } from "react-icons/md";
 import { IoIosArrowDown, IoMdSend, IoIosArrowUp } from "react-icons/io";
+import { MdOutlineZoomOutMap, MdOutlineZoomInMap } from "react-icons/md";
+import { FaPencilAlt } from "react-icons/fa";
+import { RiPencilFill, RiPencilLine } from "react-icons/ri";
 import { CiTextAlignLeft } from "react-icons/ci";
-import {
-  MdZoomOutMap,
-  MdOutlineZoomOutMap,
-  MdOutlineZoomInMap,
-} from "react-icons/md";
-import { FaUserTie } from "react-icons/fa";
+import { FaUserTie, FaDownload } from "react-icons/fa";
 import "layouts/courseViewer/CourseViewer.css";
 import { useResizeDetector } from "react-resize-detector";
 import parse from "html-react-parser";
@@ -30,8 +28,11 @@ const CourseViewer = () => {
   const [expandedCommentIndex, setExpandedCommentIndex] = useState(null);
 
   const [expandedCourseIndex, setExpandedCourseIndex] = useState(null);
+  const [expandedNote, setExpandedNote] = useState(null);
+
   const [contentHeight, setContentHeight] = useState(0);
   const [inputComment, setInputComment] = useState("");
+  const [note, setNote] = useState("");
   const [inputReply, setInputReply] = useState("");
   const [numPages, setNumPages] = useState();
   const [selectedTopic, setSelectedTopic] = useState(null);
@@ -42,6 +43,7 @@ const CourseViewer = () => {
   const [textHtml1, setTextHtml1] = useState("");
   const [user, setUser] = useState(false);
   const [activeReplyId, setActiveReplyId] = useState(null);
+  const [mediaLoading, setMediaLoading] = useState(false);
 
   const docs = [
     {
@@ -65,7 +67,30 @@ const CourseViewer = () => {
   }
   const pptUrl = `${process.env.PUBLIC_URL}/SamplePPTFile_500kb.ppt`;
 
+  useEffect(() => {
+    if (selectedTopic) {
+      // Delay to simulate load time or wait for content-specific events
+      const timeout = setTimeout(() => {
+        setMediaLoading(false);
+      }, 500); // adjust time as needed
+
+      return () => clearTimeout(timeout);
+    }
+  }, [selectedTopic]);
+
   const renderMedia = () => {
+    if (mediaLoading) {
+      return (
+        <div
+          className="d-flex justify-content-center align-items-center"
+          style={{ height: 300 }}
+        >
+          <div className="spinner-border text-primary" role="status">
+            <span className="visually-hidden">Loading...</span>
+          </div>
+        </div>
+      );
+    }
     if (!selectedTopic) return <p>Select a topic to view its content.</p>;
     switch (selectedTopic.type) {
       case "youtube":
@@ -134,11 +159,8 @@ const CourseViewer = () => {
                 top: 10,
                 right: 10,
                 zIndex: 10,
-                // background: "#000",
-                // color: "#fff",
                 border: "none",
                 borderRadius: "4px",
-                // padding: "4px 8px",
                 cursor: "pointer",
               }}
             >
@@ -154,7 +176,19 @@ const CourseViewer = () => {
         );
 
       case "ppt":
-        return <DocViewer documents={docs} />;
+        return (
+          // <iframe
+          //   src={`https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(
+          //     pptUrl
+          //   )}`}
+          //   width="100%"
+          //   height="500px"
+          //   frameBorder="0"
+          //   title="PowerPoint Presentation"
+          //   allowFullScreen
+          // />
+          <DocViewer documents={docs} pluginRenderers={DocViewerRenderers} />
+        );
       case "text":
         return (
           <div
@@ -199,6 +233,32 @@ const CourseViewer = () => {
       prevIndex === courseIndex ? null : courseIndex
     );
   };
+  const toggleNoteExpansion = (courseIndex) => {
+    setExpandedNote((prevIndex) =>
+      prevIndex === courseIndex ? null : courseIndex
+    );
+  };
+
+  const handleCommentSubmit = (courseIndex) => {
+    if (!inputComment.trim()) return;
+
+    setCourses((prev) => {
+      const updated = [...prev];
+      const course = updated[courseIndex];
+
+      if (!course.comment) {
+        course.comment = [];
+      }
+      course.comment.push({
+        commentId: Date.now(),
+        comment: inputComment.trim(),
+      });
+      return updated;
+    });
+
+    setInputComment("");
+  };
+
   const handleReply = (courseIndex, commentIndex) => {
     if (!inputReply.trim()) return;
 
@@ -225,42 +285,39 @@ const CourseViewer = () => {
     setActiveReplyId(null);
   };
 
-  const handleCommentSubmit = (courseIndex) => {
-    if (!inputComment.trim()) return;
-
-    setCourses((prev) => {
-      const updated = [...prev];
-      const course = updated[courseIndex];
-
-      if (!course.comment) {
-        course.comment = [];
-      }
-      course.comment.push({
-        commentId: Date.now(),
-        comment: inputComment.trim(),
-      });
-      return updated;
-    });
-
-    setInputComment("");
-  };
-
   const toggleUser = () => {
     setUser((prev) => !prev);
   };
 
+  const handleDownloadNote = (index) => {
+    const blob = new Blob([inputComment], { type: "text/plain" });
+    const url = URL.createObjectURL(blob);
+
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `note-${index + 1}.txt`; // Set file name
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    // Optional: Revoke the object URL after download
+    URL.revokeObjectURL(url);
+  };
+
   return (
-    <div className="course-viewer-wrapper py-3">
+    <div className="course-viewer-wrapper py-2">
       <Container fluid>
-        <Row className="gx-3 gy-3" style={{}}>
+        <Row className="gx-3 gy-3">
           {/* Main Content Area */}
           <Col lg={8} md={12}>
             <div
               ref={mediaRef}
               className="rounded-3 shadow-sm p-3"
-              style={{ background: "#eee9dbff" }}
+              style={{
+                background: "#eee9dbff",
+              }}
             >
-              <div className="mb-3 d-flex flex-sm-row justify-content-between align-items-center align-items-sm-start gap-2 sticky-xs">
+              <div className="mb-3 d-flex flex-sm-row justify-content-between align-items-center align-items-sm-start">
                 <h2 className="fw-bold text-dark mb-0 now-playing-heading">
                   Now Playing
                 </h2>
@@ -330,7 +387,7 @@ const CourseViewer = () => {
                         msOverflowStyle: "none", // for IE/Edge
                       }}
                     >
-                      {[1, 2].map((_, index) => (
+                      {[1, 2, 3].map((_, index) => (
                         <div className="border border-primary rounded mb-2 p-2">
                           <div className="d-flex align-items-center">
                             <div
@@ -396,7 +453,7 @@ const CourseViewer = () => {
               </div>
               <div
                 className="overflow-auto hide-scrollbar"
-                style={{ height: "65vh" }}
+                style={{ height: "70vh" }}
               >
                 {courses.map((course, courseIndex) => {
                   const isExpanded = expandedCourseIndex === courseIndex;
@@ -410,12 +467,10 @@ const CourseViewer = () => {
                         border: isExpanded
                           ? "2px solid #0d6efd"
                           : "1px solid #dee2e6",
-                        // height: isExpanded ? "auto" : "80px",
-                        maxHeight: isExpanded ? "450px" : "80px", // Estimate max height
+                        maxHeight: isExpanded ? "450px" : "80px",
                         transition:
                           "max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
                         overflow: "hidden",
-                        // overflowY: "auto",
                       }}
                     >
                       <div
@@ -456,8 +511,18 @@ const CourseViewer = () => {
                               }
                             />
                           </div>
+                          <span
+                            style={{ cursor: "pointer" }}
+                            onClick={() => toggleNoteExpansion(courseIndex)}
+                          >
+                            {expandedNote === courseIndex ? (
+                              <RiPencilFill size={20} />
+                            ) : (
+                              <RiPencilLine size={20} />
+                            )}
+                          </span>
 
-                          <CiTextAlignLeft style={{ cursor: "pointer" }} />
+                          {/* <CiTextAlignLeft style={{ cursor: "pointer" }} /> */}
                           <span
                             style={{ cursor: "pointer" }}
                             onClick={() => toggleExpansion(courseIndex)}
@@ -481,6 +546,7 @@ const CourseViewer = () => {
                             key={topicIndex}
                             className="topic-item"
                             onClick={() => {
+                              setMediaLoading(true);
                               setSelectedTopic(topic);
                               mediaRef.current?.scrollIntoView({
                                 behavior: "smooth",
@@ -544,7 +610,8 @@ const CourseViewer = () => {
                                         key={cmtIndx}
                                         className="list-group-item py-2 px-2 small"
                                         style={{
-                                          border: "1px solid red",
+                                          border: "1px solid lightgray",
+                                          borderRadius: "5px",
                                           marginBottom: "0.5rem",
                                         }}
                                       >
@@ -562,6 +629,7 @@ const CourseViewer = () => {
                                             fontSize: "0.75rem",
                                             lineHeight: "1",
                                             marginTop: "2px",
+                                            marginLeft: "10px",
                                           }}
                                           onClick={() =>
                                             setActiveReplyId((prev) =>
@@ -569,7 +637,11 @@ const CourseViewer = () => {
                                             )
                                           }
                                         >
-                                          Reply
+                                          Reply (
+                                          {courses[courseIndex]?.comment?.[
+                                            cmtIndx
+                                          ]?.reply?.length || 0}
+                                          )
                                         </span>
                                         {isReplying && (
                                           <>
@@ -601,16 +673,17 @@ const CourseViewer = () => {
                                         {/* Replies (if any) */}
                                         {cmt?.reply?.length > 0 && (
                                           <ul
-                                            className="list-unstyled mt-2 ms-1"
+                                            className="list-unstyled mt-2 ms-3"
                                             style={{
-                                              border: "1px solid blue",
+                                              border: "1px solid lightgray",
                                               marginBottom: "0.5rem",
+                                              borderRadius: "5px",
                                             }}
                                           >
                                             {cmt.reply.map((rep, repIndex) => (
                                               <li
                                                 key={rep.replyId}
-                                                className="mb-1 px-3"
+                                                className="mb-1 px-1"
                                                 style={{
                                                   fontSize: "0.85rem",
                                                   color: "#333",
@@ -621,56 +694,34 @@ const CourseViewer = () => {
                                             ))}
                                           </ul>
                                         )}
-                                        {/* Reply button */}
-                                        {/* <span
-                                          className="btn btn-link text-primary p-0"
-                                          style={{
-                                            fontSize: "0.75rem",
-                                            lineHeight: "1",
-                                            marginTop: "2px",
-                                          }}
-                                          onClick={() =>
-                                            setActiveReplyId((prev) =>
-                                              prev === cmtIndx ? null : cmtIndx
-                                            )
-                                          }
-                                        >
-                                          Reply
-                                        </span> */}
-                                        {/* Reply Textarea */}
-                                        {/* {isReplying && (
-                                          <>
-                                            <textarea
-                                              className="form-control form-control-sm mt-2"
-                                              rows={1}
-                                              placeholder="Write your reply..."
-                                              value={inputReply}
-                                              onChange={(e) =>
-                                                setInputReply(e.target.value)
-                                              }
-                                            />
-                                            <div className="d-flex justify-content-end mt-2">
-                                              <Button
-                                                size="sm"
-                                                color="success"
-                                                onClick={() =>
-                                                  handleReply(
-                                                    courseIndex,
-                                                    cmtIndx
-                                                  )
-                                                }
-                                              >
-                                                Replied
-                                              </Button>
-                                            </div>
-                                          </>
-                                        )} */}
                                       </li>
                                     );
                                   }
                                 )}
                               </ul>
                             )}
+                          </div>
+                        )}
+                        {expandedNote === courseIndex && (
+                          <div
+                            style={{
+                              padding: "0 1rem 1rem",
+                              marginTop: "1rem",
+                            }}
+                          >
+                            <textarea
+                              className="form-control"
+                              placeholder="Add your notes here..."
+                              rows={2}
+                              value={note}
+                              onChange={(e) => setNote(e.target.value)}
+                            />
+                            <button
+                              className="btn btn-sm btn-primary mt-2 mb-2"
+                              onClick={() => handleDownloadNote(courseIndex)}
+                            >
+                              <FaDownload />
+                            </button>
                           </div>
                         )}
                       </div>
@@ -707,11 +758,8 @@ const CourseViewer = () => {
               top: 20,
               right: 20,
               zIndex: 10000,
-              // backgroundColor: "#000",
-              // color: "#fff",
               border: "none",
               borderRadius: 4,
-              // padding: "8px 12px",
               fontSize: 14,
               cursor: "pointer",
             }}

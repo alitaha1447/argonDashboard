@@ -1,6 +1,6 @@
 .course-viewer-wrapper {
   min-height: 100vh;
-  /* background: #eec0c0; */
+  background: #ebd0d0;
 }
 
 .lesson-item:hover {
@@ -11,7 +11,7 @@
   border-left: 4px solid #007bff;
 }
 .video-wrapper {
-  aspect-ratio: 15 / 8;
+  aspect-ratio: 16 / 9;
   width: 100%;
 
   /* background: #000; */
@@ -36,6 +36,11 @@
   }
 }
 
+@media (max-width: 1024px) {
+  .video-wrapper {
+    aspect-ratio: 4 / 3;
+  }
+}
 @media (max-width: 768px) {
   .video-wrapper {
     aspect-ratio: 4 / 3;
