@@ -1,17 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import {
-  Container,
-  Row,
-  Col,
-  Button,
-  Progress,
-  DropdownMenu,
-  DropdownItem,
-  UncontrolledDropdown,
-  DropdownToggle,
-  Media,
-  Collapse,
-} from "reactstrap";
+import { Container, Row, Col, Button, Progress } from "reactstrap";
 import { course } from "DummyData";
 import { MdInsertComment, MdOutlineTimer } from "react-icons/md";
 import { IoIosArrowDown, IoMdSend, IoIosArrowUp } from "react-icons/io";
@@ -321,63 +309,73 @@ const CourseViewer = () => {
 
                 {user && (
                   <div
-                    className={`user-modal my-3 p-3 rounded position-absolute top-5 start-10 ${
-                      user ? "show" : ""
-                    }`}
+                    className={`user-modal my-3 p-3 rounded position-absolute top-5 start-10`}
                     style={{
                       zIndex: 999,
                       backgroundColor: "#d4d3d0ff",
                       width: "calc(100% - 60px)",
-                      maxWidth: "600px",
-                      transition: "opacity 0.3s ease, transform 0.3s ease",
+                      height: "250px",
+                      overflow: "hidden",
                     }}
                   >
-                    <div className="border border-primary rounded mb-2 p-2">
-                      <div className="d-flex align-items-center">
-                        <div
-                          className="rounded-circle me-3 flex-shrink-0"
-                          style={{
-                            width: "80px",
-                            height: "80px",
-                            overflow: "hidden",
-                            backgroundColor: "#f0f0f0",
-                          }}
-                        >
-                          <img
-                            src={require("assets/img/81kJPl8jmiL._SY741_.jpg")}
-                            alt="User"
-                            style={{
-                              width: "100%",
-                              height: "100%",
-                              objectFit: "contain",
-                            }}
-                          />
-                        </div>
-
-                        <div className="flex-grow-1">
-                          <div className="fw-bold user-name">Taha</div>
-                          <div className="d-flex flex-column text-muted user-details">
-                            <span>Age: 25</span>
-                            <span>Email ID: test@gmail.com</span>
-                            <div className="d-flex align-items-center gap-2 mt-1">
-                              <Button
-                                size="sm"
-                                className="contact-btn"
+                    <div
+                      style={{
+                        height: "100%",
+                        overflowY: "auto",
+                        paddingRight: "6px",
+                        willChange: "transform",
+                        backfaceVisibility: "hidden",
+                        WebkitOverflowScrolling: "touch",
+                        scrollbarWidth: "none", // for Firefox
+                        msOverflowStyle: "none", // for IE/Edge
+                      }}
+                    >
+                      {[1, 2].map((_, index) => (
+                        <div className="border border-primary rounded mb-2 p-2">
+                          <div className="d-flex align-items-center">
+                            <div
+                              className="rounded-circle me-3 flex-shrink-0"
+                              style={{
+                                width: "80px",
+                                height: "80px",
+                                overflow: "hidden",
+                                backgroundColor: "#f0f0f0",
+                              }}
+                            >
+                              <img
+                                src={require("assets/img/81kJPl8jmiL._SY741_.jpg")}
+                                alt="User"
                                 style={{
-                                  background: "#5E72E4",
-                                  color: "white",
-                                  border: "none",
+                                  width: "100%",
+                                  height: "100%",
+                                  objectFit: "contain",
                                 }}
-                              >
-                                Contact No
-                              </Button>
-                              <span className="text-dark fw-semibold contact-number">
-                                +91-1236547890
-                              </span>
+                              />
+                            </div>
+
+                            <div className="flex-grow-1">
+                              <div className="fw-bold user-name">Taha</div>
+                              <div className="d-flex flex-column text-muted user-details">
+                                <span>Age: 25</span>
+                                <span>Email ID: test@gmail.com</span>
+                                <div className="d-flex align-items-center gap-2 mt-1">
+                                  <Button
+                                    size="sm"
+                                    className="contact-btn"
+                                    style={{
+                                      background: "#5E72E4",
+                                      color: "white",
+                                      border: "none",
+                                    }}
+                                  >
+                                    +91-1236547890
+                                  </Button>
+                                </div>
+                              </div>
                             </div>
                           </div>
                         </div>
-                      </div>
+                      ))}
                     </div>
                   </div>
                 )}
@@ -428,7 +426,10 @@ const CourseViewer = () => {
                           alignItems: "center",
                         }}
                       >
-                        <div style={{ cursor: "pointer" }}>
+                        <div
+                          style={{ cursor: "pointer" }}
+                          onClick={() => toggleExpansion(courseIndex)}
+                        >
                           <strong>{course.title}</strong>
                           <div className="d-flex align-items-center gap-1 text-muted small">
                             <MdOutlineTimer size={14} />

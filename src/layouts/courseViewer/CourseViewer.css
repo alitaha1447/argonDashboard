@@ -93,10 +93,10 @@
   transform: translateY(-15px);
 }
 
-.user-modal.show {
+/* .user-modal.show {
   opacity: 1;
   transform: translateY(0);
-}
+} */
 
 /* Small screen tweaks */
 @media (max-width: 576px) {
