@@ -1,15 +1,19 @@
+import "layouts/courseViewer/CourseViewer.css";
 import React, { useState, useRef, useEffect } from "react";
 import { Container, Row, Col, Button, Progress } from "reactstrap";
 import { course } from "DummyData";
 import { MdInsertComment, MdOutlineTimer } from "react-icons/md";
 import { IoIosArrowDown, IoMdSend, IoIosArrowUp } from "react-icons/io";
-import { MdOutlineZoomOutMap, MdOutlineZoomInMap } from "react-icons/md";
-import { FaPencilAlt } from "react-icons/fa";
+// import { MdOutlineZoomOutMap, MdOutlineZoomInMap } from "react-icons/md";
+// import { FaPencilAlt } from "react-icons/fa";
 import { RiPencilFill, RiPencilLine } from "react-icons/ri";
-import { CiTextAlignLeft } from "react-icons/ci";
+// import { CiTextAlignLeft } from "react-icons/ci";
 import { FaUserTie, FaDownload } from "react-icons/fa";
-import "layouts/courseViewer/CourseViewer.css";
-import { useResizeDetector } from "react-resize-detector";
+import { TiLockClosed, TiTick } from "react-icons/ti";
+// import { RxCross2 } from "react-icons/rx";
+import { ImCross } from "react-icons/im";
+
+// import { useResizeDetector } from "react-resize-detector";
 import parse from "html-react-parser";
 import Iframe from "react-iframe";
 import ReactPlayer from "react-player";
@@ -19,38 +23,47 @@ import "@cyntler/react-doc-viewer/dist/index.css";
 import { pdfjs, Document, Page } from "react-pdf";
 import "react-pdf/dist/Page/AnnotationLayer.css";
 import "react-pdf/dist/Page/TextLayer.css";
+
 pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
 
 const CourseViewer = () => {
   const mediaRef = useRef(null);
-  const contentRef = useRef({});
-  const { width, height, ref } = useResizeDetector();
+  // const contentRef = useRef({});
+  // const { width, height, ref } = useResizeDetector();
   const [expandedCommentIndex, setExpandedCommentIndex] = useState(null);
 
   const [expandedCourseIndex, setExpandedCourseIndex] = useState(null);
   const [expandedNote, setExpandedNote] = useState(null);
 
-  const [contentHeight, setContentHeight] = useState(0);
+  // const [contentHeight, setContentHeight] = useState(0);
   const [inputComment, setInputComment] = useState("");
   const [note, setNote] = useState("");
   const [inputReply, setInputReply] = useState("");
-  const [numPages, setNumPages] = useState();
+  // const [numPages, setNumPages] = useState();
   const [selectedTopic, setSelectedTopic] = useState(null);
 
   const [courses, setCourses] = useState(course);
-  const [isFullscreen, setIsFullscreen] = useState(false);
-  const [selectedPdf, setSelectedPdf] = useState(null); // e.g. for file path
+  // const [isFullscreen, setIsFullscreen] = useState(false);
+  // const [selectedPdf, setSelectedPdf] = useState(null);
   const [textHtml1, setTextHtml1] = useState("");
   const [user, setUser] = useState(false);
   const [activeReplyId, setActiveReplyId] = useState(null);
   const [mediaLoading, setMediaLoading] = useState(false);
+  // const [allNotes, setAllNotes] = useState([]);
 
   const docs = [
     {
       uri: "https://sample-videos.com/ppt/Sample-PPT-File-500kb.ppt",
       fileType: "ppt",
-      fileName: "taha",
-    }, // Local File
+      fileName: "Sample-PPT-File-500kb.ppt",
+    },
+  ];
+  const docs2 = [
+    {
+      uri: require("assets/files/Miracle Infoserv.pdf"),
+      fileType: "pdf",
+      fileName: "Miracle Infoserv.pdf",
+    },
   ];
 
   useEffect(() => {
@@ -62,10 +75,10 @@ const CourseViewer = () => {
       .catch((err) => console.error("Error loading file:", err));
   }, []);
 
-  function onDocumentLoadSuccess({ numPages }) {
-    setNumPages(numPages);
-  }
-  const pptUrl = `${process.env.PUBLIC_URL}/SamplePPTFile_500kb.ppt`;
+  // function onDocumentLoadSuccess({ numPages }) {
+  //   setNumPages(numPages);
+  // }
+  // const pptUrl = `${process.env.PUBLIC_URL}/SamplePPTFile_500kb.ppt`;
 
   useEffect(() => {
     if (selectedTopic) {
@@ -138,55 +151,47 @@ const CourseViewer = () => {
         );
       case "pdf":
         return (
-          <div
-            ref={ref}
-            style={{
-              width: "100%",
-              height: "100%",
-              overflowY: "scroll",
-              position: "relative",
-            }}
-          >
-            <button
-              onClick={() => {
-                setIsFullscreen(true);
-                setSelectedPdf(
-                  `${process.env.PUBLIC_URL}/Miracle Infoserv.pdf`
-                );
-              }}
-              style={{
-                position: "absolute",
-                top: 10,
-                right: 10,
-                zIndex: 10,
-                border: "none",
-                borderRadius: "4px",
-                cursor: "pointer",
-              }}
-            >
-              <MdOutlineZoomOutMap />
-            </button>
-            <Document
-              file={`${process.env.PUBLIC_URL}/Miracle Infoserv.pdf`}
-              onLoadSuccess={onDocumentLoadSuccess}
-            >
-              <Page pageNumber={1} width={width} height={height} />
-            </Document>
-          </div>
+          <DocViewer documents={docs2} pluginRenderers={DocViewerRenderers} />
+
+          // <div
+          //   ref={ref}
+          //   style={{
+          //     width: "100%",
+          //     height: "100%",
+          //     overflowY: "scroll",
+          //     position: "relative",
+          //   }}
+          // >
+          //   <button
+          //     onClick={() => {
+          //       setIsFullscreen(true);
+          //       setSelectedPdf(
+          //         `${process.env.PUBLIC_URL}/Miracle Infoserv.pdf`
+          //       );
+          //     }}
+          //     style={{
+          //       position: "absolute",
+          //       top: 10,
+          //       right: 10,
+          //       zIndex: 10,
+          //       border: "none",
+          //       borderRadius: "4px",
+          //       cursor: "pointer",
+          //     }}
+          //   >
+          //     <MdOutlineZoomOutMap />
+          //   </button>
+          //   <Document
+          //     file={`${process.env.PUBLIC_URL}/Miracle Infoserv.pdf`}
+          //     onLoadSuccess={onDocumentLoadSuccess}
+          //   >
+          //     <Page pageNumber={1} width={width} height={height} />
+          //   </Document>
+          // </div>
         );
 
       case "ppt":
         return (
-          // <iframe
-          //   src={`https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(
-          //     pptUrl
-          //   )}`}
-          //   width="100%"
-          //   height="500px"
-          //   frameBorder="0"
-          //   title="PowerPoint Presentation"
-          //   allowFullScreen
-          // />
           <DocViewer documents={docs} pluginRenderers={DocViewerRenderers} />
         );
       case "text":
@@ -239,6 +244,24 @@ const CourseViewer = () => {
     );
   };
 
+  const handleAddNote = (courseIndex) => {
+    if (!note.trim()) return;
+    setCourses((prev) => {
+      const updated = [...prev];
+      const course = updated[courseIndex];
+      if (!course.note) {
+        course.note = [];
+      }
+
+      course.note.push({
+        noteId: Date.now(),
+        note: note.trim(),
+      });
+      return updated;
+    });
+    setNote("");
+  };
+
   const handleCommentSubmit = (courseIndex) => {
     if (!inputComment.trim()) return;
 
@@ -289,18 +312,17 @@ const CourseViewer = () => {
     setUser((prev) => !prev);
   };
 
-  const handleDownloadNote = (index) => {
-    const blob = new Blob([inputComment], { type: "text/plain" });
+  const handleDownloadNote = (courseIndex) => {
+    const notesText = courses[courseIndex].note.map((n) => n.note).join("\n");
+    const blob = new Blob([notesText], { type: "text/plain" });
     const url = URL.createObjectURL(blob);
 
     const link = document.createElement("a");
     link.href = url;
-    link.download = `note-${index + 1}.txt`; // Set file name
+    link.download = `notes-course-${courseIndex + 1}.txt`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-
-    // Optional: Revoke the object URL after download
     URL.revokeObjectURL(url);
   };
 
@@ -453,7 +475,7 @@ const CourseViewer = () => {
               </div>
               <div
                 className="overflow-auto hide-scrollbar"
-                style={{ height: "70vh" }}
+                style={{ height: "70vh", overscrollBehavior: "contain" }}
               >
                 {courses.map((course, courseIndex) => {
                   const isExpanded = expandedCourseIndex === courseIndex;
@@ -467,7 +489,8 @@ const CourseViewer = () => {
                         border: isExpanded
                           ? "2px solid #0d6efd"
                           : "1px solid #dee2e6",
-                        maxHeight: isExpanded ? "450px" : "80px",
+                        // maxHeight: isExpanded ? "450px" : "80px",
+                        maxHeight: isExpanded ? "none" : "80px",
                         transition:
                           "max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
                         overflow: "hidden",
@@ -531,6 +554,7 @@ const CourseViewer = () => {
                           </span>
                         </div>
                       </div>
+
                       {/* Expandable Topics */}
                       <div
                         style={{
@@ -541,43 +565,6 @@ const CourseViewer = () => {
                         }}
                         // className={`expand-wrapper ${isExpanded ? "open" : ""}`}
                       >
-                        {course?.topics?.map((topic, topicIndex) => (
-                          <div
-                            key={topicIndex}
-                            className="topic-item"
-                            onClick={() => {
-                              setMediaLoading(true);
-                              setSelectedTopic(topic);
-                              mediaRef.current?.scrollIntoView({
-                                behavior: "smooth",
-                                block: "start",
-                              });
-                            }}
-                            style={{
-                              cursor: "pointer",
-                              padding: "0.5rem",
-                              marginLeft: "1rem",
-                            }}
-                          >
-                            <strong>{topic.label}</strong>
-                            <div className="d-flex align-items-center gap-1 text-muted small">
-                              {topic?.time && (
-                                <>
-                                  <MdOutlineTimer size={14} />
-                                  <span>{topic.time.trim()}</span>
-                                </>
-                              )}
-                            </div>
-                          </div>
-                        ))}
-                        {!course.topics && (
-                          <div className="p-2">
-                            <p className="text-muted">
-                              No topics available for this course.
-                            </p>
-                          </div>
-                        )}
-
                         {expandedCommentIndex === courseIndex && (
                           <div
                             style={{
@@ -585,6 +572,17 @@ const CourseViewer = () => {
                               marginTop: "1rem",
                             }}
                           >
+                            <span
+                              className="crossIcon"
+                              onClick={() => {
+                                setExpandedCommentIndex(
+                                  (prevIndex) =>
+                                    prevIndex === courseIndex && null
+                                );
+                              }}
+                            >
+                              <ImCross size={18} color="red" />
+                            </span>
                             <textarea
                               className="form-control"
                               placeholder="Add your comment here..."
@@ -670,7 +668,6 @@ const CourseViewer = () => {
                                             </div>
                                           </>
                                         )}
-                                        {/* Replies (if any) */}
                                         {cmt?.reply?.length > 0 && (
                                           <ul
                                             className="list-unstyled mt-2 ms-3"
@@ -709,6 +706,17 @@ const CourseViewer = () => {
                               marginTop: "1rem",
                             }}
                           >
+                            <span
+                              className="crossIcon"
+                              onClick={() => {
+                                setExpandedNote(
+                                  (prevIndex) =>
+                                    prevIndex === courseIndex && null
+                                );
+                              }}
+                            >
+                              <ImCross size={18} color="red" />
+                            </span>
                             <textarea
                               className="form-control"
                               placeholder="Add your notes here..."
@@ -718,10 +726,97 @@ const CourseViewer = () => {
                             />
                             <button
                               className="btn btn-sm btn-primary mt-2 mb-2"
-                              onClick={() => handleDownloadNote(courseIndex)}
+                              onClick={() => handleAddNote(courseIndex)}
                             >
-                              <FaDownload />
+                              Add Note
+                              {/* <FaDownload /> */}
                             </button>
+                            {courses[courseIndex]?.note?.length > 0 && (
+                              <ul className="list-group list-group-flush mt-2">
+                                {courses[courseIndex].note.map(
+                                  (cmt, cmtIndx) => {
+                                    const isReplying =
+                                      activeReplyId === cmtIndx;
+                                    return (
+                                      <li
+                                        key={cmtIndx}
+                                        className="list-group-item py-2 px-2 small"
+                                        style={{
+                                          border: "1px solid lightgray",
+                                          borderRadius: "5px",
+                                          marginBottom: "0.5rem",
+                                        }}
+                                      >
+                                        <div
+                                          style={{
+                                            fontSize: "1.0rem",
+                                            fontWeight: 500,
+                                          }}
+                                        >
+                                          {cmt.note}
+                                        </div>
+                                      </li>
+                                    );
+                                  }
+                                )}
+                                <div
+                                  style={{
+                                    display: "flex",
+                                    justifyContent: "flex-end",
+                                  }}
+                                >
+                                  <button
+                                    className="btn btn-sm btn-primary mt-2 mb-2"
+                                    onClick={() =>
+                                      handleDownloadNote(courseIndex)
+                                    }
+                                  >
+                                    <FaDownload />
+                                  </button>
+                                </div>
+                              </ul>
+                            )}
+                          </div>
+                        )}
+                        {course?.topics?.map((topic, topicIndex) => (
+                          <div
+                            key={topicIndex}
+                            className="topic-item"
+                            onClick={() => {
+                              setMediaLoading(true);
+                              setSelectedTopic(topic);
+                              mediaRef.current?.scrollIntoView({
+                                behavior: "smooth",
+                                block: "start",
+                              });
+                            }}
+                            style={{
+                              cursor: "pointer",
+                              padding: "0.5rem",
+                              marginLeft: "1rem",
+                            }}
+                          >
+                            <strong>
+                              <span className="tickIcon">
+                                <TiTick />
+                              </span>
+                              {topic.label}
+                            </strong>
+                            <div className="d-flex align-items-center gap-1 text-muted small">
+                              {topic?.time && (
+                                <>
+                                  <MdOutlineTimer size={14} />
+                                  <span>{topic.time.trim()}</span>
+                                </>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                        {!course.topics && (
+                          <div className="p-2">
+                            <p className="text-muted">
+                              No topics available for this course.
+                            </p>
                           </div>
                         )}
                       </div>
@@ -733,7 +828,7 @@ const CourseViewer = () => {
           </Col>
         </Row>
       </Container>
-      {isFullscreen && selectedPdf && (
+      {/* {isFullscreen && selectedPdf && (
         <div
           style={{
             position: "fixed",
@@ -747,7 +842,7 @@ const CourseViewer = () => {
             padding: 20,
           }}
         >
-          {/* Close Fullscreen Button */}
+          Close Fullscreen Button
           <button
             onClick={() => {
               setIsFullscreen(false);
@@ -777,7 +872,7 @@ const CourseViewer = () => {
             ))}
           </Document>
         </div>
-      )}
+      )} */}
     </div>
   );
 };

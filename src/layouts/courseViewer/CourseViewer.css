@@ -38,12 +38,17 @@
 
 @media (max-width: 1024px) {
   .video-wrapper {
-    aspect-ratio: 4 / 3;
+    aspect-ratio: 16 / 9;
   }
 }
 @media (max-width: 768px) {
   .video-wrapper {
-    aspect-ratio: 4 / 3;
+    aspect-ratio: 16 / 9 !important;
+  }
+}
+@media (max-width: 425px) {
+  .video-wrapper {
+    aspect-ratio: 16 / 9 !important;
   }
 }
 @media (max-width: 768px) {
@@ -133,3 +138,45 @@
 }
 
 /*  */
+/* Responsive container height */
+/* PPT Viewer CSS */
+#header-bar {
+  display: none;
+}
+#react-doc-viewer {
+  height: 100%;
+  /* border: 1px solid red; */
+}
+#proxy-renderer {
+  height: 100%;
+}
+#msdoc-renderer {
+  width: 100%;
+  height: 100%;
+}
+#pdf-renderer {
+  height: 100%;
+  overflow-y: auto;
+}
+/* RxCross2 Icon */
+.crossIcon {
+  display: inline-block;
+  float: right;
+  margin-bottom: 8px;
+  cursor: pointer;
+  font-size: 18px;
+}
+
+/* Tick Icon */
+.tickIcon {
+  display: inline-flex; /* keeps icon centered */
+  align-items: center;
+  justify-content: center;
+  background-color: #28a745; /* green */
+  border-radius: 50%; /* makes it round */
+  color: white; /* icon color */
+  width: 20px; /* size of circle */
+  height: 20px;
+  font-size: 14px; /* icon size */
+  margin-right: 6px; /* space between icon and text */
+}
