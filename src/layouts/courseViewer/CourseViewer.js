@@ -201,6 +201,7 @@ const CourseViewer = () => {
               width: "100%",
               height: "100%",
               overflow: "auto",
+              scrollbarWidth: "thin",
             }}
           >
             {parse(textHtml1)}
@@ -229,20 +230,41 @@ const CourseViewer = () => {
     }
   };
 
-  const toggleExpansion = (index, sectionType) => {
-    setExpandedCourseIndex((prevIndex) => (prevIndex === index ? null : index));
+  const openSection = (idx, section) => {
+    // Ensure course is expanded
+    if (expandedCourseIndex !== idx) setExpandedCourseIndex(idx);
+
+    // Toggle only the requested section, close the other
+    if (section === "note") {
+      setExpandedNote((prev) => (prev === idx ? null : idx));
+      setExpandedCommentIndex(null);
+    } else if (section === "comment") {
+      setExpandedCommentIndex((prev) => (prev === idx ? null : idx));
+      setExpandedNote(null);
+    }
   };
 
-  const toggleCommentExpansion = (courseIndex) => {
-    setExpandedCommentIndex((prevIndex) =>
-      prevIndex === courseIndex ? null : courseIndex
-    );
+  const toggleExpansion = (index, sectionType) => {
+    // Arrow/title toggle only the course
+    setExpandedCourseIndex((prevIndex) => (prevIndex === index ? null : index));
+    // Optionally close panels when collapsing
+    if (expandedCourseIndex === index) {
+      setExpandedCourseIndex(null);
+      setExpandedNote(null);
+      setExpandedCommentIndex(null);
+    }
   };
-  const toggleNoteExpansion = (courseIndex) => {
-    setExpandedNote((prevIndex) =>
-      prevIndex === courseIndex ? null : courseIndex
-    );
-  };
+
+  // const toggleCommentExpansion = (courseIndex) => {
+  //   setExpandedCommentIndex((prevIndex) =>
+  //     prevIndex === courseIndex ? null : courseIndex
+  //   );
+  // };
+  // const toggleNoteExpansion = (courseIndex) => {
+  //   setExpandedNote((prevIndex) =>
+  //     prevIndex === courseIndex ? null : courseIndex
+  //   );
+  // };
 
   const handleAddNote = (courseIndex) => {
     if (!note.trim()) return;
@@ -474,8 +496,17 @@ const CourseViewer = () => {
                 <Progress value={20} />
               </div>
               <div
-                className="overflow-auto hide-scrollbar"
-                style={{ height: "70vh", overscrollBehavior: "contain" }}
+                className="overflow-auto "
+                style={{
+                  height: "70vh",
+
+                  overscrollBehavior: "auto", // remove the 'contain' shorthand conflict
+                  WebkitOverflowScrolling: "touch",
+                  minHeight: 0, // keep this
+                  touchAction: "pan-y", // new: helps on touch devices
+                  scrollbarWidth: "thin", // fine (Firefox)
+                  scrollbarGutter: "stable", // optional: prevents small jumps
+                }}
               >
                 {courses.map((course, courseIndex) => {
                   const isExpanded = expandedCourseIndex === courseIndex;
@@ -530,13 +561,21 @@ const CourseViewer = () => {
                               size={20}
                               style={{ cursor: "pointer" }}
                               onClick={() =>
-                                toggleCommentExpansion(courseIndex)
+                                openSection(courseIndex, "comment")
                               }
+                              // onClick={() => {
+                              //   toggleExpansion(courseIndex);
+                              //   toggleCommentExpansion(courseIndex);
+                              // }}
                             />
                           </div>
                           <span
                             style={{ cursor: "pointer" }}
-                            onClick={() => toggleNoteExpansion(courseIndex)}
+                            onClick={() => openSection(courseIndex, "note")}
+                            // onClick={() => {
+                            //   toggleExpansion(courseIndex);
+                            //   toggleNoteExpansion(courseIndex);
+                            // }}
                           >
                             {expandedNote === courseIndex ? (
                               <RiPencilFill size={20} />
@@ -581,7 +620,7 @@ const CourseViewer = () => {
                                 );
                               }}
                             >
-                              <ImCross size={18} color="red" />
+                              <ImCross size={12} color="red" />
                             </span>
                             <textarea
                               className="form-control"
@@ -613,6 +652,40 @@ const CourseViewer = () => {
                                           marginBottom: "0.5rem",
                                         }}
                                       >
+                                        {/* Top row with user & date */}
+                                        <div className="d-flex justify-content-between align-items-center mb-1">
+                                          <span
+                                            style={{
+                                              fontSize: "0.75rem",
+                                              fontWeight: 600,
+                                              color: "#007bff",
+                                            }}
+                                          >
+                                            {cmt.commentedBy || "Taha Ali"}
+                                          </span>
+                                          <span
+                                            style={{
+                                              fontSize: "0.60rem",
+                                              color: "#6c757d",
+                                              display: "flex",
+                                              flexDirection: "column", // makes date & time stack
+                                              lineHeight: "1.2",
+                                            }}
+                                          >
+                                            <span>
+                                              {new Date().toLocaleDateString(
+                                                "en-IN",
+                                                { dateStyle: "medium" }
+                                              )}
+                                            </span>
+                                            <span>
+                                              {new Date().toLocaleTimeString(
+                                                "en-IN",
+                                                { timeStyle: "medium" }
+                                              )}
+                                            </span>
+                                          </span>
+                                        </div>
                                         <div
                                           style={{
                                             fontSize: "1.0rem",
@@ -686,6 +759,40 @@ const CourseViewer = () => {
                                                   color: "#333",
                                                 }}
                                               >
+                                                <div className="d-flex justify-content-between align-items-center mb-1">
+                                                  <span
+                                                    style={{
+                                                      fontSize: "0.70rem",
+                                                      fontWeight: 600,
+                                                      color: "#007bff",
+                                                    }}
+                                                  >
+                                                    {cmt.commentedBy ||
+                                                      "Taha Ali"}
+                                                  </span>
+                                                  <span
+                                                    style={{
+                                                      fontSize: "0.60rem",
+                                                      color: "#6c757d",
+                                                      display: "flex",
+                                                      flexDirection: "column", // makes date & time stack
+                                                      lineHeight: "1.2",
+                                                    }}
+                                                  >
+                                                    <span>
+                                                      {new Date().toLocaleDateString(
+                                                        "en-IN",
+                                                        { dateStyle: "medium" }
+                                                      )}
+                                                    </span>
+                                                    <span>
+                                                      {new Date().toLocaleTimeString(
+                                                        "en-IN",
+                                                        { timeStyle: "medium" }
+                                                      )}
+                                                    </span>
+                                                  </span>
+                                                </div>
                                                 {rep.text}
                                               </li>
                                             ))}
@@ -715,7 +822,7 @@ const CourseViewer = () => {
                                 );
                               }}
                             >
-                              <ImCross size={18} color="red" />
+                              <ImCross size={12} color="red" />
                             </span>
                             <textarea
                               className="form-control"
@@ -749,11 +856,46 @@ const CourseViewer = () => {
                                       >
                                         <div
                                           style={{
-                                            fontSize: "1.0rem",
-                                            fontWeight: 500,
+                                            display: "flex",
+                                            justifyContent: "space-between", // pushes date/time to right
+                                            alignItems: "flex-start",
                                           }}
                                         >
-                                          {cmt.note}
+                                          {/* Left: Note text */}
+                                          <span
+                                            style={{
+                                              fontSize: "1.0rem",
+                                              fontWeight: 500,
+                                            }}
+                                          >
+                                            {cmt.note}
+                                          </span>
+
+                                          {/* Right: Date & time stacked */}
+                                          <span
+                                            style={{
+                                              fontSize: "0.65rem",
+                                              color: "#6c757d",
+                                              display: "flex",
+                                              flexDirection: "column",
+                                              textAlign: "right",
+                                              lineHeight: "1.2",
+                                              minWidth: "70px", // keeps alignment neat
+                                            }}
+                                          >
+                                            <span>
+                                              {new Date().toLocaleDateString(
+                                                "en-IN",
+                                                { dateStyle: "medium" }
+                                              )}
+                                            </span>
+                                            <span>
+                                              {new Date().toLocaleTimeString(
+                                                "en-IN",
+                                                { timeStyle: "short" }
+                                              )}
+                                            </span>
+                                          </span>
                                         </div>
                                       </li>
                                     );

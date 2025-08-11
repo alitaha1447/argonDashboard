@@ -369,3 +369,728 @@ export const course = [
     ],
   },
 ];
+
+export const BCA = [
+  {
+    semester: "Semester-1",
+    subjects: [
+      {
+        subjectName: "Programming with C",
+        units: [
+          {
+            unitNumber: "Unit-1",
+            unitTitle: "Program Concept",
+          },
+          {
+            unitNumber: "Unit-2",
+            unitTitle: "Introduction to C Language",
+          },
+          {
+            unitNumber: "Unit-3",
+            unitTitle: "Control Structure",
+          },
+          {
+            unitNumber: "Unit-4",
+            unitTitle: "The Need of c Functions",
+          },
+          {
+            unitNumber: "Unit-5",
+            unitTitle: "Defining Structure",
+          },
+        ],
+      },
+      {
+        subjectName: "Database Management System",
+        units: [
+          {
+            unitNumber: "Unit-1",
+            unitTitle: "Introduction to Database System",
+          },
+          {
+            unitNumber: "Unit-2",
+            unitTitle: "Relational Database Concept Design",
+          },
+          {
+            unitNumber: "Unit-3",
+            unitTitle: "Database Storage",
+          },
+          {
+            unitNumber: "Unit-4",
+            unitTitle: "Security",
+          },
+          {
+            unitNumber: "Unit-5",
+            unitTitle: "Introduction to Current Trends",
+          },
+        ],
+      },
+      {
+        subjectName: "Elementary Mathematics",
+        units: [
+          {
+            unitNumber: "Unit-1",
+            unitTitle: "Sets and Elements",
+          },
+          {
+            unitNumber: "Unit-2",
+            unitTitle: "Functions",
+          },
+          {
+            unitNumber: "Unit-3",
+            unitTitle: "Determinants",
+          },
+          {
+            unitNumber: "Unit-4",
+            unitTitle: "Mathematical Reasoning",
+          },
+          {
+            unitNumber: "Unit-5",
+            unitTitle: "Meaning of Probability",
+          },
+        ],
+      },
+      {
+        subjectName: "Communicative English % Hindi",
+        units: [
+          {
+            unitNumber: "Unit-1",
+            unitTitle: "Program Concept",
+          },
+          {
+            unitNumber: "Unit-2",
+            unitTitle: "Introduction to C Language",
+          },
+          {
+            unitNumber: "Unit-3",
+            unitTitle: "Control Structure",
+          },
+          {
+            unitNumber: "Unit-4",
+            unitTitle: "The Need of c Functions",
+          },
+          {
+            unitNumber: "Unit-5",
+            unitTitle: "Defining Structure",
+          },
+        ],
+      },
+    ],
+  },
+  // {
+  //   semester: "Semester-1",
+  //   subjects: [
+  //     {
+  //       subjectName: "Programming with C",
+  //       units: [
+  //         {
+  //           unitNumber: "Unit-1",
+  //           unitTitle: "Program Concept",
+  //         },
+  //         {
+  //           unitNumber: "Unit-2",
+  //           unitTitle: "Introduction to C Language",
+  //         },
+  //         {
+  //           unitNumber: "Unit-3",
+  //           unitTitle: "Control Structure",
+  //         },
+  //         {
+  //           unitNumber: "Unit-4",
+  //           unitTitle: "The Need of c Functions",
+  //         },
+  //         {
+  //           unitNumber: "Unit-5",
+  //           unitTitle: "Defining Structure",
+  //         },
+  //       ],
+  //     },
+  //     {
+  //       subjectName: "Database Management System",
+  //       units: [
+  //         {
+  //           unitNumber: "Unit-1",
+  //           unitTitle: "Introduction to Database System",
+  //         },
+  //         {
+  //           unitNumber: "Unit-2",
+  //           unitTitle: "Relational Database Concept Design",
+  //         },
+  //         {
+  //           unitNumber: "Unit-3",
+  //           unitTitle: "Database Storage",
+  //         },
+  //         {
+  //           unitNumber: "Unit-4",
+  //           unitTitle: "Security",
+  //         },
+  //         {
+  //           unitNumber: "Unit-5",
+  //           unitTitle: "Introduction to Current Trends",
+  //         },
+  //       ],
+  //     },
+  //     {
+  //       subjectName: "Elementary Mathematics",
+  //       units: [
+  //         {
+  //           unitNumber: "Unit-1",
+  //           unitTitle: "Sets and Elements",
+  //         },
+  //         {
+  //           unitNumber: "Unit-2",
+  //           unitTitle: "Functions",
+  //         },
+  //         {
+  //           unitNumber: "Unit-3",
+  //           unitTitle: "Determinants",
+  //         },
+  //         {
+  //           unitNumber: "Unit-4",
+  //           unitTitle: "Mathematical Reasoning",
+  //         },
+  //         {
+  //           unitNumber: "Unit-5",
+  //           unitTitle: "Meaning of Probability",
+  //         },
+  //       ],
+  //     },
+  //     {
+  //       subjectName: "Communicative English % Hindi",
+  //       units: [
+  //         {
+  //           unitNumber: "Unit-1",
+  //           unitTitle: "Program Concept",
+  //         },
+  //         {
+  //           unitNumber: "Unit-2",
+  //           unitTitle: "Introduction to C Language",
+  //         },
+  //         {
+  //           unitNumber: "Unit-3",
+  //           unitTitle: "Control Structure",
+  //         },
+  //         {
+  //           unitNumber: "Unit-4",
+  //           unitTitle: "The Need of c Functions",
+  //         },
+  //         {
+  //           unitNumber: "Unit-5",
+  //           unitTitle: "Defining Structure",
+  //         },
+  //       ],
+  //     },
+  //   ],
+  // },
+  // {
+  //   semester: "Semester-1",
+  //   subjects: [
+  //     {
+  //       subjectName: "Programming with C",
+  //       units: [
+  //         {
+  //           unitNumber: "Unit-1",
+  //           unitTitle: "Program Concept",
+  //         },
+  //         {
+  //           unitNumber: "Unit-2",
+  //           unitTitle: "Introduction to C Language",
+  //         },
+  //         {
+  //           unitNumber: "Unit-3",
+  //           unitTitle: "Control Structure",
+  //         },
+  //         {
+  //           unitNumber: "Unit-4",
+  //           unitTitle: "The Need of c Functions",
+  //         },
+  //         {
+  //           unitNumber: "Unit-5",
+  //           unitTitle: "Defining Structure",
+  //         },
+  //       ],
+  //     },
+  //     {
+  //       subjectName: "Database Management System",
+  //       units: [
+  //         {
+  //           unitNumber: "Unit-1",
+  //           unitTitle: "Introduction to Database System",
+  //         },
+  //         {
+  //           unitNumber: "Unit-2",
+  //           unitTitle: "Relational Database Concept Design",
+  //         },
+  //         {
+  //           unitNumber: "Unit-3",
+  //           unitTitle: "Database Storage",
+  //         },
+  //         {
+  //           unitNumber: "Unit-4",
+  //           unitTitle: "Security",
+  //         },
+  //         {
+  //           unitNumber: "Unit-5",
+  //           unitTitle: "Introduction to Current Trends",
+  //         },
+  //       ],
+  //     },
+  //     {
+  //       subjectName: "Elementary Mathematics",
+  //       units: [
+  //         {
+  //           unitNumber: "Unit-1",
+  //           unitTitle: "Sets and Elements",
+  //         },
+  //         {
+  //           unitNumber: "Unit-2",
+  //           unitTitle: "Functions",
+  //         },
+  //         {
+  //           unitNumber: "Unit-3",
+  //           unitTitle: "Determinants",
+  //         },
+  //         {
+  //           unitNumber: "Unit-4",
+  //           unitTitle: "Mathematical Reasoning",
+  //         },
+  //         {
+  //           unitNumber: "Unit-5",
+  //           unitTitle: "Meaning of Probability",
+  //         },
+  //       ],
+  //     },
+  //     {
+  //       subjectName: "Communicative English % Hindi",
+  //       units: [
+  //         {
+  //           unitNumber: "Unit-1",
+  //           unitTitle: "Program Concept",
+  //         },
+  //         {
+  //           unitNumber: "Unit-2",
+  //           unitTitle: "Introduction to C Language",
+  //         },
+  //         {
+  //           unitNumber: "Unit-3",
+  //           unitTitle: "Control Structure",
+  //         },
+  //         {
+  //           unitNumber: "Unit-4",
+  //           unitTitle: "The Need of c Functions",
+  //         },
+  //         {
+  //           unitNumber: "Unit-5",
+  //           unitTitle: "Defining Structure",
+  //         },
+  //       ],
+  //     },
+  //   ],
+  // },
+  // {
+  //   semester: "Semester-1",
+  //   subjects: [
+  //     {
+  //       subjectName: "Programming with C",
+  //       units: [
+  //         {
+  //           unitNumber: "Unit-1",
+  //           unitTitle: "Program Concept",
+  //         },
+  //         {
+  //           unitNumber: "Unit-2",
+  //           unitTitle: "Introduction to C Language",
+  //         },
+  //         {
+  //           unitNumber: "Unit-3",
+  //           unitTitle: "Control Structure",
+  //         },
+  //         {
+  //           unitNumber: "Unit-4",
+  //           unitTitle: "The Need of c Functions",
+  //         },
+  //         {
+  //           unitNumber: "Unit-5",
+  //           unitTitle: "Defining Structure",
+  //         },
+  //       ],
+  //     },
+  //     {
+  //       subjectName: "Database Management System",
+  //       units: [
+  //         {
+  //           unitNumber: "Unit-1",
+  //           unitTitle: "Introduction to Database System",
+  //         },
+  //         {
+  //           unitNumber: "Unit-2",
+  //           unitTitle: "Relational Database Concept Design",
+  //         },
+  //         {
+  //           unitNumber: "Unit-3",
+  //           unitTitle: "Database Storage",
+  //         },
+  //         {
+  //           unitNumber: "Unit-4",
+  //           unitTitle: "Security",
+  //         },
+  //         {
+  //           unitNumber: "Unit-5",
+  //           unitTitle: "Introduction to Current Trends",
+  //         },
+  //       ],
+  //     },
+  //     {
+  //       subjectName: "Elementary Mathematics",
+  //       units: [
+  //         {
+  //           unitNumber: "Unit-1",
+  //           unitTitle: "Sets and Elements",
+  //         },
+  //         {
+  //           unitNumber: "Unit-2",
+  //           unitTitle: "Functions",
+  //         },
+  //         {
+  //           unitNumber: "Unit-3",
+  //           unitTitle: "Determinants",
+  //         },
+  //         {
+  //           unitNumber: "Unit-4",
+  //           unitTitle: "Mathematical Reasoning",
+  //         },
+  //         {
+  //           unitNumber: "Unit-5",
+  //           unitTitle: "Meaning of Probability",
+  //         },
+  //       ],
+  //     },
+  //     {
+  //       subjectName: "Communicative English % Hindi",
+  //       units: [
+  //         {
+  //           unitNumber: "Unit-1",
+  //           unitTitle: "Program Concept",
+  //         },
+  //         {
+  //           unitNumber: "Unit-2",
+  //           unitTitle: "Introduction to C Language",
+  //         },
+  //         {
+  //           unitNumber: "Unit-3",
+  //           unitTitle: "Control Structure",
+  //         },
+  //         {
+  //           unitNumber: "Unit-4",
+  //           unitTitle: "The Need of c Functions",
+  //         },
+  //         {
+  //           unitNumber: "Unit-5",
+  //           unitTitle: "Defining Structure",
+  //         },
+  //       ],
+  //     },
+  //   ],
+  // },
+  // {
+  //   semester: "Semester-1",
+  //   subjects: [
+  //     {
+  //       subjectName: "Programming with C",
+  //       units: [
+  //         {
+  //           unitNumber: "Unit-1",
+  //           unitTitle: "Program Concept",
+  //         },
+  //         {
+  //           unitNumber: "Unit-2",
+  //           unitTitle: "Introduction to C Language",
+  //         },
+  //         {
+  //           unitNumber: "Unit-3",
+  //           unitTitle: "Control Structure",
+  //         },
+  //         {
+  //           unitNumber: "Unit-4",
+  //           unitTitle: "The Need of c Functions",
+  //         },
+  //         {
+  //           unitNumber: "Unit-5",
+  //           unitTitle: "Defining Structure",
+  //         },
+  //       ],
+  //     },
+  //     {
+  //       subjectName: "Database Management System",
+  //       units: [
+  //         {
+  //           unitNumber: "Unit-1",
+  //           unitTitle: "Introduction to Database System",
+  //         },
+  //         {
+  //           unitNumber: "Unit-2",
+  //           unitTitle: "Relational Database Concept Design",
+  //         },
+  //         {
+  //           unitNumber: "Unit-3",
+  //           unitTitle: "Database Storage",
+  //         },
+  //         {
+  //           unitNumber: "Unit-4",
+  //           unitTitle: "Security",
+  //         },
+  //         {
+  //           unitNumber: "Unit-5",
+  //           unitTitle: "Introduction to Current Trends",
+  //         },
+  //       ],
+  //     },
+  //     {
+  //       subjectName: "Elementary Mathematics",
+  //       units: [
+  //         {
+  //           unitNumber: "Unit-1",
+  //           unitTitle: "Sets and Elements",
+  //         },
+  //         {
+  //           unitNumber: "Unit-2",
+  //           unitTitle: "Functions",
+  //         },
+  //         {
+  //           unitNumber: "Unit-3",
+  //           unitTitle: "Determinants",
+  //         },
+  //         {
+  //           unitNumber: "Unit-4",
+  //           unitTitle: "Mathematical Reasoning",
+  //         },
+  //         {
+  //           unitNumber: "Unit-5",
+  //           unitTitle: "Meaning of Probability",
+  //         },
+  //       ],
+  //     },
+  //     {
+  //       subjectName: "Communicative English % Hindi",
+  //       units: [
+  //         {
+  //           unitNumber: "Unit-1",
+  //           unitTitle: "Program Concept",
+  //         },
+  //         {
+  //           unitNumber: "Unit-2",
+  //           unitTitle: "Introduction to C Language",
+  //         },
+  //         {
+  //           unitNumber: "Unit-3",
+  //           unitTitle: "Control Structure",
+  //         },
+  //         {
+  //           unitNumber: "Unit-4",
+  //           unitTitle: "The Need of c Functions",
+  //         },
+  //         {
+  //           unitNumber: "Unit-5",
+  //           unitTitle: "Defining Structure",
+  //         },
+  //       ],
+  //     },
+  //   ],
+  // },
+  // {
+  //   semester: "Semester-1",
+  //   subjects: [
+  //     {
+  //       subjectName: "Programming with C",
+  //       units: [
+  //         {
+  //           unitNumber: "Unit-1",
+  //           unitTitle: "Program Concept",
+  //         },
+  //         {
+  //           unitNumber: "Unit-2",
+  //           unitTitle: "Introduction to C Language",
+  //         },
+  //         {
+  //           unitNumber: "Unit-3",
+  //           unitTitle: "Control Structure",
+  //         },
+  //         {
+  //           unitNumber: "Unit-4",
+  //           unitTitle: "The Need of c Functions",
+  //         },
+  //         {
+  //           unitNumber: "Unit-5",
+  //           unitTitle: "Defining Structure",
+  //         },
+  //       ],
+  //     },
+  //     {
+  //       subjectName: "Database Management System",
+  //       units: [
+  //         {
+  //           unitNumber: "Unit-1",
+  //           unitTitle: "Introduction to Database System",
+  //         },
+  //         {
+  //           unitNumber: "Unit-2",
+  //           unitTitle: "Relational Database Concept Design",
+  //         },
+  //         {
+  //           unitNumber: "Unit-3",
+  //           unitTitle: "Database Storage",
+  //         },
+  //         {
+  //           unitNumber: "Unit-4",
+  //           unitTitle: "Security",
+  //         },
+  //         {
+  //           unitNumber: "Unit-5",
+  //           unitTitle: "Introduction to Current Trends",
+  //         },
+  //       ],
+  //     },
+  //     {
+  //       subjectName: "Elementary Mathematics",
+  //       units: [
+  //         {
+  //           unitNumber: "Unit-1",
+  //           unitTitle: "Sets and Elements",
+  //         },
+  //         {
+  //           unitNumber: "Unit-2",
+  //           unitTitle: "Functions",
+  //         },
+  //         {
+  //           unitNumber: "Unit-3",
+  //           unitTitle: "Determinants",
+  //         },
+  //         {
+  //           unitNumber: "Unit-4",
+  //           unitTitle: "Mathematical Reasoning",
+  //         },
+  //         {
+  //           unitNumber: "Unit-5",
+  //           unitTitle: "Meaning of Probability",
+  //         },
+  //       ],
+  //     },
+  //     {
+  //       subjectName: "Communicative English % Hindi",
+  //       units: [
+  //         {
+  //           unitNumber: "Unit-1",
+  //           unitTitle: "Program Concept",
+  //         },
+  //         {
+  //           unitNumber: "Unit-2",
+  //           unitTitle: "Introduction to C Language",
+  //         },
+  //         {
+  //           unitNumber: "Unit-3",
+  //           unitTitle: "Control Structure",
+  //         },
+  //         {
+  //           unitNumber: "Unit-4",
+  //           unitTitle: "The Need of c Functions",
+  //         },
+  //         {
+  //           unitNumber: "Unit-5",
+  //           unitTitle: "Defining Structure",
+  //         },
+  //       ],
+  //     },
+  //   ],
+  // },
+
+  // Repeat the same structure for semesters 2 to 6
+];
+
+export const AtalBihari = [
+  {
+    semester: "Semester-1",
+    subjects: [
+      {
+        subjectName: " आधारभूत जीव विज्ञान एवं पैथोलॉजी",
+        units: [
+          {
+            unitNumber: "इकाई-1",
+            unitTitle: "मानव शरीर परिचय",
+          },
+          {
+            unitNumber: "इकाई-2",
+            unitTitle: "अस्थि-संस्थान या कंकाल तंत्र",
+          },
+          {
+            unitNumber: "इकाई-3",
+            unitTitle: "रक्त परिसंचरण संस्थान",
+          },
+          {
+            unitNumber: "इकाई-4",
+            unitTitle: "आधारभूत पैथोलॉजी",
+          },
+        ],
+      },
+      {
+        subjectName: " मातृत्व एवं बाल स्वास्थ्य देखभाल",
+        units: [
+          {
+            unitNumber: "इकाई-1",
+            unitTitle: "मातृत्व एवं बाल स्वास्थ्य देखभाल",
+          },
+          {
+            unitNumber: "इकाई-2",
+            unitTitle: "राष्ट्रीय स्वास्थ्य कार्यक्रम",
+          },
+          {
+            unitNumber: "इकाई-3",
+            unitTitle: "परिवार कल्याण कार्यक्रम ",
+          },
+        ],
+      },
+      {
+        subjectName:
+          " सामान्य रोग, संक्रमक रोग एवं आपात रोगों का प्रबंधन एवं विभिन्न पद्धतियों से उपचार",
+        units: [
+          {
+            unitNumber: "इकाई-1",
+            unitTitle: "संक्रामक रोग",
+          },
+          {
+            unitNumber: "इकाई-2",
+            unitTitle: "सामान्य रोग",
+          },
+          {
+            unitNumber: "इकाई-3",
+            unitTitle: "आपातकालीन रोगों का प्रबंधन एवं निवारण",
+          },
+          {
+            unitNumber: "इकाई-4",
+            unitTitle:
+              "विभिन्न चिकित्सा पद्धतियों द्वारा सामान्य एवं आकस्मिक रोगों का उपचार",
+          },
+        ],
+      },
+      {
+        subjectName: "प्राथमिक स्वास्थ्य देखभाल और बुनियादी चिकित्सा",
+        units: [
+          {
+            unitNumber: "इकाई-1",
+            unitTitle: "प्राथमिक स्वास्थ्य देखभाल एवं रोगों के रोकथाम के उपाय",
+          },
+          {
+            unitNumber: "इकाई-2",
+            unitTitle: "प्राथमिक स्वास्थ्य सुविधा के सिद्धां",
+          },
+          {
+            unitNumber: "इकाई-3",
+            unitTitle: "पोषण",
+          },
+          {
+            unitNumber: "इकाई-4",
+            unitTitle: "जैव चिकित्सीय प्रबंधन",
+          },
+        ],
+      },
+    ],
+  },
+];
