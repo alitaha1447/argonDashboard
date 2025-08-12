@@ -1,37 +1,264 @@
 import "layouts/courseViewer/CourseViewer.css";
 import React, { useState, useRef, useEffect } from "react";
 import { Container, Row, Col, Button, Progress } from "reactstrap";
-import { IoIosArrowDown } from "react-icons/io";
 import { FaUserTie, FaDownload } from "react-icons/fa";
+import { MdInsertComment, MdOutlineTimer } from "react-icons/md";
+import { IoIosArrowDown, IoMdSend, IoIosArrowUp } from "react-icons/io";
+import { RiPencilFill, RiPencilLine } from "react-icons/ri";
+import { ImCross } from "react-icons/im";
+
 import { BCA } from "DummyData";
+// import { course } from "DummyData";
+import parse from "html-react-parser";
+import Iframe from "react-iframe";
+import ReactPlayer from "react-player";
+import DocViewer, { DocViewerRenderers } from "@cyntler/react-doc-viewer";
+import "@cyntler/react-doc-viewer/dist/index.css";
+import { pdfjs, Document, Page } from "react-pdf";
+import "react-pdf/dist/Page/AnnotationLayer.css";
+import "react-pdf/dist/Page/TextLayer.css";
+
+pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
 
 const CourseViewer = () => {
   const mediaRef = useRef(null);
+  const [textHtml1, setTextHtml1] = useState("");
   const [user, setUser] = useState(false);
   //   ----------------------------------------------------------------------------
   // const [expandBCACourse, setExpandBCACourse] = useState(null);
   // const [expandedBCASubject, setExpandedBCASubject] = useState({}); // { [courseIndex]: subjectIdx|null }
   // 1) Flatten to subjects
   const allSubjects = BCA.flatMap((course) => course.subjects);
+  // console.log(allSubjects);
   // 2) Local state for expanding a subject
   const [expandedSubject, setExpandedSubject] = useState(null);
+  const [expandedMedia, setExpandedMedia] = useState(null);
+  const [selectedTopic, setSelectedTopic] = useState(null);
+  const [expandedTopic, setExpandedTopic] = useState(null); // Dynamic expansion state for topics
+  const [comment, setComment] = useState(null);
+  const [inputComment, setInputComment] = useState("");
+  const [commentsList, setCommentsList] = useState([]); // New state to store comments
+
+  const [note, setNote] = useState(null);
+  const [inputNote, setInputNote] = useState("");
+  const [notesList, setNotesList] = useState([]); // New state to store comments
+  const [inputReply, setInputReply] = useState("");
+  const [replyList, setReplyList] = useState([]); // New state to store comments
+  // const [courses, setCourses] = useState(BCA);
+  const [activeReplyId, setActiveReplyId] = useState(null);
+
+  const docs = [
+    {
+      uri: "https://sample-videos.com/ppt/Sample-PPT-File-500kb.ppt",
+      fileType: "ppt",
+      fileName: "Sample-PPT-File-500kb.ppt",
+    },
+  ];
+  const docs2 = [
+    {
+      uri: require("assets/files/BCA.pdf"),
+      fileType: "pdf",
+      fileName: "Miracle Infoserv.pdf",
+    },
+  ];
+
+  useEffect(() => {
+    fetch(`${process.env.PUBLIC_URL}/test1.txt`)
+      .then((res) => res.text())
+      .then((data) => {
+        setTextHtml1(data);
+      })
+      .catch((err) => console.error("Error loading file:", err));
+  }, []);
+
+  const renderMedia = () => {
+    if (!selectedTopic) return <p>Select a topic to view its content.</p>;
+    switch (selectedTopic.type) {
+      case "youtube":
+        return (
+          // <div className="react-player-wrapper">
+          <ReactPlayer
+            src={selectedTopic.mediaUrl}
+            controls
+            width="100%"
+            height="100%"
+            className="react-player"
+            style={{ borderRadius: "12px" }}
+          />
+          // </div>
+        );
+      case "video":
+        return (
+          <video
+            controls
+            controlsList="nodownload noremoteplayback noplaybackrate"
+            disablePictureInPicture
+            width="100%"
+            height="100%"
+            style={{ borderRadius: "12px" }}
+            onContextMenu={(e) => e.preventDefault()}
+          >
+            <source src={selectedTopic.mediaUrl} type="video/mp4" />
+            Your browser does not support the video tag.
+          </video>
+        );
+
+      case "image":
+        return (
+          <img
+            src={selectedTopic.mediaUrl}
+            alt="Lesson Visual"
+            style={{
+              width: "100%",
+              height: "100%",
+              objectFit: "contain",
+              borderRadius: "12px",
+            }}
+          />
+        );
+      case "pdf":
+        return (
+          <DocViewer documents={docs2} pluginRenderers={DocViewerRenderers} />
+        );
+
+      case "ppt":
+        return (
+          <DocViewer documents={docs} pluginRenderers={DocViewerRenderers} />
+        );
+      case "text":
+        return (
+          <div
+            style={{
+              width: "100%",
+              height: "100%",
+              overflow: "auto",
+              scrollbarWidth: "thin",
+            }}
+          >
+            {parse(textHtml1)}
+          </div>
+        );
+      case "link":
+        return (
+          <div
+            style={{
+              width: "100%",
+              height: "100%",
+              border: "1px solid #ccc",
+            }}
+          >
+            <Iframe
+              url="https://www.learnpython.org/#google_vignette"
+              width="100%"
+              height="100%"
+              allowFullScreen
+            />
+          </div>
+        );
+
+      default:
+        return <p>Unsupported media type</p>;
+    }
+  };
 
   const toggleUser = () => {
     setUser((prev) => !prev);
   };
 
-  // const toggleBCAExpansion = (index) => {
-  //   setExpandBCACourse((prevIndex) => (prevIndex === index ? null : index));
-  // };
-  // const toggleBCASubject = (cIdx, sIdx) => {
-  //   setExpandedBCASubject((prev) => ({
-  //     ...prev,
-  //     [cIdx]: prev[cIdx] === sIdx ? null : sIdx,
-  //   }));
-  // };
-
   const toggleSubject = (i) =>
     setExpandedSubject(expandedSubject === i ? null : i);
+
+  const toggleTopic = (unitIndex, topicIndex) => {
+    const topicKey = `${unitIndex}-${topicIndex}`;
+    setExpandedTopic(expandedTopic === topicKey ? null : topicKey);
+  };
+
+  const toggleComment = (unitIndex, subjectIndex) => {
+    const commentKey = `${unitIndex}-${subjectIndex}`;
+    setComment((prev) => (prev === commentKey ? null : commentKey));
+  };
+
+  const toggleNote = (unitIndex, subjectIndex) => {
+    const noteKey = `${unitIndex}-${subjectIndex}`;
+    setNote((prev) => (prev === noteKey ? null : noteKey));
+  };
+
+  const handleCommentSubmit = (unitIndex, subjectIndex) => {
+    const newComment = inputComment; // Get the current comment
+    if (newComment.trim()) {
+      // Add the comment to the list
+      setCommentsList((prevComments) => [
+        ...prevComments,
+        { unitIndex, subjectIndex, comment: newComment },
+      ]);
+      setInputComment(""); // Reset the input field
+    }
+  };
+
+  // Handle reply submission
+  const handleReply = (unitIndex, subjectIndex, commentIndex) => {
+    const newReply = inputReply;
+    if (newReply.trim()) {
+      const updatedReplies = [...replyList];
+      updatedReplies.push({
+        unitIndex,
+        subjectIndex,
+        commentIndex,
+        reply: newReply,
+      });
+      setReplyList(updatedReplies);
+      setInputReply(""); // Reset the reply input field
+      setActiveReplyId(null); // Hide the reply input after submission
+    }
+  };
+
+  const handleAddNote = (unitIndex, subjectIndex) => {
+    const newNote = inputNote; // Get the current comment
+    if (newNote.trim()) {
+      // Add the comment to the list
+      setNotesList((prevNotes) => [
+        ...prevNotes,
+        { unitIndex, subjectIndex, note: newNote },
+      ]);
+      setInputNote(""); // Reset the input field
+    }
+  };
+
+  // Handle downloading all notes as a text file
+  const handleDownloadNotesForUnit = (unitIndex, subjectIndex) => {
+    // Collect notes only for the current unit and subject
+    const filteredNotes = notesList
+      .filter(
+        (item) =>
+          item.unitIndex === unitIndex && item.subjectIndex === subjectIndex
+      )
+      .map(
+        (item) =>
+          `Subject: ${item.unitIndex}-${item.subjectIndex}\nNote: ${item.note}\n\n`
+      )
+      .join(""); // Join all notes into one string
+
+    // If there are no notes, show an alert
+    if (!filteredNotes) {
+      alert("No notes available for download.");
+      return;
+    }
+
+    // Create a Blob from the filtered notes text
+    const blob = new Blob([filteredNotes], { type: "text/plain" });
+    const url = URL.createObjectURL(blob);
+
+    // Create an anchor element to trigger the download
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `notes-unit-${unitIndex}-subject-${subjectIndex}.txt`; // Naming file based on unit and subject
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    // Revoke the URL after the download is triggered
+    URL.revokeObjectURL(url);
+  };
 
   return (
     <div className="course-viewer-wrapper py-2">
@@ -62,7 +289,7 @@ const CourseViewer = () => {
                 </Button>
               </div>
               <div className="video-wrapper rounded-3 mb-3 h-100">
-                {/* {renderMedia()} */}
+                {renderMedia()}
               </div>
             </div>
           </Col>
@@ -207,72 +434,495 @@ const CourseViewer = () => {
                   scrollbarGutter: "stable", // optional: prevents small jumps
                 }}
               >
-                {allSubjects.map((subject, idx) => {
-                  const isExpanded = expandedSubject === idx;
-
-                  return (
-                    <div
-                      key={idx}
-                      className="mb-3 rounded-3"
-                      style={{
-                        backgroundColor: "#fff",
-                        height: isExpanded ? "auto" : "auto",
-                        border: isExpanded
-                          ? "1px solid #0d6efd"
-                          : "1px solid #eceff3ff",
-                        overflow: "hidden",
-                      }}
-                    >
-                      {/* Header shows SUBJECT NAME (was Semester) */}
+                {BCA.map((semester, semesterIndex) => {
+                  return semester?.subjects.map((subject, subjectIndex) => {
+                    return (
                       <div
+                        key={subjectIndex}
+                        className="mb-3 rounded-3"
                         style={{
-                          padding: "1rem",
-                          display: "flex",
-                          justifyContent: "space-between",
-                          alignItems: "center",
-                          cursor: "pointer",
+                          backgroundColor: "#fff",
+                          // border: isExpanded
+                          border:
+                            expandedSubject === subjectIndex
+                              ? "2px solid #0d6efd"
+                              : "1px solid #dee2e6",
+                          maxHeight:
+                            expandedSubject === subjectIndex ? "none" : "80px",
+                          transition:
+                            "max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
+                          overflowY: "hidden",
                         }}
-                        onClick={() => toggleSubject(idx)}
                       >
-                        <strong>{subject.subjectName}</strong>
-                        <span
+                        <div
                           style={{
-                            display: "inline-block",
-                            transform: isExpanded
-                              ? "rotate(180deg)"
-                              : "rotate(0deg)",
+                            padding: "1rem",
+                            display: "flex",
+                            justifyContent: "space-between",
+                            alignItems: "center",
                           }}
                         >
-                          <IoIosArrowDown />
-                        </span>
-                      </div>
-
-                      {/* Body shows UNITS (was Subject row) */}
-                      {isExpanded && (
-                        <ul
-                          className="list-group list-group-flush mt-2 mb-2 mx-2"
-                          style={{
-                            listStyle: "none",
-                            border: "1px solid #eceff3ff",
-                            borderRadius: "0.5rem",
-                          }}
-                        >
-                          {subject.units.map((unit, uIdx) => (
-                            <li
-                              key={uIdx}
-                              className="list-group-item py-1 px-2"
-                              style={{ listStyle: "none", fontSize: "0.9rem" }}
+                          <div
+                            style={{ cursor: "pointer" }}
+                            onClick={() => toggleSubject(subjectIndex)}
+                          >
+                            <strong>{subject.subjectName}</strong>
+                            <div className="d-flex align-items-center gap-1 text-muted small">
+                              <MdOutlineTimer size={14} />
+                              <span>2:30</span>
+                            </div>
+                          </div>
+                          <div className="d-flex align-items-center gap-2">
+                            <span
+                              style={{ cursor: "pointer" }}
+                              onClick={() => toggleSubject(subjectIndex)}
                             >
-                              <span style={{ opacity: 0.8 }}>
-                                {unit.unitNumber}:
-                              </span>{" "}
-                              {unit.unitTitle}
-                            </li>
-                          ))}
-                        </ul>
-                      )}
-                    </div>
-                  );
+                              {expandedSubject === subjectIndex ? (
+                                <IoIosArrowUp />
+                              ) : (
+                                <IoIosArrowDown />
+                              )}
+                            </span>
+                          </div>
+                        </div>
+                        {expandedSubject === subjectIndex &&
+                          subject?.units.map((unit, unitIndex) => {
+                            // const isExpanded = expandedSubject === unitIndex;
+                            return (
+                              <div
+                                key={unitIndex}
+                                style={{
+                                  padding: "0.5rem",
+                                  margin: "0 1rem",
+                                }}
+                              >
+                                <div
+                                  style={{
+                                    display: "flex",
+                                    justifyContent: "space-between",
+                                    alignItems: "center",
+                                  }}
+                                >
+                                  <strong
+                                    style={{ cursor: "pointer" }}
+                                    onClick={() =>
+                                      toggleTopic(unitIndex, subjectIndex)
+                                    }
+                                  >
+                                    <span style={{ opacity: 0.8 }}>
+                                      {unit.unitNumber}:
+                                    </span>
+                                    {unit.unitTitle}
+                                  </strong>
+                                  <div className="d-flex align-items-center gap-2">
+                                    <div
+                                      style={{
+                                        backgroundColor:
+                                          comment ===
+                                          `${unitIndex}-${subjectIndex}`
+                                            ? "#e9ecef"
+                                            : "transparent",
+                                        borderRadius: "5px",
+                                        padding: "5px",
+                                        display: "inline-block",
+                                      }}
+                                    >
+                                      <MdInsertComment
+                                        size={20}
+                                        style={{ cursor: "pointer" }}
+                                        onClick={() =>
+                                          toggleComment(unitIndex, subjectIndex)
+                                        }
+                                      />
+                                    </div>
+                                    <div
+                                      style={{ cursor: "pointer" }}
+                                      onClick={() =>
+                                        toggleNote(unitIndex, subjectIndex)
+                                      }
+                                    >
+                                      {note ===
+                                      `${unitIndex}-${subjectIndex}` ? (
+                                        <RiPencilFill size={20} />
+                                      ) : (
+                                        <RiPencilLine size={20} />
+                                      )}
+                                    </div>
+                                    <span
+                                      style={{ cursor: "pointer" }}
+                                      onClick={() =>
+                                        toggleTopic(unitIndex, subjectIndex)
+                                      }
+                                    >
+                                      {expandedTopic ===
+                                      `${unitIndex}-${subjectIndex}` ? (
+                                        <IoIosArrowUp />
+                                      ) : (
+                                        <IoIosArrowDown />
+                                      )}
+                                    </span>
+                                  </div>
+                                </div>
+                                {comment === `${unitIndex}-${subjectIndex}` && (
+                                  <div
+                                    style={{
+                                      // padding: "0 1rem 1rem",
+                                      marginTop: "1rem",
+                                    }}
+                                  >
+                                    <span
+                                      className="crossIcon"
+                                      onClick={() => {
+                                        setComment(
+                                          (prevIndex) =>
+                                            prevIndex ===
+                                              `${unitIndex}-${subjectIndex}` &&
+                                            null
+                                        );
+                                      }}
+                                    >
+                                      <ImCross size={12} color="red" />
+                                    </span>
+                                    <textarea
+                                      className="form-control"
+                                      placeholder="Add your comment here..."
+                                      rows={1}
+                                      value={inputComment}
+                                      onChange={(e) =>
+                                        setInputComment(e.target.value)
+                                      }
+                                    />
+                                    <button
+                                      className="btn btn-sm btn-primary mt-2 mb-2"
+                                      onClick={() =>
+                                        handleCommentSubmit(
+                                          unitIndex,
+                                          subjectIndex
+                                        )
+                                      }
+                                    >
+                                      Submit
+                                    </button>
+                                    {/* Separator Line */}
+
+                                    <ul className="list-group list-group-flush mt-2">
+                                      {/* Display submitted comments */}
+                                      {commentsList
+                                        .filter(
+                                          (item) =>
+                                            item.unitIndex === unitIndex &&
+                                            item.subjectIndex === subjectIndex
+                                        )
+                                        .map((item, cmtIndx) => (
+                                          <li
+                                            key={cmtIndx}
+                                            className="list-group-item py-2 px-2 small"
+                                            style={{
+                                              border: "1px solid lightgray",
+                                              borderRadius: "5px",
+                                              marginBottom: "0.5rem",
+                                            }}
+                                          >
+                                            {/* Top row with user & date */}
+                                            <div className="d-flex justify-content-between align-items-center mb-1">
+                                              <span
+                                                style={{
+                                                  fontSize: "0.75rem",
+                                                  fontWeight: 600,
+                                                  color: "#007bff",
+                                                }}
+                                              >
+                                                {"Taha Ali"}
+                                              </span>
+                                              <span
+                                                style={{
+                                                  fontSize: "0.60rem",
+                                                  color: "#6c757d",
+                                                  display: "flex",
+                                                  flexDirection: "column", // makes date & time stack
+                                                  lineHeight: "1.2",
+                                                }}
+                                              >
+                                                <span>
+                                                  {new Date().toLocaleDateString(
+                                                    "en-IN",
+                                                    { dateStyle: "medium" }
+                                                  )}
+                                                </span>
+                                                <span>
+                                                  {new Date().toLocaleTimeString(
+                                                    "en-IN",
+                                                    { timeStyle: "medium" }
+                                                  )}
+                                                </span>
+                                              </span>
+                                            </div>
+                                            <div
+                                              style={{
+                                                fontSize: "1.0rem",
+                                                fontWeight: 500,
+                                              }}
+                                            >
+                                              {item.comment}
+                                            </div>
+                                            <span
+                                              className="btn btn-link text-primary p-0"
+                                              style={{
+                                                fontSize: "0.75rem",
+                                                lineHeight: "1",
+                                                marginTop: "2px",
+                                                marginLeft: "10px",
+                                              }}
+                                              onClick={() =>
+                                                setActiveReplyId((prev) =>
+                                                  prev === cmtIndx
+                                                    ? null
+                                                    : cmtIndx
+                                                )
+                                              }
+                                            >
+                                              Reply (
+                                              {
+                                                replyList.filter(
+                                                  (reply) =>
+                                                    reply.commentIndex ===
+                                                    cmtIndx
+                                                ).length
+                                              }
+                                              )
+                                            </span>
+                                            {activeReplyId === cmtIndx && (
+                                              <>
+                                                <textarea
+                                                  className="form-control form-control-sm mt-2"
+                                                  rows={1}
+                                                  placeholder="Write your reply..."
+                                                  value={inputReply}
+                                                  onChange={(e) =>
+                                                    setInputReply(
+                                                      e.target.value
+                                                    )
+                                                  }
+                                                />
+                                                <div className="d-flex justify-content-end mt-2">
+                                                  <Button
+                                                    size="sm"
+                                                    color="success"
+                                                    onClick={() =>
+                                                      handleReply(
+                                                        unitIndex,
+                                                        subjectIndex,
+                                                        cmtIndx
+                                                      )
+                                                    }
+                                                  >
+                                                    Reply
+                                                  </Button>
+                                                </div>
+                                              </>
+                                            )}
+
+                                            {replyList
+                                              .filter(
+                                                (reply) =>
+                                                  reply.unitIndex ===
+                                                    unitIndex &&
+                                                  reply.subjectIndex ===
+                                                    subjectIndex &&
+                                                  reply.commentIndex === cmtIndx
+                                              )
+                                              .map((reply, index) => (
+                                                <div
+                                                  key={index}
+                                                  style={{
+                                                    paddingLeft: "20px",
+                                                  }}
+                                                >
+                                                  <span
+                                                    style={{
+                                                      fontSize: "0.85rem",
+                                                    }}
+                                                  >
+                                                    {reply.reply}
+                                                  </span>
+                                                </div>
+                                              ))}
+                                          </li>
+                                          // <div
+                                          //   key={index}
+                                          //   style={{
+                                          //     padding: "0.5rem 0",
+                                          //   }}
+                                          // >
+                                          //   <p
+                                          //     style={{
+                                          //       fontSize: "0.9rem", // Smaller text for the comments
+                                          //       margin: 0, // Removes extra margin around the paragraph
+                                          //       color: "#555", // Sets a darker grey color for the comment text
+                                          //     }}
+                                          //   >
+                                          //     {item.comment}
+                                          //   </p>
+                                          // </div>
+                                        ))}
+                                    </ul>
+                                  </div>
+                                )}
+                                {note === `${unitIndex}-${subjectIndex}` && (
+                                  <div
+                                    style={
+                                      {
+                                        // padding: "0 1rem 1rem",
+                                        // marginTop: "1rem",
+                                      }
+                                    }
+                                  >
+                                    <span
+                                      className="crossIcon"
+                                      onClick={() => {
+                                        setNote(
+                                          (prevIndex) =>
+                                            prevIndex ===
+                                              `${unitIndex}-${subjectIndex}` &&
+                                            null
+                                        );
+                                      }}
+                                    >
+                                      <ImCross size={12} color="red" />
+                                    </span>
+                                    <textarea
+                                      className="form-control"
+                                      placeholder="Add your notes here..."
+                                      rows={2}
+                                      value={inputNote}
+                                      onChange={(e) =>
+                                        setInputNote(e.target.value)
+                                      }
+                                    />
+                                    <button
+                                      className="btn btn-sm btn-primary mt-2 mb-2"
+                                      onClick={() =>
+                                        handleAddNote(unitIndex, subjectIndex)
+                                      }
+                                    >
+                                      Add Note
+                                      {/* <FaDownload /> */}
+                                    </button>
+                                    <ul className="list-group list-group-flush mt-2">
+                                      {/* Display submitted comments */}
+                                      {notesList
+                                        .filter(
+                                          (item) =>
+                                            item.unitIndex === unitIndex &&
+                                            item.subjectIndex === subjectIndex
+                                        )
+                                        .map((item, index) => (
+                                          <li
+                                            key={index}
+                                            className="list-group-item py-2 px-2 small"
+                                            style={{
+                                              border: "1px solid lightgray",
+                                              borderRadius: "5px",
+                                              marginBottom: "0.5rem",
+                                            }}
+                                          >
+                                            {/* Top row with user & date */}
+                                            <div
+                                              style={{
+                                                display: "flex",
+                                                justifyContent: "space-between", // pushes date/time to right
+                                                alignItems: "flex-start",
+                                              }}
+                                            >
+                                              {/* Left: Note text */}
+                                              <span
+                                                style={{
+                                                  fontSize: "1.0rem",
+                                                  fontWeight: 500,
+                                                }}
+                                              >
+                                                {item.note}
+                                              </span>
+
+                                              {/* Right: Date & time stacked */}
+                                              <span
+                                                style={{
+                                                  fontSize: "0.65rem",
+                                                  color: "#6c757d",
+                                                  display: "flex",
+                                                  flexDirection: "column",
+                                                  textAlign: "right",
+                                                  lineHeight: "1.2",
+                                                  minWidth: "70px", // keeps alignment neat
+                                                }}
+                                              >
+                                                <span>
+                                                  {new Date().toLocaleDateString(
+                                                    "en-IN",
+                                                    { dateStyle: "medium" }
+                                                  )}
+                                                </span>
+                                                <span>
+                                                  {new Date().toLocaleTimeString(
+                                                    "en-IN",
+                                                    { timeStyle: "short" }
+                                                  )}
+                                                </span>
+                                              </span>
+                                            </div>
+                                          </li>
+                                        ))}
+                                      <div
+                                        style={{
+                                          display: "flex",
+                                          justifyContent: "flex-end",
+                                        }}
+                                      >
+                                        <button
+                                          className="btn btn-sm btn-primary mt-2 mb-2"
+                                          onClick={() =>
+                                            handleDownloadNotesForUnit(
+                                              unitIndex,
+                                              subjectIndex
+                                            )
+                                          }
+                                        >
+                                          <FaDownload />
+                                        </button>
+                                      </div>
+                                    </ul>
+                                  </div>
+                                )}
+                                {/* Show Topics under each Unit */}
+                                {expandedTopic ===
+                                  `${unitIndex}-${subjectIndex}` && // Dynamic topic rendering
+                                  unit.topics?.map((topic, topicIndex) => (
+                                    <div
+                                      key={topicIndex}
+                                      onClick={() => {
+                                        // setMediaLoading(true);
+                                        setSelectedTopic(topic);
+                                        mediaRef.current?.scrollIntoView({
+                                          behavior: "smooth",
+                                          block: "start",
+                                        });
+                                      }}
+                                      style={{
+                                        cursor: "pointer",
+                                        padding: "0.5rem 1rem",
+                                        marginLeft: "0.5rem",
+                                        // margin: "0 0.5rem",
+                                      }}
+                                    >
+                                      <strong>{topic.label}</strong>
+                                    </div>
+                                  ))}
+                              </div>
+                            );
+                          })}
+                      </div>
+                    );
+                  });
                 })}
               </div>
             </div>
