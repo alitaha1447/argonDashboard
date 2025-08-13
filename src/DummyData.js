@@ -382,35 +382,35 @@ export const BCA = [
             unitTitle: "Program Concept",
             topics: [
               {
-                label: "Topic 1 - You Tude Video",
+                label: "Program Concept You Tude Video",
                 type: "youtube",
                 mediaUrl:
                   "https://www.youtube.com/watch?v=s0g4ty29Xgg&list=PLBlnK6fEyqRh6isJ01MBnbNpV3ZsktSyS",
                 time: "2:30",
               },
               {
-                label: "Topic 2 - MP 4 Video",
+                label: "Program Concept MP 4 Video",
                 type: "video",
                 mediaUrl:
                   "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
                 time: "8:30",
               },
-              { label: "Topic 3 - PDF", type: "pdf" },
+              { label: "Program Concept PDF", type: "pdf" },
               {
-                label: "Topic 4 - Image",
+                label: "Program Concept Image",
                 type: "image",
                 mediaUrl: require("assets/img/c.png"),
               },
               {
-                label: "Topic 5 - Ppt",
+                label: "Program Concept Ppt",
                 type: "ppt",
               },
               {
-                label: "Topic 6 - Text",
+                label: "Program Concept Text",
                 type: "text",
               },
               {
-                label: "Topic 7 - Link",
+                label: "Program Concept Link",
                 type: "link",
               },
             ],
@@ -1140,6 +1140,772 @@ export const BCA = [
     ],
   },
 ];
+
+export const BCA2 = [
+  {
+    subjectName: "Programming with C",
+    units: [
+      {
+        unitNumber: "Unit-1",
+        unitTitle: "Program Concept",
+        topics: [
+          {
+            label: "Program Concept You Tude Video",
+            type: "youtube",
+            mediaUrl:
+              "https://www.youtube.com/watch?v=s0g4ty29Xgg&list=PLBlnK6fEyqRh6isJ01MBnbNpV3ZsktSyS",
+            time: "2:30",
+          },
+          {
+            label: "Program Concept MP 4 Video",
+            type: "video",
+            mediaUrl:
+              "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+            time: "8:30",
+          },
+          { label: "Program Concept PDF", type: "pdf" },
+          {
+            label: "Program Concept Image",
+            type: "image",
+            mediaUrl: require("assets/img/c.png"),
+          },
+          {
+            label: "Program Concept Ppt",
+            type: "ppt",
+          },
+          {
+            label: "Program Concept Text",
+            type: "text",
+          },
+          {
+            label: "Program Concept Link",
+            type: "link",
+          },
+        ],
+      },
+      {
+        unitNumber: "Unit-2",
+        unitTitle: "Introduction to C Language",
+        topics: [
+          {
+            label: "Topic 1 - You Tude Video",
+            type: "youtube",
+            mediaUrl:
+              "https://www.youtube.com/watch?v=rQoqCP7LX60&list=PLxgZQoSe9cg1drBnejUaDD9GEJBGQ5hMt",
+            time: "2:30",
+          },
+          {
+            label: "Topic 2 - MP 4 Video",
+            type: "video",
+            mediaUrl:
+              "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+            time: "8:30",
+          },
+          { label: "Topic 3 - PDF", type: "pdf" },
+          {
+            label: "Topic 4 - Image",
+            type: "image",
+            mediaUrl: require("assets/img/c.png"),
+          },
+          {
+            label: "Topic 5 - Ppt",
+            type: "ppt",
+          },
+          {
+            label: "Topic 6 - Text",
+            type: "text",
+          },
+          {
+            label: "Topic 7 - Link",
+            type: "link",
+          },
+        ],
+      },
+      {
+        unitNumber: "Unit-3",
+        unitTitle: "Control Structure",
+        topics: [
+          {
+            label: "Topic 1 - You Tude Video",
+            type: "youtube",
+            mediaUrl: "https://www.youtube.com/watch?v=LXb3EKWsInQ",
+            time: "2:30",
+          },
+          {
+            label: "Topic 2 - MP 4 Video",
+            type: "video",
+            mediaUrl:
+              "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+            time: "8:30",
+          },
+          { label: "Topic 3 - PDF", type: "pdf" },
+          {
+            label: "Topic 4 - Image",
+            type: "image",
+            mediaUrl: require("assets/img/ship-7643503_1280.png"),
+          },
+          {
+            label: "Topic 5 - Ppt",
+            type: "ppt",
+          },
+          {
+            label: "Topic 6 - Text",
+            type: "text",
+          },
+          {
+            label: "Topic 7 - Link",
+            type: "link",
+          },
+        ],
+      },
+      {
+        unitNumber: "Unit-4",
+        unitTitle: "The Need of c Functions",
+        topics: [
+          {
+            label: "Topic 1 - You Tude Video",
+            type: "youtube",
+            mediaUrl: "https://www.youtube.com/watch?v=LXb3EKWsInQ",
+            time: "2:30",
+          },
+          {
+            label: "Topic 2 - MP 4 Video",
+            type: "video",
+            mediaUrl:
+              "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+            time: "8:30",
+          },
+          { label: "Topic 3 - PDF", type: "pdf" },
+          {
+            label: "Topic 4 - Image",
+            type: "image",
+            mediaUrl: require("assets/img/ship-7643503_1280.png"),
+          },
+          {
+            label: "Topic 5 - Ppt",
+            type: "ppt",
+          },
+          {
+            label: "Topic 6 - Text",
+            type: "text",
+          },
+          {
+            label: "Topic 7 - Link",
+            type: "link",
+          },
+        ],
+      },
+      {
+        unitNumber: "Unit-5",
+        unitTitle: "Defining Structure",
+        topics: [
+          {
+            label: "Topic 1 - You Tude Video",
+            type: "youtube",
+            mediaUrl: "https://www.youtube.com/watch?v=LXb3EKWsInQ",
+            time: "2:30",
+          },
+          {
+            label: "Topic 2 - MP 4 Video",
+            type: "video",
+            mediaUrl:
+              "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+            time: "8:30",
+          },
+          { label: "Topic 3 - PDF", type: "pdf" },
+          {
+            label: "Topic 4 - Image",
+            type: "image",
+            mediaUrl: require("assets/img/ship-7643503_1280.png"),
+          },
+          {
+            label: "Topic 5 - Ppt",
+            type: "ppt",
+          },
+          {
+            label: "Topic 6 - Text",
+            type: "text",
+          },
+          {
+            label: "Topic 7 - Link",
+            type: "link",
+          },
+        ],
+      },
+    ],
+  },
+  {
+    subjectName: "Database Management System",
+    units: [
+      {
+        unitNumber: "Unit-1",
+        unitTitle: "Introduction to Database System",
+        topics: [
+          {
+            label: "Topic 1 - You Tude Video",
+            type: "youtube",
+            mediaUrl: "https://www.youtube.com/watch?v=LXb3EKWsInQ",
+            time: "2:30",
+          },
+          {
+            label: "Topic 2 - MP 4 Video",
+            type: "video",
+            mediaUrl:
+              "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+            time: "8:30",
+          },
+          { label: "Topic 3 - PDF", type: "pdf" },
+          {
+            label: "Topic 4 - Image",
+            type: "image",
+            mediaUrl: require("assets/img/ship-7643503_1280.png"),
+          },
+          {
+            label: "Topic 5 - Ppt",
+            type: "ppt",
+          },
+          {
+            label: "Topic 6 - Text",
+            type: "text",
+          },
+          {
+            label: "Topic 7 - Link",
+            type: "link",
+          },
+        ],
+      },
+      {
+        unitNumber: "Unit-2",
+        unitTitle: "Relational Database Concept Design",
+        topics: [
+          {
+            label: "Topic 1 - You Tude Video",
+            type: "youtube",
+            mediaUrl: "https://www.youtube.com/watch?v=LXb3EKWsInQ",
+            time: "2:30",
+          },
+          {
+            label: "Topic 2 - MP 4 Video",
+            type: "video",
+            mediaUrl:
+              "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+            time: "8:30",
+          },
+          { label: "Topic 3 - PDF", type: "pdf" },
+          {
+            label: "Topic 4 - Image",
+            type: "image",
+            mediaUrl: require("assets/img/ship-7643503_1280.png"),
+          },
+          {
+            label: "Topic 5 - Ppt",
+            type: "ppt",
+          },
+          {
+            label: "Topic 6 - Text",
+            type: "text",
+          },
+          {
+            label: "Topic 7 - Link",
+            type: "link",
+          },
+        ],
+      },
+      {
+        unitNumber: "Unit-3",
+        unitTitle: "Database Storage",
+        topics: [
+          {
+            label: "Topic 1 - You Tude Video",
+            type: "youtube",
+            mediaUrl: "https://www.youtube.com/watch?v=LXb3EKWsInQ",
+            time: "2:30",
+          },
+          {
+            label: "Topic 2 - MP 4 Video",
+            type: "video",
+            mediaUrl:
+              "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+            time: "8:30",
+          },
+          { label: "Topic 3 - PDF", type: "pdf" },
+          {
+            label: "Topic 4 - Image",
+            type: "image",
+            mediaUrl: require("assets/img/ship-7643503_1280.png"),
+          },
+          {
+            label: "Topic 5 - Ppt",
+            type: "ppt",
+          },
+          {
+            label: "Topic 6 - Text",
+            type: "text",
+          },
+          {
+            label: "Topic 7 - Link",
+            type: "link",
+          },
+        ],
+      },
+      {
+        unitNumber: "Unit-4",
+        unitTitle: "Security",
+        topics: [
+          {
+            label: "Topic 1 - You Tude Video",
+            type: "youtube",
+            mediaUrl: "https://www.youtube.com/watch?v=LXb3EKWsInQ",
+            time: "2:30",
+          },
+          {
+            label: "Topic 2 - MP 4 Video",
+            type: "video",
+            mediaUrl:
+              "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+            time: "8:30",
+          },
+          { label: "Topic 3 - PDF", type: "pdf" },
+          {
+            label: "Topic 4 - Image",
+            type: "image",
+            mediaUrl: require("assets/img/ship-7643503_1280.png"),
+          },
+          {
+            label: "Topic 5 - Ppt",
+            type: "ppt",
+          },
+          {
+            label: "Topic 6 - Text",
+            type: "text",
+          },
+          {
+            label: "Topic 7 - Link",
+            type: "link",
+          },
+        ],
+      },
+      {
+        unitNumber: "Unit-5",
+        unitTitle: "Introduction to Current Trends",
+        topics: [
+          {
+            label: "Topic 1 - You Tude Video",
+            type: "youtube",
+            mediaUrl: "https://www.youtube.com/watch?v=LXb3EKWsInQ",
+            time: "2:30",
+          },
+          {
+            label: "Topic 2 - MP 4 Video",
+            type: "video",
+            mediaUrl:
+              "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+            time: "8:30",
+          },
+          { label: "Topic 3 - PDF", type: "pdf" },
+          {
+            label: "Topic 4 - Image",
+            type: "image",
+            mediaUrl: require("assets/img/ship-7643503_1280.png"),
+          },
+          {
+            label: "Topic 5 - Ppt",
+            type: "ppt",
+          },
+          {
+            label: "Topic 6 - Text",
+            type: "text",
+          },
+          {
+            label: "Topic 7 - Link",
+            type: "link",
+          },
+        ],
+      },
+    ],
+  },
+  {
+    subjectName: "Elementary Mathematics",
+    units: [
+      {
+        unitNumber: "Unit-1",
+        unitTitle: "Sets and Elements",
+        topics: [
+          {
+            label: "Topic 1 - You Tude Video",
+            type: "youtube",
+            mediaUrl: "https://www.youtube.com/watch?v=LXb3EKWsInQ",
+            time: "2:30",
+          },
+          {
+            label: "Topic 2 - MP 4 Video",
+            type: "video",
+            mediaUrl:
+              "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+            time: "8:30",
+          },
+          { label: "Topic 3 - PDF", type: "pdf" },
+          {
+            label: "Topic 4 - Image",
+            type: "image",
+            mediaUrl: require("assets/img/ship-7643503_1280.png"),
+          },
+          {
+            label: "Topic 5 - Ppt",
+            type: "ppt",
+          },
+          {
+            label: "Topic 6 - Text",
+            type: "text",
+          },
+          {
+            label: "Topic 7 - Link",
+            type: "link",
+          },
+        ],
+      },
+      {
+        unitNumber: "Unit-2",
+        unitTitle: "Functions",
+        topics: [
+          {
+            label: "Topic 1 - You Tude Video",
+            type: "youtube",
+            mediaUrl: "https://www.youtube.com/watch?v=LXb3EKWsInQ",
+            time: "2:30",
+          },
+          {
+            label: "Topic 2 - MP 4 Video",
+            type: "video",
+            mediaUrl:
+              "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+            time: "8:30",
+          },
+          { label: "Topic 3 - PDF", type: "pdf" },
+          {
+            label: "Topic 4 - Image",
+            type: "image",
+            mediaUrl: require("assets/img/ship-7643503_1280.png"),
+          },
+          {
+            label: "Topic 5 - Ppt",
+            type: "ppt",
+          },
+          {
+            label: "Topic 6 - Text",
+            type: "text",
+          },
+          {
+            label: "Topic 7 - Link",
+            type: "link",
+          },
+        ],
+      },
+      {
+        unitNumber: "Unit-3",
+        unitTitle: "Determinants",
+        topics: [
+          {
+            label: "Topic 1 - You Tude Video",
+            type: "youtube",
+            mediaUrl: "https://www.youtube.com/watch?v=LXb3EKWsInQ",
+            time: "2:30",
+          },
+          {
+            label: "Topic 2 - MP 4 Video",
+            type: "video",
+            mediaUrl:
+              "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+            time: "8:30",
+          },
+          { label: "Topic 3 - PDF", type: "pdf" },
+          {
+            label: "Topic 4 - Image",
+            type: "image",
+            mediaUrl: require("assets/img/ship-7643503_1280.png"),
+          },
+          {
+            label: "Topic 5 - Ppt",
+            type: "ppt",
+          },
+          {
+            label: "Topic 6 - Text",
+            type: "text",
+          },
+          {
+            label: "Topic 7 - Link",
+            type: "link",
+          },
+        ],
+      },
+      {
+        unitNumber: "Unit-4",
+        unitTitle: "Mathematical Reasoning",
+        topics: [
+          {
+            label: "Topic 1 - You Tude Video",
+            type: "youtube",
+            mediaUrl: "https://www.youtube.com/watch?v=LXb3EKWsInQ",
+            time: "2:30",
+          },
+          {
+            label: "Topic 2 - MP 4 Video",
+            type: "video",
+            mediaUrl:
+              "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+            time: "8:30",
+          },
+          { label: "Topic 3 - PDF", type: "pdf" },
+          {
+            label: "Topic 4 - Image",
+            type: "image",
+            mediaUrl: require("assets/img/ship-7643503_1280.png"),
+          },
+          {
+            label: "Topic 5 - Ppt",
+            type: "ppt",
+          },
+          {
+            label: "Topic 6 - Text",
+            type: "text",
+          },
+          {
+            label: "Topic 7 - Link",
+            type: "link",
+          },
+        ],
+      },
+      {
+        unitNumber: "Unit-5",
+        unitTitle: "Meaning of Probability",
+        topics: [
+          {
+            label: "Topic 1 - You Tude Video",
+            type: "youtube",
+            mediaUrl: "https://www.youtube.com/watch?v=LXb3EKWsInQ",
+            time: "2:30",
+          },
+          {
+            label: "Topic 2 - MP 4 Video",
+            type: "video",
+            mediaUrl:
+              "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+            time: "8:30",
+          },
+          { label: "Topic 3 - PDF", type: "pdf" },
+          {
+            label: "Topic 4 - Image",
+            type: "image",
+            mediaUrl: require("assets/img/ship-7643503_1280.png"),
+          },
+          {
+            label: "Topic 5 - Ppt",
+            type: "ppt",
+          },
+          {
+            label: "Topic 6 - Text",
+            type: "text",
+          },
+          {
+            label: "Topic 7 - Link",
+            type: "link",
+          },
+        ],
+      },
+    ],
+  },
+  {
+    subjectName: "Communicative English % Hindi",
+    units: [
+      {
+        unitNumber: "Unit-1",
+        unitTitle: "Program Concept",
+        topics: [
+          {
+            label: "Topic 1 - You Tude Video",
+            type: "youtube",
+            mediaUrl:
+              "https://www.youtube.com/watch?v=s0g4ty29Xgg&list=PLBlnK6fEyqRh6isJ01MBnbNpV3ZsktSyS",
+            time: "2:30",
+          },
+          {
+            label: "Topic 2 - MP 4 Video",
+            type: "video",
+            mediaUrl:
+              "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+            time: "8:30",
+          },
+          { label: "Topic 3 - PDF", type: "pdf" },
+          {
+            label: "Topic 4 - Image",
+            type: "image",
+            mediaUrl: require("assets/img/ship-7643503_1280.png"),
+          },
+          {
+            label: "Topic 5 - Ppt",
+            type: "ppt",
+          },
+          {
+            label: "Topic 6 - Text",
+            type: "text",
+          },
+          {
+            label: "Topic 7 - Link",
+            type: "link",
+          },
+        ],
+      },
+      {
+        unitNumber: "Unit-2",
+        unitTitle: "Introduction to C Language",
+        topics: [
+          {
+            label: "Topic 1 - You Tude Video",
+            type: "youtube",
+            mediaUrl: "https://www.youtube.com/watch?v=LXb3EKWsInQ",
+            time: "2:30",
+          },
+          {
+            label: "Topic 2 - MP 4 Video",
+            type: "video",
+            mediaUrl:
+              "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+            time: "8:30",
+          },
+          { label: "Topic 3 - PDF", type: "pdf" },
+          {
+            label: "Topic 4 - Image",
+            type: "image",
+            mediaUrl: require("assets/img/ship-7643503_1280.png"),
+          },
+          {
+            label: "Topic 5 - Ppt",
+            type: "ppt",
+          },
+          {
+            label: "Topic 6 - Text",
+            type: "text",
+          },
+          {
+            label: "Topic 7 - Link",
+            type: "link",
+          },
+        ],
+      },
+      {
+        unitNumber: "Unit-3",
+        unitTitle: "Control Structure",
+        topics: [
+          {
+            label: "Topic 1 - You Tude Video",
+            type: "youtube",
+            mediaUrl: "https://www.youtube.com/watch?v=LXb3EKWsInQ",
+            time: "2:30",
+          },
+          {
+            label: "Topic 2 - MP 4 Video",
+            type: "video",
+            mediaUrl:
+              "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+            time: "8:30",
+          },
+          { label: "Topic 3 - PDF", type: "pdf" },
+          {
+            label: "Topic 4 - Image",
+            type: "image",
+            mediaUrl: require("assets/img/ship-7643503_1280.png"),
+          },
+          {
+            label: "Topic 5 - Ppt",
+            type: "ppt",
+          },
+          {
+            label: "Topic 6 - Text",
+            type: "text",
+          },
+          {
+            label: "Topic 7 - Link",
+            type: "link",
+          },
+        ],
+      },
+      {
+        unitNumber: "Unit-4",
+        unitTitle: "The Need of c Functions",
+        topics: [
+          {
+            label: "Topic 1 - You Tude Video",
+            type: "youtube",
+            mediaUrl: "https://www.youtube.com/watch?v=LXb3EKWsInQ",
+            time: "2:30",
+          },
+          {
+            label: "Topic 2 - MP 4 Video",
+            type: "video",
+            mediaUrl:
+              "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+            time: "8:30",
+          },
+          { label: "Topic 3 - PDF", type: "pdf" },
+          {
+            label: "Topic 4 - Image",
+            type: "image",
+            mediaUrl: require("assets/img/ship-7643503_1280.png"),
+          },
+          {
+            label: "Topic 5 - Ppt",
+            type: "ppt",
+          },
+          {
+            label: "Topic 6 - Text",
+            type: "text",
+          },
+          {
+            label: "Topic 7 - Link",
+            type: "link",
+          },
+        ],
+      },
+      {
+        unitNumber: "Unit-5",
+        unitTitle: "Defining Structure",
+        topics: [
+          {
+            label: "Topic 1 - You Tude Video",
+            type: "youtube",
+            mediaUrl: "https://www.youtube.com/watch?v=LXb3EKWsInQ",
+            time: "2:30",
+          },
+          {
+            label: "Topic 2 - MP 4 Video",
+            type: "video",
+            mediaUrl:
+              "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+            time: "8:30",
+          },
+          { label: "Topic 3 - PDF", type: "pdf" },
+          {
+            label: "Topic 4 - Image",
+            type: "image",
+            mediaUrl: require("assets/img/ship-7643503_1280.png"),
+          },
+          {
+            label: "Topic 5 - Ppt",
+            type: "ppt",
+          },
+          {
+            label: "Topic 6 - Text",
+            type: "text",
+          },
+          {
+            label: "Topic 7 - Link",
+            type: "link",
+          },
+        ],
+      },
+    ],
+  },
+]
 
 export const AtalBihari = [
   {

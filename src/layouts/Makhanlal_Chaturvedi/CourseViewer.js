@@ -1,11 +1,20 @@
 import "layouts/courseViewer/CourseViewer.css";
 import React, { useState, useRef, useEffect } from "react";
 import { Container, Row, Col, Button, Progress } from "reactstrap";
-import { FaUserTie, FaDownload } from "react-icons/fa";
+import { FaUserTie, FaDownload, FaCheckCircle } from "react-icons/fa";
 import { MdInsertComment, MdOutlineTimer } from "react-icons/md";
 import { IoIosArrowDown, IoMdSend, IoIosArrowUp } from "react-icons/io";
 import { RiPencilFill, RiPencilLine } from "react-icons/ri";
 import { ImCross } from "react-icons/im";
+import {
+  FaYoutube,
+  FaFilePdf,
+  FaFileAlt,
+  FaImage,
+  FaFilePowerpoint,
+  FaVideo,
+  FaLink,
+} from "react-icons/fa";
 
 import { BCA } from "DummyData";
 // import { course } from "DummyData";
@@ -29,7 +38,6 @@ const CourseViewer = () => {
   // const [expandedBCASubject, setExpandedBCASubject] = useState({}); // { [courseIndex]: subjectIdx|null }
   // 1) Flatten to subjects
   const allSubjects = BCA.flatMap((course) => course.subjects);
-  // console.log(allSubjects);
   // 2) Local state for expanding a subject
   const [expandedSubject, setExpandedSubject] = useState(null);
   const [expandedMedia, setExpandedMedia] = useState(null);
@@ -46,6 +54,8 @@ const CourseViewer = () => {
   const [replyList, setReplyList] = useState([]); // New state to store comments
   // const [courses, setCourses] = useState(BCA);
   const [activeReplyId, setActiveReplyId] = useState(null);
+  const [completed, setCompleted] = useState([]);
+  const makeKey = (sem, subj, unit, topic) => `${sem}-${subj}-${unit}-${topic}`;
 
   const docs = [
     {
@@ -168,8 +178,8 @@ const CourseViewer = () => {
   const toggleSubject = (i) =>
     setExpandedSubject(expandedSubject === i ? null : i);
 
-  const toggleTopic = (unitIndex, topicIndex) => {
-    const topicKey = `${unitIndex}-${topicIndex}`;
+  const toggleTopic = (unitIndex, subjectIndex) => {
+    const topicKey = `${unitIndex}-${subjectIndex}`;
     setExpandedTopic(expandedTopic === topicKey ? null : topicKey);
   };
 
@@ -260,6 +270,144 @@ const CourseViewer = () => {
     URL.revokeObjectURL(url);
   };
 
+  // Find current indices from your existing expandedTopic "unitIndex-subjectIndex"
+  const getCurrentPath = () => {
+    if (!selectedTopic || !expandedTopic) return null;
+
+    const [unitIndex, subjectIndex] = expandedTopic.split("-").map(Number);
+
+    // Assuming Semester-1 in your current UI
+    const semesterIndex = 0;
+    const semester = BCA?.[semesterIndex];
+    const subject = semester?.subjects?.[subjectIndex];
+    const unit = subject?.units?.[unitIndex];
+    const topics = unit?.topics || [];
+    // Try strict object match first, then a safe fallback (label+type)
+    let topicIndex = topics.indexOf(selectedTopic);
+    // if (topicIndex === -1) {
+    //   topicIndex = topics.findIndex(
+    //     (t) => t.label === selectedTopic.label && t.type === selectedTopic.type
+    //   );
+    // }
+    // if (topicIndex === -1) return null;
+
+    return { semesterIndex, subjectIndex, unitIndex, topicIndex };
+  };
+
+  // Get the next topic path across (topic → unit → subject → semester)
+  const getNextPath = (path) => {
+    if (!path) return null;
+    const { semesterIndex, subjectIndex, unitIndex, topicIndex } = path;
+    const semesters = BCA;
+    const semester = semesters?.[semesterIndex];
+    if (!semester) return null;
+
+    const subjects = semester.subjects || [];
+    // const {  } = path;
+
+    // Same unit → next topic
+    const units = subjects?.[subjectIndex]?.units || [];
+    const topics = units?.[unitIndex]?.topics || [];
+    if (topicIndex + 1 < topics.length) {
+      return {
+        semesterIndex,
+        subjectIndex,
+        unitIndex,
+        topicIndex: topicIndex + 1,
+      };
+    }
+
+    // Next unit (same subject)
+    // for (let u = unitIndex + 1; u < units.length; u++) {
+    //   const tps = units[u]?.topics || [];
+    //   if (tps.length) {
+    //     return { semesterIndex, subjectIndex, unitIndex: u, topicIndex: 0 };
+    //   }
+    // }
+
+    // Next subject (same semester)
+    // for (let s = subjectIndex + 1; s < subjects.length; s++) {
+    //   const u2 = subjects[s]?.units || [];
+    //   for (let u = 0; u < u2.length; u++) {
+    //     const tps = u2[u]?.topics || [];
+    //     if (tps.length) {
+    //       return {
+    //         semesterIndex,
+    //         subjectIndex: s,
+    //         unitIndex: u,
+    //         topicIndex: 0,
+    //       };
+    //     }
+    //   }
+    // }
+
+    // (Optional) Next semester
+    // for (let sem = semesterIndex + 1; sem < semesters.length; sem++) {
+    //   const subjArr = semesters[sem]?.subjects || [];
+    //   for (let s = 0; s < subjArr.length; s++) {
+    //     const uArr = subjArr[s]?.units || [];
+    //     for (let u = 0; u < uArr.length; u++) {
+    //       const tps = uArr[u]?.topics || [];
+    //       if (tps.length) {
+    //         return {
+    //           semesterIndex: sem,
+    //           subjectIndex: s,
+    //           unitIndex: u,
+    //           topicIndex: 0,
+    //         };
+    //       }
+    //     }
+    //   }
+    // }
+
+    return null; // nothing next
+  };
+
+  // Jumps to that path and updates UI
+  const goToPath = (path) => {
+    if (!path) return;
+
+    const { semesterIndex, subjectIndex, unitIndex, topicIndex } = path;
+    const topic =
+      BCA?.[semesterIndex]?.subjects?.[subjectIndex]?.units?.[unitIndex]
+        ?.topics?.[topicIndex];
+    if (!topic) return;
+
+    // Expand the correct subject & unit
+    setExpandedSubject(subjectIndex);
+    setExpandedTopic(`${unitIndex}-${subjectIndex}`);
+
+    // Select & render it on the left
+    setSelectedTopic(topic);
+
+    // Bring player into view
+    requestAnimationFrame(() => {
+      mediaRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  };
+
+  // BUTTON: Complete & Continue → always move to next topic
+  const handleCompleteAndContinue = () => {
+    const curr = getCurrentPath();
+    if (!curr) return;
+    // tick the current topic
+    const currKey = makeKey(
+      curr.semesterIndex,
+      curr.subjectIndex,
+      curr.unitIndex,
+      curr.topicIndex
+    );
+    setCompleted((prev) =>
+      prev.includes(currKey) ? prev : [...prev, currKey]
+    );
+
+    // then move to next
+    const next = getNextPath(curr);
+    if (next) {
+      goToPath(next);
+    }
+  };
+
   return (
     <div className="course-viewer-wrapper py-2">
       <Container fluid>
@@ -280,10 +428,9 @@ const CourseViewer = () => {
                 <Button
                   className="now-playing-button"
                   style={{
-                    background: "#5E72E4",
-                    color: "white",
-                    border: "none",
+                    background: "#5E72E4", color: "white", border: "none",
                   }}
+                  onClick={handleCompleteAndContinue}
                 >
                   Complete & Continue
                 </Button>
@@ -519,7 +666,7 @@ const CourseViewer = () => {
                                       style={{
                                         backgroundColor:
                                           comment ===
-                                          `${unitIndex}-${subjectIndex}`
+                                            `${unitIndex}-${subjectIndex}`
                                             ? "#e9ecef"
                                             : "transparent",
                                         borderRadius: "5px",
@@ -542,7 +689,7 @@ const CourseViewer = () => {
                                       }
                                     >
                                       {note ===
-                                      `${unitIndex}-${subjectIndex}` ? (
+                                        `${unitIndex}-${subjectIndex}` ? (
                                         <RiPencilFill size={20} />
                                       ) : (
                                         <RiPencilLine size={20} />
@@ -555,7 +702,7 @@ const CourseViewer = () => {
                                       }
                                     >
                                       {expandedTopic ===
-                                      `${unitIndex}-${subjectIndex}` ? (
+                                        `${unitIndex}-${subjectIndex}` ? (
                                         <IoIosArrowUp />
                                       ) : (
                                         <IoIosArrowDown />
@@ -576,7 +723,7 @@ const CourseViewer = () => {
                                         setComment(
                                           (prevIndex) =>
                                             prevIndex ===
-                                              `${unitIndex}-${subjectIndex}` &&
+                                            `${unitIndex}-${subjectIndex}` &&
                                             null
                                         );
                                       }}
@@ -726,9 +873,9 @@ const CourseViewer = () => {
                                               .filter(
                                                 (reply) =>
                                                   reply.unitIndex ===
-                                                    unitIndex &&
+                                                  unitIndex &&
                                                   reply.subjectIndex ===
-                                                    subjectIndex &&
+                                                  subjectIndex &&
                                                   reply.commentIndex === cmtIndx
                                               )
                                               .map((reply, index) => (
@@ -783,7 +930,7 @@ const CourseViewer = () => {
                                         setNote(
                                           (prevIndex) =>
                                             prevIndex ===
-                                              `${unitIndex}-${subjectIndex}` &&
+                                            `${unitIndex}-${subjectIndex}` &&
                                             null
                                         );
                                       }}
@@ -836,10 +983,7 @@ const CourseViewer = () => {
                                             >
                                               {/* Left: Note text */}
                                               <span
-                                                style={{
-                                                  fontSize: "1.0rem",
-                                                  fontWeight: 500,
-                                                }}
+                                                style={{ fontSize: "1.0rem", fontWeight: 500, }}
                                               >
                                                 {item.note}
                                               </span>
@@ -896,27 +1040,110 @@ const CourseViewer = () => {
                                 {/* Show Topics under each Unit */}
                                 {expandedTopic ===
                                   `${unitIndex}-${subjectIndex}` && // Dynamic topic rendering
-                                  unit.topics?.map((topic, topicIndex) => (
-                                    <div
-                                      key={topicIndex}
-                                      onClick={() => {
-                                        // setMediaLoading(true);
-                                        setSelectedTopic(topic);
-                                        mediaRef.current?.scrollIntoView({
-                                          behavior: "smooth",
-                                          block: "start",
-                                        });
-                                      }}
-                                      style={{
-                                        cursor: "pointer",
-                                        padding: "0.5rem 1rem",
-                                        marginLeft: "0.5rem",
-                                        // margin: "0 0.5rem",
-                                      }}
-                                    >
-                                      <strong>{topic.label}</strong>
-                                    </div>
-                                  ))}
+                                  unit.topics?.map((topic, topicIndex) => {
+                                    let icon;
+                                    switch (topic.type) {
+                                      case "youtube":
+                                        icon = <FaYoutube color="#ff0000" />;
+                                        break;
+                                      case "video":
+                                        icon = <FaVideo color="black" />;
+                                        break;
+                                      case "pdf":
+                                        icon = <FaFilePdf color="#e63946" />;
+                                        break;
+                                      case "image":
+                                        icon = <FaImage color="#16a34a" />;
+                                        break;
+                                      case "ppt":
+                                        icon = (
+                                          <FaFilePowerpoint color="#16a34a" />
+                                        );
+                                        break;
+                                      case "text":
+                                        icon = <FaFileAlt color="#16a34a" />;
+                                        break;
+
+                                      case "link":
+                                        icon = <FaLink color="#f97316" />;
+                                        break;
+                                    }
+                                    return (
+                                      <div
+                                        key={topicIndex}
+                                        style={{
+                                          cursor: "pointer",
+                                          padding: "0.5rem 1rem",
+                                          display: "flex",
+                                          alignItems: "center",
+                                          justifyContent: "space-between",
+                                        }}
+                                      >
+                                        <div
+                                          onClick={() => {
+                                            // setMediaLoading(true);
+                                            setSelectedTopic(topic);
+                                            mediaRef.current?.scrollIntoView({
+                                              behavior: "smooth",
+                                              block: "start",
+                                            });
+                                          }}
+                                          style={{
+                                            // display: "flex",
+                                            gap: "0.5rem",
+                                          }}
+                                        >
+                                          {/* Icon on the left - you can replace this with your actual icon component */}
+                                          <span style={{ display: "flex", }}>
+                                          </span>
+                                          {icon}
+                                          <strong style={{ marginLeft: "0.5rem" }}>
+
+                                            {topic.label}</strong>
+                                          {/* <strong>{topicIndex}</strong> */}
+                                        </div>
+                                        {
+                                          completed.includes(
+                                            makeKey(
+                                              0,
+                                              subjectIndex,
+                                              unitIndex,
+                                              topicIndex
+                                            )
+                                          ) && (
+                                            <div>
+
+                                              <FaCheckCircle color="green" />
+                                            </div>
+                                          )
+                                        }
+                                        {/* <input
+                                          type="checkbox"
+                                          checked={completed.includes(
+                                            makeKey(
+                                              0,
+                                              subjectIndex,
+                                              unitIndex,
+                                              topicIndex
+                                            )
+                                          )}
+                                          onChange={() => {
+                                            const key = makeKey(0, subjectIndex, unitIndex, topicIndex);
+                                            setCompleted((prev) => {
+                                              if (prev.includes(key)) {
+                                                // If already checked, uncheck it
+                                                return prev.filter((item) => item !== key);
+                                              } else {
+                                                // Otherwise, mark it as completed
+                                                return [...prev, key];
+                                              }
+                                            });
+                                          }}
+                                          style={{ marginLeft: "1rem" }}
+                                        /> */}
+                                      </div>
+                                    );
+                                  })}
                               </div>
                             );
                           })}
