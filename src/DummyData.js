@@ -1917,6 +1917,40 @@ export const AtalBihari = [
           {
             unitNumber: "इकाई-1",
             unitTitle: "मानव शरीर परिचय",
+            topics: [
+              {
+                label: "मानव शरीर परिचय You Tude Video",
+                type: "youtube",
+                mediaUrl:
+                  "https://www.youtube.com/watch?v=s0g4ty29Xgg&list=PLBlnK6fEyqRh6isJ01MBnbNpV3ZsktSyS",
+                time: "2:30",
+              },
+              {
+                label: "मानव शरीर परिचय MP 4 Video",
+                type: "video",
+                mediaUrl:
+                  "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+                time: "8:30",
+              },
+              { label: "मानव शरीर परिचय PDF", type: "pdf" },
+              {
+                label: "मानव शरीर परिचय Image",
+                type: "image",
+                mediaUrl: require("assets/img/c.png"),
+              },
+              {
+                label: "मानव शरीर परिचय Ppt",
+                type: "ppt",
+              },
+              {
+                label: "मानव शरीर परिचय Text",
+                type: "text",
+              },
+              {
+                label: "मानव शरीर परिचय Link",
+                type: "link",
+              },
+            ],
           },
           {
             unitNumber: "इकाई-2",
@@ -1995,4 +2029,602 @@ export const AtalBihari = [
       },
     ],
   },
+];
+export const AtalBihari2 = [
+  {
+    subjectName: " आधारभूत जीव विज्ञान एवं पैथोलॉजी",
+    units: [
+      {
+        unitNumber: "इकाई-1",
+        unitTitle: "मानव शरीर परिचय",
+        topics: [
+          {
+            label: "मानव शरीर परिचय You Tude Video",
+            type: "youtube",
+            mediaUrl:
+              "https://www.youtube.com/watch?v=s0g4ty29Xgg&list=PLBlnK6fEyqRh6isJ01MBnbNpV3ZsktSyS",
+            time: "2:30",
+          },
+          {
+            label: "मानव शरीर परिचय MP 4 Video",
+            type: "video",
+            mediaUrl:
+              "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+            time: "8:30",
+          },
+          { label: "मानव शरीर परिचय PDF", type: "pdf" },
+          {
+            label: "मानव शरीर परिचय Image",
+            type: "image",
+            mediaUrl: require("assets/img/c.png"),
+          },
+          {
+            label: "मानव शरीर परिचय Ppt",
+            type: "ppt",
+          },
+          {
+            label: "मानव शरीर परिचय Text",
+            type: "text",
+          },
+          {
+            label: "मानव शरीर परिचय Link",
+            type: "link",
+          },
+        ],
+      },
+      {
+        unitNumber: "इकाई-2",
+        unitTitle: "अस्थि-संस्थान या कंकाल तंत्र",
+        topics: [
+          {
+            label: "मानव शरीर परिचय You Tude Video",
+            type: "youtube",
+            mediaUrl:
+              "https://www.youtube.com/watch?v=s0g4ty29Xgg&list=PLBlnK6fEyqRh6isJ01MBnbNpV3ZsktSyS",
+            time: "2:30",
+          },
+          {
+            label: "मानव शरीर परिचय MP 4 Video",
+            type: "video",
+            mediaUrl:
+              "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+            time: "8:30",
+          },
+          { label: "मानव शरीर परिचय PDF", type: "pdf" },
+          {
+            label: "मानव शरीर परिचय Image",
+            type: "image",
+            mediaUrl: require("assets/img/c.png"),
+          },
+          {
+            label: "मानव शरीर परिचय Ppt",
+            type: "ppt",
+          },
+          {
+            label: "मानव शरीर परिचय Text",
+            type: "text",
+          },
+          {
+            label: "मानव शरीर परिचय Link",
+            type: "link",
+          },
+        ],
+      },
+      {
+        unitNumber: "इकाई-3",
+        unitTitle: "रक्त परिसंचरण संस्थान",
+        topics: [
+          {
+            label: "मानव शरीर परिचय You Tude Video",
+            type: "youtube",
+            mediaUrl:
+              "https://www.youtube.com/watch?v=s0g4ty29Xgg&list=PLBlnK6fEyqRh6isJ01MBnbNpV3ZsktSyS",
+            time: "2:30",
+          },
+          {
+            label: "मानव शरीर परिचय MP 4 Video",
+            type: "video",
+            mediaUrl:
+              "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+            time: "8:30",
+          },
+          { label: "मानव शरीर परिचय PDF", type: "pdf" },
+          {
+            label: "मानव शरीर परिचय Image",
+            type: "image",
+            mediaUrl: require("assets/img/c.png"),
+          },
+          {
+            label: "मानव शरीर परिचय Ppt",
+            type: "ppt",
+          },
+          {
+            label: "मानव शरीर परिचय Text",
+            type: "text",
+          },
+          {
+            label: "मानव शरीर परिचय Link",
+            type: "link",
+          },
+        ],
+      },
+      {
+        unitNumber: "इकाई-4",
+        unitTitle: "आधारभूत पैथोलॉजी",
+        topics: [
+          {
+            label: "मानव शरीर परिचय You Tude Video",
+            type: "youtube",
+            mediaUrl:
+              "https://www.youtube.com/watch?v=s0g4ty29Xgg&list=PLBlnK6fEyqRh6isJ01MBnbNpV3ZsktSyS",
+            time: "2:30",
+          },
+          {
+            label: "मानव शरीर परिचय MP 4 Video",
+            type: "video",
+            mediaUrl:
+              "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+            time: "8:30",
+          },
+          { label: "मानव शरीर परिचय PDF", type: "pdf" },
+          {
+            label: "मानव शरीर परिचय Image",
+            type: "image",
+            mediaUrl: require("assets/img/c.png"),
+          },
+          {
+            label: "मानव शरीर परिचय Ppt",
+            type: "ppt",
+          },
+          {
+            label: "मानव शरीर परिचय Text",
+            type: "text",
+          },
+          {
+            label: "मानव शरीर परिचय Link",
+            type: "link",
+          },
+        ],
+      },
+    ],
+  },
+  {
+    subjectName: " मातृत्व एवं बाल स्वास्थ्य देखभाल",
+    units: [
+      {
+        unitNumber: "इकाई-1",
+        unitTitle: "मातृत्व एवं बाल स्वास्थ्य देखभाल",
+        topics: [
+          {
+            label: "मानव शरीर परिचय You Tude Video",
+            type: "youtube",
+            mediaUrl:
+              "https://www.youtube.com/watch?v=s0g4ty29Xgg&list=PLBlnK6fEyqRh6isJ01MBnbNpV3ZsktSyS",
+            time: "2:30",
+          },
+          {
+            label: "मानव शरीर परिचय MP 4 Video",
+            type: "video",
+            mediaUrl:
+              "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+            time: "8:30",
+          },
+          { label: "मानव शरीर परिचय PDF", type: "pdf" },
+          {
+            label: "मानव शरीर परिचय Image",
+            type: "image",
+            mediaUrl: require("assets/img/c.png"),
+          },
+          {
+            label: "मानव शरीर परिचय Ppt",
+            type: "ppt",
+          },
+          {
+            label: "मानव शरीर परिचय Text",
+            type: "text",
+          },
+          {
+            label: "मानव शरीर परिचय Link",
+            type: "link",
+          },
+        ],
+      },
+      {
+        unitNumber: "इकाई-2",
+        unitTitle: "राष्ट्रीय स्वास्थ्य कार्यक्रम",
+        topics: [
+          {
+            label: "मानव शरीर परिचय You Tude Video",
+            type: "youtube",
+            mediaUrl:
+              "https://www.youtube.com/watch?v=s0g4ty29Xgg&list=PLBlnK6fEyqRh6isJ01MBnbNpV3ZsktSyS",
+            time: "2:30",
+          },
+          {
+            label: "मानव शरीर परिचय MP 4 Video",
+            type: "video",
+            mediaUrl:
+              "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+            time: "8:30",
+          },
+          { label: "मानव शरीर परिचय PDF", type: "pdf" },
+          {
+            label: "मानव शरीर परिचय Image",
+            type: "image",
+            mediaUrl: require("assets/img/c.png"),
+          },
+          {
+            label: "मानव शरीर परिचय Ppt",
+            type: "ppt",
+          },
+          {
+            label: "मानव शरीर परिचय Text",
+            type: "text",
+          },
+          {
+            label: "मानव शरीर परिचय Link",
+            type: "link",
+          },
+        ],
+      },
+      {
+        unitNumber: "इकाई-3",
+        unitTitle: "परिवार कल्याण कार्यक्रम ",
+        topics: [
+          {
+            label: "मानव शरीर परिचय You Tude Video",
+            type: "youtube",
+            mediaUrl:
+              "https://www.youtube.com/watch?v=s0g4ty29Xgg&list=PLBlnK6fEyqRh6isJ01MBnbNpV3ZsktSyS",
+            time: "2:30",
+          },
+          {
+            label: "मानव शरीर परिचय MP 4 Video",
+            type: "video",
+            mediaUrl:
+              "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+            time: "8:30",
+          },
+          { label: "मानव शरीर परिचय PDF", type: "pdf" },
+          {
+            label: "मानव शरीर परिचय Image",
+            type: "image",
+            mediaUrl: require("assets/img/c.png"),
+          },
+          {
+            label: "मानव शरीर परिचय Ppt",
+            type: "ppt",
+          },
+          {
+            label: "मानव शरीर परिचय Text",
+            type: "text",
+          },
+          {
+            label: "मानव शरीर परिचय Link",
+            type: "link",
+          },
+        ],
+      },
+    ],
+  },
+  {
+    subjectName:
+      " सामान्य रोग, संक्रमक रोग एवं आपात रोगों का प्रबंधन एवं विभिन्न पद्धतियों से उपचार",
+    units: [
+      {
+        unitNumber: "इकाई-1",
+        unitTitle: "संक्रामक रोग",
+        topics: [
+          {
+            label: "मानव शरीर परिचय You Tude Video",
+            type: "youtube",
+            mediaUrl:
+              "https://www.youtube.com/watch?v=s0g4ty29Xgg&list=PLBlnK6fEyqRh6isJ01MBnbNpV3ZsktSyS",
+            time: "2:30",
+          },
+          {
+            label: "मानव शरीर परिचय MP 4 Video",
+            type: "video",
+            mediaUrl:
+              "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+            time: "8:30",
+          },
+          { label: "मानव शरीर परिचय PDF", type: "pdf" },
+          {
+            label: "मानव शरीर परिचय Image",
+            type: "image",
+            mediaUrl: require("assets/img/c.png"),
+          },
+          {
+            label: "मानव शरीर परिचय Ppt",
+            type: "ppt",
+          },
+          {
+            label: "मानव शरीर परिचय Text",
+            type: "text",
+          },
+          {
+            label: "मानव शरीर परिचय Link",
+            type: "link",
+          },
+        ],
+      },
+      {
+        unitNumber: "इकाई-2",
+        unitTitle: "सामान्य रोग",
+        topics: [
+          {
+            label: "मानव शरीर परिचय You Tude Video",
+            type: "youtube",
+            mediaUrl:
+              "https://www.youtube.com/watch?v=s0g4ty29Xgg&list=PLBlnK6fEyqRh6isJ01MBnbNpV3ZsktSyS",
+            time: "2:30",
+          },
+          {
+            label: "मानव शरीर परिचय MP 4 Video",
+            type: "video",
+            mediaUrl:
+              "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+            time: "8:30",
+          },
+          { label: "मानव शरीर परिचय PDF", type: "pdf" },
+          {
+            label: "मानव शरीर परिचय Image",
+            type: "image",
+            mediaUrl: require("assets/img/c.png"),
+          },
+          {
+            label: "मानव शरीर परिचय Ppt",
+            type: "ppt",
+          },
+          {
+            label: "मानव शरीर परिचय Text",
+            type: "text",
+          },
+          {
+            label: "मानव शरीर परिचय Link",
+            type: "link",
+          },
+        ],
+      },
+      {
+        unitNumber: "इकाई-3",
+        unitTitle: "आपातकालीन रोगों का प्रबंधन एवं निवारण",
+        topics: [
+          {
+            label: "मानव शरीर परिचय You Tude Video",
+            type: "youtube",
+            mediaUrl:
+              "https://www.youtube.com/watch?v=s0g4ty29Xgg&list=PLBlnK6fEyqRh6isJ01MBnbNpV3ZsktSyS",
+            time: "2:30",
+          },
+          {
+            label: "मानव शरीर परिचय MP 4 Video",
+            type: "video",
+            mediaUrl:
+              "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+            time: "8:30",
+          },
+          { label: "मानव शरीर परिचय PDF", type: "pdf" },
+          {
+            label: "मानव शरीर परिचय Image",
+            type: "image",
+            mediaUrl: require("assets/img/c.png"),
+          },
+          {
+            label: "मानव शरीर परिचय Ppt",
+            type: "ppt",
+          },
+          {
+            label: "मानव शरीर परिचय Text",
+            type: "text",
+          },
+          {
+            label: "मानव शरीर परिचय Link",
+            type: "link",
+          },
+        ],
+      },
+      {
+        unitNumber: "इकाई-4",
+        unitTitle:
+          "विभिन्न चिकित्सा पद्धतियों द्वारा सामान्य एवं आकस्मिक रोगों का उपचार",
+        topics: [
+          {
+            label: "मानव शरीर परिचय You Tude Video",
+            type: "youtube",
+            mediaUrl:
+              "https://www.youtube.com/watch?v=s0g4ty29Xgg&list=PLBlnK6fEyqRh6isJ01MBnbNpV3ZsktSyS",
+            time: "2:30",
+          },
+          {
+            label: "मानव शरीर परिचय MP 4 Video",
+            type: "video",
+            mediaUrl:
+              "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+            time: "8:30",
+          },
+          { label: "मानव शरीर परिचय PDF", type: "pdf" },
+          {
+            label: "मानव शरीर परिचय Image",
+            type: "image",
+            mediaUrl: require("assets/img/c.png"),
+          },
+          {
+            label: "मानव शरीर परिचय Ppt",
+            type: "ppt",
+          },
+          {
+            label: "मानव शरीर परिचय Text",
+            type: "text",
+          },
+          {
+            label: "मानव शरीर परिचय Link",
+            type: "link",
+          },
+        ],
+      },
+    ],
+  },
+  {
+    subjectName: "प्राथमिक स्वास्थ्य देखभाल और बुनियादी चिकित्सा",
+    units: [
+      {
+        unitNumber: "इकाई-1",
+        unitTitle: "प्राथमिक स्वास्थ्य देखभाल एवं रोगों के रोकथाम के उपाय",
+
+        topics: [
+          {
+            label: "मानव शरीर परिचय You Tude Video",
+            type: "youtube",
+            mediaUrl:
+              "https://www.youtube.com/watch?v=s0g4ty29Xgg&list=PLBlnK6fEyqRh6isJ01MBnbNpV3ZsktSyS",
+            time: "2:30",
+          },
+          {
+            label: "मानव शरीर परिचय MP 4 Video",
+            type: "video",
+            mediaUrl:
+              "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+            time: "8:30",
+          },
+          { label: "मानव शरीर परिचय PDF", type: "pdf" },
+          {
+            label: "मानव शरीर परिचय Image",
+            type: "image",
+            mediaUrl: require("assets/img/c.png"),
+          },
+          {
+            label: "मानव शरीर परिचय Ppt",
+            type: "ppt",
+          },
+          {
+            label: "मानव शरीर परिचय Text",
+            type: "text",
+          },
+          {
+            label: "मानव शरीर परिचय Link",
+            type: "link",
+          },
+        ],
+      },
+      {
+        unitNumber: "इकाई-2",
+        unitTitle: "प्राथमिक स्वास्थ्य सुविधा के सिद्धां",
+        topics: [
+          {
+            label: "मानव शरीर परिचय You Tude Video",
+            type: "youtube",
+            mediaUrl:
+              "https://www.youtube.com/watch?v=s0g4ty29Xgg&list=PLBlnK6fEyqRh6isJ01MBnbNpV3ZsktSyS",
+            time: "2:30",
+          },
+          {
+            label: "मानव शरीर परिचय MP 4 Video",
+            type: "video",
+            mediaUrl:
+              "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+            time: "8:30",
+          },
+          { label: "मानव शरीर परिचय PDF", type: "pdf" },
+          {
+            label: "मानव शरीर परिचय Image",
+            type: "image",
+            mediaUrl: require("assets/img/c.png"),
+          },
+          {
+            label: "मानव शरीर परिचय Ppt",
+            type: "ppt",
+          },
+          {
+            label: "मानव शरीर परिचय Text",
+            type: "text",
+          },
+          {
+            label: "मानव शरीर परिचय Link",
+            type: "link",
+          },
+        ],
+      },
+      {
+        unitNumber: "इकाई-3",
+        unitTitle: "पोषण",
+        topics: [
+          {
+            label: "मानव शरीर परिचय You Tude Video",
+            type: "youtube",
+            mediaUrl:
+              "https://www.youtube.com/watch?v=s0g4ty29Xgg&list=PLBlnK6fEyqRh6isJ01MBnbNpV3ZsktSyS",
+            time: "2:30",
+          },
+          {
+            label: "मानव शरीर परिचय MP 4 Video",
+            type: "video",
+            mediaUrl:
+              "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+            time: "8:30",
+          },
+          { label: "मानव शरीर परिचय PDF", type: "pdf" },
+          {
+            label: "मानव शरीर परिचय Image",
+            type: "image",
+            mediaUrl: require("assets/img/c.png"),
+          },
+          {
+            label: "मानव शरीर परिचय Ppt",
+            type: "ppt",
+          },
+          {
+            label: "मानव शरीर परिचय Text",
+            type: "text",
+          },
+          {
+            label: "मानव शरीर परिचय Link",
+            type: "link",
+          },
+        ],
+      },
+      {
+        unitNumber: "इकाई-4",
+        unitTitle: "जैव चिकित्सीय प्रबंधन",
+        topics: [
+          {
+            label: "मानव शरीर परिचय You Tude Video",
+            type: "youtube",
+            mediaUrl:
+              "https://www.youtube.com/watch?v=s0g4ty29Xgg&list=PLBlnK6fEyqRh6isJ01MBnbNpV3ZsktSyS",
+            time: "2:30",
+          },
+          {
+            label: "मानव शरीर परिचय MP 4 Video",
+            type: "video",
+            mediaUrl:
+              "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+            time: "8:30",
+          },
+          { label: "मानव शरीर परिचय PDF", type: "pdf" },
+          {
+            label: "मानव शरीर परिचय Image",
+            type: "image",
+            mediaUrl: require("assets/img/c.png"),
+          },
+          {
+            label: "मानव शरीर परिचय Ppt",
+            type: "ppt",
+          },
+          {
+            label: "मानव शरीर परिचय Text",
+            type: "text",
+          },
+          {
+            label: "मानव शरीर परिचय Link",
+            type: "link",
+          },
+        ],
+      },
+
+    ],
+  },
+
+
 ];
