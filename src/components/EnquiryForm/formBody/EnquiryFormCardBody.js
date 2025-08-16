@@ -37,9 +37,9 @@ const CheckboxOption = (props) => (
 const EnquiryFormCardBody = ({
   selectedEnquiry,
   selectedEnquiryId,
-  toggle = () => {},
-  refreshList = () => {},
-  refreshStats = () => {},
+  toggle = () => { },
+  refreshList = () => { },
+  refreshStats = () => { },
 }) => {
   const userId = useSelector((state) => state?.auth?.id);
   const storedBranches = useSelector((state) => state.auth.selectedBranch);
@@ -128,7 +128,7 @@ const EnquiryFormCardBody = ({
         setReferedBy(referObj || null);
         setSelectedOptionsQualification(
           qualificationData.find((q) => q.value === res?.data?.Qualification) ||
-            null
+          null
         );
         setSelectedCoursesOptions(
           courseData.find((q) => q.value === res?.data?.Course) || null
@@ -573,39 +573,39 @@ const EnquiryFormCardBody = ({
 
       {(selectedEnquiry.label === "Course Enquiry" ||
         selectedEnquiry.label === "Internship Enquiry") && (
-        <Row>
-          <Col md={5}>
-            <FormGroup>
-              <Label>Upload Resume</Label>
-              <Input
-                type="file"
-                name="resume"
-                id="resume"
-                accept=".pdf,.doc,.docx"
-                onChange={handleFileChange}
-              />
-              <p style={{ fontSize: "0.875rem", color: "#6c757d" }}>
-                Supported files: PDF/DOC. Max 10 MB.
-              </p>
-            </FormGroup>
-          </Col>
-          <Col md={6}>
-            <FormGroup>
-              <Label>Upload Image</Label>
-              <Input
-                type="file"
-                name="image"
-                id="image"
-                accept=".jpg,.jpeg,.png"
-                onChange={handleFileChange}
-              />
-              <p style={{ fontSize: "0.875rem", color: "#6c757d" }}>
-                Supported files: JPEG (or JPG) / PNG. Max 10 MB.
-              </p>
-            </FormGroup>
-          </Col>
-        </Row>
-      )}
+          <Row>
+            <Col md={5}>
+              <FormGroup>
+                <Label>Upload Resume</Label>
+                <Input
+                  type="file"
+                  name="resume"
+                  id="resume"
+                  accept=".pdf,.doc,.docx"
+                  onChange={handleFileChange}
+                />
+                <p style={{ fontSize: "0.875rem", color: "#6c757d" }}>
+                  Supported files: PDF/DOC. Max 10 MB.
+                </p>
+              </FormGroup>
+            </Col>
+            <Col md={6}>
+              <FormGroup>
+                <Label>Upload Image</Label>
+                <Input
+                  type="file"
+                  name="image"
+                  id="image"
+                  accept=".jpg,.jpeg,.png"
+                  onChange={handleFileChange}
+                />
+                <p style={{ fontSize: "0.875rem", color: "#6c757d" }}>
+                  Supported files: JPEG (or JPG) / PNG. Max 10 MB.
+                </p>
+              </FormGroup>
+            </Col>
+          </Row>
+        )}
 
       <div className="text-end">
         <Button

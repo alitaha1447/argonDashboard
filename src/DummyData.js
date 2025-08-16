@@ -2042,8 +2042,10 @@ export const AtalBihari2 = [
             label: "मानव शरीर परिचय You Tude Video",
             type: "youtube",
             mediaUrl:
-              "https://www.youtube.com/watch?v=s0g4ty29Xgg&list=PLBlnK6fEyqRh6isJ01MBnbNpV3ZsktSyS",
+              "https://www.youtube.com/watch?v=ZC3Rsts7s8E",
             time: "2:30",
+            pdf: require('../src/assets/files/BY-102.pdf'),
+            ppt: require('assets/files/manav_sharir_parichay.pptx'),
           },
           {
             label: "मानव शरीर परिचय MP 4 Video",
@@ -2056,7 +2058,7 @@ export const AtalBihari2 = [
           {
             label: "मानव शरीर परिचय Image",
             type: "image",
-            mediaUrl: require("assets/img/c.png"),
+            mediaUrl: require("assets/img/body-parts-boy.png"),
           },
           {
             label: "मानव शरीर परिचय Ppt",
@@ -2065,10 +2067,13 @@ export const AtalBihari2 = [
           {
             label: "मानव शरीर परिचय Text",
             type: "text",
+            file: 'test1.txt'
           },
           {
             label: "मानव शरीर परिचय Link",
             type: "link",
+            mediaUrl: 'https://hi.wikipedia.org/wiki/%E0%A4%AE%E0%A4%BE%E0%A4%A8%E0%A4%B5_%E0%A4%B6%E0%A4%B0%E0%A5%80%E0%A4%B0'
+
           },
         ],
       },
@@ -2080,7 +2085,7 @@ export const AtalBihari2 = [
             label: "मानव शरीर परिचय You Tude Video",
             type: "youtube",
             mediaUrl:
-              "https://www.youtube.com/watch?v=s0g4ty29Xgg&list=PLBlnK6fEyqRh6isJ01MBnbNpV3ZsktSyS",
+              "https://www.youtube.com/watch?v=lDfAhbRj5u0",
             time: "2:30",
           },
           {
@@ -2094,7 +2099,7 @@ export const AtalBihari2 = [
           {
             label: "मानव शरीर परिचय Image",
             type: "image",
-            mediaUrl: require("assets/img/c.png"),
+            mediaUrl: require("assets/img/skelaton.png"),
           },
           {
             label: "मानव शरीर परिचय Ppt",
@@ -2103,10 +2108,13 @@ export const AtalBihari2 = [
           {
             label: "मानव शरीर परिचय Text",
             type: "text",
+            file: 'test2.txt'
           },
           {
             label: "मानव शरीर परिचय Link",
             type: "link",
+            mediaUrl: 'https://en.wikipedia.org/wiki/Human_skeleton'
+
           },
         ],
       },
@@ -2118,7 +2126,7 @@ export const AtalBihari2 = [
             label: "मानव शरीर परिचय You Tude Video",
             type: "youtube",
             mediaUrl:
-              "https://www.youtube.com/watch?v=s0g4ty29Xgg&list=PLBlnK6fEyqRh6isJ01MBnbNpV3ZsktSyS",
+              "https://www.youtube.com/watch?v=mNP54g6NgMg",
             time: "2:30",
           },
           {
@@ -2132,7 +2140,7 @@ export const AtalBihari2 = [
           {
             label: "मानव शरीर परिचय Image",
             type: "image",
-            mediaUrl: require("assets/img/c.png"),
+            mediaUrl: require("assets/img/Anatomical_Male_Figure_Showing_Heart,_Lungs,_and_Main_Arteries.jpg"),
           },
           {
             label: "मानव शरीर परिचय Ppt",
@@ -2141,10 +2149,12 @@ export const AtalBihari2 = [
           {
             label: "मानव शरीर परिचय Text",
             type: "text",
+            file: 'test3.txt'
           },
           {
             label: "मानव शरीर परिचय Link",
             type: "link",
+            mediaUrl: 'https://hi.wikipedia.org/wiki/%E0%A4%AA%E0%A4%B0%E0%A4%BF%E0%A4%B8%E0%A4%82%E0%A4%9A%E0%A4%B0%E0%A4%A3_%E0%A4%A4%E0%A4%82%E0%A4%A4%E0%A5%8D%E0%A4%B0'
           },
         ],
       },
@@ -2156,7 +2166,7 @@ export const AtalBihari2 = [
             label: "मानव शरीर परिचय You Tude Video",
             type: "youtube",
             mediaUrl:
-              "https://www.youtube.com/watch?v=s0g4ty29Xgg&list=PLBlnK6fEyqRh6isJ01MBnbNpV3ZsktSyS",
+              "https://www.youtube.com/watch?v=M8IrduJ4Lyw",
             time: "2:30",
           },
           {
@@ -2170,7 +2180,7 @@ export const AtalBihari2 = [
           {
             label: "मानव शरीर परिचय Image",
             type: "image",
-            mediaUrl: require("assets/img/c.png"),
+            mediaUrl: require("assets/img/84bc20d4-ab30-48cd-a341-411ff0c98143.png"),
           },
           {
             label: "मानव शरीर परिचय Ppt",
@@ -2179,10 +2189,12 @@ export const AtalBihari2 = [
           {
             label: "मानव शरीर परिचय Text",
             type: "text",
+            file: 'test4.txt'
           },
           {
             label: "मानव शरीर परिचय Link",
             type: "link",
+            mediaUrl: 'https://en.wikipedia.org/wiki/Pathology'
           },
         ],
       },

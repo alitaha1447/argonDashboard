@@ -15,7 +15,6 @@ import {
   FaVideo,
   FaLink,
 } from "react-icons/fa";
-import { AtalBihari } from "DummyData";
 import { AtalBihari2 } from "DummyData";
 import parse from "html-react-parser";
 import Iframe from "react-iframe";
@@ -33,26 +32,21 @@ const CourseViewer = () => {
   const mediaRef = useRef(null);
   const [textHtml1, setTextHtml1] = useState("");
   const [user, setUser] = useState(false);
-  //   ----------------------------------------------------------------------------
-  // const [expandBCACourse, setExpandBCACourse] = useState(null);
-  // const [expandedBCASubject, setExpandedBCASubject] = useState({}); // { [courseIndex]: subjectIdx|null }
-  // 1) Flatten to subjects
-  const allSubjects = AtalBihari.flatMap((course) => course.subjects);
-  // 2) Local state for expanding a subject
+
   const [selectedTopic, setSelectedTopic] = useState(null);
   const [expandedSubject, setExpandedSubject] = useState(null);
   const [expandedTopic, setExpandedTopic] = useState(null)
   const [comment, setComment] = useState(null);
   const [inputComment, setInputComment] = useState("");
-  const [commentsList, setCommentsList] = useState([]); // New state to store comments
+  const [commentsList, setCommentsList] = useState([]);
   const [note, setNote] = useState(null);
   const [inputNote, setInputNote] = useState("");
-  const [notesList, setNotesList] = useState([]); // New state to store comments
+  const [notesList, setNotesList] = useState([]);
   const [inputReply, setInputReply] = useState("");
-  const [replyList, setReplyList] = useState([]); // New state to store comments
-  // const [courses, setCourses] = useState(BCA);
+  const [replyList, setReplyList] = useState([]);
   const [activeReplyId, setActiveReplyId] = useState(null);
   const [completed, setCompleted] = useState([]);
+  const [mediaLoading, setMediaLoading] = useState(false);
   const makeKey = (subj, unit, topic) => `${subj}-${unit}-${topic}`;
 
 
@@ -65,20 +59,82 @@ const CourseViewer = () => {
   ];
   const docs2 = [
     {
-      uri: require("assets/files/BCA.pdf"),
+      uri: require("assets/files/BY-102.pdf"),
       fileType: "pdf",
-      fileName: "Miracle Infoserv.pdf",
+      fileName: "BY-102.pdf",
     },
   ];
+  // useEffect(() => {
+  //   fetch(`${process.env.PUBLIC_URL}/test1.txt`)
+  //     .then((res) => res.text())
+  //     .then((data) => {
+  //       setTextHtml1(data);
+  //     })
+  //     .catch((err) => console.error("Error loading file:", err));
+  // }, []);
+
   useEffect(() => {
-    fetch(`${process.env.PUBLIC_URL}/test1.txt`)
-      .then((res) => res.text())
-      .then((data) => {
-        setTextHtml1(data);
-      })
-      .catch((err) => console.error("Error loading file:", err));
-  }, []);
+    if (!AtalBihari2?.length) return;
+
+    const subjectIdx = 0; // first subject
+    const unitIdx = 0;    // first unit of first subject
+    const topicIndex = 0; // first topic of first unit
+
+    const topic = AtalBihari2[subjectIdx]?.units?.[unitIdx]?.topics?.[topicIndex];
+    if (!topic) return;
+
+    setExpandedSubject(subjectIdx);
+    setExpandedTopic(`${unitIdx}-${subjectIdx}`);
+    setSelectedTopic(topic);
+
+    // Scroll player into view if needed
+    requestAnimationFrame(() => {
+      mediaRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  }, [])
+
+  useEffect(() => {
+    if (selectedTopic) {
+      // Delay to simulate load time or wait for content-specific events
+      const timeout = setTimeout(() => {
+        setMediaLoading(false);
+      }, 800); // adjust time as needed
+
+      return () => clearTimeout(timeout);
+    }
+  }, [selectedTopic]);
+
+  useEffect(() => {
+    if (selectedTopic?.type === "text" && selectedTopic.file) {
+      const fetchTextFile = async () => {
+        try {
+          const response = await fetch(`${process.env.PUBLIC_URL}/${selectedTopic.file}`);
+          if (!response.ok) throw new Error("File not found");
+          const data = await response.text();
+          setTextHtml1(data);
+        } catch (error) {
+          console.error("Error fetching text file:", error);
+          setTextHtml1("<p style='color:red;'>Unable to load file.</p>");
+        }
+      };
+
+      fetchTextFile();
+    }
+  }, [selectedTopic]);
+
   const renderMedia = () => {
+    if (mediaLoading) {
+      return (
+        <div
+          className="d-flex justify-content-center align-items-center"
+          style={{ height: 300 }}
+        >
+          <div className="spinner-border text-primary" role="status">
+            <span className="visually-hidden">Loading...</span>
+          </div>
+        </div>
+      );
+    }
     if (!selectedTopic) return <p>Select a topic to view its content.</p>;
     switch (selectedTopic.type) {
       case "youtube":
@@ -142,6 +198,7 @@ const CourseViewer = () => {
               scrollbarWidth: "thin",
             }}
           >
+
             {parse(textHtml1)}
           </div>
         );
@@ -155,7 +212,7 @@ const CourseViewer = () => {
             }}
           >
             <Iframe
-              url="https://www.learnpython.org/#google_vignette"
+              url={selectedTopic.mediaUrl}
               width="100%"
               height="100%"
               allowFullScreen
@@ -231,19 +288,17 @@ const CourseViewer = () => {
   };
 
   const handleAddNote = (unitIdx, subjectIdx) => {
-    const newNote = inputNote; // Get the current comment
+    const newNote = inputNote;
     if (newNote.trim()) {
-      // Add the comment to the list
       setNotesList((prevNotes) => [
         ...prevNotes,
         { unitIdx, subjectIdx, note: newNote },
       ]);
-      setInputNote(""); // Reset the input field
+      setInputNote("");
     }
   };
 
   const handleDownloadNotesForUnit = (unitIdx, subjectIdx) => {
-    // Collect notes only for the current unit and subject
     const filteredNotes = notesList
       .filter(
         (item) =>
@@ -253,19 +308,16 @@ const CourseViewer = () => {
         (item) =>
           `Subject: ${item.unitIdx}-${item.subjectIdx}\nNote: ${item.note}\n\n`
       )
-      .join(""); // Join all notes into one string
+      .join("");
 
-    // If there are no notes, show an alert
     if (!filteredNotes) {
       alert("No notes available for download.");
       return;
     }
 
-    // Create a Blob from the filtered notes text
     const blob = new Blob([filteredNotes], { type: "text/plain" });
     const url = URL.createObjectURL(blob);
 
-    // Create an anchor element to trigger the download
     const link = document.createElement("a");
     link.href = url;
     link.download = `notes-unit-${unitIdx}-subject-${subjectIdx}.txt`; // Naming file based on unit and subject
@@ -273,28 +325,18 @@ const CourseViewer = () => {
     link.click();
     document.body.removeChild(link);
 
-    // Revoke the URL after the download is triggered
     URL.revokeObjectURL(url);
   };
 
-  // Find current indices from your existing expandedTopic "unitIndex-subjectIndex"
 
   const getCurrentPath = () => {
     if (!selectedTopic || !expandedTopic) return null;
-    console.log(selectedTopic)
     const [unitIdx, subjectIdx] = expandedTopic.split("-").map(Number);
-    console.log(unitIdx, subjectIdx)
-    // Assuming Semester-1 in your current UI
-    // const semesterIndex = 0;
-    // const semester = BCA?.[semesterIndex];
+
     const subject = AtalBihari2?.[subjectIdx];
-    console.log(subject)
     const unit = subject?.units?.[unitIdx];
-    console.log(unit)
     const topics = unit?.topics || [];
-    // Try strict object match first, then a safe fallback (label+type)
     let topicIndex = topics.indexOf(selectedTopic);
-    console.log(topicIndex)
     // if (topicIndex === -1) {
     //   topicIndex = topics.findIndex(
     //     (t) => t.label === selectedTopic.label && t.type === selectedTopic.type
@@ -380,8 +422,6 @@ const CourseViewer = () => {
     const topic =
       AtalBihari2?.[subjectIdx]?.units?.[unitIdx]?.topics?.[topicIndex];
     if (!topic) return;
-    console.log('1')
-    console.log(topic)
     // Expand the correct subject & unit
     setExpandedSubject(subjectIdx);
     setExpandedTopic(`${unitIdx}-${subjectIdx}`);
@@ -395,7 +435,6 @@ const CourseViewer = () => {
     });
   };
 
-  // BUTTON: Complete & Continue → always move to next topic
   const handleCompleteAndContinue = () => {
     const curr = getCurrentPath();
     if (!curr) return;
@@ -415,7 +454,7 @@ const CourseViewer = () => {
       goToPath(next);
     }
   };
-  console.log(completed)
+
   return (
     <div className="course-viewer-wrapper py-2">
       <Container fluid>
@@ -579,14 +618,14 @@ const CourseViewer = () => {
               <div
                 className="overflow-auto hide-scrollbar"
                 style={{
-                  height: "60dvh", // was 60vh
-                  overflow: "auto", // covers both X/Y
-                  overscrollBehavior: "auto", // remove the 'contain' shorthand conflict
+                  height: "60dvh",
+                  overflow: "auto",
+                  overscrollBehavior: "auto",
                   WebkitOverflowScrolling: "touch",
-                  minHeight: 0, // keep this
-                  touchAction: "pan-y", // new: helps on touch devices
-                  scrollbarWidth: "thin", // fine (Firefox)
-                  scrollbarGutter: "stable", // optional: prevents small jumps
+                  minHeight: 0,
+                  touchAction: "pan-y",
+                  scrollbarWidth: "thin",
+                  scrollbarGutter: "stable",
                 }}
               >
                 {AtalBihari2.map((subject, subjectIdx) => {
@@ -893,20 +932,12 @@ const CourseViewer = () => {
                                             </div>
                                           ))}
                                       </li>
-
                                     ))}
                                 </ul>
                               </div>
                             )}
                             {note === `${unitIdx}-${subjectIdx}` && (
-                              <div
-                                style={
-                                  {
-                                    // padding: "0 1rem 1rem",
-                                    // marginTop: "1rem",
-                                  }
-                                }
-                              >
+                              <div>
                                 <span
                                   className="crossIcon"
                                   onClick={() => {
@@ -1063,26 +1094,21 @@ const CourseViewer = () => {
                                   >
                                     <div
                                       onClick={() => {
-                                        // setMediaLoading(true);
-                                        setSelectedTopic(topic);
+                                        setMediaLoading(true); setSelectedTopic(topic);
                                         mediaRef.current?.scrollIntoView({
                                           behavior: "smooth",
                                           block: "start",
                                         });
                                       }}
                                       style={{
-                                        // display: "flex",
                                         gap: "0.5rem",
                                       }}
                                     >
-                                      {/* Icon on the left - you can replace this with your actual icon component */}
-                                      <span style={{ display: "flex", }}>
-                                      </span>
+
                                       {icon}
                                       <strong style={{ marginLeft: "0.5rem" }}>
 
                                         {topic.label}</strong>
-                                      {/* <strong>{topicIndex}</strong> */}
                                     </div>
                                     {
 
