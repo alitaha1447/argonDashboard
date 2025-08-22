@@ -15,8 +15,13 @@ import {
   FaVideo,
   FaLink,
 } from "react-icons/fa";
+import { MdOutlineZoomOutMap, MdOutlineZoomInMap } from "react-icons/md";
 
-import { BCA } from "DummyData";
+
+// import { BCA } from "DummyData";
+import { BCA2 } from "DummyData";
+import { useResizeDetector } from "react-resize-detector";
+
 // import { course } from "DummyData";
 import parse from "html-react-parser";
 import Iframe from "react-iframe";
@@ -31,13 +36,14 @@ pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/b
 
 const CourseViewer = () => {
   const mediaRef = useRef(null);
+  const { width, height, ref } = useResizeDetector();
   const [textHtml1, setTextHtml1] = useState("");
   const [user, setUser] = useState(false);
   //   ----------------------------------------------------------------------------
   // const [expandBCACourse, setExpandBCACourse] = useState(null);
   // const [expandedBCASubject, setExpandedBCASubject] = useState({}); // { [courseIndex]: subjectIdx|null }
   // 1) Flatten to subjects
-  const allSubjects = BCA.flatMap((course) => course.subjects);
+  // const allSubjects = BCA.flatMap((course) => course.subjects);
   // 2) Local state for expanding a subject
   const [expandedSubject, setExpandedSubject] = useState(null);
   const [expandedMedia, setExpandedMedia] = useState(null);
@@ -56,6 +62,10 @@ const CourseViewer = () => {
   const [activeReplyId, setActiveReplyId] = useState(null);
   const [completed, setCompleted] = useState([]);
   const makeKey = (sem, subj, unit, topic) => `${sem}-${subj}-${unit}-${topic}`;
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [selectedPdf, setSelectedPdf] = useState(null);
+  const [numPages, setNumPages] = useState(null);
+  const [fullText, setFullText] = useState("");
 
   const docs = [
     {
@@ -72,14 +82,74 @@ const CourseViewer = () => {
     },
   ];
 
+  // useEffect(() => {
+  //   fetch(`${process.env.PUBLIC_URL}/test1.txt`)
+  //     .then((res) => res.text())
+  //     .then((data) => {
+  //       setTextHtml1(data);
+  //     })
+  //     .catch((err) => console.error("Error loading file:", err));
+  // }, []);
+
+  async function onDocumentLoadSuccess({ numPages }) {
+    setNumPages(numPages);
+    // let fullText = '';
+    // let textAccumulator = "";
+    // // Extract text from each page
+    // for (let i = 1; i <= numPages; i++) {
+    //   const pdf = await pdfjs.getDocument(`${process.env.PUBLIC_URL}/introduction_to_the_human_body.pdf`).promise;
+    //   const page = await pdf.getPage(i);
+    //   const textContent = await page.getTextContent();
+    //   const text = textContent.items.map(item => item.str).join(' ');
+    //   textAccumulator += text + " ";
+    //   console.log(`Text from page ${i}:`, text);
+    // }
+    // setFullText(textAccumulator);
+  }
+
   useEffect(() => {
-    fetch(`${process.env.PUBLIC_URL}/test1.txt`)
-      .then((res) => res.text())
-      .then((data) => {
-        setTextHtml1(data);
-      })
-      .catch((err) => console.error("Error loading file:", err));
-  }, []);
+    if (selectedTopic?.type === "text" && selectedTopic.file) {
+      const fetchTextFile = async () => {
+        try {
+          const response = await fetch(`${process.env.PUBLIC_URL}/${selectedTopic.file}`);
+          if (!response.ok) throw new Error("File not found");
+          const data = await response.text();
+          setTextHtml1(data);
+        } catch (error) {
+          console.error("Error fetching text file:", error);
+          setTextHtml1("<p style='color:red;'>Unable to load file.</p>");
+        }
+      };
+
+      fetchTextFile();
+    }
+  }, [selectedTopic]);
+
+  const speakText1 = (text) => {
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel(); // stop any ongoing speech
+      const utterance = new SpeechSynthesisUtterance(text);
+
+      // Detect language: Hindi uses Unicode range \u0900–\u097F
+      const isHindi = /[\u0900-\u097F]/.test(text);
+
+      utterance.lang = isHindi ? "hi-IN" : "en-IN"; // choose automatically
+      // utterance.lang = "en-IN";
+      // utterance.lang = 'hi-IN'; // Hindi voice
+      utterance.rate = 1;       // adjust speed if needed
+      utterance.pitch = 1;
+      window.speechSynthesis.speak(utterance);
+    } else {
+      alert('Your browser does not support the Web Speech API.');
+    }
+  };
+
+
+  const stopSpeech1 = () => {
+    if ("speechSynthesis" in window) {
+      window.speechSynthesis.cancel();
+    }
+  };
 
   const renderMedia = () => {
     if (!selectedTopic) return <p>Select a topic to view its content.</p>;
@@ -116,7 +186,7 @@ const CourseViewer = () => {
       case "image":
         return (
           <img
-            src={selectedTopic.mediaUrl}
+            src={selectedTopic.imageUrl}
             alt="Lesson Visual"
             style={{
               width: "100%",
@@ -128,7 +198,64 @@ const CourseViewer = () => {
         );
       case "pdf":
         return (
-          <DocViewer documents={docs2} pluginRenderers={DocViewerRenderers} />
+          // <DocViewer documents={docs2} pluginRenderers={DocViewerRenderers} />
+
+          <div
+            ref={ref}
+            style={{
+              width: "100%",
+              height: "100%",
+              overflowY: "scroll",
+              position: "relative",
+            }}
+          >
+            <button
+              onClick={() => {
+                setIsFullscreen(true);
+                setSelectedPdf(
+                  `${process.env.PUBLIC_URL}/BOM1stSem.pdf`
+                );
+              }}
+              style={{
+                position: "absolute",
+                top: 10,
+                right: 10,
+                zIndex: 10,
+                border: "none",
+                borderRadius: "4px",
+                cursor: "pointer",
+              }}
+            >
+              <MdOutlineZoomOutMap />
+            </button>
+
+            <Document
+              file={`${process.env.PUBLIC_URL}/${selectedTopic.pdf}`}
+              onLoadSuccess={onDocumentLoadSuccess}
+            >
+              {Array.from(new Array(numPages), (el, index) => (
+                <Page key={`page_${index + 1}`} pageNumber={index + 1} width={width} />
+              ))}
+            </Document>
+            {/* <div style={{ marginTop: 20 }}>
+              <button onClick={speakText} disabled={isSpeaking || !fullText}>
+                Play
+              </button>
+              <button onClick={stopSpeech} disabled={!isSpeaking}>
+                Stop
+              </button>
+            </div> */}
+            {/* <div style={{ margin: "20px" }}>
+                   <button onClick={extractAndSpeakText} disabled={isSpeaking}>
+                     {isSpeaking ? "Speaking..." : "Read PDF"}
+                   </button>
+                   {isSpeaking && (
+                     <button onClick={stopSpeaking} style={{ marginLeft: "10px" }}>
+                       Stop
+                     </button>
+                   )}
+                 </div> */}
+          </div>
         );
 
       case "ppt":
@@ -145,6 +272,18 @@ const CourseViewer = () => {
               scrollbarWidth: "thin",
             }}
           >
+            <button
+              onClick={() => speakText1(textHtml1.replace(/<[^>]+>/g, ""))}
+              style={{ margin: "10px", padding: "6px 12px", cursor: "pointer" }}
+            >
+              🔊
+            </button>
+            <button
+              onClick={stopSpeech1}
+              style={{ margin: "10px", padding: "6px 12px", cursor: "pointer" }}
+            >
+              ⏹
+            </button>
             {parse(textHtml1)}
           </div>
         );
@@ -158,7 +297,7 @@ const CourseViewer = () => {
             }}
           >
             <Iframe
-              url="https://www.learnpython.org/#google_vignette"
+              url={selectedTopic.mediaUrl}
               width="100%"
               height="100%"
               allowFullScreen
@@ -277,9 +416,10 @@ const CourseViewer = () => {
     const [unitIndex, subjectIndex] = expandedTopic.split("-").map(Number);
 
     // Assuming Semester-1 in your current UI
-    const semesterIndex = 0;
-    const semester = BCA?.[semesterIndex];
-    const subject = semester?.subjects?.[subjectIndex];
+    // const semesterIndex = 0;
+    // const semester = BCA?.[semesterIndex];
+    // const subject = semester?.subjects?.[subjectIndex];
+    const subject = BCA2?.[subjectIndex];
     const unit = subject?.units?.[unitIndex];
     const topics = unit?.topics || [];
     // Try strict object match first, then a safe fallback (label+type)
@@ -291,18 +431,18 @@ const CourseViewer = () => {
     // }
     // if (topicIndex === -1) return null;
 
-    return { semesterIndex, subjectIndex, unitIndex, topicIndex };
+    return { subjectIndex, unitIndex, topicIndex };
   };
 
   // Get the next topic path across (topic → unit → subject → semester)
   const getNextPath = (path) => {
     if (!path) return null;
-    const { semesterIndex, subjectIndex, unitIndex, topicIndex } = path;
-    const semesters = BCA;
-    const semester = semesters?.[semesterIndex];
-    if (!semester) return null;
+    const { subjectIndex, unitIndex, topicIndex } = path;
+    // const semesters = BCA;
+    // const semester = semesters?.[semesterIndex];
+    // if (!semester) return null;
 
-    const subjects = semester.subjects || [];
+    const subjects = BCA2 || [];
     // const {  } = path;
 
     // Same unit → next topic
@@ -310,7 +450,7 @@ const CourseViewer = () => {
     const topics = units?.[unitIndex]?.topics || [];
     if (topicIndex + 1 < topics.length) {
       return {
-        semesterIndex,
+        // semesterIndex,
         subjectIndex,
         unitIndex,
         topicIndex: topicIndex + 1,
@@ -367,10 +507,14 @@ const CourseViewer = () => {
   const goToPath = (path) => {
     if (!path) return;
 
-    const { semesterIndex, subjectIndex, unitIndex, topicIndex } = path;
+    const { subjectIndex, unitIndex, topicIndex } = path;
+    // const topic =
+    //   BCA?.[semesterIndex]?.subjects?.[subjectIndex]?.units?.[unitIndex]
+    //     ?.topics?.[topicIndex];
     const topic =
-      BCA?.[semesterIndex]?.subjects?.[subjectIndex]?.units?.[unitIndex]
-        ?.topics?.[topicIndex];
+      BCA2?.[subjectIndex]?.units?.[unitIndex]?.topics?.[topicIndex];
+
+
     if (!topic) return;
 
     // Expand the correct subject & unit
@@ -392,7 +536,7 @@ const CourseViewer = () => {
     if (!curr) return;
     // tick the current topic
     const currKey = makeKey(
-      curr.semesterIndex,
+      // curr.semesterIndex,
       curr.subjectIndex,
       curr.unitIndex,
       curr.topicIndex
@@ -407,6 +551,26 @@ const CourseViewer = () => {
       goToPath(next);
     }
   };
+
+  useEffect(() => {
+    if (!BCA2?.length) return;
+
+    const subjectIdx = 0; // first subject
+    const unitIdx = 0;    // first unit of first subject
+    const topicIndex = 0; // first topic of first unit
+
+    const topic = BCA2[subjectIdx]?.units?.[unitIdx]?.topics?.[topicIndex];
+    if (!topic) return;
+
+    setExpandedSubject(subjectIdx);
+    setExpandedTopic(`${unitIdx}-${subjectIdx}`);
+    setSelectedTopic(topic);
+
+    // Scroll player into view if needed
+    requestAnimationFrame(() => {
+      mediaRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  }, [])
 
   return (
     <div className="course-viewer-wrapper py-2">
@@ -451,9 +615,9 @@ const CourseViewer = () => {
                 <div className="d-flex justify-content-between align-items-center">
                   <div>
                     <h2 className="fw-bold text-dark mb-1">
-                      Bachelor of Computer Applications (BCA)
+                      B.COM. (Computer Applications)
                     </h2>
-                    <div className="">
+                    {/* <div className="">
                       <span
                         style={{
                           fontWeight: "bold",
@@ -463,7 +627,7 @@ const CourseViewer = () => {
                       >
                         Semester - 1
                       </span>
-                    </div>
+                    </div> */}
 
                     <small className="text-muted">Section : 2025-26</small>
                   </div>
@@ -581,8 +745,10 @@ const CourseViewer = () => {
                   scrollbarGutter: "stable", // optional: prevents small jumps
                 }}
               >
-                {BCA.map((semester, semesterIndex) => {
-                  return semester?.subjects.map((subject, subjectIndex) => {
+
+
+                {
+                  BCA2.map((subject, subjectIndex) => {
                     return (
                       <div
                         key={subjectIndex}
@@ -1053,15 +1219,15 @@ const CourseViewer = () => {
                                         icon = <FaFilePdf color="#e63946" />;
                                         break;
                                       case "image":
-                                        icon = <FaImage color="#16a34a" />;
+                                        icon = <FaImage color="#2196F3" />;
                                         break;
                                       case "ppt":
                                         icon = (
-                                          <FaFilePowerpoint color="#16a34a" />
+                                          <FaFilePowerpoint color="#FF9800" />
                                         );
                                         break;
                                       case "text":
-                                        icon = <FaFileAlt color="#16a34a" />;
+                                        icon = <FaFileAlt color="#4CAF50" />;
                                         break;
 
                                       case "link":
@@ -1105,7 +1271,6 @@ const CourseViewer = () => {
                                         {
                                           completed.includes(
                                             makeKey(
-                                              0,
                                               subjectIndex,
                                               unitIndex,
                                               topicIndex
@@ -1149,8 +1314,10 @@ const CourseViewer = () => {
                           })}
                       </div>
                     );
-                  });
-                })}
+                  })
+                }
+
+
               </div>
             </div>
           </Col>

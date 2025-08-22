@@ -1143,769 +1143,773 @@ export const BCA = [
 
 export const BCA2 = [
   {
-    subjectName: "Programming with C",
+    subjectName: "Business Organization & Management",
     units: [
       {
         unitNumber: "Unit-1",
-        unitTitle: "Program Concept",
+        unitTitle: "Foundation of Indian business",
         topics: [
           {
-            label: "Program Concept You Tude Video",
+            label: "Foundation of Indian business",
             type: "youtube",
             mediaUrl:
-              "https://www.youtube.com/watch?v=s0g4ty29Xgg&list=PLBlnK6fEyqRh6isJ01MBnbNpV3ZsktSyS",
+              "https://www.youtube.com/watch?v=BarcVAOT_fs",
             time: "2:30",
+            ppt: require('assets/files/manav_sharir_parichay.pptx'),
+          },
+          // {
+          //   label: "Foundation of Indian business",
+          //   type: "video",
+          //   mediaUrl:
+          //     "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+          //   time: "8:30",
+          // },
+          {
+            label: "Foundation of Indian business", type: "pdf", pdf: 'BOM1stSem.pdf',
           },
           {
-            label: "Program Concept MP 4 Video",
-            type: "video",
-            mediaUrl:
-              "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
-            time: "8:30",
-          },
-          { label: "Program Concept PDF", type: "pdf" },
-          {
-            label: "Program Concept Image",
+            label: "Foundation of Indian business",
             type: "image",
-            mediaUrl: require("assets/img/c.png"),
+            imageUrl: require('../src/assets/img/Foundation of Indian business.png'),
           },
           {
-            label: "Program Concept Ppt",
+            label: "Foundation of Indian business",
             type: "ppt",
           },
           {
-            label: "Program Concept Text",
+            label: "Foundation of Indian business",
             type: "text",
+            file: 'text5.txt'
           },
           {
-            label: "Program Concept Link",
+            label: "Foundation of Indian business",
             type: "link",
+            mediaUrl: 'https://en.wikipedia.org/wiki/Economy_of_India'
+
           },
         ],
       },
       {
         unitNumber: "Unit-2",
-        unitTitle: "Introduction to C Language",
+        unitTitle: "Business Enterprises",
         topics: [
           {
-            label: "Topic 1 - You Tude Video",
+            label: "Business Enterprises",
             type: "youtube",
             mediaUrl:
-              "https://www.youtube.com/watch?v=rQoqCP7LX60&list=PLxgZQoSe9cg1drBnejUaDD9GEJBGQ5hMt",
+              "https://www.youtube.com/watch?v=Tkr9OdaTEAw",
             time: "2:30",
           },
+          // {
+          //   label: "Business Enterprises",
+          //   type: "video",
+          //   mediaUrl:
+          //     "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+          //   time: "8:30",
+          // },
+          { label: "Business Enterprises", type: "pdf", pdf: 'business_enterprises.pdf', },
+
           {
-            label: "Topic 2 - MP 4 Video",
-            type: "video",
-            mediaUrl:
-              "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
-            time: "8:30",
-          },
-          { label: "Topic 3 - PDF", type: "pdf" },
-          {
-            label: "Topic 4 - Image",
+            label: "Business Enterprises",
             type: "image",
-            mediaUrl: require("assets/img/c.png"),
+            imageUrl: require('../src/assets/img/business.png'),
+
           },
           {
-            label: "Topic 5 - Ppt",
+            label: "Business Enterprises",
             type: "ppt",
           },
           {
-            label: "Topic 6 - Text",
+            label: "Business Enterprises",
             type: "text",
+            file: 'text6.txt'
           },
           {
-            label: "Topic 7 - Link",
+            label: "Business Enterprises",
             type: "link",
+            mediaUrl: 'https://en.wikipedia.org/wiki/Business'
+
           },
         ],
       },
       {
         unitNumber: "Unit-3",
-        unitTitle: "Control Structure",
+        unitTitle: "The Process of management",
         topics: [
           {
-            label: "Topic 1 - You Tude Video",
+            label: "The Process of management",
             type: "youtube",
-            mediaUrl: "https://www.youtube.com/watch?v=LXb3EKWsInQ",
+            mediaUrl:
+              "https://www.youtube.com/watch?v=q6LMjurECZM",
             time: "2:30",
           },
+          // {
+          //   label: "The Process of management",
+          //   type: "video",
+          //   mediaUrl:
+          //     "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+          //   time: "8:30",
+          // },
+
+          { label: "The Process of management", type: "pdf", pdf: 'the_process_of_management.pdf', },
           {
-            label: "Topic 2 - MP 4 Video",
-            type: "video",
-            mediaUrl:
-              "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
-            time: "8:30",
-          },
-          { label: "Topic 3 - PDF", type: "pdf" },
-          {
-            label: "Topic 4 - Image",
+            label: "The Process of management",
             type: "image",
-            mediaUrl: require("assets/img/ship-7643503_1280.png"),
+            imageUrl: require("assets/img/process.png"),
           },
           {
-            label: "Topic 5 - Ppt",
+            label: "The Process of management",
             type: "ppt",
           },
           {
-            label: "Topic 6 - Text",
+            label: "The Process of management",
             type: "text",
+            file: 'text7.txt'
           },
           {
-            label: "Topic 7 - Link",
+            label: "The Process of management",
             type: "link",
+            mediaUrl: 'https://en.wikipedia.org/wiki/Management_process'
           },
         ],
       },
       {
         unitNumber: "Unit-4",
-        unitTitle: "The Need of c Functions",
+        unitTitle: "Leadership and Motivation",
         topics: [
           {
-            label: "Topic 1 - You Tude Video",
+            label: "Leadership and Motivation",
             type: "youtube",
-            mediaUrl: "https://www.youtube.com/watch?v=LXb3EKWsInQ",
+            mediaUrl:
+              "https://www.youtube.com/watch?v=eXDNkwIeOqA",
             time: "2:30",
           },
+          // {
+          //   label: "Leadership and Motivation",
+          //   type: "video",
+          //   mediaUrl:
+          //     "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+          //   time: "8:30",
+          // },
+          { label: "Leadership and Motivation", type: "pdf", pdf: 'leadership_and_motivation.pdf' },
           {
-            label: "Topic 2 - MP 4 Video",
-            type: "video",
-            mediaUrl:
-              "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
-            time: "8:30",
-          },
-          { label: "Topic 3 - PDF", type: "pdf" },
-          {
-            label: "Topic 4 - Image",
+            label: "Leadership and Motivation",
             type: "image",
-            mediaUrl: require("assets/img/ship-7643503_1280.png"),
+            imageUrl: require("assets/img/leadership.png"),
           },
           {
-            label: "Topic 5 - Ppt",
+            label: "Leadership and Motivation",
             type: "ppt",
           },
           {
-            label: "Topic 6 - Text",
+            label: "Leadership and Motivation",
             type: "text",
+            file: 'text8.txt'
           },
           {
-            label: "Topic 7 - Link",
+            label: "Leadership and Motivation",
             type: "link",
+            mediaUrl: 'https://www.managementstudyguide.com/leadership-motivation.htm'
           },
         ],
       },
       {
         unitNumber: "Unit-5",
-        unitTitle: "Defining Structure",
+        unitTitle: "Conceptual Framework of Management",
         topics: [
           {
-            label: "Topic 1 - You Tude Video",
+            label: "Conceptual Framework of Management",
             type: "youtube",
-            mediaUrl: "https://www.youtube.com/watch?v=LXb3EKWsInQ",
+            mediaUrl:
+              "https://www.youtube.com/watch?v=MnfRdTCUIsc",
             time: "2:30",
           },
+          // {
+          //   label: "Conceptual Framework of Management",
+          //   type: "video",
+          //   mediaUrl:
+          //     "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+          //   time: "8:30",
+          // },
+          { label: "Conceptual Framework of Management", type: "pdf", pdf: 'conceptual_framework_of_management.pdf' },
           {
-            label: "Topic 2 - MP 4 Video",
-            type: "video",
-            mediaUrl:
-              "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
-            time: "8:30",
-          },
-          { label: "Topic 3 - PDF", type: "pdf" },
-          {
-            label: "Topic 4 - Image",
+            label: "Conceptual Framework of Management",
             type: "image",
-            mediaUrl: require("assets/img/ship-7643503_1280.png"),
+            imageUrl: require("assets/img/conceptual.png"),
           },
           {
-            label: "Topic 5 - Ppt",
+            label: "Conceptual Framework of Management",
             type: "ppt",
           },
           {
-            label: "Topic 6 - Text",
+            label: "Conceptual Framework of Management",
             type: "text",
+            file: 'text9.txt'
           },
           {
-            label: "Topic 7 - Link",
+            label: "Conceptual Framework of Management",
             type: "link",
+            mediaUrl: 'https://en.wikipedia.org/wiki/Conceptual_framework'
           },
         ],
       },
     ],
   },
   {
-    subjectName: "Database Management System",
+    subjectName: "Fundamentals of Financial Accounting",
     units: [
       {
         unitNumber: "Unit-1",
-        unitTitle: "Introduction to Database System",
-        topics: [
-          {
-            label: "Topic 1 - You Tude Video",
-            type: "youtube",
-            mediaUrl: "https://www.youtube.com/watch?v=LXb3EKWsInQ",
-            time: "2:30",
-          },
-          {
-            label: "Topic 2 - MP 4 Video",
-            type: "video",
-            mediaUrl:
-              "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
-            time: "8:30",
-          },
-          { label: "Topic 3 - PDF", type: "pdf" },
-          {
-            label: "Topic 4 - Image",
-            type: "image",
-            mediaUrl: require("assets/img/ship-7643503_1280.png"),
-          },
-          {
-            label: "Topic 5 - Ppt",
-            type: "ppt",
-          },
-          {
-            label: "Topic 6 - Text",
-            type: "text",
-          },
-          {
-            label: "Topic 7 - Link",
-            type: "link",
-          },
-        ],
+        unitTitle: "Accounting-Theoretical process",
+        // topics: [
+        //   {
+        //     label: "मानव शरीर परिचय You Tude Video",
+        //     type: "youtube",
+        //     mediaUrl:
+        //       "https://www.youtube.com/watch?v=s0g4ty29Xgg&list=PLBlnK6fEyqRh6isJ01MBnbNpV3ZsktSyS",
+        //     time: "2:30",
+        //   },
+        //   {
+        //     label: "मानव शरीर परिचय MP 4 Video",
+        //     type: "video",
+        //     mediaUrl:
+        //       "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+        //     time: "8:30",
+        //   },
+        //   { label: "मानव शरीर परिचय PDF", type: "pdf" },
+        //   {
+        //     label: "मानव शरीर परिचय Image",
+        //     type: "image",
+        //     mediaUrl: require("assets/img/c.png"),
+        //   },
+        //   {
+        //     label: "मानव शरीर परिचय Ppt",
+        //     type: "ppt",
+        //   },
+        //   {
+        //     label: "मानव शरीर परिचय Text",
+        //     type: "text",
+        //   },
+        //   {
+        //     label: "मानव शरीर परिचय Link",
+        //     type: "link",
+        //   },
+        // ],
       },
       {
         unitNumber: "Unit-2",
-        unitTitle: "Relational Database Concept Design",
-        topics: [
-          {
-            label: "Topic 1 - You Tude Video",
-            type: "youtube",
-            mediaUrl: "https://www.youtube.com/watch?v=LXb3EKWsInQ",
-            time: "2:30",
-          },
-          {
-            label: "Topic 2 - MP 4 Video",
-            type: "video",
-            mediaUrl:
-              "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
-            time: "8:30",
-          },
-          { label: "Topic 3 - PDF", type: "pdf" },
-          {
-            label: "Topic 4 - Image",
-            type: "image",
-            mediaUrl: require("assets/img/ship-7643503_1280.png"),
-          },
-          {
-            label: "Topic 5 - Ppt",
-            type: "ppt",
-          },
-          {
-            label: "Topic 6 - Text",
-            type: "text",
-          },
-          {
-            label: "Topic 7 - Link",
-            type: "link",
-          },
-        ],
+        unitTitle: "Income and Revenue",
+        // topics: [
+        //   {
+        //     label: "मानव शरीर परिचय You Tude Video",
+        //     type: "youtube",
+        //     mediaUrl:
+        //       "https://www.youtube.com/watch?v=s0g4ty29Xgg&list=PLBlnK6fEyqRh6isJ01MBnbNpV3ZsktSyS",
+        //     time: "2:30",
+        //   },
+        //   {
+        //     label: "मानव शरीर परिचय MP 4 Video",
+        //     type: "video",
+        //     mediaUrl:
+        //       "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+        //     time: "8:30",
+        //   },
+        //   { label: "मानव शरीर परिचय PDF", type: "pdf" },
+        //   {
+        //     label: "मानव शरीर परिचय Image",
+        //     type: "image",
+        //     mediaUrl: require("assets/img/c.png"),
+        //   },
+        //   {
+        //     label: "मानव शरीर परिचय Ppt",
+        //     type: "ppt",
+        //   },
+        //   {
+        //     label: "मानव शरीर परिचय Text",
+        //     type: "text",
+        //   },
+        //   {
+        //     label: "मानव शरीर परिचय Link",
+        //     type: "link",
+        //   },
+        // ],
       },
       {
         unitNumber: "Unit-3",
-        unitTitle: "Database Storage",
-        topics: [
-          {
-            label: "Topic 1 - You Tude Video",
-            type: "youtube",
-            mediaUrl: "https://www.youtube.com/watch?v=LXb3EKWsInQ",
-            time: "2:30",
-          },
-          {
-            label: "Topic 2 - MP 4 Video",
-            type: "video",
-            mediaUrl:
-              "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
-            time: "8:30",
-          },
-          { label: "Topic 3 - PDF", type: "pdf" },
-          {
-            label: "Topic 4 - Image",
-            type: "image",
-            mediaUrl: require("assets/img/ship-7643503_1280.png"),
-          },
-          {
-            label: "Topic 5 - Ppt",
-            type: "ppt",
-          },
-          {
-            label: "Topic 6 - Text",
-            type: "text",
-          },
-          {
-            label: "Topic 7 - Link",
-            type: "link",
-          },
-        ],
+        unitTitle: "Accounting",
+        // topics: [
+        //   {
+        //     label: "मानव शरीर परिचय You Tude Video",
+        //     type: "youtube",
+        //     mediaUrl:
+        //       "https://www.youtube.com/watch?v=s0g4ty29Xgg&list=PLBlnK6fEyqRh6isJ01MBnbNpV3ZsktSyS",
+        //     time: "2:30",
+        //   },
+        //   {
+        //     label: "मानव शरीर परिचय MP 4 Video",
+        //     type: "video",
+        //     mediaUrl:
+        //       "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+        //     time: "8:30",
+        //   },
+        //   { label: "मानव शरीर परिचय PDF", type: "pdf" },
+        //   {
+        //     label: "मानव शरीर परिचय Image",
+        //     type: "image",
+        //     mediaUrl: require("assets/img/c.png"),
+        //   },
+        //   {
+        //     label: "मानव शरीर परिचय Ppt",
+        //     type: "ppt",
+        //   },
+        //   {
+        //     label: "मानव शरीर परिचय Text",
+        //     type: "text",
+        //   },
+        //   {
+        //     label: "मानव शरीर परिचय Link",
+        //     type: "link",
+        //   },
+        // ],
       },
       {
         unitNumber: "Unit-4",
-        unitTitle: "Security",
-        topics: [
-          {
-            label: "Topic 1 - You Tude Video",
-            type: "youtube",
-            mediaUrl: "https://www.youtube.com/watch?v=LXb3EKWsInQ",
-            time: "2:30",
-          },
-          {
-            label: "Topic 2 - MP 4 Video",
-            type: "video",
-            mediaUrl:
-              "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
-            time: "8:30",
-          },
-          { label: "Topic 3 - PDF", type: "pdf" },
-          {
-            label: "Topic 4 - Image",
-            type: "image",
-            mediaUrl: require("assets/img/ship-7643503_1280.png"),
-          },
-          {
-            label: "Topic 5 - Ppt",
-            type: "ppt",
-          },
-          {
-            label: "Topic 6 - Text",
-            type: "text",
-          },
-          {
-            label: "Topic 7 - Link",
-            type: "link",
-          },
-        ],
+        unitTitle: "Accounting for Inland Branches",
+        // topics: [
+        //   {
+        //     label: "मानव शरीर परिचय You Tude Video",
+        //     type: "youtube",
+        //     mediaUrl:
+        //       "https://www.youtube.com/watch?v=s0g4ty29Xgg&list=PLBlnK6fEyqRh6isJ01MBnbNpV3ZsktSyS",
+        //     time: "2:30",
+        //   },
+        //   {
+        //     label: "मानव शरीर परिचय MP 4 Video",
+        //     type: "video",
+        //     mediaUrl:
+        //       "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+        //     time: "8:30",
+        //   },
+        //   { label: "मानव शरीर परिचय PDF", type: "pdf" },
+        //   {
+        //     label: "मानव शरीर परिचय Image",
+        //     type: "image",
+        //     mediaUrl: require("assets/img/c.png"),
+        //   },
+        //   {
+        //     label: "मानव शरीर परिचय Ppt",
+        //     type: "ppt",
+        //   },
+        //   {
+        //     label: "मानव शरीर परिचय Text",
+        //     type: "text",
+        //   },
+        //   {
+        //     label: "मानव शरीर परिचय Link",
+        //     type: "link",
+        //   },
+        // ],
       },
       {
         unitNumber: "Unit-5",
-        unitTitle: "Introduction to Current Trends",
-        topics: [
-          {
-            label: "Topic 1 - You Tude Video",
-            type: "youtube",
-            mediaUrl: "https://www.youtube.com/watch?v=LXb3EKWsInQ",
-            time: "2:30",
-          },
-          {
-            label: "Topic 2 - MP 4 Video",
-            type: "video",
-            mediaUrl:
-              "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
-            time: "8:30",
-          },
-          { label: "Topic 3 - PDF", type: "pdf" },
-          {
-            label: "Topic 4 - Image",
-            type: "image",
-            mediaUrl: require("assets/img/ship-7643503_1280.png"),
-          },
-          {
-            label: "Topic 5 - Ppt",
-            type: "ppt",
-          },
-          {
-            label: "Topic 6 - Text",
-            type: "text",
-          },
-          {
-            label: "Topic 7 - Link",
-            type: "link",
-          },
-        ],
+        unitTitle: "Accounting for Dissolution of Partnership Firm",
+        // topics: [
+        //   {
+        //     label: "मानव शरीर परिचय You Tude Video",
+        //     type: "youtube",
+        //     mediaUrl:
+        //       "https://www.youtube.com/watch?v=s0g4ty29Xgg&list=PLBlnK6fEyqRh6isJ01MBnbNpV3ZsktSyS",
+        //     time: "2:30",
+        //   },
+        //   {
+        //     label: "मानव शरीर परिचय MP 4 Video",
+        //     type: "video",
+        //     mediaUrl:
+        //       "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+        //     time: "8:30",
+        //   },
+        //   { label: "मानव शरीर परिचय PDF", type: "pdf" },
+        //   {
+        //     label: "मानव शरीर परिचय Image",
+        //     type: "image",
+        //     mediaUrl: require("assets/img/c.png"),
+        //   },
+        //   {
+        //     label: "मानव शरीर परिचय Ppt",
+        //     type: "ppt",
+        //   },
+        //   {
+        //     label: "मानव शरीर परिचय Text",
+        //     type: "text",
+        //   },
+        //   {
+        //     label: "मानव शरीर परिचय Link",
+        //     type: "link",
+        //   },
+        // ],
       },
     ],
   },
   {
-    subjectName: "Elementary Mathematics",
+    subjectName:
+      "Fundamentals of Computers & IT",
     units: [
       {
         unitNumber: "Unit-1",
-        unitTitle: "Sets and Elements",
-        topics: [
-          {
-            label: "Topic 1 - You Tude Video",
-            type: "youtube",
-            mediaUrl: "https://www.youtube.com/watch?v=LXb3EKWsInQ",
-            time: "2:30",
-          },
-          {
-            label: "Topic 2 - MP 4 Video",
-            type: "video",
-            mediaUrl:
-              "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
-            time: "8:30",
-          },
-          { label: "Topic 3 - PDF", type: "pdf" },
-          {
-            label: "Topic 4 - Image",
-            type: "image",
-            mediaUrl: require("assets/img/ship-7643503_1280.png"),
-          },
-          {
-            label: "Topic 5 - Ppt",
-            type: "ppt",
-          },
-          {
-            label: "Topic 6 - Text",
-            type: "text",
-          },
-          {
-            label: "Topic 7 - Link",
-            type: "link",
-          },
-        ],
+        unitTitle: "Introduction of Computer & Generations",
+        // topics: [
+        //   {
+        //     label: "मानव शरीर परिचय You Tude Video",
+        //     type: "youtube",
+        //     mediaUrl:
+        //       "https://www.youtube.com/watch?v=s0g4ty29Xgg&list=PLBlnK6fEyqRh6isJ01MBnbNpV3ZsktSyS",
+        //     time: "2:30",
+        //   },
+        //   {
+        //     label: "मानव शरीर परिचय MP 4 Video",
+        //     type: "video",
+        //     mediaUrl:
+        //       "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+        //     time: "8:30",
+        //   },
+        //   { label: "मानव शरीर परिचय PDF", type: "pdf" },
+        //   {
+        //     label: "मानव शरीर परिचय Image",
+        //     type: "image",
+        //     mediaUrl: require("assets/img/c.png"),
+        //   },
+        //   {
+        //     label: "मानव शरीर परिचय Ppt",
+        //     type: "ppt",
+        //   },
+        //   {
+        //     label: "मानव शरीर परिचय Text",
+        //     type: "text",
+        //   },
+        //   {
+        //     label: "मानव शरीर परिचय Link",
+        //     type: "link",
+        //   },
+        // ],
       },
       {
         unitNumber: "Unit-2",
-        unitTitle: "Functions",
-        topics: [
-          {
-            label: "Topic 1 - You Tude Video",
-            type: "youtube",
-            mediaUrl: "https://www.youtube.com/watch?v=LXb3EKWsInQ",
-            time: "2:30",
-          },
-          {
-            label: "Topic 2 - MP 4 Video",
-            type: "video",
-            mediaUrl:
-              "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
-            time: "8:30",
-          },
-          { label: "Topic 3 - PDF", type: "pdf" },
-          {
-            label: "Topic 4 - Image",
-            type: "image",
-            mediaUrl: require("assets/img/ship-7643503_1280.png"),
-          },
-          {
-            label: "Topic 5 - Ppt",
-            type: "ppt",
-          },
-          {
-            label: "Topic 6 - Text",
-            type: "text",
-          },
-          {
-            label: "Topic 7 - Link",
-            type: "link",
-          },
-        ],
+        unitTitle: "Computer Peripherals",
+        // topics: [
+        //   {
+        //     label: "मानव शरीर परिचय You Tude Video",
+        //     type: "youtube",
+        //     mediaUrl:
+        //       "https://www.youtube.com/watch?v=s0g4ty29Xgg&list=PLBlnK6fEyqRh6isJ01MBnbNpV3ZsktSyS",
+        //     time: "2:30",
+        //   },
+        //   {
+        //     label: "मानव शरीर परिचय MP 4 Video",
+        //     type: "video",
+        //     mediaUrl:
+        //       "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+        //     time: "8:30",
+        //   },
+        //   { label: "मानव शरीर परिचय PDF", type: "pdf" },
+        //   {
+        //     label: "मानव शरीर परिचय Image",
+        //     type: "image",
+        //     mediaUrl: require("assets/img/c.png"),
+        //   },
+        //   {
+        //     label: "मानव शरीर परिचय Ppt",
+        //     type: "ppt",
+        //   },
+        //   {
+        //     label: "मानव शरीर परिचय Text",
+        //     type: "text",
+        //   },
+        //   {
+        //     label: "मानव शरीर परिचय Link",
+        //     type: "link",
+        //   },
+        // ],
       },
       {
         unitNumber: "Unit-3",
-        unitTitle: "Determinants",
-        topics: [
-          {
-            label: "Topic 1 - You Tude Video",
-            type: "youtube",
-            mediaUrl: "https://www.youtube.com/watch?v=LXb3EKWsInQ",
-            time: "2:30",
-          },
-          {
-            label: "Topic 2 - MP 4 Video",
-            type: "video",
-            mediaUrl:
-              "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
-            time: "8:30",
-          },
-          { label: "Topic 3 - PDF", type: "pdf" },
-          {
-            label: "Topic 4 - Image",
-            type: "image",
-            mediaUrl: require("assets/img/ship-7643503_1280.png"),
-          },
-          {
-            label: "Topic 5 - Ppt",
-            type: "ppt",
-          },
-          {
-            label: "Topic 6 - Text",
-            type: "text",
-          },
-          {
-            label: "Topic 7 - Link",
-            type: "link",
-          },
-        ],
+        unitTitle: "Software and Languages",
+        // topics: [
+        //   {
+        //     label: "मानव शरीर परिचय You Tude Video",
+        //     type: "youtube",
+        //     mediaUrl:
+        //       "https://www.youtube.com/watch?v=s0g4ty29Xgg&list=PLBlnK6fEyqRh6isJ01MBnbNpV3ZsktSyS",
+        //     time: "2:30",
+        //   },
+        //   {
+        //     label: "मानव शरीर परिचय MP 4 Video",
+        //     type: "video",
+        //     mediaUrl:
+        //       "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+        //     time: "8:30",
+        //   },
+        //   { label: "मानव शरीर परिचय PDF", type: "pdf" },
+        //   {
+        //     label: "मानव शरीर परिचय Image",
+        //     type: "image",
+        //     mediaUrl: require("assets/img/c.png"),
+        //   },
+        //   {
+        //     label: "मानव शरीर परिचय Ppt",
+        //     type: "ppt",
+        //   },
+        //   {
+        //     label: "मानव शरीर परिचय Text",
+        //     type: "text",
+        //   },
+        //   {
+        //     label: "मानव शरीर परिचय Link",
+        //     type: "link",
+        //   },
+        // ],
       },
       {
         unitNumber: "Unit-4",
-        unitTitle: "Mathematical Reasoning",
-        topics: [
-          {
-            label: "Topic 1 - You Tude Video",
-            type: "youtube",
-            mediaUrl: "https://www.youtube.com/watch?v=LXb3EKWsInQ",
-            time: "2:30",
-          },
-          {
-            label: "Topic 2 - MP 4 Video",
-            type: "video",
-            mediaUrl:
-              "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
-            time: "8:30",
-          },
-          { label: "Topic 3 - PDF", type: "pdf" },
-          {
-            label: "Topic 4 - Image",
-            type: "image",
-            mediaUrl: require("assets/img/ship-7643503_1280.png"),
-          },
-          {
-            label: "Topic 5 - Ppt",
-            type: "ppt",
-          },
-          {
-            label: "Topic 6 - Text",
-            type: "text",
-          },
-          {
-            label: "Topic 7 - Link",
-            type: "link",
-          },
-        ],
+        unitTitle:
+          "Operating System",
+        // topics: [
+        //   {
+        //     label: "मानव शरीर परिचय You Tude Video",
+        //     type: "youtube",
+        //     mediaUrl:
+        //       "https://www.youtube.com/watch?v=s0g4ty29Xgg&list=PLBlnK6fEyqRh6isJ01MBnbNpV3ZsktSyS",
+        //     time: "2:30",
+        //   },
+        //   {
+        //     label: "मानव शरीर परिचय MP 4 Video",
+        //     type: "video",
+        //     mediaUrl:
+        //       "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+        //     time: "8:30",
+        //   },
+        //   { label: "मानव शरीर परिचय PDF", type: "pdf" },
+        //   {
+        //     label: "मानव शरीर परिचय Image",
+        //     type: "image",
+        //     mediaUrl: require("assets/img/c.png"),
+        //   },
+        //   {
+        //     label: "मानव शरीर परिचय Ppt",
+        //     type: "ppt",
+        //   },
+        //   {
+        //     label: "मानव शरीर परिचय Text",
+        //     type: "text",
+        //   },
+        //   {
+        //     label: "मानव शरीर परिचय Link",
+        //     type: "link",
+        //   },
+        // ],
       },
       {
         unitNumber: "Unit-5",
-        unitTitle: "Meaning of Probability",
-        topics: [
-          {
-            label: "Topic 1 - You Tude Video",
-            type: "youtube",
-            mediaUrl: "https://www.youtube.com/watch?v=LXb3EKWsInQ",
-            time: "2:30",
-          },
-          {
-            label: "Topic 2 - MP 4 Video",
-            type: "video",
-            mediaUrl:
-              "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
-            time: "8:30",
-          },
-          { label: "Topic 3 - PDF", type: "pdf" },
-          {
-            label: "Topic 4 - Image",
-            type: "image",
-            mediaUrl: require("assets/img/ship-7643503_1280.png"),
-          },
-          {
-            label: "Topic 5 - Ppt",
-            type: "ppt",
-          },
-          {
-            label: "Topic 6 - Text",
-            type: "text",
-          },
-          {
-            label: "Topic 7 - Link",
-            type: "link",
-          },
-        ],
+        unitTitle:
+          "Configuration & Management of Operating System",
+        // topics: [
+        //   {
+        //     label: "मानव शरीर परिचय You Tude Video",
+        //     type: "youtube",
+        //     mediaUrl:
+        //       "https://www.youtube.com/watch?v=s0g4ty29Xgg&list=PLBlnK6fEyqRh6isJ01MBnbNpV3ZsktSyS",
+        //     time: "2:30",
+        //   },
+        //   {
+        //     label: "मानव शरीर परिचय MP 4 Video",
+        //     type: "video",
+        //     mediaUrl:
+        //       "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+        //     time: "8:30",
+        //   },
+        //   { label: "मानव शरीर परिचय PDF", type: "pdf" },
+        //   {
+        //     label: "मानव शरीर परिचय Image",
+        //     type: "image",
+        //     mediaUrl: require("assets/img/c.png"),
+        //   },
+        //   {
+        //     label: "मानव शरीर परिचय Ppt",
+        //     type: "ppt",
+        //   },
+        //   {
+        //     label: "मानव शरीर परिचय Text",
+        //     type: "text",
+        //   },
+        //   {
+        //     label: "मानव शरीर परिचय Link",
+        //     type: "link",
+        //   },
+        // ],
       },
     ],
   },
   {
-    subjectName: "Communicative English % Hindi",
+    subjectName: "Communicative Hindi & English",
     units: [
       {
         unitNumber: "Unit-1",
-        unitTitle: "Program Concept",
-        topics: [
-          {
-            label: "Topic 1 - You Tude Video",
-            type: "youtube",
-            mediaUrl:
-              "https://www.youtube.com/watch?v=s0g4ty29Xgg&list=PLBlnK6fEyqRh6isJ01MBnbNpV3ZsktSyS",
-            time: "2:30",
-          },
-          {
-            label: "Topic 2 - MP 4 Video",
-            type: "video",
-            mediaUrl:
-              "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
-            time: "8:30",
-          },
-          { label: "Topic 3 - PDF", type: "pdf" },
-          {
-            label: "Topic 4 - Image",
-            type: "image",
-            mediaUrl: require("assets/img/ship-7643503_1280.png"),
-          },
-          {
-            label: "Topic 5 - Ppt",
-            type: "ppt",
-          },
-          {
-            label: "Topic 6 - Text",
-            type: "text",
-          },
-          {
-            label: "Topic 7 - Link",
-            type: "link",
-          },
-        ],
+        unitTitle: "Language Skills & Presentation",
+
+        // topics: [
+        //   {
+        //     label: "मानव शरीर परिचय You Tude Video",
+        //     type: "youtube",
+        //     mediaUrl:
+        //       "https://www.youtube.com/watch?v=s0g4ty29Xgg&list=PLBlnK6fEyqRh6isJ01MBnbNpV3ZsktSyS",
+        //     time: "2:30",
+        //   },
+        //   {
+        //     label: "मानव शरीर परिचय MP 4 Video",
+        //     type: "video",
+        //     mediaUrl:
+        //       "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+        //     time: "8:30",
+        //   },
+        //   { label: "मानव शरीर परिचय PDF", type: "pdf" },
+        //   {
+        //     label: "मानव शरीर परिचय Image",
+        //     type: "image",
+        //     mediaUrl: require("assets/img/c.png"),
+        //   },
+        //   {
+        //     label: "मानव शरीर परिचय Ppt",
+        //     type: "ppt",
+        //   },
+        //   {
+        //     label: "मानव शरीर परिचय Text",
+        //     type: "text",
+        //   },
+        //   {
+        //     label: "मानव शरीर परिचय Link",
+        //     type: "link",
+        //   },
+        // ],
       },
       {
         unitNumber: "Unit-2",
-        unitTitle: "Introduction to C Language",
-        topics: [
-          {
-            label: "Topic 1 - You Tude Video",
-            type: "youtube",
-            mediaUrl: "https://www.youtube.com/watch?v=LXb3EKWsInQ",
-            time: "2:30",
-          },
-          {
-            label: "Topic 2 - MP 4 Video",
-            type: "video",
-            mediaUrl:
-              "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
-            time: "8:30",
-          },
-          { label: "Topic 3 - PDF", type: "pdf" },
-          {
-            label: "Topic 4 - Image",
-            type: "image",
-            mediaUrl: require("assets/img/ship-7643503_1280.png"),
-          },
-          {
-            label: "Topic 5 - Ppt",
-            type: "ppt",
-          },
-          {
-            label: "Topic 6 - Text",
-            type: "text",
-          },
-          {
-            label: "Topic 7 - Link",
-            type: "link",
-          },
-        ],
+        unitTitle: "Reading & Understanding",
+        // topics: [
+        //   {
+        //     label: "मानव शरीर परिचय You Tude Video",
+        //     type: "youtube",
+        //     mediaUrl:
+        //       "https://www.youtube.com/watch?v=s0g4ty29Xgg&list=PLBlnK6fEyqRh6isJ01MBnbNpV3ZsktSyS",
+        //     time: "2:30",
+        //   },
+        //   {
+        //     label: "मानव शरीर परिचय MP 4 Video",
+        //     type: "video",
+        //     mediaUrl:
+        //       "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+        //     time: "8:30",
+        //   },
+        //   { label: "मानव शरीर परिचय PDF", type: "pdf" },
+        //   {
+        //     label: "मानव शरीर परिचय Image",
+        //     type: "image",
+        //     mediaUrl: require("assets/img/c.png"),
+        //   },
+        //   {
+        //     label: "मानव शरीर परिचय Ppt",
+        //     type: "ppt",
+        //   },
+        //   {
+        //     label: "मानव शरीर परिचय Text",
+        //     type: "text",
+        //   },
+        //   {
+        //     label: "मानव शरीर परिचय Link",
+        //     type: "link",
+        //   },
+        // ],
       },
       {
         unitNumber: "Unit-3",
-        unitTitle: "Control Structure",
-        topics: [
-          {
-            label: "Topic 1 - You Tude Video",
-            type: "youtube",
-            mediaUrl: "https://www.youtube.com/watch?v=LXb3EKWsInQ",
-            time: "2:30",
-          },
-          {
-            label: "Topic 2 - MP 4 Video",
-            type: "video",
-            mediaUrl:
-              "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
-            time: "8:30",
-          },
-          { label: "Topic 3 - PDF", type: "pdf" },
-          {
-            label: "Topic 4 - Image",
-            type: "image",
-            mediaUrl: require("assets/img/ship-7643503_1280.png"),
-          },
-          {
-            label: "Topic 5 - Ppt",
-            type: "ppt",
-          },
-          {
-            label: "Topic 6 - Text",
-            type: "text",
-          },
-          {
-            label: "Topic 7 - Link",
-            type: "link",
-          },
-        ],
+        unitTitle: "Hindi language",
+        // topics: [
+        //   {
+        //     label: "मानव शरीर परिचय You Tude Video",
+        //     type: "youtube",
+        //     mediaUrl:
+        //       "https://www.youtube.com/watch?v=s0g4ty29Xgg&list=PLBlnK6fEyqRh6isJ01MBnbNpV3ZsktSyS",
+        //     time: "2:30",
+        //   },
+        //   {
+        //     label: "मानव शरीर परिचय MP 4 Video",
+        //     type: "video",
+        //     mediaUrl:
+        //       "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+        //     time: "8:30",
+        //   },
+        //   { label: "मानव शरीर परिचय PDF", type: "pdf" },
+        //   {
+        //     label: "मानव शरीर परिचय Image",
+        //     type: "image",
+        //     mediaUrl: require("assets/img/c.png"),
+        //   },
+        //   {
+        //     label: "मानव शरीर परिचय Ppt",
+        //     type: "ppt",
+        //   },
+        //   {
+        //     label: "मानव शरीर परिचय Text",
+        //     type: "text",
+        //   },
+        //   {
+        //     label: "मानव शरीर परिचय Link",
+        //     type: "link",
+        //   },
+        // ],
       },
       {
         unitNumber: "Unit-4",
-        unitTitle: "The Need of c Functions",
-        topics: [
-          {
-            label: "Topic 1 - You Tude Video",
-            type: "youtube",
-            mediaUrl: "https://www.youtube.com/watch?v=LXb3EKWsInQ",
-            time: "2:30",
-          },
-          {
-            label: "Topic 2 - MP 4 Video",
-            type: "video",
-            mediaUrl:
-              "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
-            time: "8:30",
-          },
-          { label: "Topic 3 - PDF", type: "pdf" },
-          {
-            label: "Topic 4 - Image",
-            type: "image",
-            mediaUrl: require("assets/img/ship-7643503_1280.png"),
-          },
-          {
-            label: "Topic 5 - Ppt",
-            type: "ppt",
-          },
-          {
-            label: "Topic 6 - Text",
-            type: "text",
-          },
-          {
-            label: "Topic 7 - Link",
-            type: "link",
-          },
-        ],
+        unitTitle: "Language",
+        // topics: [
+        //   {
+        //     label: "मानव शरीर परिचय You Tude Video",
+        //     type: "youtube",
+        //     mediaUrl:
+        //       "https://www.youtube.com/watch?v=s0g4ty29Xgg&list=PLBlnK6fEyqRh6isJ01MBnbNpV3ZsktSyS",
+        //     time: "2:30",
+        //   },
+        //   {
+        //     label: "मानव शरीर परिचय MP 4 Video",
+        //     type: "video",
+        //     mediaUrl:
+        //       "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+        //     time: "8:30",
+        //   },
+        //   { label: "मानव शरीर परिचय PDF", type: "pdf" },
+        //   {
+        //     label: "मानव शरीर परिचय Image",
+        //     type: "image",
+        //     mediaUrl: require("assets/img/c.png"),
+        //   },
+        //   {
+        //     label: "मानव शरीर परिचय Ppt",
+        //     type: "ppt",
+        //   },
+        //   {
+        //     label: "मानव शरीर परिचय Text",
+        //     type: "text",
+        //   },
+        //   {
+        //     label: "मानव शरीर परिचय Link",
+        //     type: "link",
+        //   },
+        // ],
       },
-      {
-        unitNumber: "Unit-5",
-        unitTitle: "Defining Structure",
-        topics: [
-          {
-            label: "Topic 1 - You Tude Video",
-            type: "youtube",
-            mediaUrl: "https://www.youtube.com/watch?v=LXb3EKWsInQ",
-            time: "2:30",
-          },
-          {
-            label: "Topic 2 - MP 4 Video",
-            type: "video",
-            mediaUrl:
-              "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
-            time: "8:30",
-          },
-          { label: "Topic 3 - PDF", type: "pdf" },
-          {
-            label: "Topic 4 - Image",
-            type: "image",
-            mediaUrl: require("assets/img/ship-7643503_1280.png"),
-          },
-          {
-            label: "Topic 5 - Ppt",
-            type: "ppt",
-          },
-          {
-            label: "Topic 6 - Text",
-            type: "text",
-          },
-          {
-            label: "Topic 7 - Link",
-            type: "link",
-          },
-        ],
-      },
+
     ],
   },
-]
+
+
+];
 
 export const AtalBihari = [
   {

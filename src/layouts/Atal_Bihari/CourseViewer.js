@@ -15,7 +15,11 @@ import {
   FaVideo,
   FaLink,
 } from "react-icons/fa";
+import { MdOutlineZoomOutMap, MdOutlineZoomInMap } from "react-icons/md";
+
 import { AtalBihari2 } from "DummyData";
+import { useResizeDetector } from "react-resize-detector";
+
 import parse from "html-react-parser";
 import Iframe from "react-iframe";
 import ReactPlayer from "react-player";
@@ -27,9 +31,12 @@ import "react-pdf/dist/Page/TextLayer.css";
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
 
+const GEMINI_API_KEY = 'AIzaSyD9TOogO_OVty0FYrvLqLgPlJhCXopM81Y'
+const PDF_URL = `${process.env.PUBLIC_URL}/introduction_to_the_human_body.pdf`;
 
 const CourseViewer = () => {
   const mediaRef = useRef(null);
+  const { width, height, ref } = useResizeDetector();
   const [textHtml1, setTextHtml1] = useState("");
   const [user, setUser] = useState(false);
 
@@ -48,7 +55,20 @@ const CourseViewer = () => {
   const [completed, setCompleted] = useState([]);
   const [mediaLoading, setMediaLoading] = useState(false);
   const makeKey = (subj, unit, topic) => `${subj}-${unit}-${topic}`;
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [selectedPdf, setSelectedPdf] = useState(null);
+  const [numPages, setNumPages] = useState(null);
+  const [fullText, setFullText] = useState("");
+  const [isSpeaking, setIsSpeaking] = useState(false);
+  const [utterance, setUtterance] = useState(null);
 
+
+  const [extractedText, setExtractedText] = useState("");
+  const [audioUrls, setAudioUrls] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const audioRef = useRef(null);
+  const containerRef = useRef(null);
+  const [text, setText] = useState("");
 
   const docs = [
     {
@@ -59,7 +79,7 @@ const CourseViewer = () => {
   ];
   const docs2 = [
     {
-      uri: require("assets/files/BY-102.pdf"),
+      uri: require("assets/files/introduction_to_the_human_body.pdf"),
       fileType: "pdf",
       fileName: "BY-102.pdf",
     },
@@ -71,6 +91,241 @@ const CourseViewer = () => {
   //       setTextHtml1(data);
   //     })
   //     .catch((err) => console.error("Error loading file:", err));
+  // }, []);
+
+  async function onDocumentLoadSuccess({ numPages }) {
+    setNumPages(numPages);
+    let fullText = '';
+    let textAccumulator = "";
+    // Extract text from each page
+    for (let i = 1; i <= numPages; i++) {
+      const pdf = await pdfjs.getDocument(`${process.env.PUBLIC_URL}/introduction_to_the_human_body.pdf`).promise;
+      const page = await pdf.getPage(i);
+      const textContent = await page.getTextContent();
+      const text = textContent.items.map(item => item.str).join(' ');
+      textAccumulator += text + " ";
+      console.log(`Text from page ${i}:`, text);
+    }
+    setFullText(textAccumulator);
+  }
+
+  const speakText = () => {
+    if ("speechSynthesis" in window && fullText.length > 0) {
+      const utterance = new SpeechSynthesisUtterance(fullText);
+
+      utterance.onstart = () => setIsSpeaking(true);
+      utterance.onend = () => setIsSpeaking(false);
+      utterance.onerror = () => setIsSpeaking(false);
+
+      window.speechSynthesis.speak(utterance);
+    } else {
+      console.warn("Text-to-speech not supported or no text available.");
+    }
+  };
+
+  const stopSpeech = () => {
+    if ("speechSynthesis" in window) {
+      window.speechSynthesis.cancel();
+      setIsSpeaking(false);
+    }
+  };
+
+  // const onDocumentLoadSuccess = async ({ numPages }) => {
+  //   setNumPages(numPages);
+  // };
+
+  // const extractAndSpeakText = async () => {
+  //   setIsSpeaking(true);
+  //   const pdf = await pdfjs.getDocument(`${process.env.PUBLIC_URL}/introduction_to_the_human_body.pdf`).promise;
+  //   let fullText = "";
+
+  //   for (let i = 1; i <= pdf.numPages; i++) {
+  //     const page = await pdf.getPage(i);
+  //     const textContent = await page.getTextContent();
+  //     const pageText = textContent.items.map((item) => item.str).join(" ");
+  //     fullText += pageText + " ";
+  //   }
+
+  //   // Initialize SpeechSynthesis
+  //   if ("speechSynthesis" in window) {
+  //     const synth = window.speechSynthesis;
+  //     const newUtterance = new SpeechSynthesisUtterance(fullText);
+
+
+  //     newUtterance.onend = () => setIsSpeaking(false);
+  //     newUtterance.onerror = () => setIsSpeaking(false);
+
+  //     synth.speak(newUtterance);
+  //     setUtterance(newUtterance);
+  //   } else {
+  //     alert("Text-to-Speech is not supported in your browser.");
+  //     setIsSpeaking(false);
+  //   }
+  // };
+
+  // const stopSpeaking = () => {
+  //   if ("speechSynthesis" in window) {
+  //     window.speechSynthesis.cancel();
+  //     setIsSpeaking(false);
+  //   }
+  // };
+
+  // Make the page width responsive to container
+
+
+  // 1) Extract Hindi text cleanly from PDF
+  // const extractAllText = async () => {
+  //   try {
+  //     setLoading(true);
+
+  //     const pdf = await pdfjs.getDocument({
+  //       url: PDF_URL,
+  //       // If you use custom CMaps (optional):
+  //       // cMapUrl: 'https://unpkg.com/pdfjs-dist@3.11.174/cmaps/',
+  //       // cMapPacked: true,
+  //     }).promise;
+
+  //     const pages = [];
+
+  //     for (let i = 1; i <= pdf.numPages; i++) {
+  //       const page = await pdf.getPage(i);
+
+  //       // Keep real spaces and allow item stitching
+  //       const content = await page.getTextContent({
+  //         normalizeWhitespace: true,
+  //         disableCombineTextItems: false,
+  //       });
+
+  //       // Join with spaces, then tidy punctuation spacing and normalize
+  //       let pageText = content.items
+  //         .map((it) => (typeof it.str === "string" ? it.str : ""))
+  //         .join(" ");
+
+  //       pageText = pageText
+  //         .replace(/\u200B|\u200C|\u200D|\uFEFF/g, "") // remove ZWSP/ZWNJ/ZWJ/BOM
+  //         .replace(/\s{2,}/g, " ")
+  //         .replace(/\s+([।!?]|॥)/g, "$1")      // no space before । ॥ ! ?
+  //         .replace(/([।!?]|॥)(\S)/g, "$1 $2")  // ensure a space after
+  //         .trim()
+  //         .normalize("NFC");
+
+  //       pages.push(pageText);
+  //     }
+
+  //     const full = pages.join("\n\n").trim();
+  //     setExtractedText(full);
+  //     setText(full);
+  //   } catch (e) {
+  //     console.error("Extraction failed", e);
+  //     alert("Failed to extract text from PDF.");
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+
+  // 2) Chunk by Hindi sentence boundaries (।, ॥, !, ?)
+  // const chunkText = (t, size = 1300) => {
+  //   const sentences = t.split(/(?<=[।!?]|॥)\s+/); // keep end mark with sentence
+  //   const parts = [];
+  //   let cur = "";
+
+  //   for (const s of sentences) {
+  //     if ((cur + " " + s).trim().length <= size) {
+  //       cur = (cur ? cur + " " : "") + s;
+  //     } else {
+  //       if (cur) parts.push(cur.trim());
+  //       if (s.length > size) {
+  //         // fallback: very long single sentence
+  //         for (let i = 0; i < s.length; i += size) parts.push(s.slice(i, i + size));
+  //         cur = "";
+  //       } else {
+  //         cur = s;
+  //       }
+  //     }
+  //   }
+  //   if (cur) parts.push(cur.trim());
+  //   return parts;
+  // };
+
+  // 3) Speak Hindi; prefer hi-IN voice; handle "voices load late"
+  // const speakText = (text) => {
+  //   if (!("speechSynthesis" in window)) {
+  //     console.warn("Text-to-speech not supported in this browser.");
+  //     return;
+  //   }
+
+  //   const utterance = new SpeechSynthesisUtterance(text);
+  //   utterance.lang = "hi-IN";
+  //   // optional clarity
+  //   // utterance.rate = 0.98; 
+  //   // utterance.pitch = 1.0;
+
+  //   const pickAndSpeak = () => {
+  //     const voices = window.speechSynthesis.getVoices() || [];
+  //     const v =
+  //       voices.find(v => v.lang === "hi-IN") ||
+  //       voices.find(v => v.lang?.toLowerCase().startsWith("hi")) ||
+  //       null;
+
+  //     if (v) {
+  //       utterance.voice = v;
+  //       utterance.lang = v.lang; // keep in sync
+  //     }
+  //     window.speechSynthesis.speak(utterance);
+  //   };
+
+  //   // clear any queue, then speak
+  //   window.speechSynthesis.cancel();
+
+  //   if (window.speechSynthesis.getVoices().length === 0) {
+  //     window.speechSynthesis.onvoiceschanged = () => {
+  //       window.speechSynthesis.onvoiceschanged = null;
+  //       pickAndSpeak();
+  //     };
+  //   } else {
+  //     pickAndSpeak();
+  //   }
+  // };
+
+
+
+  // Speak entire extracted text using your speakText, chunked
+  // const listenAll = () => {
+  //   if (!text) return alert("Extract text first");
+  //   if ("speechSynthesis" in window) window.speechSynthesis.cancel();
+  //   const chunks = chunkText(text);
+  //   chunks.forEach((c) => speakText(c));
+  // };
+
+  // const pause = () => {
+  //   if ("speechSynthesis" in window && !window.speechSynthesis.paused) {
+  //     window.speechSynthesis.pause();
+  //   }
+  // };
+  // const resume = () => {
+  //   if ("speechSynthesis" in window && window.speechSynthesis.paused) {
+  //     window.speechSynthesis.resume();
+  //   }
+  // };
+  // const stop = () => {
+  //   if ("speechSynthesis" in window) {
+  //     window.speechSynthesis.cancel();
+  //   }
+  // };
+
+
+
+
+
+  // (Optional) ensure voices are loaded before first speak (helpful for setting a custom voice)
+  // useEffect(() => {
+  //   const onVoices = () => {
+  //     // console.log(speechSynthesis.getVoices());
+  //   };
+  //   window.speechSynthesis.onvoiceschanged = onVoices;
+  //   return () => {
+  //     window.speechSynthesis.onvoiceschanged = null;
+  //   };
   // }, []);
 
   useEffect(() => {
@@ -121,6 +376,36 @@ const CourseViewer = () => {
       fetchTextFile();
     }
   }, [selectedTopic]);
+
+
+
+
+
+  const speakText1 = (text) => {
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel(); // stop any ongoing speech
+      const utterance = new SpeechSynthesisUtterance(text);
+
+      // Detect language: Hindi uses Unicode range \u0900–\u097F
+      const isHindi = /[\u0900-\u097F]/.test(text);
+
+      utterance.lang = isHindi ? "hi-IN" : "en-IN"; // choose automatically
+      // utterance.lang = "en-IN";
+      // utterance.lang = 'hi-IN'; // Hindi voice
+      utterance.rate = 1;       // adjust speed if needed
+      utterance.pitch = 1;
+      window.speechSynthesis.speak(utterance);
+    } else {
+      alert('Your browser does not support the Web Speech API.');
+    }
+  };
+
+
+  const stopSpeech1 = () => {
+    if ("speechSynthesis" in window) {
+      window.speechSynthesis.cancel();
+    }
+  };
 
   const renderMedia = () => {
     if (mediaLoading) {
@@ -181,12 +466,71 @@ const CourseViewer = () => {
         );
       case "pdf":
         return (
-          <DocViewer documents={docs2} pluginRenderers={DocViewerRenderers} />
+          // <DocViewer documents={docs2} pluginRenderers={DocViewerRenderers} />
+          <div
+            ref={ref}
+            style={{
+              width: "100%",
+              height: "100%",
+              overflowY: "scroll",
+              position: "relative",
+            }}
+          >
+            <button
+              onClick={() => {
+                setIsFullscreen(true);
+                setSelectedPdf(
+                  `${process.env.PUBLIC_URL}/introduction_to_the_human_body.pdf`
+                );
+              }}
+              style={{
+                position: "absolute",
+                top: 10,
+                right: 10,
+                zIndex: 10,
+                border: "none",
+                borderRadius: "4px",
+                cursor: "pointer",
+              }}
+            >
+              <MdOutlineZoomOutMap />
+            </button>
+
+            <Document
+              file={`${process.env.PUBLIC_URL}/introduction_to_the_human_body.pdf`}
+              onLoadSuccess={onDocumentLoadSuccess}
+            >
+              {Array.from(new Array(numPages), (el, index) => (
+                <Page key={`page_${index + 1}`} pageNumber={index + 1} width={width} />
+              ))}
+            </Document>
+            <div style={{ marginTop: 20 }}>
+              <button onClick={speakText} disabled={isSpeaking || !fullText}>
+                Play
+              </button>
+              <button onClick={stopSpeech} disabled={!isSpeaking}>
+                Stop
+              </button>
+            </div>
+            {/* <div style={{ margin: "20px" }}>
+              <button onClick={extractAndSpeakText} disabled={isSpeaking}>
+                {isSpeaking ? "Speaking..." : "Read PDF"}
+              </button>
+              {isSpeaking && (
+                <button onClick={stopSpeaking} style={{ marginLeft: "10px" }}>
+                  Stop
+                </button>
+              )}
+            </div> */}
+          </div>
+
         );
 
       case "ppt":
         return (
-          <DocViewer documents={docs} pluginRenderers={DocViewerRenderers} />
+          <>
+            <DocViewer documents={docs} pluginRenderers={DocViewerRenderers} />
+          </>
         );
       case "text":
         return (
@@ -198,7 +542,18 @@ const CourseViewer = () => {
               scrollbarWidth: "thin",
             }}
           >
-
+            <button
+              onClick={() => speakText1(textHtml1.replace(/<[^>]+>/g, ""))}
+              style={{ margin: "10px", padding: "6px 12px", cursor: "pointer" }}
+            >
+              🔊 Read Aloud
+            </button>
+            <button
+              onClick={stopSpeech1}
+              style={{ margin: "10px", padding: "6px 12px", cursor: "pointer" }}
+            >
+              ⏹ Stop
+            </button>
             {parse(textHtml1)}
           </div>
         );
@@ -637,10 +992,11 @@ const CourseViewer = () => {
                           ? "2px solid #0d6efd"
                           : "1px solid #dee2e6",
                       maxHeight:
-                        expandedSubject === subjectIdx ? "none" : "80px",
+                        expandedSubject === subjectIdx && "none",
                       transition:
                         "max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
                       overflowY: "hidden",
+
                     }}>
                       <div
                         style={{
@@ -648,6 +1004,7 @@ const CourseViewer = () => {
                           display: "flex",
                           justifyContent: "space-between",
                           alignItems: "center",
+
                         }}
                       >
                         <div
@@ -1143,6 +1500,51 @@ const CourseViewer = () => {
           </Col>
         </Row>
       </Container>
+      {/* {isFullscreen && selectedPdf && (
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: "#fff",
+            zIndex: 9999,
+            overflowY: "auto",
+            padding: 20,
+          }}
+        >
+          Close Fullscreen Button
+          <button
+            onClick={() => {
+              setIsFullscreen(false);
+              setSelectedPdf(null);
+            }}
+            style={{
+              position: "fixed",
+              top: 20,
+              right: 20,
+              zIndex: 10000,
+              border: "none",
+              borderRadius: 4,
+              fontSize: 14,
+              cursor: "pointer",
+            }}
+          >
+            <MdOutlineZoomInMap />
+          </button>
+
+          <Document file={selectedPdf} onLoadSuccess={onDocumentLoadSuccess}>
+            {Array.from(new Array(numPages), (_, index) => (
+              <Page
+                key={`page_${index + 1}`}
+                pageNumber={index + 1}
+                width={window.innerWidth - 40}
+              />
+            ))}
+          </Document>
+        </div>
+      )} */}
     </div>
   );
 };

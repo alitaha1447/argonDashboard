@@ -63,7 +63,7 @@ const BrachModal = ({ show, toggle, onConfirm }) => {
       <ModalHeader
         toggle={toggle}
         className="bg-white border-bottom"
-        // style={{ position: "sticky", top: 0, zIndex: 10 }}
+      // style={{ position: "sticky", top: 0, zIndex: 10 }}
       >
         <div className="h1 mb-0">Assign Batch</div>
       </ModalHeader>
