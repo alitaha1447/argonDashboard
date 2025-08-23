@@ -1,0 +1,12 @@
+<div>
+  <h2 style="color: #2c3e50; font-size: 26px; font-weight: bold; margin-bottom: 1rem;">
+Introduction to Operating System
+ </h2>
+
+  <p style="color: #4a4a4a; font-size: 16px; line-height: 1.8; margin-bottom: 1rem;">
+The purpose of an operating system is to provide an environment in which a user can execute programs conveniently and efficiently.
+An operating system is software that manages computer hardware and software. The hardware must provide appropriate mechanisms to ensure the correct operation of the computer system and to prevent user programs from interfering with the proper operation of the system. 
+The operating system (OS) is a program that runs at all times on a computer. All other programs, including application programs, run on top of the operating system.
+It does assignment of resources like memory, processors and input / output devices to different processes that need the resources. The assignment of resources has to be fair and secure.
+</p>
+</div>

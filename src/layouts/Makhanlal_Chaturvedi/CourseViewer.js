@@ -1,5 +1,6 @@
 import "layouts/courseViewer/CourseViewer.css";
 import React, { useState, useRef, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Container, Row, Col, Button, Progress } from "reactstrap";
 import { FaUserTie, FaDownload, FaCheckCircle } from "react-icons/fa";
 import { MdInsertComment, MdOutlineTimer } from "react-icons/md";
@@ -35,6 +36,7 @@ import "react-pdf/dist/Page/TextLayer.css";
 pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
 
 const CourseViewer = () => {
+  const navigate = useNavigate();
   const mediaRef = useRef(null);
   const { width, height, ref } = useResizeDetector();
   const [textHtml1, setTextHtml1] = useState("");
@@ -61,16 +63,29 @@ const CourseViewer = () => {
   // const [courses, setCourses] = useState(BCA);
   const [activeReplyId, setActiveReplyId] = useState(null);
   const [completed, setCompleted] = useState([]);
-  const makeKey = (sem, subj, unit, topic) => `${sem}-${subj}-${unit}-${topic}`;
+  const makeKey = (subj, unit, topic) => `${subj}-${unit}-${topic}`;
+  // const makeKey = (subjectIndex, unitIndex, topicIndex) => {
+  //   return `${subjectIndex + 1}-${unitIndex + 1}-${topicIndex + 1}`;
+  // };
+
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [selectedPdf, setSelectedPdf] = useState(null);
-  const [numPages, setNumPages] = useState(null);
+  const [numPages, setNumPages] = useState(0);
   const [fullText, setFullText] = useState("");
+  const [progress, setProgress] = useState(0);
+  const [isSpeaking, setIsSpeaking] = useState(false);
+
+  let totalTopics = 0;
+  BCA2.forEach(subject => {
+    subject.units.forEach(unit => {
+      totalTopics += unit.topics.length;
+    });
+  });
 
   const docs = [
     {
-      uri: "https://sample-videos.com/ppt/Sample-PPT-File-500kb.ppt",
-      fileType: "ppt",
+      uri: require("assets/files/BCA.pdf"),
+      fileType: "pdf",
       fileName: "Sample-PPT-File-500kb.ppt",
     },
   ];
@@ -91,21 +106,21 @@ const CourseViewer = () => {
   //     .catch((err) => console.error("Error loading file:", err));
   // }, []);
 
-  async function onDocumentLoadSuccess({ numPages }) {
-    setNumPages(numPages);
-    // let fullText = '';
-    // let textAccumulator = "";
-    // // Extract text from each page
-    // for (let i = 1; i <= numPages; i++) {
-    //   const pdf = await pdfjs.getDocument(`${process.env.PUBLIC_URL}/introduction_to_the_human_body.pdf`).promise;
-    //   const page = await pdf.getPage(i);
-    //   const textContent = await page.getTextContent();
-    //   const text = textContent.items.map(item => item.str).join(' ');
-    //   textAccumulator += text + " ";
-    //   console.log(`Text from page ${i}:`, text);
-    // }
-    // setFullText(textAccumulator);
-  }
+  // async function onDocumentLoadSuccess({ numPages }) {
+  //   setNumPages(numPages);
+  //   let fullText = '';
+  //   let textAccumulator = "";
+  //   // Extract text from each page
+  //   for (let i = 1; i <= numPages; i++) {
+  //     const pdf = await pdfjs.getDocument(`${process.env.PUBLIC_URL}/introduction_to_the_human_body.pdf`).promise;
+  //     const page = await pdf.getPage(i);
+  //     const textContent = await page.getTextContent();
+  //     const text = textContent.items.map(item => item.str).join(' ');
+  //     textAccumulator += text + " ";
+  //     console.log(`Text from page ${i}:`, text);
+  //   }
+  //   setFullText(textAccumulator);
+  // }
 
   useEffect(() => {
     if (selectedTopic?.type === "text" && selectedTopic.file) {
@@ -124,6 +139,68 @@ const CourseViewer = () => {
       fetchTextFile();
     }
   }, [selectedTopic]);
+
+  async function onDocumentLoadSuccess(pdf) {
+    setNumPages(pdf.numPages);
+
+    let textAccumulator = "";
+    for (let i = 1; i <= pdf.numPages; i++) {
+      const page = await pdf.getPage(i);
+      const textContent = await page.getTextContent();
+      const text = textContent.items.map((it) => it.str).join(" ");
+      textAccumulator += text + " ";
+      // console.log(`Text from page ${i}:`, text);
+    }
+    setFullText(textAccumulator.trim());
+  }
+
+  // Chunk helper (avoid very long utterances)
+  function chunkText(text, size = 1600) {
+    const chunks = [];
+    let i = 0;
+    while (i < text.length) {
+      chunks.push(text.slice(i, i + size));
+      i += size;
+    }
+    return chunks;
+  }
+
+  function speakText() {
+    if (!("speechSynthesis" in window)) {
+      console.warn("Text-to-speech not supported.");
+      return;
+    }
+    if (!fullText) {
+      console.warn("No text available yet.");
+      return;
+    }
+
+    // Stop anything already speaking
+    window.speechSynthesis.cancel();
+
+    const chunks = chunkText(fullText);
+    setIsSpeaking(true);
+
+    // Queue chunks sequentially
+    chunks.forEach((part, idx) => {
+      const u = new SpeechSynthesisUtterance(part);
+      // Set language if needed, e.g.: u.lang = "en-IN" or "hi-IN"
+      // u.rate = 1; u.pitch = 1;
+
+      if (idx === chunks.length - 1) {
+        u.onend = () => setIsSpeaking(false);
+        u.onerror = () => setIsSpeaking(false);
+      }
+      window.speechSynthesis.speak(u);
+    });
+  }
+
+  function stopSpeech() {
+    if ("speechSynthesis" in window) {
+      window.speechSynthesis.cancel();
+      setIsSpeaking(false);
+    }
+  }
 
   const speakText1 = (text) => {
     if ('speechSynthesis' in window) {
@@ -209,11 +286,15 @@ const CourseViewer = () => {
               position: "relative",
             }}
           >
+            <button onClick={speakText} disabled={isSpeaking || !fullText}>Play</button>
+            <button onClick={stopSpeech} disabled={!isSpeaking}>Stop</button>
+
+
             <button
               onClick={() => {
                 setIsFullscreen(true);
                 setSelectedPdf(
-                  `${process.env.PUBLIC_URL}/BOM1stSem.pdf`
+                  `${process.env.PUBLIC_URL}/${selectedTopic.pdf}`
                 );
               }}
               style={{
@@ -237,6 +318,7 @@ const CourseViewer = () => {
                 <Page key={`page_${index + 1}`} pageNumber={index + 1} width={width} />
               ))}
             </Document>
+
             {/* <div style={{ marginTop: 20 }}>
               <button onClick={speakText} disabled={isSpeaking || !fullText}>
                 Play
@@ -258,7 +340,7 @@ const CourseViewer = () => {
           </div>
         );
 
-      case "ppt":
+      case "pptx":
         return (
           <DocViewer documents={docs} pluginRenderers={DocViewerRenderers} />
         );
@@ -458,28 +540,27 @@ const CourseViewer = () => {
     }
 
     // Next unit (same subject)
-    // for (let u = unitIndex + 1; u < units.length; u++) {
-    //   const tps = units[u]?.topics || [];
-    //   if (tps.length) {
-    //     return { semesterIndex, subjectIndex, unitIndex: u, topicIndex: 0 };
-    //   }
-    // }
+    for (let u = unitIndex + 1; u < units.length; u++) {
+      const tps = units[u]?.topics || [];
+      if (tps.length) {
+        return { subjectIndex, unitIndex: u, topicIndex: 0 };
+      }
+    }
 
     // Next subject (same semester)
-    // for (let s = subjectIndex + 1; s < subjects.length; s++) {
-    //   const u2 = subjects[s]?.units || [];
-    //   for (let u = 0; u < u2.length; u++) {
-    //     const tps = u2[u]?.topics || [];
-    //     if (tps.length) {
-    //       return {
-    //         semesterIndex,
-    //         subjectIndex: s,
-    //         unitIndex: u,
-    //         topicIndex: 0,
-    //       };
-    //     }
-    //   }
-    // }
+    for (let s = subjectIndex + 1; s < subjects.length; s++) {
+      const u2 = subjects[s]?.units || [];
+      for (let u = 0; u < u2.length; u++) {
+        const tps = u2[u]?.topics || [];
+        if (tps.length) {
+          return {
+            subjectIndex: s,
+            unitIndex: u,
+            topicIndex: 0,
+          };
+        }
+      }
+    }
 
     // (Optional) Next semester
     // for (let sem = semesterIndex + 1; sem < semesters.length; sem++) {
@@ -541,9 +622,28 @@ const CourseViewer = () => {
       curr.unitIndex,
       curr.topicIndex
     );
-    setCompleted((prev) =>
-      prev.includes(currKey) ? prev : [...prev, currKey]
-    );
+    // setCompleted((prev) =>
+    //   prev.includes(currKey) ? prev : [...prev, currKey]
+    // );
+    setCompleted((prev) => {
+      if (prev.includes(currKey)) return prev; // already completed
+
+      const updated = [...prev, currKey];
+      console.log(updated)
+      // ✅ Calculate progress
+      const completedCount = updated.length;
+      console.log(completedCount)
+      // const remaining = totalTopics - completedCount;
+      const percentage = ((completedCount / totalTopics) * 100).toFixed(2);
+      console.log("Progress:", percentage + "%");
+      setProgress(percentage)
+
+      // console.log("Completed:", completedCount);
+      // console.log("Remaining:", remaining);
+      // console.log("Progress:", percentage + "%");
+
+      return updated;
+    });
 
     // then move to next
     const next = getNextPath(curr);
@@ -589,15 +689,28 @@ const CourseViewer = () => {
                 <h2 className="fw-bold text-dark mb-0 now-playing-heading">
                   Now Playing
                 </h2>
-                <Button
-                  className="now-playing-button"
-                  style={{
-                    background: "#5E72E4", color: "white", border: "none",
-                  }}
-                  onClick={handleCompleteAndContinue}
-                >
-                  Complete & Continue
-                </Button>
+                <div className="d-flex gap-2 flex-nowrap">
+
+                  <Button
+                    className="btn btn-primary custom-btn"
+                    style={{
+                      background: "#5E72E4", color: "white", border: "none",
+                    }}
+                    onClick={() => navigate(-1)}
+
+                  >
+                    Go Back
+                  </Button>
+                  <Button
+                    className="btn btn-primary custom-btn"
+                    style={{
+                      background: "#5E72E4", color: "white", border: "none",
+                    }}
+                    onClick={handleCompleteAndContinue}
+                  >
+                    Complete & Continue
+                  </Button>
+                </div>
               </div>
               <div className="video-wrapper rounded-3 mb-3 h-100">
                 {renderMedia()}
@@ -726,11 +839,12 @@ const CourseViewer = () => {
                       color: "#333",
                     }}
                   >
-                    20% Completed
+                    {`${progress}% Completed`}
+
                   </span>
                 </div>
 
-                <Progress value={20} />
+                <Progress value={progress} />
               </div>
               <div
                 className="overflow-auto hide-scrollbar"
@@ -1266,6 +1380,14 @@ const CourseViewer = () => {
                                           <strong style={{ marginLeft: "0.5rem" }}>
 
                                             {topic.label}</strong>
+                                          <div className="d-flex align-items-center gap-1 text-muted small">
+                                            {topic?.time && (
+                                              <>
+                                                <MdOutlineTimer size={14} />
+                                                <span>{topic.time.trim()}</span>
+                                              </>
+                                            )}
+                                          </div>
                                           {/* <strong>{topicIndex}</strong> */}
                                         </div>
                                         {

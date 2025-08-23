@@ -24178,3 +24178,20 @@ button:focus,
     transform: rotate(360deg);
   }
 }
+
+.custom-btn {
+  font-size: 0.9rem;
+  /* default */
+  padding: 0.4rem 0.75rem;
+}
+
+@media (max-width: 576px) {
+
+  /* Mobile */
+  .custom-btn {
+    font-size: 0.75rem;
+    /* smaller text */
+    padding: 0.25rem 0.5rem;
+    /* smaller button size */
+  }
+}

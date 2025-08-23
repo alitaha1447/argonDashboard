@@ -1,3 +1,4 @@
+import "@cyntler/react-doc-viewer/dist/index.css";
 import "layouts/courseViewer/CourseViewer.css";
 import React, { useState, useRef, useEffect } from "react";
 import { Container, Row, Col, Button, Progress } from "reactstrap";
@@ -19,11 +20,10 @@ import Iframe from "react-iframe";
 import ReactPlayer from "react-player";
 // import DocViewer, { DocViewerRenderers } from "react-doc-viewer";
 import DocViewer, { DocViewerRenderers } from "@cyntler/react-doc-viewer";
-import "@cyntler/react-doc-viewer/dist/index.css";
 import { pdfjs, Document, Page } from "react-pdf";
 import "react-pdf/dist/Page/AnnotationLayer.css";
 import "react-pdf/dist/Page/TextLayer.css";
-
+import ppt1 from '../../assets/files/manav_sharir_parichay.pptx'
 pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
 
 const CourseViewer = () => {
@@ -53,9 +53,9 @@ const CourseViewer = () => {
 
   const docs = [
     {
-      uri: "https://sample-videos.com/ppt/Sample-PPT-File-500kb.ppt",
-      fileType: "ppt",
-      fileName: "Sample-PPT-File-500kb.ppt",
+      uri: `https://scholar.harvard.edu/files/torman_personal/files/samplepptx.pptx`,
+      fileType: "pptx",
+      fileName: "Sample-PPTX",
     },
   ];
   const docs2 = [
@@ -563,19 +563,19 @@ const CourseViewer = () => {
                               onClick={() =>
                                 openSection(courseIndex, "comment")
                               }
-                              // onClick={() => {
-                              //   toggleExpansion(courseIndex);
-                              //   toggleCommentExpansion(courseIndex);
-                              // }}
+                            // onClick={() => {
+                            //   toggleExpansion(courseIndex);
+                            //   toggleCommentExpansion(courseIndex);
+                            // }}
                             />
                           </div>
                           <span
                             style={{ cursor: "pointer" }}
                             onClick={() => openSection(courseIndex, "note")}
-                            // onClick={() => {
-                            //   toggleExpansion(courseIndex);
-                            //   toggleNoteExpansion(courseIndex);
-                            // }}
+                          // onClick={() => {
+                          //   toggleExpansion(courseIndex);
+                          //   toggleNoteExpansion(courseIndex);
+                          // }}
                           >
                             {expandedNote === courseIndex ? (
                               <RiPencilFill size={20} />
@@ -602,7 +602,7 @@ const CourseViewer = () => {
                           paddingRight: "0.5rem",
                           scrollbarWidth: "none" /* Firefox */,
                         }}
-                        // className={`expand-wrapper ${isExpanded ? "open" : ""}`}
+                      // className={`expand-wrapper ${isExpanded ? "open" : ""}`}
                       >
                         {expandedCommentIndex === courseIndex && (
                           <div

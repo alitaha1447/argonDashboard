@@ -1,5 +1,6 @@
 import React from "react";
 import { useLocation, Route, Routes, Navigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
 // reactstrap components
 import { Container } from "reactstrap";
 // core components
@@ -12,6 +13,11 @@ import routes from "routes.js";
 const Admin = (props) => {
   const mainContent = React.useRef(null);
   const location = useLocation();
+  const isorganisational = useSelector((state) => state?.auth.isorganisational);
+
+  const defaultRoute =
+    isorganisational === 0 ? "/admin/attendance" : "/admin/enquiryDashboard";
+
 
   React.useEffect(() => {
     document.documentElement.scrollTop = 0;
@@ -118,14 +124,14 @@ const Admin = (props) => {
       >
         <AdminNavbar
           {...props}
-          brandText={getBrandText(props?.location?.pathname)}
+        // brandText={getBrandText(props?.location?.pathname)}
         />
         <div className="flex-grow-1">
           <Routes>
             {getRoutes(routes)}
             <Route
               path="*"
-              element={<Navigate to="/admin/enquiryDashboard" replace />}
+              element={<Navigate to={defaultRoute} replace />}
             />
           </Routes>
         </div>

@@ -282,10 +282,10 @@ const Login = () => {
       <BrachModal
         show={showConfirmModal}
         toggle={toggleBranchModal}
-        // onConfirm={() => {
-        //   setShowConfirmModal(false);
-        //   navigate("/admin/enquiryDashboard");
-        // }}
+      // onConfirm={() => {
+      //   setShowConfirmModal(false);
+      //   navigate("/admin/enquiryDashboard");
+      // }}
       />
     </>
   );

@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Card,
   CardBody,
@@ -11,16 +12,19 @@ import {
   Modal,
   ModalHeader,
   ModalBody,
+  Progress
 } from "reactstrap";
 import { useSelector } from "react-redux";
 import axios from "axios";
 import Human from "@vladmandic/human";
 import { toast, ToastContainer } from "react-toastify";
+import Header from "components/Headers/Header";
 
 const API_PATH = process.env.REACT_APP_API_PATH;
 const API_KEY = process.env.REACT_APP_API_KEY;
 
 const Attendance = () => {
+  const navigate = useNavigate();
   const { name, email, mobileno, selectedBranch, isorganisational } =
     useSelector((state) => state?.auth);
   // console.log(selectedBranch?.value);
@@ -36,6 +40,7 @@ const Attendance = () => {
   const human = useRef(null);
   const animationRef = useRef(null);
   const streamRef = useRef(null);
+
 
   // Initialize Human once
   const humanRef = useRef(
@@ -199,65 +204,88 @@ const Attendance = () => {
 
   return (
     <>
-      <div className="header bg-gradient-info pb-8 pt-5 pt-md-8">
-        <Container fluid>
-          <div className="header-body">
-            <Row>
-              {isorganisational === 1 ? (
-                <Col lg={4} md={6} className="mb-4">
-                  <Card className="h-100">
+      <Header />
+      {/* <div className="header bg-gradient-info pb-8 pt-5 pt-md-8"> */}
+      <Container className="mt--8" fluid>
+        <div className="header-body">
+          <Row>
+            {isorganisational === 1 ? (
+              <Col lg={4} md={6} className="mb-4">
+                <Card className="h-100">
+                  <CardBody>
+                    <CardTitle tag="h2" className="text-primary fs-4">
+                      Employee
+                    </CardTitle>
+                    <CardText className="mb-2">
+                      <strong>Name:</strong>
+                      <span className="text-break">{name}</span>
+                    </CardText>
+                    <CardText className="mb-2">
+                      <strong className="me-1">Email:</strong>
+                      <span className="text-break">{email}</span>
+                    </CardText>
+                    <CardText className="mb-2">
+                      <strong>Contact No.:</strong>{" "}
+                      <span className="text-break">{mobileno}</span>
+                    </CardText>
+                    <CardText className="mb-3">
+                      <strong>Branch:</strong> {selectedBranch?.label}
+                    </CardText>
+                    <Button onClick={openCamera}>Attendance</Button>
+                  </CardBody>
+                </Card>
+              </Col>
+            ) : (
+              studentBatch.map((item, index) => (
+                <Col lg={4} key={index}>
+                  <Card className="card-stats shadow md-4 mb-xl-0">
                     <CardBody>
-                      <CardTitle tag="h2" className="text-primary fs-4">
-                        Employee
+                      <CardTitle tag="h2" className="text-primary">
+                        Batch {index + 1}
                       </CardTitle>
-                      <CardText className="mb-2">
-                        <strong>Name:</strong>
-                        <span className="text-break">{name}</span>
+                      <CardText className="mb-xl-0">
+                        <strong>Batch Name:</strong> {item.BatchName}
                       </CardText>
-                      <CardText className="mb-2">
-                        <strong className="me-1">Email:</strong>
-                        <span className="text-break">{email}</span>
+                      <CardText className="mb-xl-0">
+                        <strong>Description:</strong> {item.Description}
                       </CardText>
-                      <CardText className="mb-2">
-                        <strong>Contact No.:</strong>{" "}
-                        <span className="text-break">{mobileno}</span>
+                      <CardText className="">
+                        <strong>Date:</strong> {item.StartDate}
                       </CardText>
-                      <CardText className="mb-3">
-                        <strong>Branch:</strong> {selectedBranch?.label}
-                      </CardText>
-                      <Button onClick={openCamera}>Attendance</Button>
+                      <div>
+
+                        <div className="d-flex justify-content-end mb-1">
+                          <span
+                            style={{
+                              fontWeight: "bold",
+                              fontSize: "0.95rem",
+                              color: "#333",
+                            }}
+                          >
+                            20% Completed
+                          </span>
+                        </div>
+                        <Progress value={20} />
+                      </div>
+                      <Button
+                        color="primary"
+                        type="button"
+                        onClick={() => navigate("/makhanlal/courseViewer", { replace: false })}
+                      >
+                        Start
+                      </Button>
+                      <Button color="primary" onClick={openCamera}>
+                        Attendance
+                      </Button>
                     </CardBody>
                   </Card>
                 </Col>
-              ) : (
-                studentBatch.map((item, index) => (
-                  <Col lg={4} key={index}>
-                    <Card className="card-stats md-4 mb-xl-0">
-                      <CardBody>
-                        <CardTitle tag="h2" className="text-primary">
-                          Batch {index + 1}
-                        </CardTitle>
-                        <CardText className="mb-xl-0">
-                          <strong>Batch Name:</strong> {item.BatchName}
-                        </CardText>
-                        <CardText className="mb-xl-0">
-                          <strong>Description:</strong> {item.Description}
-                        </CardText>
-                        <CardText className="">
-                          <strong>Date:</strong> {item.StartDate}
-                        </CardText>
-                        <Button color="primary" onClick={openCamera}>
-                          Attendance
-                        </Button>
-                      </CardBody>
-                    </Card>
-                  </Col>
-                ))
-              )}
-            </Row>
-          </div>
-        </Container>
-      </div>
+              ))
+            )}
+          </Row>
+        </div>
+      </Container >
+      {/* </div > */}
 
       <Modal isOpen={modal} toggle={closeCamera} centered size="md">
         <ModalHeader toggle={closeCamera}>Take Attendance</ModalHeader>

@@ -104,7 +104,7 @@ const LeaveDashboard = () => {
                     showCourseEnquiry={false}
                     showBatch={false}
                     showBranch={false}
-                    //   activeFilters={activeFilters}
+                  //   activeFilters={activeFilters}
                   />
                 </motion.div>
               )}
@@ -127,7 +127,7 @@ const LeaveDashboard = () => {
               showCourseEnquiry={false}
               showBatch={false}
               showBranch={false}
-              //   activeFilters={activeFilters}
+            //   activeFilters={activeFilters}
             />
           </Col>
 
@@ -178,7 +178,7 @@ const LeaveDashboard = () => {
                           color="primary"
                           block
                           size="md"
-                          //   onClick={handlePrint}
+                        //   onClick={handlePrint}
                         >
                           Print
                         </Button>
@@ -186,7 +186,7 @@ const LeaveDashboard = () => {
                           color="primary"
                           block
                           size="md"
-                          //   onClick={handleExport}
+                        //   onClick={handleExport}
                         >
                           Save as Excel
                         </Button>

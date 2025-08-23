@@ -28,6 +28,7 @@ import Header from "components/Headers/Header";
 import FilterBar from "components/CustomFilter/FilterBar";
 import PaymentDetail from "components/CustomModals/paymentDetailModal/PaymentDetail";
 import InstallModal from "components/CustomModals/installmentModal/InstallModal";
+import AssignBatch from "components/CustomModals/assignBatchModal/AssignBatch";
 import { exportToExcel } from "utils/printFile/exportToExcel";
 import { printTableData } from "utils/printFile/printFile";
 // import Select from "react-select";
@@ -37,6 +38,7 @@ import { printTableData } from "utils/printFile/printFile";
 import axios from "axios";
 import Loader from "components/CustomLoader/Loader";
 import { useSelector } from "react-redux";
+import ExistingStudent from "components/CustomModals/assignBatchModal/ExistingStudent";
 
 const API_PATH = process.env.REACT_APP_API_PATH;
 const API_KEY = process.env.REACT_APP_API_KEY;
@@ -57,6 +59,7 @@ const BatchStudent = () => {
   const [studid, setStudid] = useState("");
   // const [totalAmount, setTotalAmount] = useState(null);
   const [installModal, setInstallModal] = useState(false);
+  const [assignBatchModal, setAssignBatchModal] = useState(false);
   // const [installmentStdId, setInstallmentStdId] = useState("");
   // customHookAPI
   // const {
@@ -150,6 +153,10 @@ const BatchStudent = () => {
     setStudid("");
   };
 
+  const toggleAssignBatch = () => {
+    setAssignBatchModal((prev) => !prev);
+  };
+
   const handleExport = () => {
     const exportData = batchStudent.map((item, index) => {
       return {
@@ -171,7 +178,6 @@ const BatchStudent = () => {
     ];
     printTableData("Student Fee List", columns, batchStudent);
   };
-
   return (
     <>
       <Header />
@@ -310,6 +316,13 @@ const BatchStudent = () => {
                         }
                       >
                         Add Student
+                      </Button>
+                      <Button
+                        color="primary"
+                        block
+                        size="md"
+                        onClick={toggleAssignBatch} >
+                        Existing Student
                       </Button>
                     </DropdownMenu>
                   </UncontrolledDropdown>
@@ -545,7 +558,13 @@ const BatchStudent = () => {
           studId={studid}
           resetParentIds={resetBatchAndStudent}
         />
+        <ExistingStudent
+          modal={assignBatchModal}
+          toggle={toggleAssignBatch}
+          selectedBatch={selectedBatch}
+        />
       </Container>
+
     </>
   );
 };

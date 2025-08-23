@@ -61,7 +61,7 @@ root.render(
           <Route path="/courseViewer" element={<CourseViewer />} />
           <Route path="/courseViewer2" element={<CourseViewer2 />} />
           <Route
-            path="makhanlal/courseViewer"
+            path="/makhanlal/courseViewer"
             element={<MakhanlalCourseViewer />}
           />
           <Route

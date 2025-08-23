@@ -24,6 +24,11 @@ const BrachModal = ({ show, toggle, onConfirm }) => {
   const [selectedBranch, setSelectedBranch] = useState(null);
 
   const userID = useSelector((state) => state?.auth?.id);
+  const isorganisational = useSelector((state) => state?.auth.isorganisational);
+
+  const defaultRoute =
+    isorganisational === 0 ? "/admin/attendance" : "/admin/enquiryDashboard";
+
 
   const handleBranches = async () => {
     const res = await axios.get(`${API_PATH}/api/Get_user_branches`, {
@@ -44,7 +49,7 @@ const BrachModal = ({ show, toggle, onConfirm }) => {
     if (selectedBranch) {
       dispatch(selectBranch(selectedBranch)); // ✅ Sets both selectedBranch and branchSelected = true
       toggle();
-      navigate("/admin/enquiryDashboard");
+      navigate(defaultRoute);
     }
   };
   const handleCancel = () => {

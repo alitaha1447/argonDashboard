@@ -1,0 +1,10 @@
+<div>
+  <h2 style="color: #2c3e50; font-size: 26px; font-weight: bold; margin-bottom: 1rem;">
+
+Partnership accounting
+ </h2>
+
+  <p style="color: #4a4a4a; font-size: 16px; line-height: 1.8; margin-bottom: 1rem;">
+When two or more individuals engage in enterprise as co-owners, the organization is known as a partnership. This form of organization is popular among personal service enterprises, as well as in the legal and public accounting professions. The important features of and accounting procedures for partnerships are discussed and illustrated below.
+</p>
+</div>

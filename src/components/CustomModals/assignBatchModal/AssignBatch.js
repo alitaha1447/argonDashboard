@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
 import {
   Modal,
   ModalHeader,
@@ -24,11 +25,12 @@ const API_KEY = process.env.REACT_APP_API_KEY;
 const AssignBatch = ({
   modal,
   toggle,
-  studentID,
-  refreshList = () => {},
-  resetSelected = () => {},
+  studentID = [],
+  refreshList = () => { },
+  resetSelected = () => { },
 }) => {
   const { id } = useSelector((state) => state.auth);
+  const location = useLocation();
   // const stdId = studentID.map((item) => ({
   //   enrollmentid: item.enrollmentid.toString(),
   // }));
@@ -37,10 +39,13 @@ const AssignBatch = ({
   const [loading, setLoading] = useState(false);
   const [batch, setBatch] = useState([]);
   const [selectedBatch, setSelectedBatch] = useState(null);
+  console.log(selectedBatch)
   const [selectedBranch, setSelectedBranch] = useState(null);
   const [facultyNameOptions, setFacultyNameOptions] = useState([]);
   const [selectedFacultyName, setSelectedFacultyName] = useState(null);
-
+  const [studentNameOptions, setStudentNameOptions] = useState([])
+  const [selectedStudent, setSelectedStudent] = useState(null);
+  const [studentSearchText, setStudentSearchText] = useState('');
   // const [batchStudent, setBatchStudent] = useState([
   //   { BatchID: "", enrollmentid: "" },
   // ]);
@@ -65,6 +70,8 @@ const AssignBatch = ({
   useEffect(() => {
     fetchBranch("", "", id);
   }, []);
+
+
 
   const fetchFaculties = async () => {
     try {
@@ -177,6 +184,8 @@ const AssignBatch = ({
                 />
               </FormGroup>
             </Col>
+
+
             <Col lg={4}>
               <FormGroup>
                 <Label>Faculty Name</Label>
@@ -193,7 +202,7 @@ const AssignBatch = ({
                   styles={{
                     menuPortal: (base) => ({ ...base, zIndex: 9999 }),
                   }}
-                  // isClearable
+                // isClearable
                 />
               </FormGroup>
             </Col>
@@ -225,18 +234,19 @@ const AssignBatch = ({
         style={{ position: "sticky", bottom: 0, zIndex: 10, gap: "1rem" }}
       >
         <Button color="primary" onClick={handleAssignBatch}>
-          {loading ? (
-            <>
-              <span
-                className="spinner-border spinner-border-sm me-2"
-                role="status"
-                aria-hidden="true"
-              ></span>
-              Assigning...
-            </>
-          ) : (
-            " Assign"
-          )}
+          {
+            loading ? (
+              <>
+                <span
+                  className="spinner-border spinner-border-sm me-2"
+                  role="status"
+                  aria-hidden="true"
+                ></span>
+                Assigning...
+              </>
+            ) : (
+              " Assign"
+            )}
         </Button>
         <Button color="secondary" onClick={toggle}>
           Cancel

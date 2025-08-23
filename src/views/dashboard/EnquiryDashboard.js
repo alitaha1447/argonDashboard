@@ -634,11 +634,11 @@ const EnquiryDashboard = (props) => {
                       <th scope="col">Contact Number</th>
                       {(selectedEnquiryType.label === "Course Enquiry" ||
                         selectedEnquiryType.label === "Internship Enquiry") && (
-                        <th scope="col">Qualification</th>
-                      )}
+                          <th scope="col">Qualification</th>
+                        )}
 
                       {selectedEnquiryType.label === "Course Enquiry" ||
-                      selectedEnquiryType.label === "Internship Enquiry" ? (
+                        selectedEnquiryType.label === "Internship Enquiry" ? (
                         <th scope="col">Course</th>
                       ) : (
                         <th scope="col">Product</th>
@@ -682,11 +682,11 @@ const EnquiryDashboard = (props) => {
                           <td>{item.Mobileno}</td>
                           {(selectedEnquiryType.label === "Course Enquiry" ||
                             selectedEnquiryType.label ===
-                              "Internship Enquiry") && (
-                            <td>{item.QualificationCode}</td>
-                          )}
+                            "Internship Enquiry") && (
+                              <td>{item.QualificationCode}</td>
+                            )}
                           {selectedEnquiryType.label === "Course Enquiry" ||
-                          selectedEnquiryType.label === "Internship Enquiry" ? (
+                            selectedEnquiryType.label === "Internship Enquiry" ? (
                             <td>{item.TopicTitle}</td>
                           ) : (
                             <td>{item.product_name}</td>
@@ -791,13 +791,13 @@ const EnquiryDashboard = (props) => {
                               <strong>
                                 {selectedEnquiryType.label ===
                                   "Course Enquiry" ||
-                                selectedEnquiryType.label ===
+                                  selectedEnquiryType.label ===
                                   "Internship Enquiry"
                                   ? "Course:"
                                   : "Product"}
                               </strong>{" "}
                               {selectedEnquiryType.label === "Course Enquiry" ||
-                              selectedEnquiryType.label === "Internship Enquiry"
+                                selectedEnquiryType.label === "Internship Enquiry"
                                 ? item.TopicTitle
                                 : item.product_name}
                             </p>
@@ -813,7 +813,7 @@ const EnquiryDashboard = (props) => {
                               <strong>Status:</strong> {item.status_txt}
                             </p>
                             <p className="fs-6 fw-semibold mb-1">
-                              <strong>Remark:</strong> {}
+                              <strong>Remark:</strong> { }
                             </p>
                           </div>
                         </div>
