@@ -9,6 +9,8 @@ import "assets/plugins/nucleo/css/nucleo.css";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import "assets/scss/argon-dashboard-react.scss";
 import "../src/assets/css/argon-dashboard-react.css";
+import 'react-tooltip/dist/react-tooltip.css'
+
 // import { GoogleOAuthProvider } from "@react-oauth/google";
 
 import AdminLayout from "layouts/Admin.js";

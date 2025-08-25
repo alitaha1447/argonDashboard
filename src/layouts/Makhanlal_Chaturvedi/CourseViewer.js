@@ -24,6 +24,8 @@ import { BCA2 } from "DummyData";
 import { useResizeDetector } from "react-resize-detector";
 
 // import { course } from "DummyData";
+import { Tooltip } from 'react-tooltip'
+import { isMobile } from 'react-device-detect';
 import parse from "html-react-parser";
 import Iframe from "react-iframe";
 import ReactPlayer from "react-player";
@@ -895,7 +897,8 @@ const CourseViewer = () => {
                             style={{ cursor: "pointer" }}
                             onClick={() => toggleSubject(subjectIndex)}
                           >
-                            <strong>{truncateText(subject.subjectName)}</strong>
+                            <strong data-tooltip-id="tooltip"
+                              data-tooltip-content={subject.subjectName}>{truncateText(subject.subjectName)}</strong>
                             <div className="d-flex align-items-center gap-1 text-muted small">
                               <MdOutlineTimer size={14} />
                               <span>2:30</span>
@@ -937,6 +940,8 @@ const CourseViewer = () => {
                                     onClick={() =>
                                       toggleTopic(unitIndex, subjectIndex)
                                     }
+                                    data-tooltip-id="tooltip"
+                                    data-tooltip-content={unit.unitTitle}
                                   >
                                     <span style={{ opacity: 0.8 }}>
                                       {unit.unitNumber}:
@@ -966,6 +971,8 @@ const CourseViewer = () => {
                                     </div>
                                     <div
                                       style={{ cursor: "pointer" }}
+                                      data-tooltip-id="tooltip"
+                                      data-tooltip-content="Add Note"
                                       onClick={() =>
                                         toggleNote(unitIndex, subjectIndex)
                                       }
@@ -1379,7 +1386,8 @@ const CourseViewer = () => {
                                           <span style={{ display: "flex", }}>
                                           </span>
                                           {icon}
-                                          <strong style={{ marginLeft: "0.5rem" }}>
+                                          <strong data-tooltip-id="tooltip"
+                                            data-tooltip-content={topic.label} style={{ marginLeft: "0.5rem" }}>
 
                                             {truncateText(topic.label)}</strong>
                                           <div className="d-flex align-items-center gap-1 text-muted small">
@@ -1447,6 +1455,21 @@ const CourseViewer = () => {
           </Col>
         </Row>
       </Container>
+      <Tooltip
+        id="tooltip"
+        place="bottom"
+        effect="solid"
+        events={isMobile ? ["click"] : ["hover"]}
+        style={{
+          fontSize: "0.7rem",      // smaller text
+          padding: "4px 8px",      // compact padding
+          borderRadius: "4px",     // rounded corners
+          backgroundColor: "#333", // dark bg
+          color: "#fff",           // white text
+          maxWidth: "180px",       // prevent very wide tooltip
+          textAlign: "center"
+        }}
+      />
     </div>
   );
 };
