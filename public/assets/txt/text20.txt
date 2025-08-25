@@ -1,0 +1,9 @@
+<div>
+  <h2 style="color: #2c3e50; font-size: 26px; font-weight: bold; margin-bottom: 1rem;">
+Hindi
+ </h2>
+
+  <p style="color: #4a4a4a; font-size: 16px; line-height: 1.8; margin-bottom: 1rem;">
+Modern Standard Hindi (आधुनिक मानक हिन्दी, Ādhunik Mānak Hindī),[11] commonly referred to as Hindi, is the standardised variety of the Hindustani language written in the Devanagari script. It is an official language of the Government of India, alongside English, and is the lingua franca of North India. Hindi is considered a Sanskritised register[12] of Hindustani. Hindustani itself developed from Old Hindi and was spoken in Delhi and neighbouring areas. It incorporated a significant number of Persian loanwords.[13]
+</p>
+</div>

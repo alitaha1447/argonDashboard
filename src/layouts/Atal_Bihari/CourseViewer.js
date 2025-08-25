@@ -363,7 +363,7 @@ const CourseViewer = () => {
     if (selectedTopic?.type === "text" && selectedTopic.file) {
       const fetchTextFile = async () => {
         try {
-          const response = await fetch(`${process.env.PUBLIC_URL}/${selectedTopic.file}`);
+          const response = await fetch(`${process.env.PUBLIC_URL}/assets/txt/${selectedTopic.file}`);
           if (!response.ok) throw new Error("File not found");
           const data = await response.text();
           setTextHtml1(data);

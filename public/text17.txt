@@ -1,9 +1,0 @@
-<div>
-  <h2 style="color: #2c3e50; font-size: 26px; font-weight: bold; margin-bottom: 1rem;">
-Software Language
- </h2>
-
-  <p style="color: #4a4a4a; font-size: 16px; line-height: 1.8; margin-bottom: 1rem;">
-Software refers to the programs and instructions that run on a computer, while programming languages are the formal languages used to create these software programs by providing sets of instructions to computers. Popular programming languages include Python, Java, JavaScript, and C++, and the choice of language often depends on the project's specific requirements, such as web development, mobile
-</p>
-</div>

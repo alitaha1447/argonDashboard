@@ -1,9 +1,0 @@
-<div>
-  <h2 style="color: #2c3e50; font-size: 26px; font-weight: bold; margin-bottom: 1rem;">
-Conceptual Framework of Management  </h2>
-
-  <p style="color: #4a4a4a; font-size: 16px; line-height: 1.8; margin-bottom: 1rem;">
-
-A Conceptual Framework of Management is a foundational model that provides a structure for understanding how an organization's resources and activities are organized and coordinated to achieve its goals. It typically includes core functions like planning, organizing, staffing, directing, and controlling, which guide the effective and judicious use of human, financial, and physical resources to meet organizational objectives. Different frameworks exist, focusing on areas such as strategic management, performance management, or the interplay of various elements like information, governance, and employee psychology. 
- 
-</div>

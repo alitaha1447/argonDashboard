@@ -1,0 +1,11 @@
+<div>
+  <h2 style="color: #2c3e50; font-size: 26px; font-weight: bold; margin-bottom: 1rem;">
+
+Financial accounting  </h2>
+
+  <p style="color: #4a4a4a; font-size: 16px; line-height: 1.8; margin-bottom: 1rem;">
+
+Financial accounting is a branch of accounting concerned with the summary, analysis and reporting of financial transactions related to a business.[1] This involves the preparation of financial statements available for public use. Stockholders, suppliers, banks, employees, government agencies, business owners, and other stakeholders are examples of people interested in receiving such information for decision making purposes.
+
+Financial accountancy is governed by both local and international accounting standards. Generally Accepted Accounting Principles (GAAP) is the standard framework of guidelines for financial accounting used in any given jurisdiction. It includes the standards, conventions and rules that accountants follow in recording and summarizing and in the preparation of financial statements. 
+</div>

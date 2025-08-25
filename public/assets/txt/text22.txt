@@ -1,0 +1,12 @@
+<div>
+  <h2 style="color: #2c3e50; font-size: 26px; font-weight: bold; margin-bottom: 1rem;">
+Language
+ </h2>
+
+  <p style="color: #4a4a4a; font-size: 16px; line-height: 1.8; margin-bottom: 1rem;">
+Language is a structured system of communication that consists of grammar and vocabulary. 
+It is the primary means by which humans convey meaning, both in spoken and signed forms, and may also be conveyed through writing.
+ Human language is characterized by its cultural and historical diversity, with significant variations observed between cultures and across time.[1] Human languages possess the properties of productivity and displacement, which enable the creation of an infinite number of sentences, and the ability to refer to objects, events, and ideas that are not immediately present in the discourse. 
+The use of human language relies on social convention and is acquired through learning.
+</p>
+</div>

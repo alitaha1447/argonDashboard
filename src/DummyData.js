@@ -1165,7 +1165,7 @@ export const BCA2 = [
           //   time: "8:30",
           // },
           {
-            label: "Business Organization & Management", type: "pdf", pdf: 'BOM1stSem.pdf',
+            label: "Business Organization & Management", type: "pdf", pdf: 'Business_Organization_Management.pdf',
           },
           {
             label: "Image",
@@ -1772,165 +1772,169 @@ export const BCA2 = [
       },
     ],
   },
-  // {
-  //   subjectName: "Communicative Hindi & English",
-  //   units: [
-  //     {
-  //       unitNumber: "Unit-1",
-  //       unitTitle: "Language Skills & Presentation",
+  {
+    subjectName: "Communicative Hindi & English",
+    units: [
+      {
+        unitNumber: "Unit-1",
+        unitTitle: "Language Skills & Presentation",
 
-  //       // topics: [
-  //       //   {
-  //       //     label: "मानव शरीर परिचय You Tude Video",
-  //       //     type: "youtube",
-  //       //     mediaUrl:
-  //       //       "https://www.youtube.com/watch?v=s0g4ty29Xgg&list=PLBlnK6fEyqRh6isJ01MBnbNpV3ZsktSyS",
-  //       //     time: "2:30",
-  //       //   },
-  //       //   {
-  //       //     label: "मानव शरीर परिचय MP 4 Video",
-  //       //     type: "video",
-  //       //     mediaUrl:
-  //       //       "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
-  //       //     time: "8:30",
-  //       //   },
-  //       //   { label: "मानव शरीर परिचय PDF", type: "pdf" },
-  //       //   {
-  //       //     label: "मानव शरीर परिचय Image",
-  //       //     type: "image",
-  //       //     mediaUrl: require("assets/img/c.png"),
-  //       //   },
-  //       //   {
-  //       //     label: "मानव शरीर परिचय Ppt",
-  //       //     type: "ppt",
-  //       //   },
-  //       //   {
-  //       //     label: "मानव शरीर परिचय Text",
-  //       //     type: "text",
-  //       //   },
-  //       //   {
-  //       //     label: "मानव शरीर परिचय Link",
-  //       //     type: "link",
-  //       //   },
-  //       // ],
-  //     },
-  //     {
-  //       unitNumber: "Unit-2",
-  //       unitTitle: "Reading & Understanding",
-  //       // topics: [
-  //       //   {
-  //       //     label: "मानव शरीर परिचय You Tude Video",
-  //       //     type: "youtube",
-  //       //     mediaUrl:
-  //       //       "https://www.youtube.com/watch?v=s0g4ty29Xgg&list=PLBlnK6fEyqRh6isJ01MBnbNpV3ZsktSyS",
-  //       //     time: "2:30",
-  //       //   },
-  //       //   {
-  //       //     label: "मानव शरीर परिचय MP 4 Video",
-  //       //     type: "video",
-  //       //     mediaUrl:
-  //       //       "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
-  //       //     time: "8:30",
-  //       //   },
-  //       //   { label: "मानव शरीर परिचय PDF", type: "pdf" },
-  //       //   {
-  //       //     label: "मानव शरीर परिचय Image",
-  //       //     type: "image",
-  //       //     mediaUrl: require("assets/img/c.png"),
-  //       //   },
-  //       //   {
-  //       //     label: "मानव शरीर परिचय Ppt",
-  //       //     type: "ppt",
-  //       //   },
-  //       //   {
-  //       //     label: "मानव शरीर परिचय Text",
-  //       //     type: "text",
-  //       //   },
-  //       //   {
-  //       //     label: "मानव शरीर परिचय Link",
-  //       //     type: "link",
-  //       //   },
-  //       // ],
-  //     },
-  //     {
-  //       unitNumber: "Unit-3",
-  //       unitTitle: "Hindi language",
-  //       // topics: [
-  //       //   {
-  //       //     label: "मानव शरीर परिचय You Tude Video",
-  //       //     type: "youtube",
-  //       //     mediaUrl:
-  //       //       "https://www.youtube.com/watch?v=s0g4ty29Xgg&list=PLBlnK6fEyqRh6isJ01MBnbNpV3ZsktSyS",
-  //       //     time: "2:30",
-  //       //   },
-  //       //   {
-  //       //     label: "मानव शरीर परिचय MP 4 Video",
-  //       //     type: "video",
-  //       //     mediaUrl:
-  //       //       "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
-  //       //     time: "8:30",
-  //       //   },
-  //       //   { label: "मानव शरीर परिचय PDF", type: "pdf" },
-  //       //   {
-  //       //     label: "मानव शरीर परिचय Image",
-  //       //     type: "image",
-  //       //     mediaUrl: require("assets/img/c.png"),
-  //       //   },
-  //       //   {
-  //       //     label: "मानव शरीर परिचय Ppt",
-  //       //     type: "ppt",
-  //       //   },
-  //       //   {
-  //       //     label: "मानव शरीर परिचय Text",
-  //       //     type: "text",
-  //       //   },
-  //       //   {
-  //       //     label: "मानव शरीर परिचय Link",
-  //       //     type: "link",
-  //       //   },
-  //       // ],
-  //     },
-  //     {
-  //       unitNumber: "Unit-4",
-  //       unitTitle: "Language",
-  //       // topics: [
-  //       //   {
-  //       //     label: "मानव शरीर परिचय You Tude Video",
-  //       //     type: "youtube",
-  //       //     mediaUrl:
-  //       //       "https://www.youtube.com/watch?v=s0g4ty29Xgg&list=PLBlnK6fEyqRh6isJ01MBnbNpV3ZsktSyS",
-  //       //     time: "2:30",
-  //       //   },
-  //       //   {
-  //       //     label: "मानव शरीर परिचय MP 4 Video",
-  //       //     type: "video",
-  //       //     mediaUrl:
-  //       //       "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
-  //       //     time: "8:30",
-  //       //   },
-  //       //   { label: "मानव शरीर परिचय PDF", type: "pdf" },
-  //       //   {
-  //       //     label: "मानव शरीर परिचय Image",
-  //       //     type: "image",
-  //       //     mediaUrl: require("assets/img/c.png"),
-  //       //   },
-  //       //   {
-  //       //     label: "मानव शरीर परिचय Ppt",
-  //       //     type: "ppt",
-  //       //   },
-  //       //   {
-  //       //     label: "मानव शरीर परिचय Text",
-  //       //     type: "text",
-  //       //   },
-  //       //   {
-  //       //     label: "मानव शरीर परिचय Link",
-  //       //     type: "link",
-  //       //   },
-  //       // ],
-  //     },
+        topics: [
+          {
+            label: "Communication & Speaking Skills",
+            type: "youtube",
+            mediaUrl: 'https://www.youtube.com/watch?v=vULoIGxBYA4',
+            time: "2:30",
+          },
+          // {
+          //   label: "मानव शरीर परिचय MP 4 Video",
+          //   type: "video",
+          //   mediaUrl:
+          //     "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+          //   time: "8:30",
+          // },
+          { label: "Personality Skills", type: "pdf", pdf: 'Communication_and_Speaking_Skills.pdf' },
+          {
+            label: "Image",
+            type: "image",
+            imageUrl: require("assets/img/ChatGPT Image Aug 25, 2025, 11_11_57 AM.png"),
+          },
+          {
+            label: "Ppt",
+            type: "ppt",
+          },
+          {
+            label: "Speaking and Communication Skills",
+            type: "text",
+            file: 'text20.txt'
+          },
+          {
+            label: "Link",
+            type: "link",
+            mediaUrl: 'https://en.wikipedia.org/wiki/Communication'
+          },
+        ],
+      },
+      {
+        unitNumber: "Unit-2",
+        unitTitle: "Reading & Understanding",
+        topics: [
+          {
+            label: "Read Fast & Learn ",
+            type: "youtube",
+            mediaUrl: 'https://www.youtube.com/watch?v=37kJ-nWAo48',
+            time: "2:30",
+          },
+          // {
+          //   label: "Read Fast & Learn ",
+          //   type: "video",
+          //   mediaUrl:
+          //     "https://www.youtube.com/watch?v=37kJ-nWAo48",
+          //   time: "8:30",
+          // },
+          { label: "Importance of Reading & Understanding", type: "pdf", pdf: 'Reading_and_Understanding.pdf' },
+          {
+            label: "Image",
+            type: "image",
+            imageUrl: require("assets/img/ChatGPT Image Aug 25, 2025, 11_29_15 AM.png"),
+          },
+          {
+            label: "Ppt",
+            type: "ppt",
+          },
+          {
+            label: "Reading",
+            type: "text",
+            file: 'text21.txt'
+          },
+          {
+            label: "Reading to Understand",
+            type: "link",
+            mediaUrl: 'https://academicguides.waldenu.edu/reading-skills/reading-to-understand'
+          },
+        ],
+      },
+      {
+        unitNumber: "Unit-3",
+        unitTitle: "Hindi language",
+        topics: [
+          {
+            label: "Learn Hindi in 30 Minutes ",
+            type: "youtube",
+            mediaUrl: "https://www.youtube.com/watch?v=1lrz11BbqCA",
+            time: "2:30",
+          },
+          // {
+          //   label: "मानव शरीर परिचय MP 4 Video",
+          //   type: "video",
+          //   mediaUrl:
+          //     "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+          //   time: "8:30",
+          // },
+          { label: "Hindi Language", type: "pdf", pdf: 'Language.pdf' },
+          {
+            label: "Image",
+            type: "image",
+            imageUrl: require("assets/img/ChatGPT Image Aug 25, 2025, 11_33_26 AM.png"),
+          },
+          {
+            label: "Ppt",
+            type: "ppt",
+          },
+          {
+            label: "Hindi",
+            type: "text",
+            file: 'text22.txt'
+          },
+          {
+            label: "Modern Standard Hindi",
+            type: "link",
+            mediaUrl: 'https://en.wikipedia.org/wiki/Hindi'
+          },
+        ],
+      },
+      {
+        unitNumber: "Unit-4",
+        unitTitle: "Language",
+        topics: [
+          {
+            label: "What is Language? ",
+            type: "youtube",
+            mediaUrl: 'https://www.youtube.com/watch?v=eJWtL72_HC0',
+            time: "2:30",
+          },
+          // {
+          //   label: "मानव शरीर परिचय MP 4 Video",
+          //   type: "video",
+          //   mediaUrl:
+          //     "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+          //   time: "8:30",
+          // },
+          { label: "Language PDF", type: "pdf", pdf: 'Language.pdf' },
+          {
+            label: "Image",
+            type: "image",
+            imageUrl: require("assets/img/ChatGPT Image Aug 25, 2025, 11_38_56 AM.png"),
+          },
+          {
+            label: "Ppt",
+            type: "ppt",
+          },
+          {
+            label: "Language Text",
+            type: "text",
+            file: 'text22.txt'
+          },
+          {
+            label: "Language Wikipedia",
+            type: "link",
+            mediaUrl: 'https://en.wikipedia.org/wiki/Language'
+          },
+        ],
+      },
 
-  //   ],
-  // },
+    ],
+  },
 
 
 ];

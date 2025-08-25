@@ -75,6 +75,11 @@ const CourseViewer = () => {
   const [progress, setProgress] = useState(0);
   const [isSpeaking, setIsSpeaking] = useState(false);
 
+  const truncateText = (text, maxLength = 50) => {
+    if (!text) return "";
+    return text.length > maxLength ? text.substring(0, maxLength) + "..." : text;
+  };
+
   let totalTopics = 0;
   BCA2.forEach(subject => {
     subject.units.forEach(unit => {
@@ -126,7 +131,7 @@ const CourseViewer = () => {
     if (selectedTopic?.type === "text" && selectedTopic.file) {
       const fetchTextFile = async () => {
         try {
-          const response = await fetch(`${process.env.PUBLIC_URL}/${selectedTopic.file}`);
+          const response = await fetch(`${process.env.PUBLIC_URL}/assets/txt/${selectedTopic.file}`);
           if (!response.ok) throw new Error("File not found");
           const data = await response.text();
           setTextHtml1(data);
@@ -153,6 +158,8 @@ const CourseViewer = () => {
     }
     setFullText(textAccumulator.trim());
   }
+
+
 
   // Chunk helper (avoid very long utterances)
   function chunkText(text, size = 1600) {
@@ -294,7 +301,7 @@ const CourseViewer = () => {
               onClick={() => {
                 setIsFullscreen(true);
                 setSelectedPdf(
-                  `${process.env.PUBLIC_URL}/${selectedTopic.pdf}`
+                  `${process.env.PUBLIC_URL}/assets/pdf/${selectedTopic.pdf}`
                 );
               }}
               style={{
@@ -311,7 +318,7 @@ const CourseViewer = () => {
             </button>
 
             <Document
-              file={`${process.env.PUBLIC_URL}/${selectedTopic.pdf}`}
+              file={`${process.env.PUBLIC_URL}/assets/pdf/${selectedTopic.pdf}`}
               onLoadSuccess={onDocumentLoadSuccess}
             >
               {Array.from(new Array(numPages), (el, index) => (
@@ -629,18 +636,13 @@ const CourseViewer = () => {
       if (prev.includes(currKey)) return prev; // already completed
 
       const updated = [...prev, currKey];
-      console.log(updated)
       // ✅ Calculate progress
       const completedCount = updated.length;
-      console.log(completedCount)
       // const remaining = totalTopics - completedCount;
       const percentage = ((completedCount / totalTopics) * 100).toFixed(2);
-      console.log("Progress:", percentage + "%");
       setProgress(percentage)
 
-      // console.log("Completed:", completedCount);
-      // console.log("Remaining:", remaining);
-      // console.log("Progress:", percentage + "%");
+
 
       return updated;
     });
@@ -875,7 +877,7 @@ const CourseViewer = () => {
                               ? "2px solid #0d6efd"
                               : "1px solid #dee2e6",
                           maxHeight:
-                            expandedSubject === subjectIndex ? "none" : "80px",
+                            expandedSubject === subjectIndex ? "none" : "auto",
                           transition:
                             "max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
                           overflowY: "hidden",
@@ -893,7 +895,7 @@ const CourseViewer = () => {
                             style={{ cursor: "pointer" }}
                             onClick={() => toggleSubject(subjectIndex)}
                           >
-                            <strong>{subject.subjectName}</strong>
+                            <strong>{truncateText(subject.subjectName)}</strong>
                             <div className="d-flex align-items-center gap-1 text-muted small">
                               <MdOutlineTimer size={14} />
                               <span>2:30</span>
@@ -939,7 +941,7 @@ const CourseViewer = () => {
                                     <span style={{ opacity: 0.8 }}>
                                       {unit.unitNumber}:
                                     </span>
-                                    {unit.unitTitle}
+                                    {truncateText(unit.unitTitle)}
                                   </strong>
                                   <div className="d-flex align-items-center gap-2">
                                     <div
@@ -1379,7 +1381,7 @@ const CourseViewer = () => {
                                           {icon}
                                           <strong style={{ marginLeft: "0.5rem" }}>
 
-                                            {topic.label}</strong>
+                                            {truncateText(topic.label)}</strong>
                                           <div className="d-flex align-items-center gap-1 text-muted small">
                                             {topic?.time && (
                                               <>
