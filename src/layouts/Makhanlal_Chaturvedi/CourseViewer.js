@@ -76,11 +76,36 @@ const CourseViewer = () => {
   const [fullText, setFullText] = useState("");
   const [progress, setProgress] = useState(0);
   const [isSpeaking, setIsSpeaking] = useState(false);
+  const [loading, setLoading] = useState(false);
+
 
   const truncateText = (text, maxLength = 50) => {
     if (!text) return "";
     return text.length > maxLength ? text.substring(0, maxLength) + "..." : text;
   };
+
+  const Loader = () => (
+    <div style={{
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      height: "100%",
+      width: "100%",
+    }}>
+      <span style={{
+        border: "4px solid #f3f3f3",
+        borderTop: "4px solid #5E72E4",
+        borderRadius: "50%",
+        width: "40px",
+        height: "40px",
+        animation: "spin 1s linear infinite"
+      }} />
+      <style>
+        {`@keyframes spin { 100% { transform: rotate(360deg); } }`}
+      </style>
+    </div>
+  );
+
 
   let totalTopics = 0;
   BCA2.forEach(subject => {
@@ -237,20 +262,31 @@ const CourseViewer = () => {
     }
   };
 
+  useEffect(() => {
+    if (selectedTopic) {
+      setLoading(true);   // start loader whenever topic changes
+    }
+  }, [selectedTopic]);
+
   const renderMedia = () => {
     if (!selectedTopic) return <p>Select a topic to view its content.</p>;
     switch (selectedTopic.type) {
       case "youtube":
         return (
           // <div className="react-player-wrapper">
-          <ReactPlayer
-            src={selectedTopic.mediaUrl}
-            controls
-            width="100%"
-            height="100%"
-            className="react-player"
-            style={{ borderRadius: "12px" }}
-          />
+          <>
+            {/* {loading && <Loader />} */}
+            <ReactPlayer
+              src={selectedTopic.mediaUrl}
+              controls
+              width="100%"
+              height="100%"
+              onReady={() => setLoading(false)}     // ⬅️ when player is ready
+              onError={() => setLoading(false)}
+              className="react-player"
+              style={{ borderRadius: "12px" }}
+            />
+          </>
           // </div>
         );
       case "video":
@@ -271,82 +307,94 @@ const CourseViewer = () => {
 
       case "image":
         return (
-          <img
-            src={selectedTopic.imageUrl}
-            alt="Lesson Visual"
-            style={{
-              width: "100%",
-              height: "100%",
-              objectFit: "contain",
-              borderRadius: "12px",
-            }}
-          />
+          <>
+            {loading && <Loader />}
+            <img
+              src={selectedTopic.imageUrl}
+              alt="Lesson Visual"
+              onLoad={() => setLoading(false)}   // ⬅️ when image finishes loading
+              onError={() => setLoading(false)}  // ⬅️ in case of error
+              style={{
+                width: "100%",
+                height: "100%",
+                objectFit: "contain",
+                borderRadius: "12px",
+              }}
+            />
+          </>
         );
       case "pdf":
         return (
           // <DocViewer documents={docs2} pluginRenderers={DocViewerRenderers} />
-
-          <div
-            ref={ref}
-            style={{
-              width: "100%",
-              height: "100%",
-              overflowY: "scroll",
-              position: "relative",
-            }}
-          >
-            <button onClick={speakText} disabled={isSpeaking || !fullText}>Play</button>
-            <button onClick={stopSpeech} disabled={!isSpeaking}>Stop</button>
-
-
-            <button
-              onClick={() => {
-                setIsFullscreen(true);
-                setSelectedPdf(
-                  `${process.env.PUBLIC_URL}/assets/pdf/${selectedTopic.pdf}`
-                );
-              }}
+          <>
+            {loading && <Loader />}
+            <div
+              ref={ref}
               style={{
-                position: "absolute",
-                top: 10,
-                right: 10,
-                zIndex: 10,
-                border: "none",
-                borderRadius: "4px",
-                cursor: "pointer",
+                width: "100%",
+                height: "100%",
+                overflowY: "scroll",
+                position: "relative",
               }}
             >
-              <MdOutlineZoomOutMap />
-            </button>
+              <button onClick={speakText} disabled={isSpeaking || !fullText}>Play</button>
+              <button onClick={stopSpeech} disabled={!isSpeaking}>Stop</button>
 
-            <Document
-              file={`${process.env.PUBLIC_URL}/assets/pdf/${selectedTopic.pdf}`}
-              onLoadSuccess={onDocumentLoadSuccess}
-            >
-              {Array.from(new Array(numPages), (el, index) => (
-                <Page key={`page_${index + 1}`} pageNumber={index + 1} width={width} />
-              ))}
-            </Document>
 
-            {/* <div style={{ marginTop: 20 }}>
+              <button
+                onClick={() => {
+                  setIsFullscreen(true);
+                  setSelectedPdf(
+                    `${process.env.PUBLIC_URL}/assets/pdf/${selectedTopic.pdf}`
+                  );
+                }}
+                style={{
+                  position: "absolute",
+                  top: 10,
+                  right: 10,
+                  zIndex: 10,
+                  border: "none",
+                  borderRadius: "4px",
+                  cursor: "pointer",
+                }}
+              >
+                <MdOutlineZoomOutMap />
+              </button>
+
+              <Document
+                file={`${process.env.PUBLIC_URL}/assets/pdf/${selectedTopic.pdf}`}
+                onLoadSuccess={(pdf) => {
+                  setLoading(false);                  // ⬅️ stop loader when PDF is loaded
+                  onDocumentLoadSuccess(pdf);
+                }}
+                onLoadError={() => setLoading(false)}
+              // loading={<Loader />}
+              >
+                {Array.from(new Array(numPages), (el, index) => (
+                  <Page key={`page_${index + 1}`} pageNumber={index + 1} width={width} />
+                ))}
+              </Document>
+
+              {/* <div style={{ marginTop: 20 }}>
               <button onClick={speakText} disabled={isSpeaking || !fullText}>
-                Play
+              Play
               </button>
               <button onClick={stopSpeech} disabled={!isSpeaking}>
                 Stop
               </button>
             </div> */}
-            {/* <div style={{ margin: "20px" }}>
+              {/* <div style={{ margin: "20px" }}>
                    <button onClick={extractAndSpeakText} disabled={isSpeaking}>
                      {isSpeaking ? "Speaking..." : "Read PDF"}
                    </button>
                    {isSpeaking && (
                      <button onClick={stopSpeaking} style={{ marginLeft: "10px" }}>
-                       Stop
+                     Stop
                      </button>
-                   )}
+                     )}
                  </div> */}
-          </div>
+            </div>
+          </>
         );
 
       case "pptx":
@@ -380,20 +428,26 @@ const CourseViewer = () => {
         );
       case "link":
         return (
-          <div
-            style={{
-              width: "100%",
-              height: "100%",
-              border: "1px solid #ccc",
-            }}
-          >
-            <Iframe
-              url={selectedTopic.mediaUrl}
-              width="100%"
-              height="100%"
-              allowFullScreen
-            />
-          </div>
+          <>
+            {loading && <Loader />}
+
+            <div
+              style={{
+                width: "100%",
+                height: "100%",
+                border: "1px solid #ccc",
+              }}
+            >
+              <Iframe
+                url={selectedTopic.mediaUrl}
+                width="100%"
+                height="100%"
+                allowFullScreen
+                onLoad={() => setLoading(false)}      // ⬅️ when iframe loads
+                onError={() => setLoading(false)}
+              />
+            </div>
+          </>
         );
 
       default:
