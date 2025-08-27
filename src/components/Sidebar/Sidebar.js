@@ -260,8 +260,8 @@ const Sidebar = (props) => {
         .filter(
           (route) =>
             route.name !== "Login" &&
-            route.name !== "Register" &&
-            route.showInSidebar !== false
+            route.name !== "Register"
+          // && route.showInSidebar !== false
         ) // 👈 Exclude these
         .filter(
           (route) =>
@@ -294,9 +294,8 @@ const Sidebar = (props) => {
                     <i className={route.icon} />
                     <span className="ml-0">{route.name}</span>
                     <i
-                      className={`ml-auto fas fa-chevron-${
-                        openDropdowns[route.id] ? "up" : "down"
-                      }`}
+                      className={`ml-auto fas fa-chevron-${openDropdowns[route.id] ? "up" : "down"
+                        }`}
                     />
                   </div>
                   <Collapse isOpen={openDropdowns[route.id]}>

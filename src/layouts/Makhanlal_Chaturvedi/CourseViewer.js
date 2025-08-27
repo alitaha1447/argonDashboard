@@ -76,8 +76,8 @@ const CourseViewer = () => {
   const [fullText, setFullText] = useState("");
   const [progress, setProgress] = useState(0);
   const [isSpeaking, setIsSpeaking] = useState(false);
+  // const [loading, setLoading] = useState(false);
   const [loading, setLoading] = useState(false);
-
 
   const truncateText = (text, maxLength = 50) => {
     if (!text) return "";
@@ -264,9 +264,45 @@ const CourseViewer = () => {
 
   useEffect(() => {
     if (selectedTopic) {
-      setLoading(true);   // start loader whenever topic changes
+      setLoading(true);
+      console.log(loading)
     }
   }, [selectedTopic]);
+
+  // useEffect(() => {
+  //   if (!selectedTopic) return;
+
+  //   // Turn loader ON for async types only
+  //   if (["link"].includes(selectedTopic.type)) {
+  //     setLoading(true);
+  //   } else {
+  //     // For instant types (text, pptx, etc.), force it off
+  //     setLoading(false);
+  //   }
+  // }, [selectedTopic]);
+
+
+  const Frame = ({ children }) => (
+    <div style={{ position: "relative", width: "100%", height: "100%" }}>
+      {loading && (
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            background: "rgba(255,255,255,0.6)",
+            zIndex: 2
+          }}
+        >
+          <Loader />
+        </div>
+      )}
+      {children}
+    </div>
+  );
+
 
   const renderMedia = () => {
     if (!selectedTopic) return <p>Select a topic to view its content.</p>;
@@ -275,17 +311,19 @@ const CourseViewer = () => {
         return (
           // <div className="react-player-wrapper">
           <>
-            {/* {loading && <Loader />} */}
+            {/* <Frame> */}
+
             <ReactPlayer
               src={selectedTopic.mediaUrl}
               controls
               width="100%"
               height="100%"
-              onReady={() => setLoading(false)}     // ⬅️ when player is ready
-              onError={() => setLoading(false)}
+              // onReady={() => setLoading(false)}     // ⬅️ when player is ready
+              // onError={() => setLoading(false)}
               className="react-player"
               style={{ borderRadius: "12px" }}
             />
+            {/* </Frame> */}
           </>
           // </div>
         );
@@ -308,12 +346,11 @@ const CourseViewer = () => {
       case "image":
         return (
           <>
-            {loading && <Loader />}
             <img
               src={selectedTopic.imageUrl}
               alt="Lesson Visual"
-              onLoad={() => setLoading(false)}   // ⬅️ when image finishes loading
-              onError={() => setLoading(false)}  // ⬅️ in case of error
+              // onLoad={() => setLoading(false)}   // ⬅️ when image finishes loading
+              // onError={() => setLoading(false)}  // ⬅️ in case of error
               style={{
                 width: "100%",
                 height: "100%",
@@ -327,7 +364,7 @@ const CourseViewer = () => {
         return (
           // <DocViewer documents={docs2} pluginRenderers={DocViewerRenderers} />
           <>
-            {loading && <Loader />}
+
             <div
               ref={ref}
               style={{
@@ -335,10 +372,11 @@ const CourseViewer = () => {
                 height: "100%",
                 overflowY: "scroll",
                 position: "relative",
+
               }}
             >
-              <button onClick={speakText} disabled={isSpeaking || !fullText}>Play</button>
-              <button onClick={stopSpeech} disabled={!isSpeaking}>Stop</button>
+              <button onClick={speakText} style={{ margin: "10px", padding: "5px 10px", borderRadius: '10px', cursor: "pointer" }} disabled={isSpeaking || !fullText}> 🔊</button>
+              <button onClick={stopSpeech} style={{ margin: "10px", padding: "5px 10px", borderRadius: '10px', cursor: "pointer" }} disabled={!isSpeaking}> ⏹</button>
 
 
               <button
@@ -363,12 +401,7 @@ const CourseViewer = () => {
 
               <Document
                 file={`${process.env.PUBLIC_URL}/assets/pdf/${selectedTopic.pdf}`}
-                onLoadSuccess={(pdf) => {
-                  setLoading(false);                  // ⬅️ stop loader when PDF is loaded
-                  onDocumentLoadSuccess(pdf);
-                }}
-                onLoadError={() => setLoading(false)}
-              // loading={<Loader />}
+                onLoadSuccess={(pdf) => { onDocumentLoadSuccess(pdf); }}
               >
                 {Array.from(new Array(numPages), (el, index) => (
                   <Page key={`page_${index + 1}`} pageNumber={index + 1} width={width} />
@@ -394,6 +427,7 @@ const CourseViewer = () => {
                      )}
                  </div> */}
             </div>
+
           </>
         );
 
@@ -403,6 +437,7 @@ const CourseViewer = () => {
         );
       case "text":
         return (
+
           <div
             style={{
               width: "100%",
@@ -413,40 +448,34 @@ const CourseViewer = () => {
           >
             <button
               onClick={() => speakText1(textHtml1.replace(/<[^>]+>/g, ""))}
-              style={{ margin: "10px", padding: "6px 12px", cursor: "pointer" }}
+              style={{ margin: "10px", padding: "5px 10px", borderRadius: '10px', cursor: "pointer" }}
             >
               🔊
             </button>
             <button
               onClick={stopSpeech1}
-              style={{ margin: "10px", padding: "6px 12px", cursor: "pointer" }}
+              style={{ margin: "10px", padding: "5px 10px", borderRadius: '10px', cursor: "pointer" }}
             >
               ⏹
             </button>
             {parse(textHtml1)}
           </div>
+
         );
       case "link":
         return (
           <>
-            {loading && <Loader />}
-
-            <div
-              style={{
-                width: "100%",
-                height: "100%",
-                border: "1px solid #ccc",
-              }}
-            >
-              <Iframe
-                url={selectedTopic.mediaUrl}
-                width="100%"
-                height="100%"
-                allowFullScreen
-                onLoad={() => setLoading(false)}      // ⬅️ when iframe loads
-                onError={() => setLoading(false)}
-              />
-            </div>
+            <Frame>
+              <div style={{ width: "100%", height: "100%", border: "1px solid #ccc" }}>
+                <Iframe
+                  url={selectedTopic.mediaUrl}
+                  width="100%"
+                  height="100%"
+                  onLoad={() => setLoading(false)}
+                  onError={() => setLoading(false)}
+                />
+              </div>
+            </Frame>
           </>
         );
 
@@ -1524,6 +1553,51 @@ const CourseViewer = () => {
           textAlign: "center"
         }}
       />
+      {isFullscreen && selectedPdf && (
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: "#fff",
+            zIndex: 9999,
+            overflowY: "auto",
+            padding: 20,
+          }}
+        >
+          Close Fullscreen Button
+          <button
+            onClick={() => {
+              setIsFullscreen(false);
+              setSelectedPdf(null);
+            }}
+            style={{
+              position: "fixed",
+              top: 20,
+              right: 20,
+              zIndex: 10000,
+              border: "none",
+              borderRadius: 4,
+              fontSize: 14,
+              cursor: "pointer",
+            }}
+          >
+            <MdOutlineZoomInMap />
+          </button>
+
+          <Document file={selectedPdf} onLoadSuccess={onDocumentLoadSuccess}>
+            {Array.from(new Array(numPages), (_, index) => (
+              <Page
+                key={`page_${index + 1}`}
+                pageNumber={index + 1}
+                width={window.innerWidth - 40}
+              />
+            ))}
+          </Document>
+        </div>
+      )}
     </div>
   );
 };

@@ -44,7 +44,31 @@ const CourseMasterModal = ({ modal, toggle, refreshList, course }) => {
     }
   }, [modal, course]);
 
+  const validate = () => {
+    const name = courseName.trim();
+    const desc = courseDescription.trim();
+    const seq = String(courseSequence).trim();
+
+    if (!name) {
+      toast.error("Course Name is required");
+      return false;
+    }
+    if (!desc) {
+      toast.error("Description is required");
+      return false;
+    }
+    if (seq) {
+      const n = Number(seq);
+      if (!Number.isInteger(n) || n <= 0) {
+        toast.error("Course Sequence must be a positive integer");
+        return false;
+      }
+    }
+    return true;
+  };
+
   const handleSubmit = async () => {
+    if (!validate()) return;
     setLoading(true);
 
     const courseData = {

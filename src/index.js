@@ -26,6 +26,7 @@ import AtalBihariCourseViewer from "layouts/Atal_Bihari/CourseViewer";
 import PrivateRoute from "PrivateRoute";
 import PublicRoute from "PublicRoute";
 import App from "./App.js";
+// import NetworkError from "utils/NetworkError/NetworkError";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 
@@ -37,6 +38,8 @@ root.render(
     <PersistGate loading={null} persistor={persistor}>
       {/* <GoogleOAuthProvider clientId={CLIENT_ID}> */}
       <BrowserRouter>
+        {/* <NetworkError /> */}
+
         <Routes>
           {/* <Route path="/admin/*" element={<AdminLayout />} /> */}
           <Route
