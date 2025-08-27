@@ -19,10 +19,10 @@ import EnquiryForm from "layouts/EnquiryForm";
 // import FaceDetection from "layouts/FaceDetection";
 import HumanFaceDetection from "layouts/HumanFaceDetection";
 import Receipt from "layouts/receipt/Receipt";
-import CourseViewer from "layouts/courseViewer/CourseViewer";
-import CourseViewer2 from "layouts/courseViewer2/CourseViewer2";
+// import CourseViewer from "layouts/courseViewer/CourseViewer";
+// import CourseViewer2 from "layouts/courseViewer2/CourseViewer2";
 import MakhanlalCourseViewer from "layouts/Makhanlal_Chaturvedi/CourseViewer";
-import AtalBihariCourseViewer from "layouts/Atal_Bihari/CourseViewer";
+// import AtalBihariCourseViewer from "layouts/Atal_Bihari/CourseViewer";
 import PrivateRoute from "PrivateRoute";
 import PublicRoute from "PublicRoute";
 import App from "./App.js";
@@ -63,16 +63,16 @@ root.render(
           <Route path="/enquiryForm" element={<EnquiryForm />} />
           {/* <Route path="/faceDetection" element={<FaceDetection />} /> */}
           <Route path="/humanFaceDetection" element={<HumanFaceDetection />} />
-          <Route path="/courseViewer" element={<CourseViewer />} />
-          <Route path="/courseViewer2" element={<CourseViewer2 />} />
+          {/* <Route path="/courseViewer" element={<CourseViewer />} /> */}
+          {/* <Route path="/courseViewer2" element={<CourseViewer2 />} /> */}
           <Route
             path="/makhanlal/courseViewer"
             element={<MakhanlalCourseViewer />}
           />
-          <Route
+          {/* <Route
             path="atal/courseViewer"
             element={<AtalBihariCourseViewer />}
-          />
+          /> */}
           <Route path="/receiptForm" element={<Receipt />} />
           {/* <Route path="*" element={<Navigate to="/receiptForm" replace />} /> */}
           {/* <Route path="*" element={<Navigate to="/admin/index" replace />} /> */}

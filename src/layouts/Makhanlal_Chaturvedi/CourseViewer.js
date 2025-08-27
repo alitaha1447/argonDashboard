@@ -1,4 +1,5 @@
-import "layouts/courseViewer/CourseViewer.css";
+// import "layouts/Makhanlal_Chaturvedi/CourseViewer.css";
+import '../Makhanlal_Chaturvedi/MakhanlalCourseViewer.css'
 import React, { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Container, Row, Col, Button, Progress } from "reactstrap";
