@@ -1,6 +1,7 @@
 .course-viewer-wrapper {
   min-height: 100vh;
-  background: #ebd0d0;
+  background: #d41919;
+  display: "flex";
 }
 
 .lesson-item:hover {
@@ -12,23 +13,44 @@
 }
 
 .video-wrapper {
-  aspect-ratio: 16 / 9;
   width: 100%;
+  min-height: 300px;
+  height: clamp(320px, 60dvh, 78dvh);
 
-  /* background: #000; */
+}
+
+.hide-scrollbar {
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+
+/* Keep */
+.user-modal {
+  animation: fadeSlideDown 0.5s ease forwards;
+  opacity: 0;
+  transform: translateY(-15px);
+}
+
+@keyframes fadeSlideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-15px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @media (max-width: 425px) {
   .now-playing-heading {
     font-size: 1.15rem;
-    /* Smaller heading */
   }
 
   .now-playing-button {
     padding: 0.3rem 0.8rem;
-    /* Tighter button padding */
     font-size: 12px;
-    /* Smaller button text */
   }
 }
 
@@ -40,9 +62,7 @@
 
   .now-playing-button {
     padding: 0.25rem 0.5rem;
-    /* Tighter button padding */
     font-size: 12px;
-    /* Smaller button text */
   }
 }
 
@@ -67,7 +87,6 @@
 @media (max-width: 768px) {
   .responsive-now-playing {
     height: 1000px !important;
-    /* or whatever height works well on small screens */
   }
 }
 
@@ -78,39 +97,11 @@
 }
 
 .hide-scrollbar::-webkit-scrollbar {
-  display: none;
+  /* display: none; */
   /* Chrome, Safari */
 }
 
-/* .expand-wrapper {
-  overflow: hidden;
-  max-height: 0;
-  transition: max-height 0.4s ease-in-out;
-}
 
-.expand-wrapper.open {
-  max-height: 1000px;
-} */
-
-/* .comment-box {
-  margin-top: 0.5rem;
-  background: #f8f9fa;
-  border-radius: 8px;
-  padding: 1rem;
-} */
-
-/* Fade and slide down animation */
-@keyframes fadeSlideDown {
-  from {
-    opacity: 0;
-    transform: translateY(-15px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
 
 /* Modal container with transition */
 .user-modal {
@@ -119,12 +110,7 @@
   transform: translateY(-15px);
 }
 
-/* .user-modal.show {
-  opacity: 1;
-  transform: translateY(0);
-} */
 
-/* Small screen tweaks */
 @media (max-width: 576px) {
   .user-modal {
     padding: 0.75rem !important;
@@ -186,25 +172,4 @@
   margin-bottom: 8px;
   cursor: pointer;
   font-size: 18px;
-}
-
-/* Tick Icon */
-.tickIcon {
-  display: inline-flex;
-  /* keeps icon centered */
-  align-items: center;
-  justify-content: center;
-  background-color: #28a745;
-  /* green */
-  border-radius: 50%;
-  /* makes it round */
-  color: white;
-  /* icon color */
-  width: 20px;
-  /* size of circle */
-  height: 20px;
-  font-size: 14px;
-  /* icon size */
-  margin-right: 6px;
-  /* space between icon and text */
 }

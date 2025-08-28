@@ -313,20 +313,20 @@ const CourseViewer = () => {
           // <div className="react-player-wrapper">
           <>
             {/* <Frame> */}
-
-            <ReactPlayer
-              src={selectedTopic.mediaUrl}
-              controls
-              width="100%"
-              height="100%"
-              // onReady={() => setLoading(false)}     // ⬅️ when player is ready
-              // onError={() => setLoading(false)}
-              className="react-player"
-              style={{ borderRadius: "12px" }}
-            />
-            {/* </Frame> */}
+            <div style={{ position: "absolute", inset: 0, borderRadius: 12, overflow: "hidden" }}>
+              <ReactPlayer
+                src={selectedTopic.mediaUrl}
+                controls
+                width="100%"
+                height="100%"
+                // onReady={() => setLoading(false)}     // ⬅️ when player is ready
+                // onError={() => setLoading(false)}
+                className="react-player"
+                style={{ borderRadius: "12px" }}
+              />
+              {/* </Frame> */}
+            </div>
           </>
-          // </div>
         );
       case "video":
         return (
@@ -347,18 +347,15 @@ const CourseViewer = () => {
       case "image":
         return (
           <>
-            <img
-              src={selectedTopic.imageUrl}
-              alt="Lesson Visual"
-              // onLoad={() => setLoading(false)}   // ⬅️ when image finishes loading
-              // onError={() => setLoading(false)}  // ⬅️ in case of error
-              style={{
-                width: "100%",
-                height: "100%",
-                objectFit: "contain",
-                borderRadius: "12px",
-              }}
-            />
+            <div style={{ position: "absolute", inset: 0 }}>
+              <img
+                src={selectedTopic.imageUrl}
+                alt="Lesson Visual"
+                // onLoad={() => setLoading(false)}   // ⬅️ when image finishes loading
+                // onError={() => setLoading(false)}  // ⬅️ in case of error
+                style={{ width: "100%", height: "100%", objectFit: "contain", borderRadius: 12 }}
+              />
+            </div>
           </>
         );
       case "pdf":
@@ -369,10 +366,10 @@ const CourseViewer = () => {
             <div
               ref={ref}
               style={{
-                width: "100%",
-                height: "100%",
-                overflowY: "scroll",
-                position: "relative",
+                position: "absolute",
+                inset: 0,
+                overflowY: "auto",
+                padding: 8,
 
               }}
             >
@@ -467,7 +464,7 @@ const CourseViewer = () => {
         return (
           <>
             <Frame>
-              <div style={{ width: "100%", height: "100%", border: "1px solid #ccc" }}>
+              <div style={{ position: "absolute", inset: 0, border: "1px solid #ccc" }}>
                 <Iframe
                   url={selectedTopic.mediaUrl}
                   width="100%"
@@ -762,15 +759,15 @@ const CourseViewer = () => {
 
   return (
     <div className="course-viewer-wrapper py-2">
-      <Container fluid>
-        <Row className="gx-3 gy-3">
+      <Container fluid className="flex-grow-1">
+        <Row className="gx-3 gy-3 h-100 align-items-stretch">
           {/* Main Content Area */}
-          <Col lg={8} md={12}>
+          <Col lg={8} md={12} className="d-flex flex-column" style={{ minHeight: 0 }}>
             <div
               ref={mediaRef}
-              className="rounded-3 shadow-sm p-3"
+              className="rounded-3 shadow-sm p-3 d-flex flex-column flex-grow-1"
               style={{
-                background: "#eee9dbff",
+                background: "#eee9dbff", minHeight: 0
               }}
             >
               <div className="mb-3 d-flex flex-sm-row justify-content-between align-items-center align-items-sm-start">
@@ -800,17 +797,18 @@ const CourseViewer = () => {
                   </Button>
                 </div>
               </div>
-              <div className="video-wrapper rounded-3 mb-3 h-100">
+              <div className="video-wrapper rounded-3 mb-3 flex-grow-1 position-relative"
+                style={{ minHeight: 0 }}>
                 {renderMedia()}
               </div>
             </div>
           </Col>
 
           {/* Sidebar */}
-          <Col lg={4} md={12}>
+          <Col lg={4} md={12} className="d-flex flex-column" style={{ minHeight: 0 }}>
             <div
-              className="rounded-3 shadow-sm p-3 "
-              style={{ background: "#eee9dbff", height: "100%" }}
+              className="rounded-3 shadow-sm p-3 d-flex flex-column flex-grow-1"
+              style={{ background: "#eee9dbff", minHeight: 0 }}
             >
               <div className="mb-4">
                 <div className="d-flex justify-content-between align-items-center">
@@ -937,14 +935,12 @@ const CourseViewer = () => {
               <div
                 className="overflow-auto hide-scrollbar"
                 style={{
-                  height: "60dvh", // was 60vh
-                  overflow: "auto", // covers both X/Y
-                  overscrollBehavior: "auto", // remove the 'contain' shorthand conflict
+                  height: "60dvh",
+                  minHeight: 0,
+                  overflow: "auto",
                   WebkitOverflowScrolling: "touch",
-                  minHeight: 0, // keep this
-                  touchAction: "pan-y", // new: helps on touch devices
-                  scrollbarWidth: "thin", // fine (Firefox)
-                  scrollbarGutter: "stable", // optional: prevents small jumps
+                  scrollbarWidth: "thin",
+                  scrollbarGutter: "stable",
                 }}
               >
 

@@ -1157,13 +1157,13 @@ export const BCA2 = [
             time: "2:30",
             ppt: require('assets/files/manav_sharir_parichay.pptx'),
           },
-          // {
-          //   label: "Foundation of Indian business",
-          //   type: "video",
-          //   mediaUrl:
-          //     "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
-          //   time: "8:30",
-          // },
+          {
+            label: "Foundation of Indian business",
+            type: "video",
+            mediaUrl:
+              "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+            time: "8:30",
+          },
           {
             label: "Business Organization & Management", type: "pdf", pdf: 'Business_Organization_Management.pdf',
           },
