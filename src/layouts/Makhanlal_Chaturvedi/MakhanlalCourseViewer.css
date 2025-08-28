@@ -1,6 +1,6 @@
 .course-viewer-wrapper {
   min-height: 100vh;
-  background: #d41919;
+  background: #ebd0d0;
   display: "flex";
 }
 
@@ -14,9 +14,9 @@
 
 .video-wrapper {
   width: 100%;
-  min-height: 300px;
-  height: clamp(320px, 60dvh, 78dvh);
-
+  aspect-ratio: 16 / 9;
+  /* min-height: 300px; */
+  /* height: clamp(320px, 60dvh, 78dvh); */
 }
 
 .hide-scrollbar {

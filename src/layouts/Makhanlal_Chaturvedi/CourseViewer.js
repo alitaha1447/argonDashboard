@@ -366,10 +366,14 @@ const CourseViewer = () => {
             <div
               ref={ref}
               style={{
-                position: "absolute",
-                inset: 0,
-                overflowY: "auto",
-                padding: 8,
+                // position: "absolute",
+                // inset: 0,
+                // overflowY: "auto",
+                // padding: 8,
+                width: "100%",
+                height: "100%",
+                overflowY: "scroll",
+                position: "relative",
 
               }}
             >
@@ -760,7 +764,7 @@ const CourseViewer = () => {
   return (
     <div className="course-viewer-wrapper py-2">
       <Container fluid className="flex-grow-1">
-        <Row className="gx-3 gy-3 h-100 align-items-stretch">
+        <Row className="gx-3 gy-3 h-100">
           {/* Main Content Area */}
           <Col lg={8} md={12} className="d-flex flex-column" style={{ minHeight: 0 }}>
             <div
@@ -805,7 +809,7 @@ const CourseViewer = () => {
           </Col>
 
           {/* Sidebar */}
-          <Col lg={4} md={12} className="d-flex flex-column" style={{ minHeight: 0 }}>
+          <Col lg={4} md={12} className="d-flex flex-column" style={{ minHeight: "calc(100vh - 1rem)" }}>
             <div
               className="rounded-3 shadow-sm p-3 d-flex flex-column flex-grow-1"
               style={{ background: "#eee9dbff", minHeight: 0 }}
