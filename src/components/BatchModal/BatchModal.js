@@ -59,8 +59,8 @@ const BatchModal = ({
   modal,
   toggle,
   studentID,
-  refreshList = () => {},
-  resetSelected = () => {},
+  refreshList = () => { },
+  resetSelected = () => { },
 }) => {
   const userId = useSelector((state) => state?.auth?.id);
   const storedBranches = useSelector((state) => state.auth.selectedBranch);
