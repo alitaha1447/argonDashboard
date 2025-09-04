@@ -19,15 +19,15 @@ import axios from "axios";
 import Human from "@vladmandic/human";
 import { toast, ToastContainer } from "react-toastify";
 import Header from "components/Headers/Header";
+import { formatDateToDMY } from "utils/formattedDate/formatDateToDMY";
 
 const API_PATH = process.env.REACT_APP_API_PATH;
 const API_KEY = process.env.REACT_APP_API_KEY;
 
 const Attendance = () => {
   const navigate = useNavigate();
-  const { name, email, mobileno, selectedBranch, isorganisational } =
+  const { id, name, email, mobileno, selectedBranch, isorganisational } =
     useSelector((state) => state?.auth);
-  // console.log(selectedBranch?.value);
   const [studentBatch, setStudentBatch] = useState([]);
   const [isProcessing, setIsProcessing] = useState(false);
   const [modal, setModal] = useState(false);
@@ -62,10 +62,9 @@ const Attendance = () => {
         const res = await axios.get(`${API_PATH}/api/Get_Student_Batch`, {
           params: {
             APIKEY: API_KEY,
-            studentid: 2559,
+            studentid: id,
           },
         });
-        // console.log(res);
         setStudentBatch(res?.data);
       } catch (err) {
         console.error("Error fetching student batch:", err);
@@ -96,14 +95,12 @@ const Attendance = () => {
       isapprove: 1,
       branchid: selectedBranch?.value,
     };
-    // console.log(attendedData);
     try {
       const res = await axios.post(`${API_PATH}/api/Attendance`, attendedData, {
         params: {
           APIKEY: API_KEY,
         },
       });
-      console.log(res?.data);
       toast("Attendace Done!!!");
     } catch (err) {
       console.error("Error fetching student batch:", err);
@@ -142,7 +139,6 @@ const Attendance = () => {
   };
 
   const detectFaces = async () => {
-    console.log("Starting detection...");
     setIsProcessing(true); // Show loader here
     if (!isDetectingRef.current || !videoRef.current || !canvasRef.current)
       return;
@@ -250,7 +246,7 @@ const Attendance = () => {
                         <strong>Description:</strong> {item.Description}
                       </CardText>
                       <CardText className="">
-                        <strong>Date:</strong> {item.StartDate}
+                        <strong>Date:</strong> {formatDateToDMY(item.StartDate)}
                       </CardText>
                       <div>
 
